@@ -19,6 +19,7 @@ use PHPUnit\Framework\MockObject\Exception;
 
 use PHPUnit\Framework\TestCase;
 
+use function rawurlencode;
 use function sprintf;
 
 #[CoversClass(LocationApi::class)]
@@ -225,6 +226,42 @@ final class LocationApiTest extends TestCase
         // Second call for the same locationId is served from the cache without hitting the API.
         self::assertSame($location, $locationApi->getOneById('test-location-id'));
         self::assertSame($location, $locationApi->getOneById('test-location-id'));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    #[TestWith(['a/b c'])]
+    #[TestWith(['../../locations'])]
+    public function testGetOneByIdEncodesId(string $locationId): void
+    {
+        $data = ['test-location-data'];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->method('get')
+            ->with(
+                sprintf(LocationApiInterface::API_URL_SPRINTF, rawurlencode($locationId)),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $location = self::createStub(LocationInterface::class);
+
+        $locationTransformer = self::createMock(LocationTransformerInterface::class);
+        $locationTransformer->method('transform')
+            ->with($data)
+            ->willReturn($location);
+
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
+
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
+        $actual = $locationApi->getOneById($locationId);
+
+        self::assertSame($location, $actual);
     }
 
     /**

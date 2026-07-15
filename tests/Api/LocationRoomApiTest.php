@@ -20,6 +20,7 @@ use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
+use function rawurlencode;
 use function sprintf;
 
 #[CoversClass(LocationRoomApi::class)]
@@ -178,6 +179,44 @@ final class LocationRoomApiTest extends TestCase
 
         $roomApi = new LocationRoomApi($requestSender, $roomTransformer, 'test-api-token');
         $actual = $roomApi->getOneByLocationAndId($location, 'test-room-id');
+
+        self::assertSame($room, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    #[TestWith(['a/b c', 'x/y z'])]
+    #[TestWith(['../../locations', '../../rooms'])]
+    public function testGetOneByLocationAndIdEncodesIds(string $locationId, string $roomId): void
+    {
+        $data = ['test-room-data'];
+
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn($locationId);
+
+        $room = self::createStub(LocationRoomInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->method('get')
+            ->with(
+                sprintf(LocationRoomApiInterface::API_URL_SPRINTF, rawurlencode($locationId), rawurlencode($roomId)),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $roomTransformer = self::createMock(LocationRoomTransformerInterface::class);
+        $roomTransformer->method('transform')
+            ->with($data)
+            ->willReturn($room);
+
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, 'test-api-token');
+        $actual = $roomApi->getOneByLocationAndId($location, $roomId);
 
         self::assertSame($room, $actual);
     }

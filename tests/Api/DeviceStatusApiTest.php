@@ -19,6 +19,7 @@ use PHPUnit\Framework\MockObject\Exception;
 
 use PHPUnit\Framework\TestCase;
 
+use function rawurlencode;
 use function sprintf;
 
 #[CoversClass(DeviceStatusApi::class)]
@@ -132,6 +133,44 @@ final class DeviceStatusApiTest extends TestCase
 
         $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, 'test-api-token');
         $actual = $deviceApi->getOneById('test-device-id');
+
+        self::assertSame($deviceStatus, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    #[TestWith(['a/b c'])]
+    #[TestWith(['../../locations'])]
+    public function testGetOneByIdEncodesId(string $deviceId): void
+    {
+        $data = [
+            DeviceStatusApiInterface::KEY_COMPONENTS => [
+                DeviceStatusApiInterface::KEY_COMPONENTS_MAIN => ['test-item-1', 'test-item-2'],
+            ],
+        ];
+
+        $deviceStatus = self::createStub(DeviceStatusInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->method('get')
+            ->with(
+                sprintf(DeviceStatusApiInterface::API_URL_SPRINTF, rawurlencode($deviceId)),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $deviceStatusTransformer = self::createMock(DeviceStatusTransformerInterface::class);
+        $deviceStatusTransformer->method('transform')
+            ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
+            ->willReturn($deviceStatus);
+
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, 'test-api-token');
+        $actual = $deviceApi->getOneById($deviceId);
 
         self::assertSame($deviceStatus, $actual);
     }

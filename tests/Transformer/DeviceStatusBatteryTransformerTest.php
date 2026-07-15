@@ -42,20 +42,6 @@ final class DeviceStatusBatteryTransformerTest extends TestCase
         self::assertSame($battery, $actual->getBattery());
     }
 
-    public function testTransformWithoutValueReturnsNull(): void
-    {
-        $data = [
-            DeviceStatusBatteryTransformerInterface::KEY_BATTERY => [
-                DeviceStatusBatteryBatteryTransformerInterface::KEY_VALUE => null,
-            ],
-        ];
-
-        $batteryTransformer = self::createStub(DeviceStatusBatteryBatteryTransformerInterface::class);
-        $transformer = new DeviceStatusBatteryTransformer($batteryTransformer);
-
-        self::assertNull($transformer->transform($data));
-    }
-
     /**
      * @param mixed[] $data
      */
@@ -69,5 +55,19 @@ final class DeviceStatusBatteryTransformerTest extends TestCase
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DeviceStatusBatteryTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, DeviceStatusBatteryTransformerInterface::KEY_BATTERY));
         $transformer->transform($data);
+    }
+
+    public function testTransformWithoutValueReturnsNull(): void
+    {
+        $data = [
+            DeviceStatusBatteryTransformerInterface::KEY_BATTERY => [
+                DeviceStatusBatteryBatteryTransformerInterface::KEY_VALUE => null,
+            ],
+        ];
+
+        $batteryTransformer = self::createStub(DeviceStatusBatteryBatteryTransformerInterface::class);
+        $transformer = new DeviceStatusBatteryTransformer($batteryTransformer);
+
+        self::assertNull($transformer->transform($data));
     }
 }

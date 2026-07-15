@@ -12,6 +12,7 @@ use ChristianBrown\SmartThings\Transformer\LocationsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\LocationTransformerInterface;
 
 use function is_array;
+use function rawurlencode;
 use function sprintf;
 
 final class LocationApi implements LocationApiInterface
@@ -85,7 +86,7 @@ final class LocationApi implements LocationApiInterface
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => sprintf(self::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, $this->apiToken),
         ];
-        $url = sprintf(self::API_URL_SPRINTF, $locationId);
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($locationId));
         $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data)) {

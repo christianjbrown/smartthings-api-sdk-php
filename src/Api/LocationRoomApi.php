@@ -13,6 +13,7 @@ use ChristianBrown\SmartThings\Model\LocationInterface;
 use ChristianBrown\SmartThings\Model\LocationRoomInterface;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformerInterface;
 
+use function rawurlencode;
 use function sprintf;
 
 final class LocationRoomApi implements LocationRoomApiInterface
@@ -74,7 +75,7 @@ final class LocationRoomApi implements LocationRoomApiInterface
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => sprintf(self::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, $this->apiToken),
         ];
-        $url = sprintf(self::API_URL_SPRINTF, $locationId, $roomId);
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($locationId), rawurlencode($roomId));
         $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data)) {

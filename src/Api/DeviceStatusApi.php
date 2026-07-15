@@ -12,6 +12,7 @@ use ChristianBrown\SmartThings\Model\DeviceStatusInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTransformerInterface;
 
 use function is_array;
+use function rawurlencode;
 use function sprintf;
 
 final class DeviceStatusApi implements DeviceStatusApiInterface
@@ -56,7 +57,7 @@ final class DeviceStatusApi implements DeviceStatusApiInterface
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => sprintf(self::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, $this->apiToken),
         ];
-        $url = sprintf(self::API_URL_SPRINTF, $deviceId);
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($deviceId));
         $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data[self::KEY_COMPONENTS])) {
