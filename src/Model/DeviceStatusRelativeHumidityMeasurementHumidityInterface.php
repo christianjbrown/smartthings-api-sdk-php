@@ -10,11 +10,11 @@ interface DeviceStatusRelativeHumidityMeasurementHumidityInterface
 
     public function getUnit(): string;
 
-    public function getValue(): int;
+    public function getValue(): float;
 
     public function setTimestamp(int $value): self;
 
     public function setUnit(string $value): self;
 
-    public function setValue(int $value): self;
+    public function setValue(float $value): self;
 }

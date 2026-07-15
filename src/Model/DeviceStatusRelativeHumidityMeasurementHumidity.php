@@ -8,9 +8,9 @@ final class DeviceStatusRelativeHumidityMeasurementHumidity implements DeviceSta
 {
     private int $timestamp;
     private string $unit;
-    private int $value;
+    private float $value;
 
-    public function __construct(int $timestamp, string $unit, int $value)
+    public function __construct(int $timestamp, string $unit, float $value)
     {
         $this->timestamp = $timestamp;
         $this->unit = $unit;
@@ -27,7 +27,7 @@ final class DeviceStatusRelativeHumidityMeasurementHumidity implements DeviceSta
         return $this->unit;
     }
 
-    public function getValue(): int
+    public function getValue(): float
     {
         return $this->value;
     }
@@ -46,7 +46,7 @@ final class DeviceStatusRelativeHumidityMeasurementHumidity implements DeviceSta
         return $this;
     }
 
-    public function setValue(int $value): DeviceStatusRelativeHumidityMeasurementHumidityInterface
+    public function setValue(float $value): DeviceStatusRelativeHumidityMeasurementHumidityInterface
     {
         $this->value = $value;
 

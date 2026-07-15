@@ -8,6 +8,7 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceStatusRelativeHumidityMeasurementHumidity;
 use ChristianBrown\SmartThings\Model\DeviceStatusRelativeHumidityMeasurementHumidityInterface;
 
+use function is_float;
 use function is_int;
 use function is_string;
 use function sprintf;
@@ -40,12 +41,12 @@ final class DeviceStatusRelativeHumidityMeasurementHumidityTransformer implement
         $unit = $data[self::KEY_UNIT];
 
         if (!isset($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_INT_SPRINTF, self::KEY_VALUE));
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_FLOAT_SPRINTF, self::KEY_VALUE));
         }
-        if (!is_int($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_INT_SPRINTF, self::KEY_VALUE));
+        if (!is_int($data[self::KEY_VALUE]) && !is_float($data[self::KEY_VALUE])) {
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_FLOAT_SPRINTF, self::KEY_VALUE));
         }
-        $value = $data[self::KEY_VALUE];
+        $value = (float) $data[self::KEY_VALUE];
 
         $humidity = new DeviceStatusRelativeHumidityMeasurementHumidity($timestamp, $unit, $value);
 
