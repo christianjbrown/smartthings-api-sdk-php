@@ -14,5 +14,5 @@ interface DeviceStatusBatteryTransformerInterface
     /**
      * @param mixed[] $data
      */
-    public function transform(array $data): DeviceStatusBatteryInterface;
+    public function transform(array $data): ?DeviceStatusBatteryInterface;
 }

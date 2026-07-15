@@ -23,13 +23,19 @@ final class DeviceStatusBatteryTransformer implements DeviceStatusBatteryTransfo
     /**
      * @param mixed[] $data
      */
-    public function transform(array $data): DeviceStatusBatteryInterface
+    public function transform(array $data): ?DeviceStatusBatteryInterface
     {
         if (empty($data[self::KEY_BATTERY])) {
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_BATTERY));
         }
         if (!is_array($data[self::KEY_BATTERY])) {
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_BATTERY));
+        }
+        // SmartThings reports a device that supports the battery capability but
+        // has no current reading as `{"value": null}` (no unit or timestamp), so
+        // treat a missing value as "no battery" rather than an error.
+        if (!isset($data[self::KEY_BATTERY][DeviceStatusBatteryBatteryTransformerInterface::KEY_VALUE])) {
+            return null;
         }
         $battery = $this->deviceStatusBatteryBatteryTransformer->transform($data[self::KEY_BATTERY]);
         $deviceStatusBattery = new DeviceStatusBattery($battery);

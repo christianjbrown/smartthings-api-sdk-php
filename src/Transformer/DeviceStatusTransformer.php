@@ -42,8 +42,9 @@ final class DeviceStatusTransformer implements DeviceStatusTransformerInterface
         }
         if (!empty($data[self::KEY_BATTERY])) {
             if (is_array($data[self::KEY_BATTERY])) {
-                $battery = $this->deviceStatusBatteryTransformer->transform($data[self::KEY_BATTERY]);
-                $status->setBattery($battery);
+                // transform() returns null when the device reports no battery value;
+                // setBattery accepts null, so no extra branch is needed here.
+                $status->setBattery($this->deviceStatusBatteryTransformer->transform($data[self::KEY_BATTERY]));
             }
         }
 

@@ -20,22 +20,40 @@ final class DeviceStatusBatteryTransformerTest extends TestCase
 {
     public function testTransform(): void
     {
+        $batteryData = [
+            DeviceStatusBatteryBatteryTransformerInterface::KEY_VALUE => 42,
+        ];
         $data = [
-            DeviceStatusBatteryTransformerInterface::KEY_BATTERY => ['test-battery'],
+            DeviceStatusBatteryTransformerInterface::KEY_BATTERY => $batteryData,
         ];
 
         $battery = self::createStub(DeviceStatusBatteryBatteryInterface::class);
 
         $batteryTransformer = self::createMock(DeviceStatusBatteryBatteryTransformerInterface::class);
         $batteryTransformer->method('transform')
-            ->with(['test-battery'])
+            ->with($batteryData)
             ->willReturn($battery);
 
         $transformer = new DeviceStatusBatteryTransformer($batteryTransformer);
 
         $actual = $transformer->transform($data);
 
+        self::assertNotNull($actual);
         self::assertSame($battery, $actual->getBattery());
+    }
+
+    public function testTransformWithoutValueReturnsNull(): void
+    {
+        $data = [
+            DeviceStatusBatteryTransformerInterface::KEY_BATTERY => [
+                DeviceStatusBatteryBatteryTransformerInterface::KEY_VALUE => null,
+            ],
+        ];
+
+        $batteryTransformer = self::createStub(DeviceStatusBatteryBatteryTransformerInterface::class);
+        $transformer = new DeviceStatusBatteryTransformer($batteryTransformer);
+
+        self::assertNull($transformer->transform($data));
     }
 
     /**
