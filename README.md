@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/christianjbrown/php-smartthings-api-lib/actions/workflows/ci.yml/badge.svg)](https://github.com/christianjbrown/php-smartthings-api-lib/actions/workflows/ci.yml)
 
-A strongly-typed PHP 8.3+ client for the [SmartThings API](https://developer.smartthings.com/). It lists the devices in your SmartThings account and reads a device's status, returning plain, typed model objects rather than raw arrays.
+A strongly-typed PHP client for the [SmartThings API](https://developer.smartthings.com/). It lists the devices in your SmartThings account and reads a device's status, returning plain, typed model objects rather than raw arrays.
 
 The client is **read-only** and currently supports:
 
