@@ -18,6 +18,8 @@ interface SmartThingsInterface
     public const SERVICE_DEVICE_COMPONENT_TRANSFORMER = 'smartthings.transformer.device_component_transformer';
     public const SERVICE_DEVICE_COMPONENTS_TRANSFORMER = 'smartthings.transformer.device_components_transformer';
     public const SERVICE_DEVICE_STATUS_API = 'smartthings.api.device_status_api';
+    public const SERVICE_DEVICE_STATUS_BATTERY_BATTERY_TRANSFORMER = 'smartthings.transformer.device_status_battery_battery_transformer';
+    public const SERVICE_DEVICE_STATUS_BATTERY_TRANSFORMER = 'smartthings.transformer.device_status_battery_transformer';
     public const SERVICE_DEVICE_STATUS_RELATIVE_HUMIDITY_MEASUREMENT_HUMIDITY_TRANSFORMER = 'smartthings.transformer.device_status_relative_humidity_measurement_humidity_transformer';
     public const SERVICE_DEVICE_STATUS_RELATIVE_HUMIDITY_MEASUREMENT_TRANSFORMER = 'smartthings.transformer.device_status_relative_humidity_measurement_transformer';
     public const SERVICE_DEVICE_STATUS_TEMPERATURE_MEASUREMENT_TEMPERATURE_TRANSFORMER = 'smartthings.transformer.device_status_temperature_measurement_temperature_transformer';

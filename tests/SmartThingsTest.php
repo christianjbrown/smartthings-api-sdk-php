@@ -13,6 +13,8 @@ use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransforme
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryBatteryTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasurementHumidityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasurementTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTemperatureTransformer;
@@ -37,6 +39,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DeviceComponentsTransformer::class)]
 #[UsesClass(DeviceComponentTransformer::class)]
 #[UsesClass(DevicesTransformer::class)]
+#[UsesClass(DeviceStatusBatteryBatteryTransformer::class)]
+#[UsesClass(DeviceStatusBatteryTransformer::class)]
 #[UsesClass(DeviceStatusRelativeHumidityMeasurementHumidityTransformer::class)]
 #[UsesClass(DeviceStatusRelativeHumidityMeasurementTransformer::class)]
 #[UsesClass(DeviceStatusTemperatureMeasurementTemperatureTransformer::class)]

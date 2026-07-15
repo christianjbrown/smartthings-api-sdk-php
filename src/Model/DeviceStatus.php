@@ -6,8 +6,14 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class DeviceStatus implements DeviceStatusInterface
 {
+    private ?DeviceStatusBatteryInterface $battery = null;
     private ?DeviceStatusRelativeHumidityMeasurementInterface $relativeHumidityMeasurement = null;
     private ?DeviceStatusTemperatureMeasurementInterface $temperatureMeasurement = null;
+
+    public function getBattery(): ?DeviceStatusBatteryInterface
+    {
+        return $this->battery;
+    }
 
     public function getRelativeHumidityMeasurement(): ?DeviceStatusRelativeHumidityMeasurementInterface
     {
@@ -17,6 +23,13 @@ final class DeviceStatus implements DeviceStatusInterface
     public function getTemperatureMeasurement(): ?DeviceStatusTemperatureMeasurementInterface
     {
         return $this->temperatureMeasurement;
+    }
+
+    public function setBattery(?DeviceStatusBatteryInterface $battery): DeviceStatusInterface
+    {
+        $this->battery = $battery;
+
+        return $this;
     }
 
     public function setRelativeHumidityMeasurement(?DeviceStatusRelativeHumidityMeasurementInterface $relativeHumidityMeasurement): DeviceStatusInterface

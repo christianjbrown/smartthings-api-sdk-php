@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
-use ChristianBrown\SmartThings\Model\DeviceStatusRelativeHumidityMeasurementHumidity;
-use ChristianBrown\SmartThings\Model\DeviceStatusRelativeHumidityMeasurementHumidityInterface;
+use ChristianBrown\SmartThings\Model\DeviceStatusBatteryBattery;
+use ChristianBrown\SmartThings\Model\DeviceStatusBatteryBatteryInterface;
 
-use function is_numeric;
+use function is_int;
 use function is_string;
 use function sprintf;
 use function strtotime;
 
-final class DeviceStatusRelativeHumidityMeasurementHumidityTransformer implements DeviceStatusRelativeHumidityMeasurementHumidityTransformerInterface
+final class DeviceStatusBatteryBatteryTransformer implements DeviceStatusBatteryBatteryTransformerInterface
 {
     /**
      * @param mixed[] $data
      */
-    public function transform(array $data): DeviceStatusRelativeHumidityMeasurementHumidityInterface
+    public function transform(array $data): DeviceStatusBatteryBatteryInterface
     {
         if (empty($data[self::KEY_TIMESTAMP])) {
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_TIMESTAMP));
@@ -40,15 +40,15 @@ final class DeviceStatusRelativeHumidityMeasurementHumidityTransformer implement
         $unit = $data[self::KEY_UNIT];
 
         if (!isset($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_FLOAT_SPRINTF, self::KEY_VALUE));
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_INT_SPRINTF, self::KEY_VALUE));
         }
-        if (!is_numeric($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_FLOAT_SPRINTF, self::KEY_VALUE));
+        if (!is_int($data[self::KEY_VALUE])) {
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_INT_SPRINTF, self::KEY_VALUE));
         }
-        $value = (float) $data[self::KEY_VALUE];
+        $value = $data[self::KEY_VALUE];
 
-        $humidity = new DeviceStatusRelativeHumidityMeasurementHumidity($timestamp, $unit, $value);
+        $battery = new DeviceStatusBatteryBattery($timestamp, $unit, $value);
 
-        return $humidity;
+        return $battery;
     }
 }

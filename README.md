@@ -7,7 +7,7 @@ A strongly-typed PHP 8.3+ client for the [SmartThings API](https://developer.sma
 The client is **read-only** and currently supports:
 
 - **Listing devices** — id, name, label, location and room ids, and each component's capabilities.
-- **Reading a device's status** — currently the `temperatureMeasurement` and `relativeHumidityMeasurement` capabilities (value, unit, and timestamp) from the device's `main` component.
+- **Reading a device's status** — currently the `temperatureMeasurement`, `relativeHumidityMeasurement`, and `battery` capabilities (value, unit, and timestamp) from the device's `main` component.
 - **Listing locations** — id and name, or reading a single location by id (`getOneById`).
 - **Reading a room** — id, name, and location id, either from a device (`getOneByDevice`) or by a location and room id (`getOneByLocationAndId`).
 
@@ -76,6 +76,11 @@ foreach ($devices as $device) {
     if ($humidity !== null) {
         printf("  Humidity: %d%s\n", $humidity->getValue(), $humidity->getUnit());
     }
+
+    $battery = $status->getBattery()?->getBattery();
+    if ($battery !== null) {
+        printf("  Battery: %d%s\n", $battery->getValue(), $battery->getUnit());
+    }
 }
 ```
 
@@ -139,6 +144,8 @@ use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTra
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTemperatureTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasurementTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasurementHumidityTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryBatteryTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
@@ -174,6 +181,9 @@ $deviceStatusApi = new DeviceStatusApi(
         ),
         new DeviceStatusRelativeHumidityMeasurementTransformer(
             new DeviceStatusRelativeHumidityMeasurementHumidityTransformer()
+        ),
+        new DeviceStatusBatteryTransformer(
+            new DeviceStatusBatteryBatteryTransformer()
         )
     ),
     $apiToken

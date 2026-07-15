@@ -11,13 +11,15 @@ use function is_array;
 
 final class DeviceStatusTransformer implements DeviceStatusTransformerInterface
 {
+    private DeviceStatusBatteryTransformerInterface $deviceStatusBatteryTransformer;
     private DeviceStatusRelativeHumidityMeasurementTransformerInterface $deviceStatusRelativeHumidityMeasurementTransformer;
     private DeviceStatusTemperatureMeasurementTransformerInterface $deviceStatusTemperatureMeasurementTransformer;
 
-    public function __construct(DeviceStatusTemperatureMeasurementTransformerInterface $deviceStatusTemperatureMeasurementTransformer, DeviceStatusRelativeHumidityMeasurementTransformerInterface $deviceStatusRelativeHumidityMeasurementTransformer)
+    public function __construct(DeviceStatusTemperatureMeasurementTransformerInterface $deviceStatusTemperatureMeasurementTransformer, DeviceStatusRelativeHumidityMeasurementTransformerInterface $deviceStatusRelativeHumidityMeasurementTransformer, DeviceStatusBatteryTransformerInterface $deviceStatusBatteryTransformer)
     {
         $this->deviceStatusTemperatureMeasurementTransformer = $deviceStatusTemperatureMeasurementTransformer;
         $this->deviceStatusRelativeHumidityMeasurementTransformer = $deviceStatusRelativeHumidityMeasurementTransformer;
+        $this->deviceStatusBatteryTransformer = $deviceStatusBatteryTransformer;
     }
 
     /**
@@ -36,6 +38,12 @@ final class DeviceStatusTransformer implements DeviceStatusTransformerInterface
             if (is_array($data[self::KEY_RELATIVE_HUMIDITY_MEASUREMENT])) {
                 $relativeHumidityMeasurement = $this->deviceStatusRelativeHumidityMeasurementTransformer->transform($data[self::KEY_RELATIVE_HUMIDITY_MEASUREMENT]);
                 $status->setRelativeHumidityMeasurement($relativeHumidityMeasurement);
+            }
+        }
+        if (!empty($data[self::KEY_BATTERY])) {
+            if (is_array($data[self::KEY_BATTERY])) {
+                $battery = $this->deviceStatusBatteryTransformer->transform($data[self::KEY_BATTERY]);
+                $status->setBattery($battery);
             }
         }
 
