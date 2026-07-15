@@ -26,12 +26,22 @@
         "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^12.0"
     },
-    "config": {
-        "bin-dir": "bin"
+    "autoload": {
+        "psr-4": {
+            "ChristianBrown\\SmartThings\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ChristianBrown\\SmartThings\\Tests\\": "tests/"
+        }
     },
     "scripts": {
         "test": [
             "clear && XDEBUG_MODE=coverage php -d memory_limit=-1 ./bin/phpunit && open ./.phpunit.cache/code-coverage-html/index.html"
+        ],
+        "stan": [
+            "clear && ./bin/phpstan analyse"
         ],
         "check-style": [
             "clear && ./bin/php-cs ./src ./tests"
@@ -44,20 +54,10 @@
         ],
         "fix-style-diff": [
             "clear && ./bin/php-cs-fix-diff"
-        ],
-        "stan": [
-            "clear && ./bin/phpstan analyse"
         ]
     },
-    "autoload": {
-        "psr-4": {
-            "ChristianBrown\\SmartThings\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "ChristianBrown\\SmartThings\\Tests\\": "tests/"
-        }
+    "config": {
+        "bin-dir": "bin"
     },
     "repositories": [
         {

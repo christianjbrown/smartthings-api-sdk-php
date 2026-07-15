@@ -1,4 +1,4 @@
-# Overview
+# SmartThings API Client
 
 [![CI](https://github.com/christianjbrown/php-smartthings-api-lib/actions/workflows/ci.yml/badge.svg)](https://github.com/christianjbrown/php-smartthings-api-lib/actions/workflows/ci.yml)
 
