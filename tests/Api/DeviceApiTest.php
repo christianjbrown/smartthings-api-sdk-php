@@ -91,6 +91,69 @@ final class DeviceApiTest extends TestCase
      * @throws RequestExceptionInterface
      * @throws Exception
      */
+    public function testGetMultipleCachesPerLocation(): void
+    {
+        $data = [
+            DeviceApiInterface::KEY_ITEMS => ['test-item-1', 'test-item-2'],
+        ];
+
+        $devices = [self::createStub(DeviceInterface::class)];
+
+        // A distinct locationId is a distinct cache key, so it hits the API again.
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))
+            ->method('get')
+            ->willReturn($data);
+
+        $devicesTransformer = self::createMock(DevicesTransformerInterface::class);
+        $devicesTransformer->method('transform')
+            ->with($data[DeviceApiInterface::KEY_ITEMS])
+            ->willReturn($devices);
+
+        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, 'test-api-token');
+
+        self::assertSame($devices, $deviceApi->getMultiple('test-location-a'));
+        self::assertSame($devices, $deviceApi->getMultiple('test-location-b'));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetMultipleFiltersByLocation(): void
+    {
+        $data = [
+            DeviceApiInterface::KEY_ITEMS => ['test-item-1', 'test-item-2'],
+        ];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->method('get')
+            ->with(
+                DeviceApiInterface::API_URL,
+                [DeviceApiInterface::KEY_LOCATION_ID => 'test-location-id'],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $devices = [self::createStub(DeviceInterface::class), self::createStub(DeviceInterface::class)];
+
+        $devicesTransformer = self::createMock(DevicesTransformerInterface::class);
+        $devicesTransformer->method('transform')
+            ->with($data[DeviceApiInterface::KEY_ITEMS])
+            ->willReturn($devices);
+
+        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, 'test-api-token');
+        $actual = $deviceApi->getMultiple('test-location-id');
+
+        self::assertSame($devices, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
     public function testGetMultipleSkipsCache(): void
     {
         $data = [
@@ -113,7 +176,7 @@ final class DeviceApiTest extends TestCase
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($devices, $deviceApi->getMultiple());
-        self::assertSame($devices, $deviceApi->getMultiple(true));
+        self::assertSame($devices, $deviceApi->getMultiple(null, true));
     }
 
     /**
@@ -145,6 +208,6 @@ final class DeviceApiTest extends TestCase
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DeviceApiInterface::UNEXPECTED_RESPONSE_SPRINTF, DeviceApiInterface::KEY_ITEMS));
-        $deviceApi->getMultiple($skipCache);
+        $deviceApi->getMultiple(null, $skipCache);
     }
 }
