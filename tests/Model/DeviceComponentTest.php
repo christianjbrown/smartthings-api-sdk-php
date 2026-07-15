@@ -17,8 +17,8 @@ final class DeviceComponentTest extends TestCase
         $deviceComponent = new DeviceComponent();
         self::assertEmpty($deviceComponent->getCapabilities());
         $capabilities = [
-            $this->createMock(DeviceComponentCapabilityInterface::class),
-            $this->createMock(DeviceComponentCapabilityInterface::class),
+            self::createStub(DeviceComponentCapabilityInterface::class),
+            self::createStub(DeviceComponentCapabilityInterface::class),
         ];
         self::assertSame($deviceComponent, $deviceComponent->setCapabilities($capabilities));
         self::assertSame($capabilities, $deviceComponent->getCapabilities());

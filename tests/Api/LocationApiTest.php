@@ -34,7 +34,7 @@ final class LocationApiTest extends TestCase
             LocationApiInterface::KEY_ITEMS => ['test-item-1', 'test-item-2'],
         ];
 
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->method('get')
             ->with(
                 LocationApiInterface::API_URL,
@@ -45,11 +45,11 @@ final class LocationApiTest extends TestCase
             )
             ->willReturn($data);
 
-        $locations = [$this->createMock(LocationInterface::class), $this->createMock(LocationInterface::class)];
+        $locations = [self::createStub(LocationInterface::class), self::createStub(LocationInterface::class)];
 
-        $locationTransformer = $this->createMock(LocationTransformerInterface::class);
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
 
-        $locationsTransformer = $this->createMock(LocationsTransformerInterface::class);
+        $locationsTransformer = self::createMock(LocationsTransformerInterface::class);
         $locationsTransformer->method('transform')
             ->with($data[LocationApiInterface::KEY_ITEMS])
             ->willReturn($locations);
@@ -70,16 +70,16 @@ final class LocationApiTest extends TestCase
             LocationApiInterface::KEY_ITEMS => ['test-item-1', 'test-item-2'],
         ];
 
-        $locations = [$this->createMock(LocationInterface::class)];
+        $locations = [self::createStub(LocationInterface::class)];
 
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::once())
             ->method('get')
             ->willReturn($data);
 
-        $locationTransformer = $this->createMock(LocationTransformerInterface::class);
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
 
-        $locationsTransformer = $this->createMock(LocationsTransformerInterface::class);
+        $locationsTransformer = self::createMock(LocationsTransformerInterface::class);
         $locationsTransformer->expects(self::once())
             ->method('transform')
             ->with($data[LocationApiInterface::KEY_ITEMS])
@@ -102,16 +102,16 @@ final class LocationApiTest extends TestCase
             LocationApiInterface::KEY_ITEMS => ['test-item-1', 'test-item-2'],
         ];
 
-        $locations = [$this->createMock(LocationInterface::class)];
+        $locations = [self::createStub(LocationInterface::class)];
 
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::exactly(2))
             ->method('get')
             ->willReturn($data);
 
-        $locationTransformer = $this->createMock(LocationTransformerInterface::class);
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
 
-        $locationsTransformer = $this->createMock(LocationsTransformerInterface::class);
+        $locationsTransformer = self::createMock(LocationsTransformerInterface::class);
         $locationsTransformer->method('transform')
             ->with($data[LocationApiInterface::KEY_ITEMS])
             ->willReturn($locations);
@@ -135,7 +135,7 @@ final class LocationApiTest extends TestCase
     #[TestWith([[LocationApiInterface::KEY_ITEMS => 'test-not-array'], true])]
     public function testGetMultipleUnexpectedResponse(array $data, bool $skipCache): void
     {
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->method('get')
             ->with(
                 LocationApiInterface::API_URL,
@@ -146,8 +146,8 @@ final class LocationApiTest extends TestCase
             )
             ->willReturn($data);
 
-        $locationTransformer = $this->createMock(LocationTransformerInterface::class);
-        $locationsTransformer = $this->createMock(LocationsTransformerInterface::class);
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
         $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
 
@@ -164,7 +164,7 @@ final class LocationApiTest extends TestCase
     {
         $data = ['test-location-data'];
 
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->method('get')
             ->with(
                 sprintf(LocationApiInterface::API_URL_SPRINTF, 'test-location-id'),
@@ -175,14 +175,14 @@ final class LocationApiTest extends TestCase
             )
             ->willReturn($data);
 
-        $location = $this->createMock(LocationInterface::class);
+        $location = self::createStub(LocationInterface::class);
 
-        $locationTransformer = $this->createMock(LocationTransformerInterface::class);
+        $locationTransformer = self::createMock(LocationTransformerInterface::class);
         $locationTransformer->method('transform')
             ->with($data)
             ->willReturn($location);
 
-        $locationsTransformer = $this->createMock(LocationsTransformerInterface::class);
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
         $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
         $actual = $locationApi->getOneById('test-location-id');
@@ -198,9 +198,9 @@ final class LocationApiTest extends TestCase
     {
         $data = ['test-location-data'];
 
-        $location = $this->createMock(LocationInterface::class);
+        $location = self::createStub(LocationInterface::class);
 
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::once())
             ->method('get')
             ->with(
@@ -212,13 +212,13 @@ final class LocationApiTest extends TestCase
             )
             ->willReturn($data);
 
-        $locationTransformer = $this->createMock(LocationTransformerInterface::class);
+        $locationTransformer = self::createMock(LocationTransformerInterface::class);
         $locationTransformer->expects(self::once())
             ->method('transform')
             ->with($data)
             ->willReturn($location);
 
-        $locationsTransformer = $this->createMock(LocationsTransformerInterface::class);
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
         $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
 
@@ -235,9 +235,9 @@ final class LocationApiTest extends TestCase
     {
         $data = ['test-location-data'];
 
-        $location = $this->createMock(LocationInterface::class);
+        $location = self::createStub(LocationInterface::class);
 
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::exactly(2))
             ->method('get')
             ->with(
@@ -249,12 +249,12 @@ final class LocationApiTest extends TestCase
             )
             ->willReturn($data);
 
-        $locationTransformer = $this->createMock(LocationTransformerInterface::class);
+        $locationTransformer = self::createMock(LocationTransformerInterface::class);
         $locationTransformer->method('transform')
             ->with($data)
             ->willReturn($location);
 
-        $locationsTransformer = $this->createMock(LocationsTransformerInterface::class);
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
         $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
 
@@ -271,7 +271,7 @@ final class LocationApiTest extends TestCase
     #[TestWith([true])]
     public function testGetOneByIdUnexpectedResponse(bool $skipCache): void
     {
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->method('get')
             ->with(
                 sprintf(LocationApiInterface::API_URL_SPRINTF, 'test-location-id'),
@@ -282,8 +282,8 @@ final class LocationApiTest extends TestCase
             )
             ->willReturn([]);
 
-        $locationTransformer = $this->createMock(LocationTransformerInterface::class);
-        $locationsTransformer = $this->createMock(LocationsTransformerInterface::class);
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
         $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
 

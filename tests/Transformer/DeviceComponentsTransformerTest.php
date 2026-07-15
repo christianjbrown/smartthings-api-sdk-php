@@ -19,11 +19,11 @@ final class DeviceComponentsTransformerTest extends TestCase
     {
         $data = [['test-component-1'], ['test-component-2']];
 
-        $component1 = $this->createMock(DeviceComponentInterface::class);
-        $component2 = $this->createMock(DeviceComponentInterface::class);
+        $component1 = self::createStub(DeviceComponentInterface::class);
+        $component2 = self::createStub(DeviceComponentInterface::class);
         $components = [$component1, $component2];
 
-        $componentTransformer = $this->createMock(DeviceComponentTransformerInterface::class);
+        $componentTransformer = self::createStub(DeviceComponentTransformerInterface::class);
         $componentTransformer->method('transform')
             ->willReturnMap(
                 [
@@ -41,7 +41,7 @@ final class DeviceComponentsTransformerTest extends TestCase
 
     public function testTransformEmpty(): void
     {
-        $componentTransformer = $this->createMock(DeviceComponentTransformerInterface::class);
+        $componentTransformer = self::createStub(DeviceComponentTransformerInterface::class);
 
         $transformer = new DeviceComponentsTransformer($componentTransformer);
 
@@ -50,9 +50,9 @@ final class DeviceComponentsTransformerTest extends TestCase
 
     public function testTransformSingle(): void
     {
-        $component1 = $this->createMock(DeviceComponentInterface::class);
+        $component1 = self::createStub(DeviceComponentInterface::class);
 
-        $componentTransformer = $this->createMock(DeviceComponentTransformerInterface::class);
+        $componentTransformer = self::createMock(DeviceComponentTransformerInterface::class);
         $componentTransformer->method('transform')
             ->with(['test-component-1'])
             ->willReturn($component1);
@@ -64,7 +64,7 @@ final class DeviceComponentsTransformerTest extends TestCase
 
     public function testTransformThrowsOnFirstNonArray(): void
     {
-        $componentTransformer = $this->createMock(DeviceComponentTransformerInterface::class);
+        $componentTransformer = self::createStub(DeviceComponentTransformerInterface::class);
 
         $transformer = new DeviceComponentsTransformer($componentTransformer);
 
@@ -78,10 +78,10 @@ final class DeviceComponentsTransformerTest extends TestCase
     {
         $data = [['test-component-1-array'], 'test-component-2-not-array', ['test-component-3-array'], 'test-component-4-not-array'];
 
-        $component1 = $this->createMock(DeviceComponentInterface::class);
-        $component3 = $this->createMock(DeviceComponentInterface::class);
+        $component1 = self::createStub(DeviceComponentInterface::class);
+        $component3 = self::createStub(DeviceComponentInterface::class);
 
-        $componentTransformer = $this->createMock(DeviceComponentTransformerInterface::class);
+        $componentTransformer = self::createStub(DeviceComponentTransformerInterface::class);
         $componentTransformer->method('transform')
             ->willReturnMap(
                 [

@@ -19,11 +19,11 @@ final class DeviceComponentCapabilitiesTransformerTest extends TestCase
     {
         $data = [['test-capability-1'], ['test-capability-2']];
 
-        $capability1 = $this->createMock(DeviceComponentCapabilityInterface::class);
-        $capability2 = $this->createMock(DeviceComponentCapabilityInterface::class);
+        $capability1 = self::createStub(DeviceComponentCapabilityInterface::class);
+        $capability2 = self::createStub(DeviceComponentCapabilityInterface::class);
         $capabilities = [$capability1, $capability2];
 
-        $capabilityTransformer = $this->createMock(DeviceComponentCapabilityTransformerInterface::class);
+        $capabilityTransformer = self::createStub(DeviceComponentCapabilityTransformerInterface::class);
         $capabilityTransformer->method('transform')
             ->willReturnMap(
                 [
@@ -41,7 +41,7 @@ final class DeviceComponentCapabilitiesTransformerTest extends TestCase
 
     public function testTransformEmpty(): void
     {
-        $capabilityTransformer = $this->createMock(DeviceComponentCapabilityTransformerInterface::class);
+        $capabilityTransformer = self::createStub(DeviceComponentCapabilityTransformerInterface::class);
 
         $transformer = new DeviceComponentCapabilitiesTransformer($capabilityTransformer);
 
@@ -50,9 +50,9 @@ final class DeviceComponentCapabilitiesTransformerTest extends TestCase
 
     public function testTransformSingle(): void
     {
-        $capability1 = $this->createMock(DeviceComponentCapabilityInterface::class);
+        $capability1 = self::createStub(DeviceComponentCapabilityInterface::class);
 
-        $capabilityTransformer = $this->createMock(DeviceComponentCapabilityTransformerInterface::class);
+        $capabilityTransformer = self::createMock(DeviceComponentCapabilityTransformerInterface::class);
         $capabilityTransformer->method('transform')
             ->with(['test-capability-1'])
             ->willReturn($capability1);
@@ -64,7 +64,7 @@ final class DeviceComponentCapabilitiesTransformerTest extends TestCase
 
     public function testTransformThrowsOnFirstNonArray(): void
     {
-        $capabilityTransformer = $this->createMock(DeviceComponentCapabilityTransformerInterface::class);
+        $capabilityTransformer = self::createStub(DeviceComponentCapabilityTransformerInterface::class);
 
         $transformer = new DeviceComponentCapabilitiesTransformer($capabilityTransformer);
 
@@ -78,10 +78,10 @@ final class DeviceComponentCapabilitiesTransformerTest extends TestCase
     {
         $data = [['test-capability-1-array'], 'test-capability-2-not-array', ['test-capability-3-array'], 'test-capability-4-not-array'];
 
-        $capability1 = $this->createMock(DeviceComponentCapabilityInterface::class);
-        $capability3 = $this->createMock(DeviceComponentCapabilityInterface::class);
+        $capability1 = self::createStub(DeviceComponentCapabilityInterface::class);
+        $capability3 = self::createStub(DeviceComponentCapabilityInterface::class);
 
-        $capabilityTransformer = $this->createMock(DeviceComponentCapabilityTransformerInterface::class);
+        $capabilityTransformer = self::createStub(DeviceComponentCapabilityTransformerInterface::class);
         $capabilityTransformer->method('transform')
             ->willReturnMap(
                 [

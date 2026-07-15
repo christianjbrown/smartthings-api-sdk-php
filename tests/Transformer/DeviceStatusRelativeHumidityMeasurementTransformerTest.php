@@ -24,9 +24,9 @@ final class DeviceStatusRelativeHumidityMeasurementTransformerTest extends TestC
             DeviceStatusRelativeHumidityMeasurementTransformerInterface::KEY_HUMIDITY => ['test-humidity'],
         ];
 
-        $humidity = $this->createMock(DeviceStatusRelativeHumidityMeasurementHumidityInterface::class);
+        $humidity = self::createStub(DeviceStatusRelativeHumidityMeasurementHumidityInterface::class);
 
-        $humidityTransformer = $this->createMock(DeviceStatusRelativeHumidityMeasurementHumidityTransformerInterface::class);
+        $humidityTransformer = self::createMock(DeviceStatusRelativeHumidityMeasurementHumidityTransformerInterface::class);
         $humidityTransformer->method('transform')
             ->with(['test-humidity'])
             ->willReturn($humidity);
@@ -45,7 +45,7 @@ final class DeviceStatusRelativeHumidityMeasurementTransformerTest extends TestC
     #[TestWith([[DeviceStatusRelativeHumidityMeasurementTransformerInterface::KEY_HUMIDITY => 'test-not-an-array']])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $humidityTransformer = $this->createMock(DeviceStatusRelativeHumidityMeasurementHumidityTransformerInterface::class);
+        $humidityTransformer = self::createStub(DeviceStatusRelativeHumidityMeasurementHumidityTransformerInterface::class);
         $transformer = new DeviceStatusRelativeHumidityMeasurementTransformer($humidityTransformer);
 
         $this->expectException(UnexpectedResponseException::class);

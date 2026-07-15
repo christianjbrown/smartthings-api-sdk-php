@@ -14,11 +14,11 @@ final class DeviceStatusRelativeHumidityMeasurementTest extends TestCase
 {
     public function test(): void
     {
-        $humidity = $this->createMock(DeviceStatusRelativeHumidityMeasurementHumidityInterface::class);
+        $humidity = self::createStub(DeviceStatusRelativeHumidityMeasurementHumidityInterface::class);
         $measurement = new DeviceStatusRelativeHumidityMeasurement($humidity);
         self::assertSame($humidity, $measurement->getHumidity());
 
-        $newHumidity = $this->createMock(DeviceStatusRelativeHumidityMeasurementHumidityInterface::class);
+        $newHumidity = self::createStub(DeviceStatusRelativeHumidityMeasurementHumidityInterface::class);
         self::assertSame($measurement, $measurement->setHumidity($newHumidity));
         self::assertSame($newHumidity, $measurement->getHumidity());
     }

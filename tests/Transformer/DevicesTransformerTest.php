@@ -19,11 +19,11 @@ final class DevicesTransformerTest extends TestCase
     {
         $data = [['test-device-1'], ['test-device-2']];
 
-        $device1 = $this->createMock(DeviceInterface::class);
-        $device2 = $this->createMock(DeviceInterface::class);
+        $device1 = self::createStub(DeviceInterface::class);
+        $device2 = self::createStub(DeviceInterface::class);
         $devices = [$device1, $device2];
 
-        $deviceTransformer = $this->createMock(DeviceTransformerInterface::class);
+        $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
         $deviceTransformer->method('transform')
             ->willReturnMap(
                 [
@@ -41,7 +41,7 @@ final class DevicesTransformerTest extends TestCase
 
     public function testTransformEmpty(): void
     {
-        $deviceTransformer = $this->createMock(DeviceTransformerInterface::class);
+        $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
 
         $transformer = new DevicesTransformer($deviceTransformer);
 
@@ -50,9 +50,9 @@ final class DevicesTransformerTest extends TestCase
 
     public function testTransformSingle(): void
     {
-        $device1 = $this->createMock(DeviceInterface::class);
+        $device1 = self::createStub(DeviceInterface::class);
 
-        $deviceTransformer = $this->createMock(DeviceTransformerInterface::class);
+        $deviceTransformer = self::createMock(DeviceTransformerInterface::class);
         $deviceTransformer->method('transform')
             ->with(['test-device-1'])
             ->willReturn($device1);
@@ -64,7 +64,7 @@ final class DevicesTransformerTest extends TestCase
 
     public function testTransformThrowsOnFirstNonArray(): void
     {
-        $deviceTransformer = $this->createMock(DeviceTransformerInterface::class);
+        $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
 
         $transformer = new DevicesTransformer($deviceTransformer);
 
@@ -78,10 +78,10 @@ final class DevicesTransformerTest extends TestCase
     {
         $data = [['test-device-1-array'], 'test-device-2-not-array', ['test-device-3-array'], 'test-device-4-not-array'];
 
-        $device1 = $this->createMock(DeviceInterface::class);
-        $device3 = $this->createMock(DeviceInterface::class);
+        $device1 = self::createStub(DeviceInterface::class);
+        $device3 = self::createStub(DeviceInterface::class);
 
-        $deviceTransformer = $this->createMock(DeviceTransformerInterface::class);
+        $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
         $deviceTransformer->method('transform')
             ->willReturnMap(
                 [

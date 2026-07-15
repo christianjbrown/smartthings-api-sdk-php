@@ -24,8 +24,8 @@ final class DeviceTest extends TestCase
         self::assertSame($device, $device->setLabel('test-label'));
         self::assertSame($device, $device->setName('test-name'));
         $components = [
-            $this->createMock(DeviceComponentInterface::class),
-            $this->createMock(DeviceComponentInterface::class),
+            self::createStub(DeviceComponentInterface::class),
+            self::createStub(DeviceComponentInterface::class),
         ];
         self::assertSame($device, $device->setComponents($components));
 

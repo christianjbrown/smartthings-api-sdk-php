@@ -26,11 +26,11 @@ final class DeviceComponentTransformerTest extends TestCase
         ];
 
         $capabilities = [
-            $this->createMock(DeviceComponentCapabilityInterface::class),
-            $this->createMock(DeviceComponentCapabilityInterface::class),
+            self::createStub(DeviceComponentCapabilityInterface::class),
+            self::createStub(DeviceComponentCapabilityInterface::class),
         ];
 
-        $capabilitiesTransformer = $this->createMock(DeviceComponentCapabilitiesTransformerInterface::class);
+        $capabilitiesTransformer = self::createMock(DeviceComponentCapabilitiesTransformerInterface::class);
         $capabilitiesTransformer->method('transform')
             ->with($capabilitiesData)
             ->willReturn($capabilities);
@@ -49,7 +49,7 @@ final class DeviceComponentTransformerTest extends TestCase
     #[TestWith([[DeviceComponentTransformerInterface::KEY_CAPABILITIES => 'test-not-an-array']])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $capabilitiesTransformer = $this->createMock(DeviceComponentCapabilitiesTransformerInterface::class);
+        $capabilitiesTransformer = self::createStub(DeviceComponentCapabilitiesTransformerInterface::class);
         $transformer = new DeviceComponentTransformer($capabilitiesTransformer);
 
         $this->expectException(UnexpectedResponseException::class);

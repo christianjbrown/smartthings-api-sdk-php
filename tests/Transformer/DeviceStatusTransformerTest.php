@@ -27,8 +27,8 @@ final class DeviceStatusTransformerTest extends TestCase
         ];
         $data2 = [];
 
-        $measurement1 = $this->createMock(DeviceStatusTemperatureMeasurementInterface::class);
-        $measurementTransformer = $this->createMock(DeviceStatusTemperatureMeasurementTransformerInterface::class);
+        $measurement1 = self::createStub(DeviceStatusTemperatureMeasurementInterface::class);
+        $measurementTransformer = self::createStub(DeviceStatusTemperatureMeasurementTransformerInterface::class);
         $measurementTransformer->method('transform')
             ->willReturnMap(
                 [
@@ -36,8 +36,8 @@ final class DeviceStatusTransformerTest extends TestCase
                 ]
             );
 
-        $humidityMeasurement1 = $this->createMock(DeviceStatusRelativeHumidityMeasurementInterface::class);
-        $humidityMeasurementTransformer = $this->createMock(DeviceStatusRelativeHumidityMeasurementTransformerInterface::class);
+        $humidityMeasurement1 = self::createStub(DeviceStatusRelativeHumidityMeasurementInterface::class);
+        $humidityMeasurementTransformer = self::createStub(DeviceStatusRelativeHumidityMeasurementTransformerInterface::class);
         $humidityMeasurementTransformer->method('transform')
             ->willReturnMap(
                 [
@@ -74,8 +74,8 @@ final class DeviceStatusTransformerTest extends TestCase
     #[DataProvider('provideTransformMeasurementCombinationsCases')]
     public function testTransformMeasurementCombinations(array $data, bool $expectTemperature, bool $expectHumidity): void
     {
-        $temperature = $this->createMock(DeviceStatusTemperatureMeasurementInterface::class);
-        $measurementTransformer = $this->createMock(DeviceStatusTemperatureMeasurementTransformerInterface::class);
+        $temperature = self::createStub(DeviceStatusTemperatureMeasurementInterface::class);
+        $measurementTransformer = self::createMock(DeviceStatusTemperatureMeasurementTransformerInterface::class);
         if ($expectTemperature) {
             $measurementTransformer->expects(self::once())
                 ->method('transform')
@@ -85,8 +85,8 @@ final class DeviceStatusTransformerTest extends TestCase
             $measurementTransformer->expects(self::never())->method('transform');
         }
 
-        $humidity = $this->createMock(DeviceStatusRelativeHumidityMeasurementInterface::class);
-        $humidityMeasurementTransformer = $this->createMock(DeviceStatusRelativeHumidityMeasurementTransformerInterface::class);
+        $humidity = self::createStub(DeviceStatusRelativeHumidityMeasurementInterface::class);
+        $humidityMeasurementTransformer = self::createMock(DeviceStatusRelativeHumidityMeasurementTransformerInterface::class);
         if ($expectHumidity) {
             $humidityMeasurementTransformer->expects(self::once())
                 ->method('transform')

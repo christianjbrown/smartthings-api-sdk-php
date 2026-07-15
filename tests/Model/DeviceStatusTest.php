@@ -17,12 +17,12 @@ final class DeviceStatusTest extends TestCase
     {
         $status = new DeviceStatus();
         self::assertNull($status->getTemperatureMeasurement());
-        $temperatureMeasurement = $this->createMock(DeviceStatusTemperatureMeasurementInterface::class);
+        $temperatureMeasurement = self::createStub(DeviceStatusTemperatureMeasurementInterface::class);
         self::assertSame($status, $status->setTemperatureMeasurement($temperatureMeasurement));
         self::assertSame($temperatureMeasurement, $status->getTemperatureMeasurement());
 
         self::assertNull($status->getRelativeHumidityMeasurement());
-        $relativeHumidityMeasurement = $this->createMock(DeviceStatusRelativeHumidityMeasurementInterface::class);
+        $relativeHumidityMeasurement = self::createStub(DeviceStatusRelativeHumidityMeasurementInterface::class);
         self::assertSame($status, $status->setRelativeHumidityMeasurement($relativeHumidityMeasurement));
         self::assertSame($relativeHumidityMeasurement, $status->getRelativeHumidityMeasurement());
     }

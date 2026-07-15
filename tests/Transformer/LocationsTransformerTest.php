@@ -19,11 +19,11 @@ final class LocationsTransformerTest extends TestCase
     {
         $data = [['test-location-1'], ['test-location-2']];
 
-        $location1 = $this->createMock(LocationInterface::class);
-        $location2 = $this->createMock(LocationInterface::class);
+        $location1 = self::createStub(LocationInterface::class);
+        $location2 = self::createStub(LocationInterface::class);
         $locations = [$location1, $location2];
 
-        $locationTransformer = $this->createMock(LocationTransformerInterface::class);
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
         $locationTransformer->method('transform')
             ->willReturnMap(
                 [
@@ -41,7 +41,7 @@ final class LocationsTransformerTest extends TestCase
 
     public function testTransformEmpty(): void
     {
-        $locationTransformer = $this->createMock(LocationTransformerInterface::class);
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
 
         $transformer = new LocationsTransformer($locationTransformer);
 
@@ -50,9 +50,9 @@ final class LocationsTransformerTest extends TestCase
 
     public function testTransformSingle(): void
     {
-        $location1 = $this->createMock(LocationInterface::class);
+        $location1 = self::createStub(LocationInterface::class);
 
-        $locationTransformer = $this->createMock(LocationTransformerInterface::class);
+        $locationTransformer = self::createMock(LocationTransformerInterface::class);
         $locationTransformer->method('transform')
             ->with(['test-location-1'])
             ->willReturn($location1);
@@ -64,7 +64,7 @@ final class LocationsTransformerTest extends TestCase
 
     public function testTransformThrowsOnFirstNonArray(): void
     {
-        $locationTransformer = $this->createMock(LocationTransformerInterface::class);
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
 
         $transformer = new LocationsTransformer($locationTransformer);
 
@@ -78,10 +78,10 @@ final class LocationsTransformerTest extends TestCase
     {
         $data = [['test-location-1-array'], 'test-location-2-not-array', ['test-location-3-array'], 'test-location-4-not-array'];
 
-        $location1 = $this->createMock(LocationInterface::class);
-        $location3 = $this->createMock(LocationInterface::class);
+        $location1 = self::createStub(LocationInterface::class);
+        $location3 = self::createStub(LocationInterface::class);
 
-        $locationTransformer = $this->createMock(LocationTransformerInterface::class);
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
         $locationTransformer->method('transform')
             ->willReturnMap(
                 [

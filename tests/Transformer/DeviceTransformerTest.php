@@ -32,11 +32,11 @@ final class DeviceTransformerTest extends TestCase
         ];
 
         $components = [
-            $this->createMock(DeviceComponentInterface::class),
-            $this->createMock(DeviceComponentInterface::class),
+            self::createStub(DeviceComponentInterface::class),
+            self::createStub(DeviceComponentInterface::class),
         ];
 
-        $componentsTransformer = $this->createMock(DeviceComponentsTransformerInterface::class);
+        $componentsTransformer = self::createMock(DeviceComponentsTransformerInterface::class);
         $componentsTransformer->method('transform')
             ->with($componentsData)
             ->willReturn($components);
@@ -65,9 +65,9 @@ final class DeviceTransformerTest extends TestCase
     public function testTransformOptionalFieldCombinations(array $data, ?string $expectedLabel, ?string $expectedLocationId, ?string $expectedName, ?string $expectedRoomId, bool $expectComponents): void
     {
         $componentsData = $data[DeviceTransformerInterface::KEY_COMPONENTS] ?? null;
-        $components = [$this->createMock(DeviceComponentInterface::class)];
+        $components = [self::createStub(DeviceComponentInterface::class)];
 
-        $componentsTransformer = $this->createMock(DeviceComponentsTransformerInterface::class);
+        $componentsTransformer = self::createMock(DeviceComponentsTransformerInterface::class);
         if ($expectComponents) {
             $componentsTransformer->expects(self::once())
                 ->method('transform')
@@ -157,7 +157,7 @@ final class DeviceTransformerTest extends TestCase
     #[TestWith([[DeviceTransformerInterface::KEY_DEVICE_ID => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $componentsTransformer = $this->createMock(DeviceComponentsTransformerInterface::class);
+        $componentsTransformer = self::createStub(DeviceComponentsTransformerInterface::class);
         $transformer = new DeviceTransformer($componentsTransformer);
 
         $this->expectException(UnexpectedResponseException::class);

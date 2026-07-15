@@ -24,9 +24,9 @@ final class DeviceStatusTemperatureMeasurementTransformerTest extends TestCase
             DeviceStatusTemperatureMeasurementTransformerInterface::KEY_TEMPERATURE => ['test-temperature'],
         ];
 
-        $temperature = $this->createMock(DeviceStatusTemperatureMeasurementTemperatureInterface::class);
+        $temperature = self::createStub(DeviceStatusTemperatureMeasurementTemperatureInterface::class);
 
-        $tempTransformer = $this->createMock(DeviceStatusTemperatureMeasurementTemperatureTransformerInterface::class);
+        $tempTransformer = self::createMock(DeviceStatusTemperatureMeasurementTemperatureTransformerInterface::class);
         $tempTransformer->method('transform')
             ->with(['test-temperature'])
             ->willReturn($temperature);
@@ -45,7 +45,7 @@ final class DeviceStatusTemperatureMeasurementTransformerTest extends TestCase
     #[TestWith([[DeviceStatusTemperatureMeasurementTransformerInterface::KEY_TEMPERATURE => 'test-not-an-array']])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $tempTransformer = $this->createMock(DeviceStatusTemperatureMeasurementTemperatureTransformerInterface::class);
+        $tempTransformer = self::createStub(DeviceStatusTemperatureMeasurementTemperatureTransformerInterface::class);
         $transformer = new DeviceStatusTemperatureMeasurementTransformer($tempTransformer);
 
         $this->expectException(UnexpectedResponseException::class);

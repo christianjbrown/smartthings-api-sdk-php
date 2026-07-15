@@ -33,15 +33,15 @@ final class LocationRoomApiTest extends TestCase
     {
         $data = ['test-room-data'];
 
-        $device = $this->createMock(DeviceInterface::class);
+        $device = self::createStub(DeviceInterface::class);
         $device->method('getLocationId')
             ->willReturn('test-location-id');
         $device->method('getRoomId')
             ->willReturn('test-room-id');
 
-        $room = $this->createMock(LocationRoomInterface::class);
+        $room = self::createStub(LocationRoomInterface::class);
 
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::once())
             ->method('get')
             ->with(
@@ -53,7 +53,7 @@ final class LocationRoomApiTest extends TestCase
             )
             ->willReturn($data);
 
-        $roomTransformer = $this->createMock(LocationRoomTransformerInterface::class);
+        $roomTransformer = self::createMock(LocationRoomTransformerInterface::class);
         $roomTransformer->expects(self::once())
             ->method('transform')
             ->with($data)
@@ -74,15 +74,15 @@ final class LocationRoomApiTest extends TestCase
     {
         $data = ['test-room-data'];
 
-        $device = $this->createMock(DeviceInterface::class);
+        $device = self::createStub(DeviceInterface::class);
         $device->method('getLocationId')
             ->willReturn('test-location-id');
         $device->method('getRoomId')
             ->willReturn('test-room-id');
 
-        $room = $this->createMock(LocationRoomInterface::class);
+        $room = self::createStub(LocationRoomInterface::class);
 
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->method('get')
             ->with(
                 sprintf(LocationRoomApiInterface::API_URL_SPRINTF, 'test-location-id', 'test-room-id'),
@@ -93,7 +93,7 @@ final class LocationRoomApiTest extends TestCase
             )
             ->willReturn($data);
 
-        $roomTransformer = $this->createMock(LocationRoomTransformerInterface::class);
+        $roomTransformer = self::createMock(LocationRoomTransformerInterface::class);
         $roomTransformer->method('transform')
             ->with($data)
             ->willReturn($room);
@@ -110,12 +110,12 @@ final class LocationRoomApiTest extends TestCase
      */
     public function testGetOneByDeviceMissingLocationId(): void
     {
-        $device = $this->createMock(DeviceInterface::class);
+        $device = self::createStub(DeviceInterface::class);
         $device->method('getLocationId')
             ->willReturn(null);
 
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
-        $roomTransformer = $this->createMock(LocationRoomTransformerInterface::class);
+        $requestSender = self::createStub(JsonApiRequestSenderInterface::class);
+        $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
 
         $roomApi = new LocationRoomApi($requestSender, $roomTransformer, 'test-api-token');
 
@@ -130,14 +130,14 @@ final class LocationRoomApiTest extends TestCase
      */
     public function testGetOneByDeviceMissingRoomId(): void
     {
-        $device = $this->createMock(DeviceInterface::class);
+        $device = self::createStub(DeviceInterface::class);
         $device->method('getLocationId')
             ->willReturn('test-location-id');
         $device->method('getRoomId')
             ->willReturn(null);
 
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
-        $roomTransformer = $this->createMock(LocationRoomTransformerInterface::class);
+        $requestSender = self::createStub(JsonApiRequestSenderInterface::class);
+        $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
 
         $roomApi = new LocationRoomApi($requestSender, $roomTransformer, 'test-api-token');
 
@@ -154,13 +154,13 @@ final class LocationRoomApiTest extends TestCase
     {
         $data = ['test-room-data'];
 
-        $location = $this->createMock(LocationInterface::class);
+        $location = self::createStub(LocationInterface::class);
         $location->method('getLocationId')
             ->willReturn('test-location-id');
 
-        $room = $this->createMock(LocationRoomInterface::class);
+        $room = self::createStub(LocationRoomInterface::class);
 
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->method('get')
             ->with(
                 sprintf(LocationRoomApiInterface::API_URL_SPRINTF, 'test-location-id', 'test-room-id'),
@@ -171,7 +171,7 @@ final class LocationRoomApiTest extends TestCase
             )
             ->willReturn($data);
 
-        $roomTransformer = $this->createMock(LocationRoomTransformerInterface::class);
+        $roomTransformer = self::createMock(LocationRoomTransformerInterface::class);
         $roomTransformer->method('transform')
             ->with($data)
             ->willReturn($room);
@@ -190,11 +190,11 @@ final class LocationRoomApiTest extends TestCase
     #[TestWith([true])]
     public function testGetOneUnexpectedResponse(bool $skipCache): void
     {
-        $location = $this->createMock(LocationInterface::class);
+        $location = self::createStub(LocationInterface::class);
         $location->method('getLocationId')
             ->willReturn('test-location-id');
 
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->method('get')
             ->with(
                 sprintf(LocationRoomApiInterface::API_URL_SPRINTF, 'test-location-id', 'test-room-id'),
@@ -205,7 +205,7 @@ final class LocationRoomApiTest extends TestCase
             )
             ->willReturn([]);
 
-        $roomTransformer = $this->createMock(LocationRoomTransformerInterface::class);
+        $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
 
         $roomApi = new LocationRoomApi($requestSender, $roomTransformer, 'test-api-token');
 
@@ -222,15 +222,15 @@ final class LocationRoomApiTest extends TestCase
     {
         $data = ['test-room-data'];
 
-        $device = $this->createMock(DeviceInterface::class);
+        $device = self::createStub(DeviceInterface::class);
         $device->method('getLocationId')
             ->willReturn('test-location-id');
         $device->method('getRoomId')
             ->willReturn('test-room-id');
 
-        $room = $this->createMock(LocationRoomInterface::class);
+        $room = self::createStub(LocationRoomInterface::class);
 
-        $requestSender = $this->createMock(JsonApiRequestSenderInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::exactly(2))
             ->method('get')
             ->with(
@@ -242,7 +242,7 @@ final class LocationRoomApiTest extends TestCase
             )
             ->willReturn($data);
 
-        $roomTransformer = $this->createMock(LocationRoomTransformerInterface::class);
+        $roomTransformer = self::createMock(LocationRoomTransformerInterface::class);
         $roomTransformer->method('transform')
             ->with($data)
             ->willReturn($room);

@@ -14,11 +14,11 @@ final class DeviceStatusTemperatureMeasurementTest extends TestCase
 {
     public function test(): void
     {
-        $temperature = $this->createMock(DeviceStatusTemperatureMeasurementTemperatureInterface::class);
+        $temperature = self::createStub(DeviceStatusTemperatureMeasurementTemperatureInterface::class);
         $measurement = new DeviceStatusTemperatureMeasurement($temperature);
         self::assertSame($temperature, $measurement->getTemperature());
 
-        $newTemperature = $this->createMock(DeviceStatusTemperatureMeasurementTemperatureInterface::class);
+        $newTemperature = self::createStub(DeviceStatusTemperatureMeasurementTemperatureInterface::class);
         self::assertSame($measurement, $measurement->setTemperature($newTemperature));
         self::assertSame($newTemperature, $measurement->getTemperature());
     }
