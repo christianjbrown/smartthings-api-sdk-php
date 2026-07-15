@@ -1,5 +1,6 @@
-
 # Overview
+
+[![CI](https://github.com/christianjbrown/php-smartthings-api-lib/actions/workflows/ci.yml/badge.svg)](https://github.com/christianjbrown/php-smartthings-api-lib/actions/workflows/ci.yml)
 
 A strongly-typed PHP 8.3+ client for the [SmartThings API](https://developer.smartthings.com/). It lists the devices in your SmartThings account and reads a device's status, returning plain, typed model objects rather than raw arrays.
 
@@ -22,7 +23,7 @@ The client is **read-only** and currently supports:
 
 
 
-# :building_construction: Installation
+## :building_construction: Installation
 
 For your composer-enabled project:
 
@@ -32,7 +33,7 @@ composer require christianjbrown/php-smartthings-api-lib
 
 
 
-# :computer: Usage
+## :computer: Usage
 
 First, create a SmartThings [personal access token](https://account.smartthings.com/tokens) with the `devices` scopes. This token is passed to each API client.
 
@@ -95,7 +96,7 @@ $room = $locationRoomApi->getOneByLocationAndId($locations[0], 'a-room-id'); // 
 echo $room->getName(), "\n";
 ```
 
-## Error handling
+## :rotating_light: Error handling
 
 Everything this library throws implements `ChristianBrown\SmartThings\Exception\ExceptionInterface`, so a single `catch` covers it all:
 
@@ -197,3 +198,7 @@ $locationRoomApi = new LocationRoomApi(
 ```
 
 </details>
+
+## :page_facing_up: License
+
+Released under the [MIT License](LICENSE).

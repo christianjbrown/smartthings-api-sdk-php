@@ -115,7 +115,7 @@ in mind:
   sets `includeUncoveredFiles` and `pathCoverage`, so any untested file, path, or branch shows up
   there. New code without full coverage is not done.
 - **Every test class needs a `#[CoversClass(...)]` attribute** (may list more than one) or the run
-  fails. Use PHPUnit 11 **attributes, not annotations**: `#[CoversClass]`, `#[DataProvider]`,
+  fails. Use PHPUnit 12 **attributes, not annotations**: `#[CoversClass]`, `#[DataProvider]`,
   `#[TestWith]`.
 - Tests mirror `src/` 1:1 under `tests/<Layer>/`, one `final class XTest extends TestCase` per class,
   methods named `test<Method><Scenario>` (e.g. `testTransform`, `testGetUnexpectedResponse`).
