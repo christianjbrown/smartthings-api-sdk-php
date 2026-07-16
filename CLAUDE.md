@@ -5,7 +5,7 @@ small, uniform, and highly opinionated, so new code should be indistinguishable 
 
 ## What this is
 
-A strongly-typed, **read-only** PHP 8.3+ client for the [SmartThings API](https://developer.smartthings.com/).
+A strongly-typed, **read-only** PHP 8.5+ client for the [SmartThings API](https://developer.smartthings.com/).
 It lists devices and locations, reads a device's status, and reads rooms, returning typed model
 objects instead of raw arrays. The primary entry point is the `SmartThings` facade (`src/SmartThings.php`),
 which wires the clients and their transformer chains through a Symfony `ContainerBuilder` DI container.

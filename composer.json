@@ -1,6 +1,6 @@
 {
     "name": "christianjbrown/php-smartthings-api-lib",
-    "description": "A strongly-typed, read-only PHP 8.3+ client for the SmartThings API that returns typed model objects instead of raw arrays.",
+    "description": "A strongly-typed, read-only PHP 8.5+ client for the SmartThings API that returns typed model objects instead of raw arrays.",
     "type": "library",
     "license": "MIT",
     "keywords": [
@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^8.3",
+        "php": "^8.5",
         "christianjbrown/php-api-client-lib": "dev-main",
         "psr/container": "^2.0",
         "symfony/dependency-injection": "^7.2"
