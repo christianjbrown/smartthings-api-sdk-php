@@ -105,82 +105,18 @@ final class SmartThings implements SmartThingsInterface
 
     private function init(): void
     {
-        $this->container->register(self::SERVICE_API_CLIENT, ApiClient::class);
-        $this->container->register(self::SERVICE_JSON_API_REQUEST_SENDER, JsonApiRequestSenderInterface::class)
-            ->setFactory([new Reference(self::SERVICE_API_CLIENT), 'getJsonApiRequestSender']);
+        // Registration order matters: a service must be registered before another
+        // service wires a reference to its definition, so core comes first and the
+        // API clients (which reference every transformer chain) come last.
+        $this->registerCore();
+        $this->registerDeviceTransformers();
+        $this->registerDeviceStatusTransformers();
+        $this->registerLocationTransformers();
+        $this->registerApiClients();
+    }
 
-        $this->container->register(self::SERVICE_DEVICE_COMPONENT_CAPABILITY_TRANSFORMER, DeviceComponentCapabilityTransformer::class);
-        $this->container->register(self::SERVICE_DEVICE_COMPONENT_CAPABILITIES_TRANSFORMER, DeviceComponentCapabilitiesTransformer::class)
-            ->setArguments(
-                [
-                    $this->container->getDefinition(self::SERVICE_DEVICE_COMPONENT_CAPABILITY_TRANSFORMER),
-                ]
-            );
-        $this->container->register(self::SERVICE_DEVICE_COMPONENT_TRANSFORMER, DeviceComponentTransformer::class)
-            ->setArguments(
-                [
-                    $this->container->getDefinition(self::SERVICE_DEVICE_COMPONENT_CAPABILITIES_TRANSFORMER),
-                ]
-            );
-        $this->container->register(self::SERVICE_DEVICE_COMPONENTS_TRANSFORMER, DeviceComponentsTransformer::class)
-            ->setArguments(
-                [
-                    $this->container->getDefinition(self::SERVICE_DEVICE_COMPONENT_TRANSFORMER),
-                ]
-            );
-        $this->container->register(self::SERVICE_DEVICE_TRANSFORMER, DeviceTransformer::class)
-            ->setArguments(
-                [
-                    $this->container->getDefinition(self::SERVICE_DEVICE_COMPONENTS_TRANSFORMER),
-                ]
-            );
-        $this->container->register(self::SERVICE_DEVICES_TRANSFORMER, DevicesTransformer::class)
-            ->setArguments(
-                [
-                    $this->container->getDefinition(self::SERVICE_DEVICE_TRANSFORMER),
-                ]
-            );
-
-        $this->container->register(self::SERVICE_DEVICE_STATUS_TEMPERATURE_MEASUREMENT_TEMPERATURE_TRANSFORMER, DeviceStatusTemperatureMeasurementTemperatureTransformer::class);
-        $this->container->register(self::SERVICE_DEVICE_STATUS_TEMPERATURE_MEASUREMENT_TRANSFORMER, DeviceStatusTemperatureMeasurementTransformer::class)
-            ->setArguments(
-                [
-                    $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_TEMPERATURE_MEASUREMENT_TEMPERATURE_TRANSFORMER),
-                ]
-            );
-        $this->container->register(self::SERVICE_DEVICE_STATUS_RELATIVE_HUMIDITY_MEASUREMENT_HUMIDITY_TRANSFORMER, DeviceStatusRelativeHumidityMeasurementHumidityTransformer::class);
-        $this->container->register(self::SERVICE_DEVICE_STATUS_RELATIVE_HUMIDITY_MEASUREMENT_TRANSFORMER, DeviceStatusRelativeHumidityMeasurementTransformer::class)
-            ->setArguments(
-                [
-                    $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_RELATIVE_HUMIDITY_MEASUREMENT_HUMIDITY_TRANSFORMER),
-                ]
-            );
-        $this->container->register(self::SERVICE_DEVICE_STATUS_BATTERY_BATTERY_TRANSFORMER, DeviceStatusBatteryBatteryTransformer::class);
-        $this->container->register(self::SERVICE_DEVICE_STATUS_BATTERY_TRANSFORMER, DeviceStatusBatteryTransformer::class)
-            ->setArguments(
-                [
-                    $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_BATTERY_BATTERY_TRANSFORMER),
-                ]
-            );
-        $this->container->register(self::SERVICE_DEVICE_STATUS_TRANSFORMER, DeviceStatusTransformer::class)
-            ->setArguments(
-                [
-                    $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_TEMPERATURE_MEASUREMENT_TRANSFORMER),
-                    $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_RELATIVE_HUMIDITY_MEASUREMENT_TRANSFORMER),
-                    $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_BATTERY_TRANSFORMER),
-                ]
-            );
-
-        $this->container->register(self::SERVICE_LOCATION_TRANSFORMER, LocationTransformer::class);
-        $this->container->register(self::SERVICE_LOCATIONS_TRANSFORMER, LocationsTransformer::class)
-            ->setArguments(
-                [
-                    $this->container->getDefinition(self::SERVICE_LOCATION_TRANSFORMER),
-                ]
-            );
-
-        $this->container->register(self::SERVICE_LOCATION_ROOM_TRANSFORMER, LocationRoomTransformer::class);
-
+    private function registerApiClients(): void
+    {
         $this->container->register(self::SERVICE_DEVICE_API, DeviceApi::class)
             ->setArguments(
                 [
@@ -214,5 +150,93 @@ final class SmartThings implements SmartThingsInterface
                     $this->apiToken,
                 ]
             );
+    }
+
+    private function registerCore(): void
+    {
+        $this->container->register(self::SERVICE_API_CLIENT, ApiClient::class);
+        $this->container->register(self::SERVICE_JSON_API_REQUEST_SENDER, JsonApiRequestSenderInterface::class)
+            ->setFactory([new Reference(self::SERVICE_API_CLIENT), 'getJsonApiRequestSender']);
+    }
+
+    private function registerDeviceStatusTransformers(): void
+    {
+        $this->container->register(self::SERVICE_DEVICE_STATUS_TEMPERATURE_MEASUREMENT_TEMPERATURE_TRANSFORMER, DeviceStatusTemperatureMeasurementTemperatureTransformer::class);
+        $this->container->register(self::SERVICE_DEVICE_STATUS_TEMPERATURE_MEASUREMENT_TRANSFORMER, DeviceStatusTemperatureMeasurementTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_TEMPERATURE_MEASUREMENT_TEMPERATURE_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_DEVICE_STATUS_RELATIVE_HUMIDITY_MEASUREMENT_HUMIDITY_TRANSFORMER, DeviceStatusRelativeHumidityMeasurementHumidityTransformer::class);
+        $this->container->register(self::SERVICE_DEVICE_STATUS_RELATIVE_HUMIDITY_MEASUREMENT_TRANSFORMER, DeviceStatusRelativeHumidityMeasurementTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_RELATIVE_HUMIDITY_MEASUREMENT_HUMIDITY_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_DEVICE_STATUS_BATTERY_BATTERY_TRANSFORMER, DeviceStatusBatteryBatteryTransformer::class);
+        $this->container->register(self::SERVICE_DEVICE_STATUS_BATTERY_TRANSFORMER, DeviceStatusBatteryTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_BATTERY_BATTERY_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_DEVICE_STATUS_TRANSFORMER, DeviceStatusTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_TEMPERATURE_MEASUREMENT_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_RELATIVE_HUMIDITY_MEASUREMENT_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_BATTERY_TRANSFORMER),
+                ]
+            );
+    }
+
+    private function registerDeviceTransformers(): void
+    {
+        $this->container->register(self::SERVICE_DEVICE_COMPONENT_CAPABILITY_TRANSFORMER, DeviceComponentCapabilityTransformer::class);
+        $this->container->register(self::SERVICE_DEVICE_COMPONENT_CAPABILITIES_TRANSFORMER, DeviceComponentCapabilitiesTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_DEVICE_COMPONENT_CAPABILITY_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_DEVICE_COMPONENT_TRANSFORMER, DeviceComponentTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_DEVICE_COMPONENT_CAPABILITIES_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_DEVICE_COMPONENTS_TRANSFORMER, DeviceComponentsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_DEVICE_COMPONENT_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_DEVICE_TRANSFORMER, DeviceTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_DEVICE_COMPONENTS_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_DEVICES_TRANSFORMER, DevicesTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_DEVICE_TRANSFORMER),
+                ]
+            );
+    }
+
+    private function registerLocationTransformers(): void
+    {
+        $this->container->register(self::SERVICE_LOCATION_TRANSFORMER, LocationTransformer::class);
+        $this->container->register(self::SERVICE_LOCATIONS_TRANSFORMER, LocationsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_LOCATION_TRANSFORMER),
+                ]
+            );
+
+        $this->container->register(self::SERVICE_LOCATION_ROOM_TRANSFORMER, LocationRoomTransformer::class);
     }
 }
