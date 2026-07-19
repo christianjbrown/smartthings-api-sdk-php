@@ -7,6 +7,8 @@ namespace ChristianBrown\SmartThings\Tests\Api;
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Api\ApiInterface;
+use ChristianBrown\SmartThings\Api\Token;
+use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceApiInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
@@ -21,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 use function sprintf;
 
 #[CoversClass(DeviceApi::class)]
+#[CoversClass(Token::class)]
 final class DeviceApiTest extends TestCase
 {
     /**
@@ -39,7 +42,7 @@ final class DeviceApiTest extends TestCase
                 DeviceApiInterface::API_URL,
                 [],
                 [
-                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
             )
             ->willReturn($data);
@@ -51,7 +54,7 @@ final class DeviceApiTest extends TestCase
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, 'test-api-token');
+        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, new Token('test-api-token'));
         $actual = $deviceApi->getMultiple();
 
         self::assertSame($devices, $actual);
@@ -80,7 +83,7 @@ final class DeviceApiTest extends TestCase
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, 'test-api-token');
+        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, new Token('test-api-token'));
 
         // Second call is served from the cache without hitting the API.
         self::assertSame($devices, $deviceApi->getMultiple());
@@ -110,7 +113,7 @@ final class DeviceApiTest extends TestCase
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, 'test-api-token');
+        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, new Token('test-api-token'));
 
         self::assertSame($devices, $deviceApi->getMultiple('test-location-a'));
         self::assertSame($devices, $deviceApi->getMultiple('test-location-b'));
@@ -132,7 +135,7 @@ final class DeviceApiTest extends TestCase
                 DeviceApiInterface::API_URL,
                 [DeviceApiInterface::KEY_LOCATION_ID => 'test-location-id'],
                 [
-                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
             )
             ->willReturn($data);
@@ -144,7 +147,7 @@ final class DeviceApiTest extends TestCase
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, 'test-api-token');
+        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, new Token('test-api-token'));
         $actual = $deviceApi->getMultiple('test-location-id');
 
         self::assertSame($devices, $actual);
@@ -172,7 +175,7 @@ final class DeviceApiTest extends TestCase
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, 'test-api-token');
+        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, new Token('test-api-token'));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($devices, $deviceApi->getMultiple());
@@ -197,14 +200,14 @@ final class DeviceApiTest extends TestCase
                 DeviceApiInterface::API_URL,
                 [],
                 [
-                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
             )
             ->willReturn($data);
 
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, 'test-api-token');
+        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, new Token('test-api-token'));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DeviceApiInterface::UNEXPECTED_RESPONSE_SPRINTF, DeviceApiInterface::KEY_ITEMS));

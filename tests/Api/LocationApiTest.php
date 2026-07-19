@@ -7,6 +7,8 @@ namespace ChristianBrown\SmartThings\Tests\Api;
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Api\ApiInterface;
+use ChristianBrown\SmartThings\Api\Token;
+use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationApiInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
@@ -23,6 +25,7 @@ use function rawurlencode;
 use function sprintf;
 
 #[CoversClass(LocationApi::class)]
+#[CoversClass(Token::class)]
 final class LocationApiTest extends TestCase
 {
     /**
@@ -41,7 +44,7 @@ final class LocationApiTest extends TestCase
                 LocationApiInterface::API_URL,
                 [],
                 [
-                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
             )
             ->willReturn($data);
@@ -55,7 +58,7 @@ final class LocationApiTest extends TestCase
             ->with($data[LocationApiInterface::KEY_ITEMS])
             ->willReturn($locations);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
         $actual = $locationApi->getMultiple();
 
         self::assertSame($locations, $actual);
@@ -86,7 +89,7 @@ final class LocationApiTest extends TestCase
             ->with($data[LocationApiInterface::KEY_ITEMS])
             ->willReturn($locations);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
 
         // Second call is served from the cache without hitting the API.
         self::assertSame($locations, $locationApi->getMultiple());
@@ -117,7 +120,7 @@ final class LocationApiTest extends TestCase
             ->with($data[LocationApiInterface::KEY_ITEMS])
             ->willReturn($locations);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($locations, $locationApi->getMultiple());
@@ -142,7 +145,7 @@ final class LocationApiTest extends TestCase
                 LocationApiInterface::API_URL,
                 [],
                 [
-                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
             )
             ->willReturn($data);
@@ -150,7 +153,7 @@ final class LocationApiTest extends TestCase
         $locationTransformer = self::createStub(LocationTransformerInterface::class);
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(LocationApiInterface::UNEXPECTED_RESPONSE_SPRINTF, LocationApiInterface::KEY_ITEMS));
@@ -171,7 +174,7 @@ final class LocationApiTest extends TestCase
                 sprintf(LocationApiInterface::API_URL_SPRINTF, 'test-location-id'),
                 [],
                 [
-                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
             )
             ->willReturn($data);
@@ -185,7 +188,7 @@ final class LocationApiTest extends TestCase
 
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
         $actual = $locationApi->getOneById('test-location-id');
 
         self::assertSame($location, $actual);
@@ -208,7 +211,7 @@ final class LocationApiTest extends TestCase
                 sprintf(LocationApiInterface::API_URL_SPRINTF, 'test-location-id'),
                 [],
                 [
-                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
             )
             ->willReturn($data);
@@ -221,7 +224,7 @@ final class LocationApiTest extends TestCase
 
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
 
         // Second call for the same locationId is served from the cache without hitting the API.
         self::assertSame($location, $locationApi->getOneById('test-location-id'));
@@ -244,7 +247,7 @@ final class LocationApiTest extends TestCase
                 sprintf(LocationApiInterface::API_URL_SPRINTF, rawurlencode($locationId)),
                 [],
                 [
-                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
             )
             ->willReturn($data);
@@ -258,7 +261,7 @@ final class LocationApiTest extends TestCase
 
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
         $actual = $locationApi->getOneById($locationId);
 
         self::assertSame($location, $actual);
@@ -281,7 +284,7 @@ final class LocationApiTest extends TestCase
                 sprintf(LocationApiInterface::API_URL_SPRINTF, 'test-location-id'),
                 [],
                 [
-                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
             )
             ->willReturn($data);
@@ -293,7 +296,7 @@ final class LocationApiTest extends TestCase
 
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($location, $locationApi->getOneById('test-location-id'));
@@ -314,7 +317,7 @@ final class LocationApiTest extends TestCase
                 sprintf(LocationApiInterface::API_URL_SPRINTF, 'test-location-id'),
                 [],
                 [
-                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
             )
             ->willReturn([]);
@@ -322,7 +325,7 @@ final class LocationApiTest extends TestCase
         $locationTransformer = self::createStub(LocationTransformerInterface::class);
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, 'test-api-token');
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationApiInterface::UNEXPECTED_RESPONSE);

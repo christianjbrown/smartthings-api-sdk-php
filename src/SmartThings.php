@@ -14,6 +14,8 @@ use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationApiInterface;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApiInterface;
+use ChristianBrown\SmartThings\Api\Token;
+use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentsTransformer;
@@ -37,13 +39,13 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class SmartThings implements SmartThingsInterface
 {
-    private string $apiToken;
     private ContainerBuilder $container;
+    private TokenInterface $token;
 
     public function __construct(string $apiToken)
     {
-        $this->apiToken = $apiToken;
         $this->container = new ContainerBuilder();
+        $this->token = new Token($apiToken);
         $this->init();
     }
 
@@ -122,7 +124,7 @@ final class SmartThings implements SmartThingsInterface
                 [
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_DEVICES_TRANSFORMER),
-                    $this->apiToken,
+                    $this->token,
                 ]
             );
         $this->container->register(self::SERVICE_DEVICE_STATUS_API, DeviceStatusApi::class)
@@ -130,7 +132,7 @@ final class SmartThings implements SmartThingsInterface
                 [
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_TRANSFORMER),
-                    $this->apiToken,
+                    $this->token,
                 ]
             );
         $this->container->register(self::SERVICE_LOCATION_API, LocationApi::class)
@@ -139,7 +141,7 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_LOCATION_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_LOCATIONS_TRANSFORMER),
-                    $this->apiToken,
+                    $this->token,
                 ]
             );
         $this->container->register(self::SERVICE_LOCATION_ROOM_API, LocationRoomApi::class)
@@ -147,7 +149,7 @@ final class SmartThings implements SmartThingsInterface
                 [
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_LOCATION_ROOM_TRANSFORMER),
-                    $this->apiToken,
+                    $this->token,
                 ]
             );
     }

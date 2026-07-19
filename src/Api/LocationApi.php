@@ -17,7 +17,7 @@ use function sprintf;
 
 final class LocationApi implements LocationApiInterface
 {
-    private string $apiToken;
+    private TokenInterface $token;
 
     /**
      * @var array<string, LocationInterface>
@@ -32,12 +32,12 @@ final class LocationApi implements LocationApiInterface
     private LocationTransformerInterface $locationTransformer;
     private JsonApiRequestSenderInterface $requestSender;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, LocationTransformerInterface $locationTransformer, LocationsTransformerInterface $locationsTransformer, string $apiToken)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, LocationTransformerInterface $locationTransformer, LocationsTransformerInterface $locationsTransformer, TokenInterface $token)
     {
         $this->requestSender = $requestSender;
         $this->locationTransformer = $locationTransformer;
         $this->locationsTransformer = $locationsTransformer;
-        $this->apiToken = $apiToken;
+        $this->token = $token;
     }
 
     /**
@@ -55,7 +55,7 @@ final class LocationApi implements LocationApiInterface
         }
 
         $headers = [
-            self::HEADER_KEY_AUTHORIZATION => sprintf(self::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, $this->apiToken),
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $data = $this->requestSender->get(self::API_URL, [], $headers);
 
@@ -84,7 +84,7 @@ final class LocationApi implements LocationApiInterface
         }
 
         $headers = [
-            self::HEADER_KEY_AUTHORIZATION => sprintf(self::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, $this->apiToken),
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($locationId));
         $data = $this->requestSender->get($url, [], $headers);

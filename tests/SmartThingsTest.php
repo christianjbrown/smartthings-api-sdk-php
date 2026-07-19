@@ -8,6 +8,7 @@ use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
+use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\SmartThings;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
@@ -34,6 +35,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DeviceStatusApi::class)]
 #[UsesClass(LocationApi::class)]
 #[UsesClass(LocationRoomApi::class)]
+#[UsesClass(Token::class)]
 #[UsesClass(DeviceComponentCapabilitiesTransformer::class)]
 #[UsesClass(DeviceComponentCapabilityTransformer::class)]
 #[UsesClass(DeviceComponentsTransformer::class)]

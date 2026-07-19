@@ -18,7 +18,7 @@ use function sprintf;
 
 final class LocationRoomApi implements LocationRoomApiInterface
 {
-    private string $apiToken;
+    private TokenInterface $token;
 
     /**
      * @var array<string, LocationRoomInterface>
@@ -27,11 +27,11 @@ final class LocationRoomApi implements LocationRoomApiInterface
     private JsonApiRequestSenderInterface $requestSender;
     private LocationRoomTransformerInterface $roomTransformer;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, LocationRoomTransformerInterface $roomTransformer, string $apiToken)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, LocationRoomTransformerInterface $roomTransformer, TokenInterface $token)
     {
         $this->requestSender = $requestSender;
         $this->roomTransformer = $roomTransformer;
-        $this->apiToken = $apiToken;
+        $this->token = $token;
     }
 
     /**
@@ -73,7 +73,7 @@ final class LocationRoomApi implements LocationRoomApiInterface
         }
 
         $headers = [
-            self::HEADER_KEY_AUTHORIZATION => sprintf(self::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, $this->apiToken),
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($locationId), rawurlencode($roomId));
         $data = $this->requestSender->get($url, [], $headers);

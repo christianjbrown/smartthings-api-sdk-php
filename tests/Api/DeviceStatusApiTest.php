@@ -7,6 +7,8 @@ namespace ChristianBrown\SmartThings\Tests\Api;
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Api\ApiInterface;
+use ChristianBrown\SmartThings\Api\Token;
+use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApiInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
@@ -23,6 +25,7 @@ use function rawurlencode;
 use function sprintf;
 
 #[CoversClass(DeviceStatusApi::class)]
+#[CoversClass(Token::class)]
 final class DeviceStatusApiTest extends TestCase
 {
     /**
@@ -54,7 +57,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, 'test-api-token');
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
 
         // Second call for the same deviceId is served from the cache without hitting the API.
         self::assertSame($deviceStatus, $deviceApi->getOneByDevice($device));
@@ -85,7 +88,7 @@ final class DeviceStatusApiTest extends TestCase
                 sprintf(DeviceStatusApiInterface::API_URL_SPRINTF, 'test-device-id'),
                 [],
                 [
-                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
             )
             ->willReturn($data);
@@ -95,7 +98,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, 'test-api-token');
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
         $actual = $deviceApi->getOneByDevice($device);
 
         self::assertSame($deviceStatus, $actual);
@@ -121,7 +124,7 @@ final class DeviceStatusApiTest extends TestCase
                 sprintf(DeviceStatusApiInterface::API_URL_SPRINTF, 'test-device-id'),
                 [],
                 [
-                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
             )
             ->willReturn($data);
@@ -131,7 +134,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, 'test-api-token');
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
         $actual = $deviceApi->getOneById('test-device-id');
 
         self::assertSame($deviceStatus, $actual);
@@ -159,7 +162,7 @@ final class DeviceStatusApiTest extends TestCase
                 sprintf(DeviceStatusApiInterface::API_URL_SPRINTF, rawurlencode($deviceId)),
                 [],
                 [
-                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
             )
             ->willReturn($data);
@@ -169,7 +172,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, 'test-api-token');
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
         $actual = $deviceApi->getOneById($deviceId);
 
         self::assertSame($deviceStatus, $actual);
@@ -203,7 +206,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, 'test-api-token');
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($deviceStatus, $deviceApi->getOneByDevice($device));
@@ -236,14 +239,14 @@ final class DeviceStatusApiTest extends TestCase
                 sprintf(DeviceStatusApiInterface::API_URL_SPRINTF, 'test-device-id'),
                 [],
                 [
-                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(ApiInterface::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
             )
             ->willReturn($data);
 
         $deviceStatusTransformer = self::createStub(DeviceStatusTransformerInterface::class);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, 'test-api-token');
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DeviceStatusApiInterface::UNEXPECTED_RESPONSE_SPRINTF, $exceptionString));

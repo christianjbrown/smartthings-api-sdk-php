@@ -17,7 +17,7 @@ use function sprintf;
 
 final class DeviceStatusApi implements DeviceStatusApiInterface
 {
-    private string $apiToken;
+    private TokenInterface $token;
 
     /**
      * @var array<string, DeviceStatusInterface>
@@ -26,11 +26,11 @@ final class DeviceStatusApi implements DeviceStatusApiInterface
     private DeviceStatusTransformerInterface $deviceStatusTransformer;
     private JsonApiRequestSenderInterface $requestSender;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceStatusTransformerInterface $deviceStatusTransformer, string $apiToken)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceStatusTransformerInterface $deviceStatusTransformer, TokenInterface $token)
     {
         $this->requestSender = $requestSender;
         $this->deviceStatusTransformer = $deviceStatusTransformer;
-        $this->apiToken = $apiToken;
+        $this->token = $token;
     }
 
     /**
@@ -55,7 +55,7 @@ final class DeviceStatusApi implements DeviceStatusApiInterface
         }
 
         $headers = [
-            self::HEADER_KEY_AUTHORIZATION => sprintf(self::HEADER_VALUE_AUTHORIZATION_BEARER_SPRINTF, $this->apiToken),
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($deviceId));
         $data = $this->requestSender->get($url, [], $headers);
