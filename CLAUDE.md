@@ -55,8 +55,11 @@ Three layers under `src/`, mirrored 1:1 under `tests/`, plus the top-level `Smar
   empty response before delegating. Clients cache by id (`LocationRoomApi` caches by roomId).
 - **`Transformer/`** — turn raw decoded-JSON arrays into `Model` objects. Nested transformers are
   constructor-injected and composed into a chain (e.g. `DevicesTransformer` → `DeviceTransformer` →
-  `DeviceComponentsTransformer` → … → leaf). Status supports the `temperatureMeasurement` and
-  `relativeHumidityMeasurement` capabilities.
+  `DeviceComponentsTransformer` → … → leaf). `DeviceStatusTransformer` supports the
+  `temperatureMeasurement`, `relativeHumidityMeasurement` and `battery` capabilities via a
+  `capabilityKey => applier` map built in its constructor: `transform()` dispatches over the map with
+  `array_map` (no `foreach`), so a new capability is added by registering one map entry — the dispatch
+  logic itself stays closed for modification.
 - **`Model/`** — plain, mutable typed DTOs with getters and fluent setters.
 - **`Exception/`** — `final` exception classes + matching interfaces: `UnexpectedResponseException`
   (extends `RuntimeException`, thrown by clients and transformers for malformed responses) and
@@ -129,7 +132,9 @@ in mind:
 
 1. Add the `Model` DTO + its interface (constants, if any, on the interface).
 2. Add the `Transformer` + its interface, with `KEY_*` and `*_SPRINTF` constants on the interface.
-3. Wire the new transformer into its parent transformer's constructor chain.
+3. Wire the new transformer into its parent transformer's constructor chain. For a new device-status
+   capability, inject its transformer into `DeviceStatusTransformer` and register a
+   `self::KEY_… => applier` entry in the `capabilityAppliers` map — `transform()` needs no change.
 4. If it's a new endpoint, extend/add the `Api` client and its interface (`API_URL*` constant).
 5. Add a matching `#[CoversClass]` test under `tests/<Layer>/`.
 6. Run `composer fix-style`, then `composer check-style` to catch anything left to fix by hand, then
