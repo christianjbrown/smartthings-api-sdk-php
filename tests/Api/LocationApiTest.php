@@ -39,7 +39,7 @@ final class LocationApiTest extends TestCase
         ];
 
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 LocationApiInterface::API_URL,
                 [],
@@ -54,7 +54,7 @@ final class LocationApiTest extends TestCase
         $locationTransformer = self::createStub(LocationTransformerInterface::class);
 
         $locationsTransformer = self::createMock(LocationsTransformerInterface::class);
-        $locationsTransformer->method('transform')
+        $locationsTransformer->expects(self::once())->method('transform')
             ->with($data[LocationApiInterface::KEY_ITEMS])
             ->willReturn($locations);
 
@@ -116,7 +116,7 @@ final class LocationApiTest extends TestCase
         $locationTransformer = self::createStub(LocationTransformerInterface::class);
 
         $locationsTransformer = self::createMock(LocationsTransformerInterface::class);
-        $locationsTransformer->method('transform')
+        $locationsTransformer->expects(self::exactly(2))->method('transform')
             ->with($data[LocationApiInterface::KEY_ITEMS])
             ->willReturn($locations);
 
@@ -140,7 +140,7 @@ final class LocationApiTest extends TestCase
     public function testGetMultipleUnexpectedResponse(array $data, bool $skipCache): void
     {
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 LocationApiInterface::API_URL,
                 [],
@@ -169,7 +169,7 @@ final class LocationApiTest extends TestCase
         $data = ['test-location-data'];
 
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 sprintf(LocationApiInterface::API_URL_SPRINTF, 'test-location-id'),
                 [],
@@ -182,7 +182,7 @@ final class LocationApiTest extends TestCase
         $location = self::createStub(LocationInterface::class);
 
         $locationTransformer = self::createMock(LocationTransformerInterface::class);
-        $locationTransformer->method('transform')
+        $locationTransformer->expects(self::once())->method('transform')
             ->with($data)
             ->willReturn($location);
 
@@ -242,7 +242,7 @@ final class LocationApiTest extends TestCase
         $data = ['test-location-data'];
 
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 sprintf(LocationApiInterface::API_URL_SPRINTF, rawurlencode($locationId)),
                 [],
@@ -255,7 +255,7 @@ final class LocationApiTest extends TestCase
         $location = self::createStub(LocationInterface::class);
 
         $locationTransformer = self::createMock(LocationTransformerInterface::class);
-        $locationTransformer->method('transform')
+        $locationTransformer->expects(self::once())->method('transform')
             ->with($data)
             ->willReturn($location);
 
@@ -290,7 +290,7 @@ final class LocationApiTest extends TestCase
             ->willReturn($data);
 
         $locationTransformer = self::createMock(LocationTransformerInterface::class);
-        $locationTransformer->method('transform')
+        $locationTransformer->expects(self::exactly(2))->method('transform')
             ->with($data)
             ->willReturn($location);
 
@@ -312,7 +312,7 @@ final class LocationApiTest extends TestCase
     public function testGetOneByIdUnexpectedResponse(bool $skipCache): void
     {
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 sprintf(LocationApiInterface::API_URL_SPRINTF, 'test-location-id'),
                 [],

@@ -27,7 +27,7 @@ final class DeviceStatusRelativeHumidityMeasurementTransformerTest extends TestC
         $humidity = self::createStub(DeviceStatusRelativeHumidityMeasurementHumidityInterface::class);
 
         $humidityTransformer = self::createMock(DeviceStatusRelativeHumidityMeasurementHumidityTransformerInterface::class);
-        $humidityTransformer->method('transform')
+        $humidityTransformer->expects(self::once())->method('transform')
             ->with(['test-humidity'])
             ->willReturn($humidity);
 

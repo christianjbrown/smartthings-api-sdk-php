@@ -37,7 +37,7 @@ final class DeviceApiTest extends TestCase
         ];
 
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 DeviceApiInterface::API_URL,
                 [],
@@ -50,7 +50,7 @@ final class DeviceApiTest extends TestCase
         $devices = [self::createStub(DeviceInterface::class), self::createStub(DeviceInterface::class)];
 
         $devicesTransformer = self::createMock(DevicesTransformerInterface::class);
-        $devicesTransformer->method('transform')
+        $devicesTransformer->expects(self::once())->method('transform')
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
@@ -109,7 +109,7 @@ final class DeviceApiTest extends TestCase
             ->willReturn($data);
 
         $devicesTransformer = self::createMock(DevicesTransformerInterface::class);
-        $devicesTransformer->method('transform')
+        $devicesTransformer->expects(self::exactly(2))->method('transform')
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
@@ -130,7 +130,7 @@ final class DeviceApiTest extends TestCase
         ];
 
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 DeviceApiInterface::API_URL,
                 [DeviceApiInterface::KEY_LOCATION_ID => 'test-location-id'],
@@ -143,7 +143,7 @@ final class DeviceApiTest extends TestCase
         $devices = [self::createStub(DeviceInterface::class), self::createStub(DeviceInterface::class)];
 
         $devicesTransformer = self::createMock(DevicesTransformerInterface::class);
-        $devicesTransformer->method('transform')
+        $devicesTransformer->expects(self::once())->method('transform')
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
@@ -171,7 +171,7 @@ final class DeviceApiTest extends TestCase
             ->willReturn($data);
 
         $devicesTransformer = self::createMock(DevicesTransformerInterface::class);
-        $devicesTransformer->method('transform')
+        $devicesTransformer->expects(self::exactly(2))->method('transform')
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
@@ -195,7 +195,7 @@ final class DeviceApiTest extends TestCase
     public function testGetMultipleUnexpectedResponse(array $data, bool $skipCache): void
     {
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 DeviceApiInterface::API_URL,
                 [],

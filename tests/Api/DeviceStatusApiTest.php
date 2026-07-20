@@ -83,7 +83,7 @@ final class DeviceStatusApiTest extends TestCase
         $deviceStatus = self::createStub(DeviceStatusInterface::class);
 
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 sprintf(DeviceStatusApiInterface::API_URL_SPRINTF, 'test-device-id'),
                 [],
@@ -94,7 +94,7 @@ final class DeviceStatusApiTest extends TestCase
             ->willReturn($data);
 
         $deviceStatusTransformer = self::createMock(DeviceStatusTransformerInterface::class);
-        $deviceStatusTransformer->method('transform')
+        $deviceStatusTransformer->expects(self::once())->method('transform')
             ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
             ->willReturn($deviceStatus);
 
@@ -119,7 +119,7 @@ final class DeviceStatusApiTest extends TestCase
         $deviceStatus = self::createStub(DeviceStatusInterface::class);
 
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 sprintf(DeviceStatusApiInterface::API_URL_SPRINTF, 'test-device-id'),
                 [],
@@ -130,7 +130,7 @@ final class DeviceStatusApiTest extends TestCase
             ->willReturn($data);
 
         $deviceStatusTransformer = self::createMock(DeviceStatusTransformerInterface::class);
-        $deviceStatusTransformer->method('transform')
+        $deviceStatusTransformer->expects(self::once())->method('transform')
             ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
             ->willReturn($deviceStatus);
 
@@ -157,7 +157,7 @@ final class DeviceStatusApiTest extends TestCase
         $deviceStatus = self::createStub(DeviceStatusInterface::class);
 
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 sprintf(DeviceStatusApiInterface::API_URL_SPRINTF, rawurlencode($deviceId)),
                 [],
@@ -168,7 +168,7 @@ final class DeviceStatusApiTest extends TestCase
             ->willReturn($data);
 
         $deviceStatusTransformer = self::createMock(DeviceStatusTransformerInterface::class);
-        $deviceStatusTransformer->method('transform')
+        $deviceStatusTransformer->expects(self::once())->method('transform')
             ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
             ->willReturn($deviceStatus);
 
@@ -202,7 +202,7 @@ final class DeviceStatusApiTest extends TestCase
             ->willReturn($data);
 
         $deviceStatusTransformer = self::createMock(DeviceStatusTransformerInterface::class);
-        $deviceStatusTransformer->method('transform')
+        $deviceStatusTransformer->expects(self::exactly(2))->method('transform')
             ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
             ->willReturn($deviceStatus);
 
@@ -234,7 +234,7 @@ final class DeviceStatusApiTest extends TestCase
             ->willReturn('test-device-id');
 
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 sprintf(DeviceStatusApiInterface::API_URL_SPRINTF, 'test-device-id'),
                 [],

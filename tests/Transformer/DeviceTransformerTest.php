@@ -37,7 +37,7 @@ final class DeviceTransformerTest extends TestCase
         ];
 
         $componentsTransformer = self::createMock(DeviceComponentsTransformerInterface::class);
-        $componentsTransformer->method('transform')
+        $componentsTransformer->expects(self::once())->method('transform')
             ->with($componentsData)
             ->willReturn($components);
 

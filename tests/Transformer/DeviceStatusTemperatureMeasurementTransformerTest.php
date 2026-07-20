@@ -27,7 +27,7 @@ final class DeviceStatusTemperatureMeasurementTransformerTest extends TestCase
         $temperature = self::createStub(DeviceStatusTemperatureMeasurementTemperatureInterface::class);
 
         $tempTransformer = self::createMock(DeviceStatusTemperatureMeasurementTemperatureTransformerInterface::class);
-        $tempTransformer->method('transform')
+        $tempTransformer->expects(self::once())->method('transform')
             ->with(['test-temperature'])
             ->willReturn($temperature);
 

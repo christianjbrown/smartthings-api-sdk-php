@@ -53,7 +53,7 @@ final class LocationsTransformerTest extends TestCase
         $location1 = self::createStub(LocationInterface::class);
 
         $locationTransformer = self::createMock(LocationTransformerInterface::class);
-        $locationTransformer->method('transform')
+        $locationTransformer->expects(self::once())->method('transform')
             ->with(['test-location-1'])
             ->willReturn($location1);
 

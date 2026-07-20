@@ -53,7 +53,7 @@ final class DeviceComponentsTransformerTest extends TestCase
         $component1 = self::createStub(DeviceComponentInterface::class);
 
         $componentTransformer = self::createMock(DeviceComponentTransformerInterface::class);
-        $componentTransformer->method('transform')
+        $componentTransformer->expects(self::once())->method('transform')
             ->with(['test-component-1'])
             ->willReturn($component1);
 

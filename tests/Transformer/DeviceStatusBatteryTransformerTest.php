@@ -30,7 +30,7 @@ final class DeviceStatusBatteryTransformerTest extends TestCase
         $battery = self::createStub(DeviceStatusBatteryBatteryInterface::class);
 
         $batteryTransformer = self::createMock(DeviceStatusBatteryBatteryTransformerInterface::class);
-        $batteryTransformer->method('transform')
+        $batteryTransformer->expects(self::once())->method('transform')
             ->with($batteryData)
             ->willReturn($battery);
 

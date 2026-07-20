@@ -87,7 +87,7 @@ final class LocationRoomApiTest extends TestCase
         $room = self::createStub(LocationRoomInterface::class);
 
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 sprintf(LocationRoomApiInterface::API_URL_SPRINTF, 'test-location-id', 'test-room-id'),
                 [],
@@ -98,7 +98,7 @@ final class LocationRoomApiTest extends TestCase
             ->willReturn($data);
 
         $roomTransformer = self::createMock(LocationRoomTransformerInterface::class);
-        $roomTransformer->method('transform')
+        $roomTransformer->expects(self::once())->method('transform')
             ->with($data)
             ->willReturn($room);
 
@@ -165,7 +165,7 @@ final class LocationRoomApiTest extends TestCase
         $room = self::createStub(LocationRoomInterface::class);
 
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 sprintf(LocationRoomApiInterface::API_URL_SPRINTF, 'test-location-id', 'test-room-id'),
                 [],
@@ -176,7 +176,7 @@ final class LocationRoomApiTest extends TestCase
             ->willReturn($data);
 
         $roomTransformer = self::createMock(LocationRoomTransformerInterface::class);
-        $roomTransformer->method('transform')
+        $roomTransformer->expects(self::once())->method('transform')
             ->with($data)
             ->willReturn($room);
 
@@ -203,7 +203,7 @@ final class LocationRoomApiTest extends TestCase
         $room = self::createStub(LocationRoomInterface::class);
 
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 sprintf(LocationRoomApiInterface::API_URL_SPRINTF, rawurlencode($locationId), rawurlencode($roomId)),
                 [],
@@ -214,7 +214,7 @@ final class LocationRoomApiTest extends TestCase
             ->willReturn($data);
 
         $roomTransformer = self::createMock(LocationRoomTransformerInterface::class);
-        $roomTransformer->method('transform')
+        $roomTransformer->expects(self::once())->method('transform')
             ->with($data)
             ->willReturn($room);
 
@@ -237,7 +237,7 @@ final class LocationRoomApiTest extends TestCase
             ->willReturn('test-location-id');
 
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->method('get')
+        $requestSender->expects(self::once())->method('get')
             ->with(
                 sprintf(LocationRoomApiInterface::API_URL_SPRINTF, 'test-location-id', 'test-room-id'),
                 [],
@@ -285,7 +285,7 @@ final class LocationRoomApiTest extends TestCase
             ->willReturn($data);
 
         $roomTransformer = self::createMock(LocationRoomTransformerInterface::class);
-        $roomTransformer->method('transform')
+        $roomTransformer->expects(self::exactly(2))->method('transform')
             ->with($data)
             ->willReturn($room);
 

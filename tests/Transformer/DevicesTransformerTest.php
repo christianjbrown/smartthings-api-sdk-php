@@ -53,7 +53,7 @@ final class DevicesTransformerTest extends TestCase
         $device1 = self::createStub(DeviceInterface::class);
 
         $deviceTransformer = self::createMock(DeviceTransformerInterface::class);
-        $deviceTransformer->method('transform')
+        $deviceTransformer->expects(self::once())->method('transform')
             ->with(['test-device-1'])
             ->willReturn($device1);
 
