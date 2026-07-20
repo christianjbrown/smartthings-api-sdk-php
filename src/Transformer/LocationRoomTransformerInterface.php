@@ -8,10 +8,10 @@ use ChristianBrown\SmartThings\Model\LocationRoomInterface;
 
 interface LocationRoomTransformerInterface
 {
-    public const KEY_LOCATION_ID = 'locationId';
-    public const KEY_NAME = 'name';
-    public const KEY_ROOM_ID = 'roomId';
-    public const UNEXPECTED_STRING_SPRINTF = '%s not set or not a string';
+    public const string KEY_LOCATION_ID = 'locationId';
+    public const string KEY_NAME = 'name';
+    public const string KEY_ROOM_ID = 'roomId';
+    public const string UNEXPECTED_STRING_SPRINTF = '%s not set or not a string';
 
     /**
      * @param mixed[] $data

@@ -8,8 +8,8 @@ use ChristianBrown\SmartThings\Model\DeviceStatusRelativeHumidityMeasurementInte
 
 interface DeviceStatusRelativeHumidityMeasurementTransformerInterface
 {
-    public const KEY_HUMIDITY = 'humidity';
-    public const UNEXPECTED_ARRAY_SPRINTF = '%s not set or not an array';
+    public const string KEY_HUMIDITY = 'humidity';
+    public const string UNEXPECTED_ARRAY_SPRINTF = '%s not set or not an array';
 
     /**
      * @param mixed[] $data

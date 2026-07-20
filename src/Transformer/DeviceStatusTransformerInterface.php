@@ -8,9 +8,9 @@ use ChristianBrown\SmartThings\Model\DeviceStatusInterface;
 
 interface DeviceStatusTransformerInterface
 {
-    public const KEY_BATTERY = 'battery';
-    public const KEY_RELATIVE_HUMIDITY_MEASUREMENT = 'relativeHumidityMeasurement';
-    public const KEY_TEMPERATURE_MEASUREMENT = 'temperatureMeasurement';
+    public const string KEY_BATTERY = 'battery';
+    public const string KEY_RELATIVE_HUMIDITY_MEASUREMENT = 'relativeHumidityMeasurement';
+    public const string KEY_TEMPERATURE_MEASUREMENT = 'temperatureMeasurement';
 
     /**
      * @param mixed[] $data

@@ -8,8 +8,8 @@ use ChristianBrown\SmartThings\Model\LocationInterface;
 
 interface LocationsTransformerInterface
 {
-    public const ARRAY_NAME = 'location';
-    public const UNEXPECTED_ARRAY_SPRINTF = '%s not set or not an array';
+    public const string ARRAY_NAME = 'location';
+    public const string UNEXPECTED_ARRAY_SPRINTF = '%s not set or not an array';
 
     /**
      * @param mixed[] $data

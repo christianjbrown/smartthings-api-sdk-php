@@ -8,8 +8,8 @@ use ChristianBrown\SmartThings\Model\DeviceComponentInterface;
 
 interface DeviceComponentsTransformerInterface
 {
-    public const ARRAY_NAME = 'device component';
-    public const UNEXPECTED_ARRAY_SPRINTF = '%s not set or not an array';
+    public const string ARRAY_NAME = 'device component';
+    public const string UNEXPECTED_ARRAY_SPRINTF = '%s not set or not an array';
 
     /**
      * @param mixed[] $data

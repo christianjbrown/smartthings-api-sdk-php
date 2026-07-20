@@ -9,10 +9,10 @@ use ChristianBrown\SmartThings\Model\DeviceStatusInterface;
 
 interface DeviceStatusApiInterface extends ApiInterface
 {
-    public const API_URL_SPRINTF = 'https://api.smartthings.com/v1/devices/%s/status';
-    public const KEY_COMPONENTS = 'components';
-    public const KEY_COMPONENTS_MAIN = 'main';
-    public const UNEXPECTED_RESPONSE_SPRINTF = '%s not set or not an array';
+    public const string API_URL_SPRINTF = 'https://api.smartthings.com/v1/devices/%s/status';
+    public const string KEY_COMPONENTS = 'components';
+    public const string KEY_COMPONENTS_MAIN = 'main';
+    public const string UNEXPECTED_RESPONSE_SPRINTF = '%s not set or not an array';
 
     public function getOneByDevice(DeviceInterface $device, bool $skipCache = false): DeviceStatusInterface;
 

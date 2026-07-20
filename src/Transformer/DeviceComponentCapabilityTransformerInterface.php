@@ -8,8 +8,8 @@ use ChristianBrown\SmartThings\Model\DeviceComponentCapabilityInterface;
 
 interface DeviceComponentCapabilityTransformerInterface
 {
-    public const KEY_ID = 'id';
-    public const UNEXPECTED_STRING_SPRINTF = '%s not set or not a string';
+    public const string KEY_ID = 'id';
+    public const string UNEXPECTED_STRING_SPRINTF = '%s not set or not a string';
 
     /**
      * @param mixed[] $data

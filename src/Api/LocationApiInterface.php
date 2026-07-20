@@ -8,11 +8,11 @@ use ChristianBrown\SmartThings\Model\LocationInterface;
 
 interface LocationApiInterface extends ApiInterface
 {
-    public const API_URL = 'https://api.smartthings.com/v1/locations';
-    public const API_URL_SPRINTF = 'https://api.smartthings.com/v1/locations/%s';
-    public const KEY_ITEMS = 'items';
-    public const UNEXPECTED_RESPONSE = 'Response not set or not an array';
-    public const UNEXPECTED_RESPONSE_SPRINTF = '%s not set or not an array';
+    public const string API_URL = 'https://api.smartthings.com/v1/locations';
+    public const string API_URL_SPRINTF = 'https://api.smartthings.com/v1/locations/%s';
+    public const string KEY_ITEMS = 'items';
+    public const string UNEXPECTED_RESPONSE = 'Response not set or not an array';
+    public const string UNEXPECTED_RESPONSE_SPRINTF = '%s not set or not an array';
 
     /**
      * @return array<int, LocationInterface>
