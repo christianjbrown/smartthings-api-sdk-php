@@ -46,9 +46,7 @@ final class DeviceStatusTransformer implements DeviceStatusTransformerInterface
     }
 
     /**
-     * @param DeviceStatusInterface $status
-     * @param mixed[]               $data
-     * @param string                $key
+     * @phpstan-param mixed[] $data
      */
     private function applyCapability(DeviceStatusInterface $status, array $data, string $key): DeviceStatusInterface
     {

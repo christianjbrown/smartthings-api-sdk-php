@@ -18,14 +18,13 @@ use function sprintf;
 
 final class LocationRoomApi implements LocationRoomApiInterface
 {
-    private TokenInterface $token;
-
     /**
      * @var array<string, LocationRoomInterface>
      */
     private array $cache = [];
     private JsonApiRequestSenderInterface $requestSender;
     private LocationRoomTransformerInterface $roomTransformer;
+    private TokenInterface $token;
 
     public function __construct(JsonApiRequestSenderInterface $requestSender, LocationRoomTransformerInterface $roomTransformer, TokenInterface $token)
     {

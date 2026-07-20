@@ -31,6 +31,9 @@ final class LocationTransformer implements LocationTransformerInterface
         return $location;
     }
 
+    /**
+     * @phpstan-param mixed[] $data
+     */
     private function applyName(Location $location, array $data): void
     {
         if (empty($data[self::KEY_NAME])) {

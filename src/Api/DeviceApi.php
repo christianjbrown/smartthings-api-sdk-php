@@ -15,14 +15,13 @@ use function sprintf;
 
 final class DeviceApi implements DeviceApiInterface
 {
-    private TokenInterface $token;
-
     /**
      * @var array<string, array<int, DeviceInterface>>
      */
     private array $cache = [];
     private DevicesTransformerInterface $devicesTransformer;
     private JsonApiRequestSenderInterface $requestSender;
+    private TokenInterface $token;
 
     public function __construct(JsonApiRequestSenderInterface $requestSender, DevicesTransformerInterface $devicesTransformer, TokenInterface $token)
     {

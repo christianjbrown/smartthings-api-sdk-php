@@ -43,6 +43,9 @@ final class DeviceTransformer implements DeviceTransformerInterface
         return $device;
     }
 
+    /**
+     * @phpstan-param mixed[] $data
+     */
     private function applyComponents(Device $device, array $data): void
     {
         if (empty($data[self::KEY_COMPONENTS])) {
@@ -55,6 +58,9 @@ final class DeviceTransformer implements DeviceTransformerInterface
         $device->setComponents($components);
     }
 
+    /**
+     * @phpstan-param mixed[] $data
+     */
     private function applyLabel(Device $device, array $data): void
     {
         if (empty($data[self::KEY_LABEL])) {
@@ -66,6 +72,9 @@ final class DeviceTransformer implements DeviceTransformerInterface
         $device->setLabel($data[self::KEY_LABEL]);
     }
 
+    /**
+     * @phpstan-param mixed[] $data
+     */
     private function applyLocationId(Device $device, array $data): void
     {
         if (empty($data[self::KEY_LOCATION_ID])) {
@@ -77,6 +86,9 @@ final class DeviceTransformer implements DeviceTransformerInterface
         $device->setLocationId($data[self::KEY_LOCATION_ID]);
     }
 
+    /**
+     * @phpstan-param mixed[] $data
+     */
     private function applyName(Device $device, array $data): void
     {
         if (empty($data[self::KEY_NAME])) {
@@ -88,6 +100,9 @@ final class DeviceTransformer implements DeviceTransformerInterface
         $device->setName($data[self::KEY_NAME]);
     }
 
+    /**
+     * @phpstan-param mixed[] $data
+     */
     private function applyRoomId(Device $device, array $data): void
     {
         if (empty($data[self::KEY_ROOM_ID])) {

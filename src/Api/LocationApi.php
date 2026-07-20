@@ -17,8 +17,6 @@ use function sprintf;
 
 final class LocationApi implements LocationApiInterface
 {
-    private TokenInterface $token;
-
     /**
      * @var array<string, LocationInterface>
      */
@@ -31,6 +29,7 @@ final class LocationApi implements LocationApiInterface
     private LocationsTransformerInterface $locationsTransformer;
     private LocationTransformerInterface $locationTransformer;
     private JsonApiRequestSenderInterface $requestSender;
+    private TokenInterface $token;
 
     public function __construct(JsonApiRequestSenderInterface $requestSender, LocationTransformerInterface $locationTransformer, LocationsTransformerInterface $locationsTransformer, TokenInterface $token)
     {
