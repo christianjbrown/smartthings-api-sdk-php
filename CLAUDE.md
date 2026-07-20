@@ -28,8 +28,10 @@ gitignored and Composer-installed, so run `composer install` first.
 
 After adding autoloadable files, run `composer dump-autoload` if the class isn't found.
 
-Style tooling comes from the `christianjbrown/php-code-quality-scripts` dev dependency (php-cs-fixer
-+ PHP_CodeSniffer, **Symfony2 coding standard**); the `bin/php-cs*` scripts are thin wrappers over it.
+Style tooling comes from the `christianjbrown/php-code-quality-scripts` dev dependency: `check-style`
+lints with **PHP_CodeSniffer 4** using the **`ChristianBrown` standard** (slevomat sniffs plus
+PSR/PEAR/Squiz/Generic), and **php-cs-fixer** (`@PhpCsFixer`/`@Symfony`) handles formatting; the
+`bin/php-cs*` scripts are thin wrappers over it.
 Static analysis is **PHPStan at `level: max`** (`phpstan.neon.dist`, run with `composer stan` /
 `./bin/phpstan analyse`), and there is a **GitHub Actions CI workflow** (`.github/workflows/ci.yml`)
 that runs style, PHPStan, and the PHPUnit suite with coverage on every push/PR. Always run
