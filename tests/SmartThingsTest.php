@@ -9,6 +9,7 @@ use ChristianBrown\SmartThings\Api\CapabilityApi;
 use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceHealthApi;
 use ChristianBrown\SmartThings\Api\DeviceHistoryApi;
+use ChristianBrown\SmartThings\Api\DevicePreferencesApi;
 use ChristianBrown\SmartThings\Api\DeviceProfileApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\InstalledAppApi;
@@ -35,6 +36,8 @@ use ChristianBrown\SmartThings\Transformer\DeviceComponentTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHealthTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHistoryEventsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHistoryEventTransformer;
+use ChristianBrown\SmartThings\Transformer\DevicePreferencesTransformer;
+use ChristianBrown\SmartThings\Transformer\DevicePreferenceTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfilesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryBatteryTransformer;
@@ -75,6 +78,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DeviceApi::class)]
 #[UsesClass(DeviceHealthApi::class)]
 #[UsesClass(DeviceHistoryApi::class)]
+#[UsesClass(DevicePreferencesApi::class)]
 #[UsesClass(DeviceProfileApi::class)]
 #[UsesClass(DeviceStatusApi::class)]
 #[UsesClass(InstalledAppApi::class)]
@@ -100,6 +104,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DeviceHealthTransformer::class)]
 #[UsesClass(DeviceHistoryEventsTransformer::class)]
 #[UsesClass(DeviceHistoryEventTransformer::class)]
+#[UsesClass(DevicePreferencesTransformer::class)]
+#[UsesClass(DevicePreferenceTransformer::class)]
 #[UsesClass(DeviceProfilesTransformer::class)]
 #[UsesClass(DeviceProfileTransformer::class)]
 #[UsesClass(DevicesTransformer::class)]
@@ -165,6 +171,13 @@ final class SmartThingsTest extends TestCase
         $smartThings = new SmartThings('token');
 
         self::assertInstanceOf(DeviceHistoryApi::class, $smartThings->getDeviceHistoryApi());
+    }
+
+    public function testGetDevicePreferencesApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(DevicePreferencesApi::class, $smartThings->getDevicePreferencesApi());
     }
 
     public function testGetDeviceProfileApi(): void

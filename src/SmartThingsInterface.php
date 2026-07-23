@@ -9,6 +9,7 @@ use ChristianBrown\SmartThings\Api\CapabilityApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceHealthApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceHistoryApiInterface;
+use ChristianBrown\SmartThings\Api\DevicePreferencesApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceProfileApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceStatusApiInterface;
 use ChristianBrown\SmartThings\Api\InstalledAppApiInterface;
@@ -42,6 +43,9 @@ interface SmartThingsInterface
     public const string SERVICE_DEVICE_HISTORY_API = 'smartthings.api.device_history_api';
     public const string SERVICE_DEVICE_HISTORY_EVENT_TRANSFORMER = 'smartthings.transformer.device_history_event_transformer';
     public const string SERVICE_DEVICE_HISTORY_EVENTS_TRANSFORMER = 'smartthings.transformer.device_history_events_transformer';
+    public const string SERVICE_DEVICE_PREFERENCE_TRANSFORMER = 'smartthings.transformer.device_preference_transformer';
+    public const string SERVICE_DEVICE_PREFERENCES_API = 'smartthings.api.device_preferences_api';
+    public const string SERVICE_DEVICE_PREFERENCES_TRANSFORMER = 'smartthings.transformer.device_preferences_transformer';
     public const string SERVICE_DEVICE_PROFILE_API = 'smartthings.api.device_profile_api';
     public const string SERVICE_DEVICE_PROFILE_TRANSFORMER = 'smartthings.transformer.device_profile_transformer';
     public const string SERVICE_DEVICE_PROFILES_TRANSFORMER = 'smartthings.transformer.device_profiles_transformer';
@@ -94,6 +98,8 @@ interface SmartThingsInterface
     public function getDeviceHealthApi(): DeviceHealthApiInterface;
 
     public function getDeviceHistoryApi(): DeviceHistoryApiInterface;
+
+    public function getDevicePreferencesApi(): DevicePreferencesApiInterface;
 
     public function getDeviceProfileApi(): DeviceProfileApiInterface;
 
