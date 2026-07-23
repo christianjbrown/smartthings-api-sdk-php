@@ -12,6 +12,7 @@ use ChristianBrown\SmartThings\Api\DeviceStatusApiInterface;
 use ChristianBrown\SmartThings\Api\LocationApiInterface;
 use ChristianBrown\SmartThings\Api\LocationModeApiInterface;
 use ChristianBrown\SmartThings\Api\LocationRoomApiInterface;
+use ChristianBrown\SmartThings\Api\PresentationApiInterface;
 use ChristianBrown\SmartThings\Api\RuleApiInterface;
 use ChristianBrown\SmartThings\Api\SceneApiInterface;
 
@@ -51,6 +52,8 @@ interface SmartThingsInterface
     public const string SERVICE_LOCATIONS_TRANSFORMER = 'smartthings.transformer.locations_transformer';
     public const string SERVICE_MODE_TRANSFORMER = 'smartthings.transformer.mode_transformer';
     public const string SERVICE_MODES_TRANSFORMER = 'smartthings.transformer.modes_transformer';
+    public const string SERVICE_PRESENTATION_API = 'smartthings.api.presentation_api';
+    public const string SERVICE_PRESENTATION_TRANSFORMER = 'smartthings.transformer.presentation_transformer';
     public const string SERVICE_RULE_API = 'smartthings.api.rule_api';
     public const string SERVICE_RULE_TRANSFORMER = 'smartthings.transformer.rule_transformer';
     public const string SERVICE_RULES_TRANSFORMER = 'smartthings.transformer.rules_transformer';
@@ -73,6 +76,8 @@ interface SmartThingsInterface
     public function getLocationModeApi(): LocationModeApiInterface;
 
     public function getLocationRoomApi(): LocationRoomApiInterface;
+
+    public function getPresentationApi(): PresentationApiInterface;
 
     public function getRuleApi(): RuleApiInterface;
 

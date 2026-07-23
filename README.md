@@ -16,6 +16,7 @@ The client is **read-only** and currently supports:
 - **Reading rules** — listing a location's rules (`getMultiple`) or a single rule by id (`getOneById`); both require a location id. Each rule carries its id, name, and status.
 - **Reading capabilities** — listing all platform capabilities (`getMultiple`), the custom capabilities in a namespace (`getMultipleByNamespace`), or one capability definition by id and version (`getOneByIdAndVersion`). Each carries its id, name, status, and version.
 - **Reading device profiles** — listing the account's device profiles (`getMultiple`) or a single profile by id (`getOneById`). Each carries its id, name, and status.
+- **Reading presentations** — a device presentation by presentation id (`getOne`), a stored device config (`getDeviceConfig`), or the default config generated from a device type (`getDeviceConfigByType`). Each carries its presentation id, manufacturer name, and type.
 
 ### Supported endpoints
 
@@ -31,6 +32,7 @@ The client is **read-only** and currently supports:
 | Rules | `getRuleApi()` | `GET /rules?locationId=…`, `GET /rules/{ruleId}?locationId=…` | `RuleInterface[]` / `RuleInterface` |
 | Capabilities | `getCapabilityApi()` | `GET /capabilities`, `GET /capabilities/namespaces/{namespace}`, `GET /capabilities/{id}/{version}` | `CapabilityInterface[]` / `CapabilityInterface` |
 | Device profiles | `getDeviceProfileApi()` | `GET /deviceprofiles`, `GET /deviceprofiles/{deviceProfileId}` | `DeviceProfileInterface[]` / `DeviceProfileInterface` |
+| Presentation | `getPresentationApi()` | `GET /presentation`, `GET /presentation/deviceconfig`, `GET /presentation/types/{typeIntegrationId}/deviceconfig` | `PresentationInterface` |
 
 
 
@@ -74,6 +76,7 @@ $sceneApi        = $smartThings->getSceneApi();  // SceneApiInterface
 $ruleApi         = $smartThings->getRuleApi();  // RuleApiInterface
 $capabilityApi   = $smartThings->getCapabilityApi();  // CapabilityApiInterface
 $deviceProfileApi = $smartThings->getDeviceProfileApi();  // DeviceProfileApiInterface
+$presentationApi = $smartThings->getPresentationApi();  // PresentationApiInterface
 ```
 
 If you'd rather wire the clients by hand, see [Wiring the clients](#wiring-the-clients) below.
@@ -175,6 +178,7 @@ use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationModeApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
+use ChristianBrown\SmartThings\Api\PresentationApi;
 use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
@@ -201,6 +205,7 @@ use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 use ChristianBrown\SmartThings\Transformer\ModesTransformer;
 use ChristianBrown\SmartThings\Transformer\ModeTransformer;
+use ChristianBrown\SmartThings\Transformer\PresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\RulesTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleTransformer;
 use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
@@ -329,6 +334,13 @@ $ruleApi = new RuleApi(
     $requestSender,
     $ruleTransformer,
     new RulesTransformer($ruleTransformer),
+    $apiToken
+);
+
+// Presentation client. A single transformer serves all three read methods.
+$presentationApi = new PresentationApi(
+    $requestSender,
+    new PresentationTransformer(),
     $apiToken
 );
 ```
