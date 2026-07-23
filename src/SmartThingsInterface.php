@@ -13,6 +13,7 @@ use ChristianBrown\SmartThings\Api\DevicePreferenceDefinitionApiInterface;
 use ChristianBrown\SmartThings\Api\DevicePreferencesApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceProfileApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceStatusApiInterface;
+use ChristianBrown\SmartThings\Api\DriverApiInterface;
 use ChristianBrown\SmartThings\Api\InstalledAppApiInterface;
 use ChristianBrown\SmartThings\Api\LocationApiInterface;
 use ChristianBrown\SmartThings\Api\LocationModeApiInterface;
@@ -69,6 +70,9 @@ interface SmartThingsInterface
     public const string SERVICE_DEVICE_STATUS_TRANSFORMER = 'smartthings.transformer.device_status_transformer';
     public const string SERVICE_DEVICE_TRANSFORMER = 'smartthings.transformer.device_transformer';
     public const string SERVICE_DEVICES_TRANSFORMER = 'smartthings.transformer.devices_transformer';
+    public const string SERVICE_DRIVER_API = 'smartthings.api.driver_api';
+    public const string SERVICE_DRIVER_TRANSFORMER = 'smartthings.transformer.driver_transformer';
+    public const string SERVICE_DRIVERS_TRANSFORMER = 'smartthings.transformer.drivers_transformer';
     public const string SERVICE_INSTALLED_APP_API = 'smartthings.api.installed_app_api';
     public const string SERVICE_INSTALLED_APP_CONFIG_TRANSFORMER = 'smartthings.transformer.installed_app_config_transformer';
     public const string SERVICE_INSTALLED_APP_CONFIGS_TRANSFORMER = 'smartthings.transformer.installed_app_configs_transformer';
@@ -128,6 +132,8 @@ interface SmartThingsInterface
     public function getDeviceProfileApi(): DeviceProfileApiInterface;
 
     public function getDeviceStatusApi(): DeviceStatusApiInterface;
+
+    public function getDriverApi(): DriverApiInterface;
 
     public function getInstalledAppApi(): InstalledAppApiInterface;
 

@@ -13,6 +13,7 @@ use ChristianBrown\SmartThings\Api\DevicePreferenceDefinitionApi;
 use ChristianBrown\SmartThings\Api\DevicePreferencesApi;
 use ChristianBrown\SmartThings\Api\DeviceProfileApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
+use ChristianBrown\SmartThings\Api\DriverApi;
 use ChristianBrown\SmartThings\Api\InstalledAppApi;
 use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationModeApi;
@@ -58,6 +59,8 @@ use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTra
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
+use ChristianBrown\SmartThings\Transformer\DriversTransformer;
+use ChristianBrown\SmartThings\Transformer\DriverTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformer;
@@ -100,6 +103,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DevicePreferencesApi::class)]
 #[UsesClass(DeviceProfileApi::class)]
 #[UsesClass(DeviceStatusApi::class)]
+#[UsesClass(DriverApi::class)]
 #[UsesClass(InstalledAppApi::class)]
 #[UsesClass(LocationApi::class)]
 #[UsesClass(LocationModeApi::class)]
@@ -136,6 +140,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DeviceProfilesTransformer::class)]
 #[UsesClass(DeviceProfileTransformer::class)]
 #[UsesClass(DevicesTransformer::class)]
+#[UsesClass(DriversTransformer::class)]
+#[UsesClass(DriverTransformer::class)]
 #[UsesClass(DeviceStatusBatteryBatteryTransformer::class)]
 #[UsesClass(DeviceStatusBatteryTransformer::class)]
 #[UsesClass(DeviceStatusRelativeHumidityMeasurementHumidityTransformer::class)]
@@ -235,6 +241,13 @@ final class SmartThingsTest extends TestCase
         $smartThings = new SmartThings('token');
 
         self::assertInstanceOf(DeviceStatusApi::class, $smartThings->getDeviceStatusApi());
+    }
+
+    public function testGetDriverApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(DriverApi::class, $smartThings->getDriverApi());
     }
 
     public function testGetInstalledAppApi(): void

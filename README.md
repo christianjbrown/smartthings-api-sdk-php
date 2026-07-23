@@ -23,6 +23,7 @@ The client is **read-only** and currently supports:
 - **Reading installed apps** — listing installed app instances, optionally by location (`getMultiple`), one instance by id (`getOneById`), the instance for the current token (`getMe`), its configurations (`getConfigs`), or a single configuration (`getConfig`).
 - **Reading subscriptions** — listing an installed app's subscriptions (`getMultiple`) or a single subscription by id (`getOneById`). Each carries its id, installed app id, and source type.
 - **Reading schedules** — listing an installed app's schedules (`getMultiple`) or a single schedule by name (`getOneByName`). Each carries its name and installed app id.
+- **Reading Edge drivers** — listing the account's drivers (`getMultiple`), the drivers on the default channel (`getDefaults`), a single driver by id (`getOneById`), or a specific driver revision by id and version (`getOneByIdAndVersion`). Each carries its driver id, name, description, package key, and version.
 - **Reading virtual devices** — listing the account's virtual devices, optionally filtered by location (`getMultiple`). Each is returned as a `DeviceInterface`, the same typed model as a physical device.
 - **Reading location services** — a location's service info (`getLocationInfo` — city, latitude, longitude, and subscriptions), the list of available service-capability names (`getAvailableCapabilities`), or the data for one or more capabilities such as `weather`, `airQuality`, and `forecast` (`getCapability` / `getCapabilities`). Each capability's fields are returned as a name-keyed map of typed `ServiceMeasurementInterface` values (value + unit).
 - **Reading organizations** — listing the account's organizations (`getMultiple`) or a single organization by id (`getOneById`). Each carries its organization id, name, label, manufacturer name, and default-user-org flag.
@@ -53,6 +54,7 @@ The client is **read-only** and currently supports:
 | Schedules | `getScheduleApi()` | `GET /installedapps/{id}/schedules`, `GET /installedapps/{id}/schedules/{scheduleName}` | `ScheduleInterface[]` / `ScheduleInterface` |
 | Organizations | `getOrganizationApi()` | `GET /organizations`, `GET /organizations/{organizationId}` | `OrganizationInterface[]` / `OrganizationInterface` |
 | Location services | `getServiceApi()` | `GET /services/coordinate/locations/{id}`, `GET /services/coordinate/locations/{id}/capabilities` (list and `?name=…`) | `ServiceLocationInfoInterface` / `string[]` / `ServiceCapabilityDataInterface` |
+| Edge drivers | `getDriverApi()` | `GET /drivers`, `GET /drivers/default`, `GET /drivers/{driverId}`, `GET /drivers/{driverId}/versions/{version}` | `DriverInterface[]` / `DriverInterface` |
 
 
 

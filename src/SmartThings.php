@@ -24,6 +24,8 @@ use ChristianBrown\SmartThings\Api\DeviceProfileApi;
 use ChristianBrown\SmartThings\Api\DeviceProfileApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApiInterface;
+use ChristianBrown\SmartThings\Api\DriverApi;
+use ChristianBrown\SmartThings\Api\DriverApiInterface;
 use ChristianBrown\SmartThings\Api\InstalledAppApi;
 use ChristianBrown\SmartThings\Api\InstalledAppApiInterface;
 use ChristianBrown\SmartThings\Api\LocationApi;
@@ -81,6 +83,8 @@ use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTra
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
+use ChristianBrown\SmartThings\Transformer\DriversTransformer;
+use ChristianBrown\SmartThings\Transformer\DriverTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformer;
@@ -248,6 +252,20 @@ final class SmartThings implements SmartThingsInterface
          * @var DeviceStatusApiInterface $service
          */
         $service = $this->container->get(self::SERVICE_DEVICE_STATUS_API);
+
+        return $service;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getDriverApi(): DriverApiInterface
+    {
+        /**
+         * @var DriverApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_DRIVER_API);
 
         return $service;
     }
@@ -435,6 +453,7 @@ final class SmartThings implements SmartThingsInterface
         $this->registerDevicePreferenceTransformers();
         $this->registerDeviceProfileTransformers();
         $this->registerDeviceStatusTransformers();
+        $this->registerDriverTransformers();
         $this->registerInstalledAppTransformers();
         $this->registerLocationTransformers();
         $this->registerModeTransformers();
@@ -528,6 +547,15 @@ final class SmartThings implements SmartThingsInterface
                 [
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_TRANSFORMER),
+                    $this->token,
+                ]
+            );
+        $this->container->register(self::SERVICE_DRIVER_API, DriverApi::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_DRIVER_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_DRIVERS_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -795,6 +823,17 @@ final class SmartThings implements SmartThingsInterface
             ->setArguments(
                 [
                     $this->container->getDefinition(self::SERVICE_DEVICE_TRANSFORMER),
+                ]
+            );
+    }
+
+    private function registerDriverTransformers(): void
+    {
+        $this->container->register(self::SERVICE_DRIVER_TRANSFORMER, DriverTransformer::class);
+        $this->container->register(self::SERVICE_DRIVERS_TRANSFORMER, DriversTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_DRIVER_TRANSFORMER),
                 ]
             );
     }
