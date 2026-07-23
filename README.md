@@ -12,6 +12,7 @@ The client is **read-only** and currently supports:
 - **Listing locations** — id and name, or reading a single location by id (`getOneById`).
 - **Reading rooms** — listing every room in a location (`getMultiple`), or reading a single room, either from a device (`getOneByDevice`) or by a location and room id (`getOneByLocationAndId`). Each room carries its id, name, and location id.
 - **Reading modes** — listing a location's modes (`getMultiple`), reading the currently active mode (`getCurrent`), or a single mode by id (`getOneByLocationAndId`). Each mode carries its id, label, and name.
+- **Reading scenes** — listing scenes for the account, optionally filtered by location (`getMultiple`), or a single scene by id (`getOneById`). Each scene carries its id, name, and location id.
 
 ### Supported endpoints
 
@@ -23,6 +24,7 @@ The client is **read-only** and currently supports:
 | Locations | `getLocationApi()` | `GET /locations`, `GET /locations/{locationId}` | `LocationInterface[]` / `LocationInterface` |
 | Rooms | `getLocationRoomApi()` | `GET /locations/{locationId}/rooms`, `GET /locations/{locationId}/rooms/{roomId}` | `LocationRoomInterface[]` / `LocationRoomInterface` |
 | Modes | `getLocationModeApi()` | `GET /locations/{locationId}/modes`, `GET /locations/{locationId}/modes/current`, `GET /locations/{locationId}/modes/{modeId}` | `ModeInterface[]` / `ModeInterface` |
+| Scenes | `getSceneApi()` | `GET /scenes`, `GET /scenes/{sceneId}` | `SceneInterface[]` / `SceneInterface` |
 
 
 
@@ -62,6 +64,7 @@ $deviceHealthApi = $smartThings->getDeviceHealthApi();  // DeviceHealthApiInterf
 $locationApi     = $smartThings->getLocationApi();  // LocationApiInterface
 $locationModeApi = $smartThings->getLocationModeApi();  // LocationModeApiInterface
 $locationRoomApi = $smartThings->getLocationRoomApi();  // LocationRoomApiInterface
+$sceneApi        = $smartThings->getSceneApi();  // SceneApiInterface
 ```
 
 If you'd rather wire the clients by hand, see [Wiring the clients](#wiring-the-clients) below.
@@ -161,6 +164,7 @@ use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationModeApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
+use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentsTransformer;
@@ -181,6 +185,8 @@ use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 use ChristianBrown\SmartThings\Transformer\ModesTransformer;
 use ChristianBrown\SmartThings\Transformer\ModeTransformer;
+use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
+use ChristianBrown\SmartThings\Transformer\SceneTransformer;
 
 $apiToken = 'your-smartthings-personal-access-token';
 
@@ -259,6 +265,17 @@ $locationRoomApi = new LocationRoomApi(
     $requestSender,
     $locationRoomTransformer,
     new LocationRoomsTransformer($locationRoomTransformer),
+    $apiToken
+);
+
+// Scenes client. The single scene transformer is shared: the list endpoint wraps
+// it in a ScenesTransformer, and getOneById() uses it directly.
+$sceneTransformer = new SceneTransformer();
+
+$sceneApi = new SceneApi(
+    $requestSender,
+    $sceneTransformer,
+    new ScenesTransformer($sceneTransformer),
     $apiToken
 );
 ```

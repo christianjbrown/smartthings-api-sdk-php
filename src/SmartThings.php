@@ -18,6 +18,8 @@ use ChristianBrown\SmartThings\Api\LocationModeApi;
 use ChristianBrown\SmartThings\Api\LocationModeApiInterface;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApiInterface;
+use ChristianBrown\SmartThings\Api\SceneApi;
+use ChristianBrown\SmartThings\Api\SceneApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
@@ -40,6 +42,8 @@ use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationTransformer;
 use ChristianBrown\SmartThings\Transformer\ModesTransformer;
 use ChristianBrown\SmartThings\Transformer\ModeTransformer;
+use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
+use ChristianBrown\SmartThings\Transformer\SceneTransformer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -141,6 +145,20 @@ final class SmartThings implements SmartThingsInterface
         return $service;
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getSceneApi(): SceneApiInterface
+    {
+        /**
+         * @var SceneApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_SCENE_API);
+
+        return $service;
+    }
+
     private function init(): void
     {
         // Registration order matters: a service must be registered before another
@@ -152,6 +170,7 @@ final class SmartThings implements SmartThingsInterface
         $this->registerDeviceStatusTransformers();
         $this->registerLocationTransformers();
         $this->registerModeTransformers();
+        $this->registerSceneTransformers();
         $this->registerApiClients();
     }
 
@@ -206,6 +225,15 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_LOCATION_ROOM_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_LOCATION_ROOMS_TRANSFORMER),
+                    $this->token,
+                ]
+            );
+        $this->container->register(self::SERVICE_SCENE_API, SceneApi::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_SCENE_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_SCENES_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -317,6 +345,17 @@ final class SmartThings implements SmartThingsInterface
             ->setArguments(
                 [
                     $this->container->getDefinition(self::SERVICE_MODE_TRANSFORMER),
+                ]
+            );
+    }
+
+    private function registerSceneTransformers(): void
+    {
+        $this->container->register(self::SERVICE_SCENE_TRANSFORMER, SceneTransformer::class);
+        $this->container->register(self::SERVICE_SCENES_TRANSFORMER, ScenesTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_SCENE_TRANSFORMER),
                 ]
             );
     }
