@@ -32,6 +32,8 @@ interface SmartThingsInterface
     public const string SERVICE_APPS_TRANSFORMER = 'smartthings.transformer.apps_transformer';
     public const string SERVICE_CAPABILITIES_TRANSFORMER = 'smartthings.transformer.capabilities_transformer';
     public const string SERVICE_CAPABILITY_API = 'smartthings.api.capability_api';
+    public const string SERVICE_CAPABILITY_NAMESPACE_TRANSFORMER = 'smartthings.transformer.capability_namespace_transformer';
+    public const string SERVICE_CAPABILITY_NAMESPACES_TRANSFORMER = 'smartthings.transformer.capability_namespaces_transformer';
     public const string SERVICE_CAPABILITY_TRANSFORMER = 'smartthings.transformer.capability_transformer';
     public const string SERVICE_DEVICE_API = 'smartthings.api.device_api';
     public const string SERVICE_DEVICE_COMPONENT_CAPABILITIES_TRANSFORMER = 'smartthings.transformer.device_component_capabilities_transformer';

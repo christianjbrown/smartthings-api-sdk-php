@@ -28,6 +28,8 @@ use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityNamespaceTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
@@ -96,6 +98,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(AppsTransformer::class)]
 #[UsesClass(AppTransformer::class)]
 #[UsesClass(CapabilitiesTransformer::class)]
+#[UsesClass(CapabilityNamespacesTransformer::class)]
+#[UsesClass(CapabilityNamespaceTransformer::class)]
 #[UsesClass(CapabilityTransformer::class)]
 #[UsesClass(DeviceComponentCapabilitiesTransformer::class)]
 #[UsesClass(DeviceComponentCapabilityTransformer::class)]

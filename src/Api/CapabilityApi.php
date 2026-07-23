@@ -8,7 +8,9 @@ use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilityInterface;
+use ChristianBrown\SmartThings\Model\CapabilityNamespaceInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformerInterface;
 
 use function is_array;
@@ -22,6 +24,7 @@ final class CapabilityApi implements CapabilityApiInterface
      */
     private array $cache = [];
     private CapabilitiesTransformerInterface $capabilitiesTransformer;
+    private CapabilityNamespacesTransformerInterface $capabilityNamespacesTransformer;
     private CapabilityTransformerInterface $capabilityTransformer;
 
     /**
@@ -33,6 +36,11 @@ final class CapabilityApi implements CapabilityApiInterface
      * @var array<string, array<int, CapabilityInterface>>
      */
     private array $namespaceCache = [];
+
+    /**
+     * @var ?array<int, CapabilityNamespaceInterface>
+     */
+    private ?array $namespacesCache = null;
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
@@ -41,11 +49,12 @@ final class CapabilityApi implements CapabilityApiInterface
      */
     private array $versionsCache = [];
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, CapabilityTransformerInterface $capabilityTransformer, CapabilitiesTransformerInterface $capabilitiesTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, CapabilityTransformerInterface $capabilityTransformer, CapabilitiesTransformerInterface $capabilitiesTransformer, CapabilityNamespacesTransformerInterface $capabilityNamespacesTransformer, TokenInterface $token)
     {
         $this->requestSender = $requestSender;
         $this->capabilityTransformer = $capabilityTransformer;
         $this->capabilitiesTransformer = $capabilitiesTransformer;
+        $this->capabilityNamespacesTransformer = $capabilityNamespacesTransformer;
         $this->token = $token;
     }
 
@@ -88,6 +97,36 @@ final class CapabilityApi implements CapabilityApiInterface
         $this->namespaceCache[$namespace] = $capabilities;
 
         return $capabilities;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     *
+     * @return array<int, CapabilityNamespaceInterface>
+     */
+    public function getNamespaces(bool $skipCache = false): array
+    {
+        if (!$skipCache) {
+            if (null !== $this->namespacesCache) {
+                return $this->namespacesCache;
+            }
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        // The namespaces endpoint returns a top-level JSON array (no items wrapper),
+        // so the whole decoded response is the collection handed to the transformer.
+        $data = $this->requestSender->get(self::API_URL_NAMESPACES, [], $headers);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $namespaces = $this->capabilityNamespacesTransformer->transform($data);
+        $this->namespacesCache = $namespaces;
+
+        return $namespaces;
     }
 
     /**

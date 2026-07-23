@@ -47,6 +47,8 @@ use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityNamespaceTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
@@ -386,6 +388,7 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_CAPABILITY_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_CAPABILITIES_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_CAPABILITY_NAMESPACES_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -544,6 +547,13 @@ final class SmartThings implements SmartThingsInterface
             ->setArguments(
                 [
                     $this->container->getDefinition(self::SERVICE_CAPABILITY_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_CAPABILITY_NAMESPACE_TRANSFORMER, CapabilityNamespaceTransformer::class);
+        $this->container->register(self::SERVICE_CAPABILITY_NAMESPACES_TRANSFORMER, CapabilityNamespacesTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_CAPABILITY_NAMESPACE_TRANSFORMER),
                 ]
             );
     }
