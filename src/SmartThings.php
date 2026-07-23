@@ -42,6 +42,8 @@ use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\SceneApiInterface;
 use ChristianBrown\SmartThings\Api\ScheduleApi;
 use ChristianBrown\SmartThings\Api\ScheduleApiInterface;
+use ChristianBrown\SmartThings\Api\ServiceApi;
+use ChristianBrown\SmartThings\Api\ServiceApiInterface;
 use ChristianBrown\SmartThings\Api\SubscriptionApi;
 use ChristianBrown\SmartThings\Api\SubscriptionApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
@@ -98,6 +100,13 @@ use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
 use ChristianBrown\SmartThings\Transformer\SchedulesTransformer;
 use ChristianBrown\SmartThings\Transformer\ScheduleTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceCapabilityNamesTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoSubscriptionsTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoSubscriptionTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceMeasurementsTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceMeasurementTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
 use Psr\Container\ContainerExceptionInterface;
@@ -373,6 +382,20 @@ final class SmartThings implements SmartThingsInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    public function getServiceApi(): ServiceApiInterface
+    {
+        /**
+         * @var ServiceApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_SERVICE_API);
+
+        return $service;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function getSubscriptionApi(): SubscriptionApiInterface
     {
         /**
@@ -420,6 +443,7 @@ final class SmartThings implements SmartThingsInterface
         $this->registerRuleTransformers();
         $this->registerSceneTransformers();
         $this->registerScheduleTransformers();
+        $this->registerServiceTransformers();
         $this->registerSubscriptionTransformers();
         $this->registerApiClients();
     }
@@ -587,6 +611,16 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_SCHEDULE_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_SCHEDULES_TRANSFORMER),
+                    $this->token,
+                ]
+            );
+        $this->container->register(self::SERVICE_SERVICE_API, ServiceApi::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_SERVICE_LOCATION_INFO_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_SERVICE_CAPABILITY_NAMES_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_SERVICE_CAPABILITY_DATA_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -858,6 +892,37 @@ final class SmartThings implements SmartThingsInterface
             ->setArguments(
                 [
                     $this->container->getDefinition(self::SERVICE_SCHEDULE_TRANSFORMER),
+                ]
+            );
+    }
+
+    private function registerServiceTransformers(): void
+    {
+        $this->container->register(self::SERVICE_SERVICE_MEASUREMENT_TRANSFORMER, ServiceMeasurementTransformer::class);
+        $this->container->register(self::SERVICE_SERVICE_MEASUREMENTS_TRANSFORMER, ServiceMeasurementsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_SERVICE_MEASUREMENT_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_SERVICE_CAPABILITY_DATA_TRANSFORMER, ServiceCapabilityDataTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_SERVICE_MEASUREMENTS_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_SERVICE_CAPABILITY_NAMES_TRANSFORMER, ServiceCapabilityNamesTransformer::class);
+        $this->container->register(self::SERVICE_SERVICE_LOCATION_INFO_SUBSCRIPTION_TRANSFORMER, ServiceLocationInfoSubscriptionTransformer::class);
+        $this->container->register(self::SERVICE_SERVICE_LOCATION_INFO_SUBSCRIPTIONS_TRANSFORMER, ServiceLocationInfoSubscriptionsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_SERVICE_LOCATION_INFO_SUBSCRIPTION_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_SERVICE_LOCATION_INFO_TRANSFORMER, ServiceLocationInfoTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_SERVICE_LOCATION_INFO_SUBSCRIPTIONS_TRANSFORMER),
                 ]
             );
     }

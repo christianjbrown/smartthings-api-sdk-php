@@ -24,6 +24,7 @@ The client is **read-only** and currently supports:
 - **Reading subscriptions** — listing an installed app's subscriptions (`getMultiple`) or a single subscription by id (`getOneById`). Each carries its id, installed app id, and source type.
 - **Reading schedules** — listing an installed app's schedules (`getMultiple`) or a single schedule by name (`getOneByName`). Each carries its name and installed app id.
 - **Reading virtual devices** — listing the account's virtual devices, optionally filtered by location (`getMultiple`). Each is returned as a `DeviceInterface`, the same typed model as a physical device.
+- **Reading location services** — a location's service info (`getLocationInfo` — city, latitude, longitude, and subscriptions), the list of available service-capability names (`getAvailableCapabilities`), or the data for one or more capabilities such as `weather`, `airQuality`, and `forecast` (`getCapability` / `getCapabilities`). Each capability's fields are returned as a name-keyed map of typed `ServiceMeasurementInterface` values (value + unit).
 - **Reading organizations** — listing the account's organizations (`getMultiple`) or a single organization by id (`getOneById`). Each carries its organization id, name, label, manufacturer name, and default-user-org flag.
 - **Reading device history** — device event history (`getMultiple`), optionally filtered by device and/or location, oldest-first, transparently paged across the API's `_links.next` chain (with an optional page cap). Each event carries its device id, location id, component, capability, attribute, value, and epoch (the SmartThings history window is roughly the last 7 days).
 
@@ -51,6 +52,7 @@ The client is **read-only** and currently supports:
 | Subscriptions | `getSubscriptionApi()` | `GET /installedapps/{id}/subscriptions`, `GET /installedapps/{id}/subscriptions/{subscriptionId}` | `SubscriptionInterface[]` / `SubscriptionInterface` |
 | Schedules | `getScheduleApi()` | `GET /installedapps/{id}/schedules`, `GET /installedapps/{id}/schedules/{scheduleName}` | `ScheduleInterface[]` / `ScheduleInterface` |
 | Organizations | `getOrganizationApi()` | `GET /organizations`, `GET /organizations/{organizationId}` | `OrganizationInterface[]` / `OrganizationInterface` |
+| Location services | `getServiceApi()` | `GET /services/coordinate/locations/{id}`, `GET /services/coordinate/locations/{id}/capabilities` (list and `?name=…`) | `ServiceLocationInfoInterface` / `string[]` / `ServiceCapabilityDataInterface` |
 
 
 

@@ -22,6 +22,7 @@ use ChristianBrown\SmartThings\Api\PresentationApiInterface;
 use ChristianBrown\SmartThings\Api\RuleApiInterface;
 use ChristianBrown\SmartThings\Api\SceneApiInterface;
 use ChristianBrown\SmartThings\Api\ScheduleApiInterface;
+use ChristianBrown\SmartThings\Api\ServiceApiInterface;
 use ChristianBrown\SmartThings\Api\SubscriptionApiInterface;
 use ChristianBrown\SmartThings\Api\VirtualDeviceApiInterface;
 
@@ -97,6 +98,14 @@ interface SmartThingsInterface
     public const string SERVICE_SCHEDULE_API = 'smartthings.api.schedule_api';
     public const string SERVICE_SCHEDULE_TRANSFORMER = 'smartthings.transformer.schedule_transformer';
     public const string SERVICE_SCHEDULES_TRANSFORMER = 'smartthings.transformer.schedules_transformer';
+    public const string SERVICE_SERVICE_API = 'smartthings.api.service_api';
+    public const string SERVICE_SERVICE_CAPABILITY_DATA_TRANSFORMER = 'smartthings.transformer.service_capability_data_transformer';
+    public const string SERVICE_SERVICE_CAPABILITY_NAMES_TRANSFORMER = 'smartthings.transformer.service_capability_names_transformer';
+    public const string SERVICE_SERVICE_LOCATION_INFO_SUBSCRIPTION_TRANSFORMER = 'smartthings.transformer.service_location_info_subscription_transformer';
+    public const string SERVICE_SERVICE_LOCATION_INFO_SUBSCRIPTIONS_TRANSFORMER = 'smartthings.transformer.service_location_info_subscriptions_transformer';
+    public const string SERVICE_SERVICE_LOCATION_INFO_TRANSFORMER = 'smartthings.transformer.service_location_info_transformer';
+    public const string SERVICE_SERVICE_MEASUREMENT_TRANSFORMER = 'smartthings.transformer.service_measurement_transformer';
+    public const string SERVICE_SERVICE_MEASUREMENTS_TRANSFORMER = 'smartthings.transformer.service_measurements_transformer';
     public const string SERVICE_SUBSCRIPTION_API = 'smartthings.api.subscription_api';
     public const string SERVICE_SUBSCRIPTION_TRANSFORMER = 'smartthings.transformer.subscription_transformer';
     public const string SERVICE_SUBSCRIPTIONS_TRANSFORMER = 'smartthings.transformer.subscriptions_transformer';
@@ -137,6 +146,8 @@ interface SmartThingsInterface
     public function getSceneApi(): SceneApiInterface;
 
     public function getScheduleApi(): ScheduleApiInterface;
+
+    public function getServiceApi(): ServiceApiInterface;
 
     public function getSubscriptionApi(): SubscriptionApiInterface;
 

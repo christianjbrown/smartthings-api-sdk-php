@@ -22,6 +22,7 @@ use ChristianBrown\SmartThings\Api\PresentationApi;
 use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\ScheduleApi;
+use ChristianBrown\SmartThings\Api\ServiceApi;
 use ChristianBrown\SmartThings\Api\SubscriptionApi;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\VirtualDeviceApi;
@@ -76,6 +77,13 @@ use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
 use ChristianBrown\SmartThings\Transformer\SchedulesTransformer;
 use ChristianBrown\SmartThings\Transformer\ScheduleTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceCapabilityNamesTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoSubscriptionsTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoSubscriptionTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceMeasurementsTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceMeasurementTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -101,6 +109,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(RuleApi::class)]
 #[UsesClass(SceneApi::class)]
 #[UsesClass(ScheduleApi::class)]
+#[UsesClass(ServiceApi::class)]
 #[UsesClass(SubscriptionApi::class)]
 #[UsesClass(VirtualDeviceApi::class)]
 #[UsesClass(Token::class)]
@@ -154,6 +163,13 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(SceneTransformer::class)]
 #[UsesClass(SchedulesTransformer::class)]
 #[UsesClass(ScheduleTransformer::class)]
+#[UsesClass(ServiceCapabilityDataTransformer::class)]
+#[UsesClass(ServiceCapabilityNamesTransformer::class)]
+#[UsesClass(ServiceLocationInfoSubscriptionsTransformer::class)]
+#[UsesClass(ServiceLocationInfoSubscriptionTransformer::class)]
+#[UsesClass(ServiceLocationInfoTransformer::class)]
+#[UsesClass(ServiceMeasurementsTransformer::class)]
+#[UsesClass(ServiceMeasurementTransformer::class)]
 #[UsesClass(SubscriptionsTransformer::class)]
 #[UsesClass(SubscriptionTransformer::class)]
 final class SmartThingsTest extends TestCase
@@ -282,6 +298,13 @@ final class SmartThingsTest extends TestCase
         $smartThings = new SmartThings('token');
 
         self::assertInstanceOf(ScheduleApi::class, $smartThings->getScheduleApi());
+    }
+
+    public function testGetServiceApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(ServiceApi::class, $smartThings->getServiceApi());
     }
 
     public function testGetSubscriptionApi(): void
