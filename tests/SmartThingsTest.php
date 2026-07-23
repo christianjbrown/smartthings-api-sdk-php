@@ -10,6 +10,7 @@ use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceHealthApi;
 use ChristianBrown\SmartThings\Api\DeviceProfileApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
+use ChristianBrown\SmartThings\Api\InstalledAppApi;
 use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationModeApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
@@ -40,6 +41,10 @@ use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTra
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
@@ -62,6 +67,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DeviceHealthApi::class)]
 #[UsesClass(DeviceProfileApi::class)]
 #[UsesClass(DeviceStatusApi::class)]
+#[UsesClass(InstalledAppApi::class)]
 #[UsesClass(LocationApi::class)]
 #[UsesClass(LocationModeApi::class)]
 #[UsesClass(LocationRoomApi::class)]
@@ -91,6 +97,10 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DeviceStatusTemperatureMeasurementTransformer::class)]
 #[UsesClass(DeviceStatusTransformer::class)]
 #[UsesClass(DeviceTransformer::class)]
+#[UsesClass(InstalledAppConfigsTransformer::class)]
+#[UsesClass(InstalledAppConfigTransformer::class)]
+#[UsesClass(InstalledAppsTransformer::class)]
+#[UsesClass(InstalledAppTransformer::class)]
 #[UsesClass(LocationsTransformer::class)]
 #[UsesClass(LocationTransformer::class)]
 #[UsesClass(LocationRoomsTransformer::class)]
@@ -144,6 +154,13 @@ final class SmartThingsTest extends TestCase
         $smartThings = new SmartThings('token');
 
         self::assertInstanceOf(DeviceStatusApi::class, $smartThings->getDeviceStatusApi());
+    }
+
+    public function testGetInstalledAppApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(InstalledAppApi::class, $smartThings->getInstalledAppApi());
     }
 
     public function testGetLocationApi(): void

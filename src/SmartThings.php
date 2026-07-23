@@ -18,6 +18,8 @@ use ChristianBrown\SmartThings\Api\DeviceProfileApi;
 use ChristianBrown\SmartThings\Api\DeviceProfileApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApiInterface;
+use ChristianBrown\SmartThings\Api\InstalledAppApi;
+use ChristianBrown\SmartThings\Api\InstalledAppApiInterface;
 use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationApiInterface;
 use ChristianBrown\SmartThings\Api\LocationModeApi;
@@ -54,6 +56,10 @@ use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTra
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
@@ -170,6 +176,20 @@ final class SmartThings implements SmartThingsInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    public function getInstalledAppApi(): InstalledAppApiInterface
+    {
+        /**
+         * @var InstalledAppApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_INSTALLED_APP_API);
+
+        return $service;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function getLocationApi(): LocationApiInterface
     {
         /**
@@ -262,6 +282,7 @@ final class SmartThings implements SmartThingsInterface
         $this->registerDeviceHealthTransformers();
         $this->registerDeviceProfileTransformers();
         $this->registerDeviceStatusTransformers();
+        $this->registerInstalledAppTransformers();
         $this->registerLocationTransformers();
         $this->registerModeTransformers();
         $this->registerPresentationTransformers();
@@ -323,6 +344,17 @@ final class SmartThings implements SmartThingsInterface
                 [
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_DEVICE_STATUS_TRANSFORMER),
+                    $this->token,
+                ]
+            );
+        $this->container->register(self::SERVICE_INSTALLED_APP_API, InstalledAppApi::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_INSTALLED_APP_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_INSTALLED_APPS_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_INSTALLED_APP_CONFIG_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_INSTALLED_APP_CONFIGS_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -492,6 +524,24 @@ final class SmartThings implements SmartThingsInterface
             ->setArguments(
                 [
                     $this->container->getDefinition(self::SERVICE_DEVICE_TRANSFORMER),
+                ]
+            );
+    }
+
+    private function registerInstalledAppTransformers(): void
+    {
+        $this->container->register(self::SERVICE_INSTALLED_APP_TRANSFORMER, InstalledAppTransformer::class);
+        $this->container->register(self::SERVICE_INSTALLED_APPS_TRANSFORMER, InstalledAppsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_INSTALLED_APP_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_INSTALLED_APP_CONFIG_TRANSFORMER, InstalledAppConfigTransformer::class);
+        $this->container->register(self::SERVICE_INSTALLED_APP_CONFIGS_TRANSFORMER, InstalledAppConfigsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_INSTALLED_APP_CONFIG_TRANSFORMER),
                 ]
             );
     }

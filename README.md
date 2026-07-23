@@ -18,6 +18,7 @@ The client is **read-only** and currently supports:
 - **Reading device profiles** — listing the account's device profiles (`getMultiple`) or a single profile by id (`getOneById`). Each carries its id, name, and status.
 - **Reading presentations** — a device presentation by presentation id (`getOne`), a stored device config (`getDeviceConfig`), or the default config generated from a device type (`getDeviceConfigByType`). Each carries its presentation id, manufacturer name, and type.
 - **Reading apps** — listing the account's apps (`getMultiple`), one app by name or id (`getOneById`), an app's OAuth config (`getOauth` — client name, scopes, redirect URIs), or its settings map (`getSettings`).
+- **Reading installed apps** — listing installed app instances, optionally by location (`getMultiple`), one instance by id (`getOneById`), its configurations (`getConfigs`), or a single configuration (`getConfig`).
 
 ### Supported endpoints
 
@@ -35,6 +36,7 @@ The client is **read-only** and currently supports:
 | Device profiles | `getDeviceProfileApi()` | `GET /deviceprofiles`, `GET /deviceprofiles/{deviceProfileId}` | `DeviceProfileInterface[]` / `DeviceProfileInterface` |
 | Presentation | `getPresentationApi()` | `GET /presentation`, `GET /presentation/deviceconfig`, `GET /presentation/types/{typeIntegrationId}/deviceconfig` | `PresentationInterface` |
 | Apps | `getAppApi()` | `GET /apps`, `GET /apps/{appNameOrId}`, `GET /apps/{appNameOrId}/oauth`, `GET /apps/{appNameOrId}/settings` | `AppInterface[]` / `AppInterface` / `AppOauthInterface` / `AppSettingsInterface` |
+| Installed apps | `getInstalledAppApi()` | `GET /installedapps`, `GET /installedapps/{id}`, `GET /installedapps/{id}/configs`, `GET /installedapps/{id}/configs/{configurationId}` | `InstalledAppInterface[]` / `InstalledAppInterface` / `InstalledAppConfigInterface[]` / `InstalledAppConfigInterface` |
 
 
 
@@ -80,6 +82,7 @@ $capabilityApi   = $smartThings->getCapabilityApi();  // CapabilityApiInterface
 $deviceProfileApi = $smartThings->getDeviceProfileApi();  // DeviceProfileApiInterface
 $presentationApi = $smartThings->getPresentationApi();  // PresentationApiInterface
 $appApi          = $smartThings->getAppApi();  // AppApiInterface
+$installedAppApi = $smartThings->getInstalledAppApi();  // InstalledAppApiInterface
 ```
 
 If you'd rather wire the clients by hand, see [Wiring the clients](#wiring-the-clients) below.
@@ -179,6 +182,7 @@ use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceHealthApi;
 use ChristianBrown\SmartThings\Api\DeviceProfileApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
+use ChristianBrown\SmartThings\Api\InstalledAppApi;
 use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationModeApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
@@ -200,6 +204,10 @@ use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTemperatureTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasurementTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasurementHumidityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryTransformer;
@@ -300,6 +308,20 @@ $deviceProfileApi = new DeviceProfileApi(
     $requestSender,
     $deviceProfileTransformer,
     new DeviceProfilesTransformer($deviceProfileTransformer),
+    $apiToken
+);
+
+// Installed apps client. The list endpoint wraps the single transformer in an
+// InstalledAppsTransformer; the config endpoints have their own single/collection pair.
+$installedAppTransformer = new InstalledAppTransformer();
+$installedAppConfigTransformer = new InstalledAppConfigTransformer();
+
+$installedAppApi = new InstalledAppApi(
+    $requestSender,
+    $installedAppTransformer,
+    new InstalledAppsTransformer($installedAppTransformer),
+    $installedAppConfigTransformer,
+    new InstalledAppConfigsTransformer($installedAppConfigTransformer),
     $apiToken
 );
 

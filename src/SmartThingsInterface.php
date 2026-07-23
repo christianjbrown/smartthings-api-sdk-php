@@ -10,6 +10,7 @@ use ChristianBrown\SmartThings\Api\DeviceApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceHealthApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceProfileApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceStatusApiInterface;
+use ChristianBrown\SmartThings\Api\InstalledAppApiInterface;
 use ChristianBrown\SmartThings\Api\LocationApiInterface;
 use ChristianBrown\SmartThings\Api\LocationModeApiInterface;
 use ChristianBrown\SmartThings\Api\LocationRoomApiInterface;
@@ -48,6 +49,11 @@ interface SmartThingsInterface
     public const string SERVICE_DEVICE_STATUS_TRANSFORMER = 'smartthings.transformer.device_status_transformer';
     public const string SERVICE_DEVICE_TRANSFORMER = 'smartthings.transformer.device_transformer';
     public const string SERVICE_DEVICES_TRANSFORMER = 'smartthings.transformer.devices_transformer';
+    public const string SERVICE_INSTALLED_APP_API = 'smartthings.api.installed_app_api';
+    public const string SERVICE_INSTALLED_APP_CONFIG_TRANSFORMER = 'smartthings.transformer.installed_app_config_transformer';
+    public const string SERVICE_INSTALLED_APP_CONFIGS_TRANSFORMER = 'smartthings.transformer.installed_app_configs_transformer';
+    public const string SERVICE_INSTALLED_APP_TRANSFORMER = 'smartthings.transformer.installed_app_transformer';
+    public const string SERVICE_INSTALLED_APPS_TRANSFORMER = 'smartthings.transformer.installed_apps_transformer';
     public const string SERVICE_JSON_API_REQUEST_SENDER = 'smartthings.json_api_request_sender';
     public const string SERVICE_LOCATION_API = 'smartthings.api.location_api';
     public const string SERVICE_LOCATION_MODE_API = 'smartthings.api.location_mode_api';
@@ -78,6 +84,8 @@ interface SmartThingsInterface
     public function getDeviceProfileApi(): DeviceProfileApiInterface;
 
     public function getDeviceStatusApi(): DeviceStatusApiInterface;
+
+    public function getInstalledAppApi(): InstalledAppApiInterface;
 
     public function getLocationApi(): LocationApiInterface;
 
