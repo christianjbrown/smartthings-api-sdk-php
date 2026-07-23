@@ -17,6 +17,7 @@ use ChristianBrown\SmartThings\Api\LocationRoomApiInterface;
 use ChristianBrown\SmartThings\Api\PresentationApiInterface;
 use ChristianBrown\SmartThings\Api\RuleApiInterface;
 use ChristianBrown\SmartThings\Api\SceneApiInterface;
+use ChristianBrown\SmartThings\Api\SubscriptionApiInterface;
 
 interface SmartThingsInterface
 {
@@ -72,6 +73,9 @@ interface SmartThingsInterface
     public const string SERVICE_SCENE_API = 'smartthings.api.scene_api';
     public const string SERVICE_SCENE_TRANSFORMER = 'smartthings.transformer.scene_transformer';
     public const string SERVICE_SCENES_TRANSFORMER = 'smartthings.transformer.scenes_transformer';
+    public const string SERVICE_SUBSCRIPTION_API = 'smartthings.api.subscription_api';
+    public const string SERVICE_SUBSCRIPTION_TRANSFORMER = 'smartthings.transformer.subscription_transformer';
+    public const string SERVICE_SUBSCRIPTIONS_TRANSFORMER = 'smartthings.transformer.subscriptions_transformer';
 
     public function getAppApi(): AppApiInterface;
 
@@ -98,4 +102,6 @@ interface SmartThingsInterface
     public function getRuleApi(): RuleApiInterface;
 
     public function getSceneApi(): SceneApiInterface;
+
+    public function getSubscriptionApi(): SubscriptionApiInterface;
 }

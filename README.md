@@ -19,6 +19,7 @@ The client is **read-only** and currently supports:
 - **Reading presentations** — a device presentation by presentation id (`getOne`), a stored device config (`getDeviceConfig`), or the default config generated from a device type (`getDeviceConfigByType`). Each carries its presentation id, manufacturer name, and type.
 - **Reading apps** — listing the account's apps (`getMultiple`), one app by name or id (`getOneById`), an app's OAuth config (`getOauth` — client name, scopes, redirect URIs), or its settings map (`getSettings`).
 - **Reading installed apps** — listing installed app instances, optionally by location (`getMultiple`), one instance by id (`getOneById`), its configurations (`getConfigs`), or a single configuration (`getConfig`).
+- **Reading subscriptions** — listing an installed app's subscriptions (`getMultiple`) or a single subscription by id (`getOneById`). Each carries its id, installed app id, and source type.
 
 ### Supported endpoints
 
@@ -37,6 +38,7 @@ The client is **read-only** and currently supports:
 | Presentation | `getPresentationApi()` | `GET /presentation`, `GET /presentation/deviceconfig`, `GET /presentation/types/{typeIntegrationId}/deviceconfig` | `PresentationInterface` |
 | Apps | `getAppApi()` | `GET /apps`, `GET /apps/{appNameOrId}`, `GET /apps/{appNameOrId}/oauth`, `GET /apps/{appNameOrId}/settings` | `AppInterface[]` / `AppInterface` / `AppOauthInterface` / `AppSettingsInterface` |
 | Installed apps | `getInstalledAppApi()` | `GET /installedapps`, `GET /installedapps/{id}`, `GET /installedapps/{id}/configs`, `GET /installedapps/{id}/configs/{configurationId}` | `InstalledAppInterface[]` / `InstalledAppInterface` / `InstalledAppConfigInterface[]` / `InstalledAppConfigInterface` |
+| Subscriptions | `getSubscriptionApi()` | `GET /installedapps/{id}/subscriptions`, `GET /installedapps/{id}/subscriptions/{subscriptionId}` | `SubscriptionInterface[]` / `SubscriptionInterface` |
 
 
 
@@ -83,6 +85,7 @@ $deviceProfileApi = $smartThings->getDeviceProfileApi();  // DeviceProfileApiInt
 $presentationApi = $smartThings->getPresentationApi();  // PresentationApiInterface
 $appApi          = $smartThings->getAppApi();  // AppApiInterface
 $installedAppApi = $smartThings->getInstalledAppApi();  // InstalledAppApiInterface
+$subscriptionApi = $smartThings->getSubscriptionApi();  // SubscriptionApiInterface
 ```
 
 If you'd rather wire the clients by hand, see [Wiring the clients](#wiring-the-clients) below.
@@ -189,6 +192,7 @@ use ChristianBrown\SmartThings\Api\LocationRoomApi;
 use ChristianBrown\SmartThings\Api\PresentationApi;
 use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
+use ChristianBrown\SmartThings\Api\SubscriptionApi;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
 use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppsTransformer;
@@ -226,6 +230,8 @@ use ChristianBrown\SmartThings\Transformer\RulesTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleTransformer;
 use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
+use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformer;
+use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
 
 $apiToken = 'your-smartthings-personal-access-token';
 
@@ -377,6 +383,17 @@ $ruleApi = new RuleApi(
     $requestSender,
     $ruleTransformer,
     new RulesTransformer($ruleTransformer),
+    $apiToken
+);
+
+// Subscriptions client. The single subscription transformer is shared: the list
+// endpoint wraps it in a SubscriptionsTransformer, and getOneById() uses it directly.
+$subscriptionTransformer = new SubscriptionTransformer();
+
+$subscriptionApi = new SubscriptionApi(
+    $requestSender,
+    $subscriptionTransformer,
+    new SubscriptionsTransformer($subscriptionTransformer),
     $apiToken
 );
 

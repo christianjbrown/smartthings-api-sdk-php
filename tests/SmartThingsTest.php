@@ -17,6 +17,7 @@ use ChristianBrown\SmartThings\Api\LocationRoomApi;
 use ChristianBrown\SmartThings\Api\PresentationApi;
 use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
+use ChristianBrown\SmartThings\Api\SubscriptionApi;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\SmartThings;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
@@ -56,6 +57,8 @@ use ChristianBrown\SmartThings\Transformer\RulesTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleTransformer;
 use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
+use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformer;
+use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -74,6 +77,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(PresentationApi::class)]
 #[UsesClass(RuleApi::class)]
 #[UsesClass(SceneApi::class)]
+#[UsesClass(SubscriptionApi::class)]
 #[UsesClass(Token::class)]
 #[UsesClass(AppOauthTransformer::class)]
 #[UsesClass(AppSettingsTransformer::class)]
@@ -112,6 +116,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(RuleTransformer::class)]
 #[UsesClass(ScenesTransformer::class)]
 #[UsesClass(SceneTransformer::class)]
+#[UsesClass(SubscriptionsTransformer::class)]
+#[UsesClass(SubscriptionTransformer::class)]
 final class SmartThingsTest extends TestCase
 {
     public function testGetAppApi(): void
@@ -203,5 +209,12 @@ final class SmartThingsTest extends TestCase
         $smartThings = new SmartThings('token');
 
         self::assertInstanceOf(SceneApi::class, $smartThings->getSceneApi());
+    }
+
+    public function testGetSubscriptionApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(SubscriptionApi::class, $smartThings->getSubscriptionApi());
     }
 }

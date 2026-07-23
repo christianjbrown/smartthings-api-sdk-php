@@ -32,6 +32,8 @@ use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\RuleApiInterface;
 use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\SceneApiInterface;
+use ChristianBrown\SmartThings\Api\SubscriptionApi;
+use ChristianBrown\SmartThings\Api\SubscriptionApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
@@ -71,6 +73,8 @@ use ChristianBrown\SmartThings\Transformer\RulesTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleTransformer;
 use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
+use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformer;
+use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -270,6 +274,20 @@ final class SmartThings implements SmartThingsInterface
         return $service;
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getSubscriptionApi(): SubscriptionApiInterface
+    {
+        /**
+         * @var SubscriptionApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_SUBSCRIPTION_API);
+
+        return $service;
+    }
+
     private function init(): void
     {
         // Registration order matters: a service must be registered before another
@@ -288,6 +306,7 @@ final class SmartThings implements SmartThingsInterface
         $this->registerPresentationTransformers();
         $this->registerRuleTransformers();
         $this->registerSceneTransformers();
+        $this->registerSubscriptionTransformers();
         $this->registerApiClients();
     }
 
@@ -408,6 +427,15 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_SCENE_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_SCENES_TRANSFORMER),
+                    $this->token,
+                ]
+            );
+        $this->container->register(self::SERVICE_SUBSCRIPTION_API, SubscriptionApi::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_SUBSCRIPTION_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_SUBSCRIPTIONS_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -599,6 +627,17 @@ final class SmartThings implements SmartThingsInterface
             ->setArguments(
                 [
                     $this->container->getDefinition(self::SERVICE_SCENE_TRANSFORMER),
+                ]
+            );
+    }
+
+    private function registerSubscriptionTransformers(): void
+    {
+        $this->container->register(self::SERVICE_SUBSCRIPTION_TRANSFORMER, SubscriptionTransformer::class);
+        $this->container->register(self::SERVICE_SUBSCRIPTIONS_TRANSFORMER, SubscriptionsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_SUBSCRIPTION_TRANSFORMER),
                 ]
             );
     }
