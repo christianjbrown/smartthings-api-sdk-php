@@ -474,6 +474,7 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_LOCATION_ROOM_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_LOCATION_ROOMS_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_DEVICES_TRANSFORMER),
                     $this->token,
                 ]
             );

@@ -11,6 +11,7 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceInterface;
 use ChristianBrown\SmartThings\Model\LocationInterface;
 use ChristianBrown\SmartThings\Model\LocationRoomInterface;
+use ChristianBrown\SmartThings\Transformer\DevicesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformerInterface;
 
@@ -26,6 +27,12 @@ final class LocationRoomApi implements LocationRoomApiInterface
     private array $cache = [];
 
     /**
+     * @var array<string, array<int, DeviceInterface>>
+     */
+    private array $devicesCache = [];
+    private DevicesTransformerInterface $devicesTransformer;
+
+    /**
      * @var array<string, array<int, LocationRoomInterface>>
      */
     private array $listCache = [];
@@ -34,12 +41,45 @@ final class LocationRoomApi implements LocationRoomApiInterface
     private LocationRoomTransformerInterface $roomTransformer;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, LocationRoomTransformerInterface $roomTransformer, LocationRoomsTransformerInterface $roomsTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, LocationRoomTransformerInterface $roomTransformer, LocationRoomsTransformerInterface $roomsTransformer, DevicesTransformerInterface $devicesTransformer, TokenInterface $token)
     {
         $this->requestSender = $requestSender;
         $this->roomTransformer = $roomTransformer;
         $this->roomsTransformer = $roomsTransformer;
+        $this->devicesTransformer = $devicesTransformer;
         $this->token = $token;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     *
+     * @return array<int, DeviceInterface>
+     */
+    public function getDevicesInRoom(LocationInterface $location, string $roomId, bool $skipCache = false): array
+    {
+        if (!$skipCache) {
+            if (isset($this->devicesCache[$roomId])) {
+                return $this->devicesCache[$roomId];
+            }
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_DEVICES_SPRINTF, rawurlencode($location->getLocationId()), rawurlencode($roomId));
+        $data = $this->requestSender->get($url, [], $headers);
+
+        if (empty($data[self::KEY_ITEMS])) {
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
+        }
+        if (!is_array($data[self::KEY_ITEMS])) {
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
+        }
+        $devices = $this->devicesTransformer->transform($data[self::KEY_ITEMS]);
+        $this->devicesCache[$roomId] = $devices;
+
+        return $devices;
     }
 
     /**

@@ -11,7 +11,7 @@ The client is **read-only** and currently supports:
 - **Reading a device's health** — the connection `state` (`ONLINE`/`OFFLINE`/`UNHEALTHY`) and the `lastUpdatedDate`, by id (`getOneById`) or from a device (`getOneByDevice`).
 - **Reading a device's preferences** — the device's current preference values, by id (`getOneById`) or from a device (`getOneByDevice`). Each preference carries its name, `preferenceType`, and value.
 - **Listing locations** — id and name, or reading a single location by id (`getOneById`).
-- **Reading rooms** — listing every room in a location (`getMultiple`), or reading a single room, either from a device (`getOneByDevice`) or by a location and room id (`getOneByLocationAndId`). Each room carries its id, name, and location id.
+- **Reading rooms** — listing every room in a location (`getMultiple`), reading a single room, either from a device (`getOneByDevice`) or by a location and room id (`getOneByLocationAndId`), or listing the devices in a room (`getDevicesInRoom`). Each room carries its id, name, and location id.
 - **Reading modes** — listing a location's modes (`getMultiple`), reading the currently active mode (`getCurrent`), or a single mode by id (`getOneByLocationAndId`). Each mode carries its id, label, and name.
 - **Reading scenes** — listing scenes for the account, optionally filtered by location (`getMultiple`), or a single scene by id (`getOneById`). Each scene carries its id, name, and location id.
 - **Reading rules** — listing a location's rules (`getMultiple`) or a single rule by id (`getOneById`); both require a location id. Each rule carries its id, name, and status.
@@ -34,7 +34,7 @@ The client is **read-only** and currently supports:
 | Device preferences | `getDevicePreferencesApi()` | `GET /devices/{deviceId}/preferences` | `DevicePreferenceInterface[]` |
 | Device history | `getDeviceHistoryApi()` | `GET /history/devices` (paged) | `DeviceHistoryEventInterface[]` |
 | Locations | `getLocationApi()` | `GET /locations`, `GET /locations/{locationId}` | `LocationInterface[]` / `LocationInterface` |
-| Rooms | `getLocationRoomApi()` | `GET /locations/{locationId}/rooms`, `GET /locations/{locationId}/rooms/{roomId}` | `LocationRoomInterface[]` / `LocationRoomInterface` |
+| Rooms | `getLocationRoomApi()` | `GET /locations/{locationId}/rooms`, `GET /locations/{locationId}/rooms/{roomId}`, `GET /locations/{locationId}/rooms/{roomId}/devices` | `LocationRoomInterface[]` / `LocationRoomInterface` / `DeviceInterface[]` |
 | Modes | `getLocationModeApi()` | `GET /locations/{locationId}/modes`, `GET /locations/{locationId}/modes/current`, `GET /locations/{locationId}/modes/{modeId}` | `ModeInterface[]` / `ModeInterface` |
 | Scenes | `getSceneApi()` | `GET /scenes`, `GET /scenes/{sceneId}` | `SceneInterface[]` / `SceneInterface` |
 | Rules | `getRuleApi()` | `GET /rules?locationId=…`, `GET /rules/{ruleId}?locationId=…` | `RuleInterface[]` / `RuleInterface` |
