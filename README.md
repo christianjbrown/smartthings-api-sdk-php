@@ -22,6 +22,7 @@ The client is **read-only** and currently supports:
 - **Reading installed apps** — listing installed app instances, optionally by location (`getMultiple`), one instance by id (`getOneById`), the instance for the current token (`getMe`), its configurations (`getConfigs`), or a single configuration (`getConfig`).
 - **Reading subscriptions** — listing an installed app's subscriptions (`getMultiple`) or a single subscription by id (`getOneById`). Each carries its id, installed app id, and source type.
 - **Reading schedules** — listing an installed app's schedules (`getMultiple`) or a single schedule by name (`getOneByName`). Each carries its name and installed app id.
+- **Reading virtual devices** — listing the account's virtual devices, optionally filtered by location (`getMultiple`). Each is returned as a `DeviceInterface`, the same typed model as a physical device.
 - **Reading device history** — device event history (`getMultiple`), optionally filtered by device and/or location, oldest-first, transparently paged across the API's `_links.next` chain (with an optional page cap). Each event carries its device id, location id, component, capability, attribute, value, and epoch (the SmartThings history window is roughly the last 7 days).
 
 ### Supported endpoints
@@ -29,6 +30,7 @@ The client is **read-only** and currently supports:
 | Resource | Client | Endpoint(s) | Returns |
 | --- | --- | --- | --- |
 | Devices | `getDeviceApi()` | `GET /devices`, `GET /devices/{deviceId}` | `DeviceInterface[]` / `DeviceInterface` |
+| Virtual devices | `getVirtualDeviceApi()` | `GET /virtualdevices` | `DeviceInterface[]` |
 | Device status | `getDeviceStatusApi()` | `GET /devices/{deviceId}/status`, `GET /devices/{deviceId}/components/{componentId}/status`, `GET /devices/{deviceId}/components/{componentId}/capabilities/{capabilityId}/status` | `DeviceStatusInterface` |
 | Device health | `getDeviceHealthApi()` | `GET /devices/{deviceId}/health` | `DeviceHealthInterface` |
 | Device preferences | `getDevicePreferencesApi()` | `GET /devices/{deviceId}/preferences` | `DevicePreferenceInterface[]` |

@@ -21,6 +21,7 @@ use ChristianBrown\SmartThings\Api\RuleApiInterface;
 use ChristianBrown\SmartThings\Api\SceneApiInterface;
 use ChristianBrown\SmartThings\Api\ScheduleApiInterface;
 use ChristianBrown\SmartThings\Api\SubscriptionApiInterface;
+use ChristianBrown\SmartThings\Api\VirtualDeviceApiInterface;
 
 interface SmartThingsInterface
 {
@@ -91,6 +92,7 @@ interface SmartThingsInterface
     public const string SERVICE_SUBSCRIPTION_API = 'smartthings.api.subscription_api';
     public const string SERVICE_SUBSCRIPTION_TRANSFORMER = 'smartthings.transformer.subscription_transformer';
     public const string SERVICE_SUBSCRIPTIONS_TRANSFORMER = 'smartthings.transformer.subscriptions_transformer';
+    public const string SERVICE_VIRTUAL_DEVICE_API = 'smartthings.api.virtual_device_api';
 
     public function getAppApi(): AppApiInterface;
 
@@ -125,4 +127,6 @@ interface SmartThingsInterface
     public function getScheduleApi(): ScheduleApiInterface;
 
     public function getSubscriptionApi(): SubscriptionApiInterface;
+
+    public function getVirtualDeviceApi(): VirtualDeviceApiInterface;
 }

@@ -22,6 +22,7 @@ use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\ScheduleApi;
 use ChristianBrown\SmartThings\Api\SubscriptionApi;
 use ChristianBrown\SmartThings\Api\Token;
+use ChristianBrown\SmartThings\Api\VirtualDeviceApi;
 use ChristianBrown\SmartThings\SmartThings;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
 use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
@@ -93,6 +94,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(SceneApi::class)]
 #[UsesClass(ScheduleApi::class)]
 #[UsesClass(SubscriptionApi::class)]
+#[UsesClass(VirtualDeviceApi::class)]
 #[UsesClass(Token::class)]
 #[UsesClass(AppOauthTransformer::class)]
 #[UsesClass(AppSettingsTransformer::class)]
@@ -261,5 +263,12 @@ final class SmartThingsTest extends TestCase
         $smartThings = new SmartThings('token');
 
         self::assertInstanceOf(SubscriptionApi::class, $smartThings->getSubscriptionApi());
+    }
+
+    public function testGetVirtualDeviceApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(VirtualDeviceApi::class, $smartThings->getVirtualDeviceApi());
     }
 }

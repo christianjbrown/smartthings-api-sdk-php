@@ -42,6 +42,8 @@ use ChristianBrown\SmartThings\Api\SubscriptionApi;
 use ChristianBrown\SmartThings\Api\SubscriptionApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
+use ChristianBrown\SmartThings\Api\VirtualDeviceApi;
+use ChristianBrown\SmartThings\Api\VirtualDeviceApiInterface;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
 use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppsTransformer;
@@ -345,6 +347,20 @@ final class SmartThings implements SmartThingsInterface
         return $service;
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getVirtualDeviceApi(): VirtualDeviceApiInterface
+    {
+        /**
+         * @var VirtualDeviceApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_VIRTUAL_DEVICE_API);
+
+        return $service;
+    }
+
     private function init(): void
     {
         // Registration order matters: a service must be registered before another
@@ -524,6 +540,14 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_SUBSCRIPTION_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_SUBSCRIPTIONS_TRANSFORMER),
+                    $this->token,
+                ]
+            );
+        $this->container->register(self::SERVICE_VIRTUAL_DEVICE_API, VirtualDeviceApi::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_DEVICES_TRANSFORMER),
                     $this->token,
                 ]
             );
