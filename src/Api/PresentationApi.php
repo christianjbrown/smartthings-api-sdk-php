@@ -7,6 +7,7 @@ namespace ChristianBrown\SmartThings\Api;
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
+use ChristianBrown\SmartThings\Model\DeviceInterface;
 use ChristianBrown\SmartThings\Model\PresentationInterface;
 use ChristianBrown\SmartThings\Transformer\PresentationTransformerInterface;
 
@@ -19,6 +20,11 @@ final class PresentationApi implements PresentationApiInterface
      * @var array<string, PresentationInterface>
      */
     private array $cache = [];
+
+    /**
+     * @var array<string, PresentationInterface>
+     */
+    private array $deviceCache = [];
 
     /**
      * @var array<string, PresentationInterface>
@@ -38,6 +44,33 @@ final class PresentationApi implements PresentationApiInterface
         $this->requestSender = $requestSender;
         $this->presentationTransformer = $presentationTransformer;
         $this->token = $token;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function getByDevice(DeviceInterface $device, bool $skipCache = false): PresentationInterface
+    {
+        return $this->getByDeviceId($device->getDeviceId(), $skipCache);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function getByDeviceId(string $deviceId, bool $skipCache = false): PresentationInterface
+    {
+        if (!$skipCache) {
+            if (isset($this->deviceCache[$deviceId])) {
+                return $this->deviceCache[$deviceId];
+            }
+        }
+
+        $presentation = $this->fetch([self::KEY_DEVICE_ID => $deviceId], self::API_URL);
+        $this->deviceCache[$deviceId] = $presentation;
+
+        return $presentation;
     }
 
     /**
