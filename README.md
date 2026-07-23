@@ -17,6 +17,7 @@ The client is **read-only** and currently supports:
 - **Reading capabilities** — listing all platform capabilities (`getMultiple`), the custom capabilities in a namespace (`getMultipleByNamespace`), or one capability definition by id and version (`getOneByIdAndVersion`). Each carries its id, name, status, and version.
 - **Reading device profiles** — listing the account's device profiles (`getMultiple`) or a single profile by id (`getOneById`). Each carries its id, name, and status.
 - **Reading presentations** — a device presentation by presentation id (`getOne`), a stored device config (`getDeviceConfig`), or the default config generated from a device type (`getDeviceConfigByType`). Each carries its presentation id, manufacturer name, and type.
+- **Reading apps** — listing the account's apps (`getMultiple`), one app by name or id (`getOneById`), an app's OAuth config (`getOauth` — client name, scopes, redirect URIs), or its settings map (`getSettings`).
 
 ### Supported endpoints
 
@@ -33,6 +34,7 @@ The client is **read-only** and currently supports:
 | Capabilities | `getCapabilityApi()` | `GET /capabilities`, `GET /capabilities/namespaces/{namespace}`, `GET /capabilities/{id}/{version}` | `CapabilityInterface[]` / `CapabilityInterface` |
 | Device profiles | `getDeviceProfileApi()` | `GET /deviceprofiles`, `GET /deviceprofiles/{deviceProfileId}` | `DeviceProfileInterface[]` / `DeviceProfileInterface` |
 | Presentation | `getPresentationApi()` | `GET /presentation`, `GET /presentation/deviceconfig`, `GET /presentation/types/{typeIntegrationId}/deviceconfig` | `PresentationInterface` |
+| Apps | `getAppApi()` | `GET /apps`, `GET /apps/{appNameOrId}`, `GET /apps/{appNameOrId}/oauth`, `GET /apps/{appNameOrId}/settings` | `AppInterface[]` / `AppInterface` / `AppOauthInterface` / `AppSettingsInterface` |
 
 
 
@@ -77,6 +79,7 @@ $ruleApi         = $smartThings->getRuleApi();  // RuleApiInterface
 $capabilityApi   = $smartThings->getCapabilityApi();  // CapabilityApiInterface
 $deviceProfileApi = $smartThings->getDeviceProfileApi();  // DeviceProfileApiInterface
 $presentationApi = $smartThings->getPresentationApi();  // PresentationApiInterface
+$appApi          = $smartThings->getAppApi();  // AppApiInterface
 ```
 
 If you'd rather wire the clients by hand, see [Wiring the clients](#wiring-the-clients) below.
@@ -170,6 +173,7 @@ Under the hood, `SmartThings` wires the clients and their transformer chains thr
 
 ```php
 use ChristianBrown\ApiClient\ApiClient;
+use ChristianBrown\SmartThings\Api\AppApi;
 use ChristianBrown\SmartThings\Api\CapabilityApi;
 use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceHealthApi;
@@ -181,6 +185,10 @@ use ChristianBrown\SmartThings\Api\LocationRoomApi;
 use ChristianBrown\SmartThings\Api\PresentationApi;
 use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
+use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
+use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
+use ChristianBrown\SmartThings\Transformer\AppsTransformer;
+use ChristianBrown\SmartThings\Transformer\AppTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
@@ -215,6 +223,19 @@ $apiToken = 'your-smartthings-personal-access-token';
 
 // Shared JSON request sender (wires Guzzle for you).
 $requestSender = (new ApiClient())->getJsonApiRequestSender();
+
+// Apps client. The list endpoint wraps the single app transformer in an
+// AppsTransformer; the oauth and settings endpoints get their own transformers.
+$appTransformer = new AppTransformer();
+
+$appApi = new AppApi(
+    $requestSender,
+    $appTransformer,
+    new AppsTransformer($appTransformer),
+    new AppOauthTransformer(),
+    new AppSettingsTransformer(),
+    $apiToken
+);
 
 // Capabilities client. The single capability transformer is shared: the list
 // endpoints wrap it in a CapabilitiesTransformer, and getOneByIdAndVersion() uses

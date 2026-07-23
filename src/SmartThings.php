@@ -6,6 +6,8 @@ namespace ChristianBrown\SmartThings;
 
 use ChristianBrown\ApiClient\ApiClient;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
+use ChristianBrown\SmartThings\Api\AppApi;
+use ChristianBrown\SmartThings\Api\AppApiInterface;
 use ChristianBrown\SmartThings\Api\CapabilityApi;
 use ChristianBrown\SmartThings\Api\CapabilityApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceApi;
@@ -30,6 +32,10 @@ use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\SceneApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
+use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
+use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
+use ChristianBrown\SmartThings\Transformer\AppsTransformer;
+use ChristianBrown\SmartThings\Transformer\AppTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
@@ -74,6 +80,20 @@ final class SmartThings implements SmartThingsInterface
         $this->container = new ContainerBuilder();
         $this->token = new Token($apiToken);
         $this->init();
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getAppApi(): AppApiInterface
+    {
+        /**
+         * @var AppApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_APP_API);
+
+        return $service;
     }
 
     /**
@@ -236,6 +256,7 @@ final class SmartThings implements SmartThingsInterface
         // service wires a reference to its definition, so core comes first and the
         // API clients (which reference every transformer chain) come last.
         $this->registerCore();
+        $this->registerAppTransformers();
         $this->registerCapabilityTransformers();
         $this->registerDeviceTransformers();
         $this->registerDeviceHealthTransformers();
@@ -251,6 +272,17 @@ final class SmartThings implements SmartThingsInterface
 
     private function registerApiClients(): void
     {
+        $this->container->register(self::SERVICE_APP_API, AppApi::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_APP_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_APPS_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_APP_OAUTH_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_APP_SETTINGS_TRANSFORMER),
+                    $this->token,
+                ]
+            );
         $this->container->register(self::SERVICE_CAPABILITY_API, CapabilityApi::class)
             ->setArguments(
                 [
@@ -347,6 +379,19 @@ final class SmartThings implements SmartThingsInterface
                     $this->token,
                 ]
             );
+    }
+
+    private function registerAppTransformers(): void
+    {
+        $this->container->register(self::SERVICE_APP_TRANSFORMER, AppTransformer::class);
+        $this->container->register(self::SERVICE_APPS_TRANSFORMER, AppsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_APP_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_APP_OAUTH_TRANSFORMER, AppOauthTransformer::class);
+        $this->container->register(self::SERVICE_APP_SETTINGS_TRANSFORMER, AppSettingsTransformer::class);
     }
 
     private function registerCapabilityTransformers(): void

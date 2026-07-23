@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests;
 
+use ChristianBrown\SmartThings\Api\AppApi;
 use ChristianBrown\SmartThings\Api\CapabilityApi;
 use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceHealthApi;
@@ -17,6 +18,10 @@ use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\SmartThings;
+use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
+use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
+use ChristianBrown\SmartThings\Transformer\AppsTransformer;
+use ChristianBrown\SmartThings\Transformer\AppTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
@@ -51,6 +56,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SmartThings::class)]
+#[UsesClass(AppApi::class)]
 #[UsesClass(CapabilityApi::class)]
 #[UsesClass(DeviceApi::class)]
 #[UsesClass(DeviceHealthApi::class)]
@@ -63,6 +69,10 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(RuleApi::class)]
 #[UsesClass(SceneApi::class)]
 #[UsesClass(Token::class)]
+#[UsesClass(AppOauthTransformer::class)]
+#[UsesClass(AppSettingsTransformer::class)]
+#[UsesClass(AppsTransformer::class)]
+#[UsesClass(AppTransformer::class)]
 #[UsesClass(CapabilitiesTransformer::class)]
 #[UsesClass(CapabilityTransformer::class)]
 #[UsesClass(DeviceComponentCapabilitiesTransformer::class)]
@@ -94,6 +104,13 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(SceneTransformer::class)]
 final class SmartThingsTest extends TestCase
 {
+    public function testGetAppApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(AppApi::class, $smartThings->getAppApi());
+    }
+
     public function testGetCapabilityApi(): void
     {
         $smartThings = new SmartThings('token');
