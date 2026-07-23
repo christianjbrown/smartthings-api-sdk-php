@@ -28,6 +28,8 @@ use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApiInterface;
 use ChristianBrown\SmartThings\Api\DriverApi;
 use ChristianBrown\SmartThings\Api\DriverApiInterface;
+use ChristianBrown\SmartThings\Api\HubApi;
+use ChristianBrown\SmartThings\Api\HubApiInterface;
 use ChristianBrown\SmartThings\Api\InstalledAppApi;
 use ChristianBrown\SmartThings\Api\InstalledAppApiInterface;
 use ChristianBrown\SmartThings\Api\LocationApi;
@@ -91,6 +93,12 @@ use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
 use ChristianBrown\SmartThings\Transformer\DriversTransformer;
 use ChristianBrown\SmartThings\Transformer\DriverTransformer;
+use ChristianBrown\SmartThings\Transformer\HubCharacteristicsTransformer;
+use ChristianBrown\SmartThings\Transformer\HubEnrolledChannelsTransformer;
+use ChristianBrown\SmartThings\Transformer\HubEnrolledChannelTransformer;
+use ChristianBrown\SmartThings\Transformer\HubInstalledDriversTransformer;
+use ChristianBrown\SmartThings\Transformer\HubInstalledDriverTransformer;
+use ChristianBrown\SmartThings\Transformer\HubTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformer;
@@ -294,6 +302,20 @@ final class SmartThings implements SmartThingsInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    public function getHubApi(): HubApiInterface
+    {
+        /**
+         * @var HubApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_HUB_API);
+
+        return $service;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function getInstalledAppApi(): InstalledAppApiInterface
     {
         /**
@@ -475,6 +497,7 @@ final class SmartThings implements SmartThingsInterface
         $this->registerDeviceProfileTransformers();
         $this->registerDeviceStatusTransformers();
         $this->registerDriverTransformers();
+        $this->registerHubTransformers();
         $this->registerInstalledAppTransformers();
         $this->registerLocationTransformers();
         $this->registerModeTransformers();
@@ -588,6 +611,18 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_DRIVER_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_DRIVERS_TRANSFORMER),
+                    $this->token,
+                ]
+            );
+        $this->container->register(self::SERVICE_HUB_API, HubApi::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_HUB_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_HUB_CHARACTERISTICS_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_HUB_INSTALLED_DRIVER_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_HUB_INSTALLED_DRIVERS_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_HUB_ENROLLED_CHANNELS_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -884,6 +919,26 @@ final class SmartThings implements SmartThingsInterface
             ->setArguments(
                 [
                     $this->container->getDefinition(self::SERVICE_DRIVER_TRANSFORMER),
+                ]
+            );
+    }
+
+    private function registerHubTransformers(): void
+    {
+        $this->container->register(self::SERVICE_HUB_TRANSFORMER, HubTransformer::class);
+        $this->container->register(self::SERVICE_HUB_CHARACTERISTICS_TRANSFORMER, HubCharacteristicsTransformer::class);
+        $this->container->register(self::SERVICE_HUB_INSTALLED_DRIVER_TRANSFORMER, HubInstalledDriverTransformer::class);
+        $this->container->register(self::SERVICE_HUB_INSTALLED_DRIVERS_TRANSFORMER, HubInstalledDriversTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_HUB_INSTALLED_DRIVER_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_HUB_ENROLLED_CHANNEL_TRANSFORMER, HubEnrolledChannelTransformer::class);
+        $this->container->register(self::SERVICE_HUB_ENROLLED_CHANNELS_TRANSFORMER, HubEnrolledChannelsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_HUB_ENROLLED_CHANNEL_TRANSFORMER),
                 ]
             );
     }

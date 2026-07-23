@@ -15,6 +15,7 @@ use ChristianBrown\SmartThings\Api\DevicePreferencesApi;
 use ChristianBrown\SmartThings\Api\DeviceProfileApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\DriverApi;
+use ChristianBrown\SmartThings\Api\HubApi;
 use ChristianBrown\SmartThings\Api\InstalledAppApi;
 use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationModeApi;
@@ -66,6 +67,12 @@ use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
 use ChristianBrown\SmartThings\Transformer\DriversTransformer;
 use ChristianBrown\SmartThings\Transformer\DriverTransformer;
+use ChristianBrown\SmartThings\Transformer\HubCharacteristicsTransformer;
+use ChristianBrown\SmartThings\Transformer\HubEnrolledChannelsTransformer;
+use ChristianBrown\SmartThings\Transformer\HubEnrolledChannelTransformer;
+use ChristianBrown\SmartThings\Transformer\HubInstalledDriversTransformer;
+use ChristianBrown\SmartThings\Transformer\HubInstalledDriverTransformer;
+use ChristianBrown\SmartThings\Transformer\HubTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformer;
@@ -110,6 +117,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DeviceProfileApi::class)]
 #[UsesClass(DeviceStatusApi::class)]
 #[UsesClass(DriverApi::class)]
+#[UsesClass(HubApi::class)]
 #[UsesClass(InstalledAppApi::class)]
 #[UsesClass(LocationApi::class)]
 #[UsesClass(LocationModeApi::class)]
@@ -152,6 +160,12 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DevicesTransformer::class)]
 #[UsesClass(DriversTransformer::class)]
 #[UsesClass(DriverTransformer::class)]
+#[UsesClass(HubCharacteristicsTransformer::class)]
+#[UsesClass(HubEnrolledChannelsTransformer::class)]
+#[UsesClass(HubEnrolledChannelTransformer::class)]
+#[UsesClass(HubInstalledDriversTransformer::class)]
+#[UsesClass(HubInstalledDriverTransformer::class)]
+#[UsesClass(HubTransformer::class)]
 #[UsesClass(DeviceStatusBatteryBatteryTransformer::class)]
 #[UsesClass(DeviceStatusBatteryTransformer::class)]
 #[UsesClass(DeviceStatusRelativeHumidityMeasurementHumidityTransformer::class)]
@@ -265,6 +279,13 @@ final class SmartThingsTest extends TestCase
         $smartThings = new SmartThings('token');
 
         self::assertInstanceOf(DriverApi::class, $smartThings->getDriverApi());
+    }
+
+    public function testGetHubApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(HubApi::class, $smartThings->getHubApi());
     }
 
     public function testGetInstalledAppApi(): void
