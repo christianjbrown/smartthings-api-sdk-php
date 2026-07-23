@@ -14,12 +14,14 @@ use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceInterface;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\DeviceTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\Exception;
 
 use PHPUnit\Framework\TestCase;
 
+use function rawurlencode;
 use function sprintf;
 
 #[CoversClass(DeviceApi::class)]
@@ -49,12 +51,14 @@ final class DeviceApiTest extends TestCase
 
         $devices = [self::createStub(DeviceInterface::class), self::createStub(DeviceInterface::class)];
 
+        $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
+
         $devicesTransformer = self::createMock(DevicesTransformerInterface::class);
         $devicesTransformer->expects(self::once())->method('transform')
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'));
         $actual = $deviceApi->getMultiple();
 
         self::assertSame($devices, $actual);
@@ -77,13 +81,15 @@ final class DeviceApiTest extends TestCase
             ->method('get')
             ->willReturn($data);
 
+        $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
+
         $devicesTransformer = self::createMock(DevicesTransformerInterface::class);
         $devicesTransformer->expects(self::once())
             ->method('transform')
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'));
 
         // Second call is served from the cache without hitting the API.
         self::assertSame($devices, $deviceApi->getMultiple());
@@ -108,12 +114,14 @@ final class DeviceApiTest extends TestCase
             ->method('get')
             ->willReturn($data);
 
+        $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
+
         $devicesTransformer = self::createMock(DevicesTransformerInterface::class);
         $devicesTransformer->expects(self::exactly(2))->method('transform')
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'));
 
         self::assertSame($devices, $deviceApi->getMultiple('test-location-a'));
         self::assertSame($devices, $deviceApi->getMultiple('test-location-b'));
@@ -142,12 +150,14 @@ final class DeviceApiTest extends TestCase
 
         $devices = [self::createStub(DeviceInterface::class), self::createStub(DeviceInterface::class)];
 
+        $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
+
         $devicesTransformer = self::createMock(DevicesTransformerInterface::class);
         $devicesTransformer->expects(self::once())->method('transform')
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'));
         $actual = $deviceApi->getMultiple('test-location-id');
 
         self::assertSame($devices, $actual);
@@ -170,12 +180,14 @@ final class DeviceApiTest extends TestCase
             ->method('get')
             ->willReturn($data);
 
+        $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
+
         $devicesTransformer = self::createMock(DevicesTransformerInterface::class);
         $devicesTransformer->expects(self::exactly(2))->method('transform')
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($devices, $deviceApi->getMultiple());
@@ -205,12 +217,185 @@ final class DeviceApiTest extends TestCase
             )
             ->willReturn($data);
 
+        $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $devicesTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DeviceApiInterface::UNEXPECTED_RESPONSE_SPRINTF, DeviceApiInterface::KEY_ITEMS));
         $deviceApi->getMultiple(null, $skipCache);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetOneById(): void
+    {
+        $data = ['test-device-data'];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')
+            ->with(
+                sprintf(DeviceApiInterface::API_URL_SPRINTF, 'test-device-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $device = self::createStub(DeviceInterface::class);
+
+        $deviceTransformer = self::createMock(DeviceTransformerInterface::class);
+        $deviceTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($device);
+
+        $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
+
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'));
+        $actual = $deviceApi->getOneById('test-device-id');
+
+        self::assertSame($device, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetOneByIdCaches(): void
+    {
+        $data = ['test-device-data'];
+
+        $device = self::createStub(DeviceInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())
+            ->method('get')
+            ->with(
+                sprintf(DeviceApiInterface::API_URL_SPRINTF, 'test-device-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $deviceTransformer = self::createMock(DeviceTransformerInterface::class);
+        $deviceTransformer->expects(self::once())
+            ->method('transform')
+            ->with($data)
+            ->willReturn($device);
+
+        $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
+
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'));
+
+        // Second call for the same deviceId is served from the cache without hitting the API.
+        self::assertSame($device, $deviceApi->getOneById('test-device-id'));
+        self::assertSame($device, $deviceApi->getOneById('test-device-id'));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    #[TestWith(['a/b c'])]
+    #[TestWith(['../../devices'])]
+    public function testGetOneByIdEncodesId(string $deviceId): void
+    {
+        $data = ['test-device-data'];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')
+            ->with(
+                sprintf(DeviceApiInterface::API_URL_SPRINTF, rawurlencode($deviceId)),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $device = self::createStub(DeviceInterface::class);
+
+        $deviceTransformer = self::createMock(DeviceTransformerInterface::class);
+        $deviceTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($device);
+
+        $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
+
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'));
+        $actual = $deviceApi->getOneById($deviceId);
+
+        self::assertSame($device, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetOneByIdSkipsCache(): void
+    {
+        $data = ['test-device-data'];
+
+        $device = self::createStub(DeviceInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))
+            ->method('get')
+            ->with(
+                sprintf(DeviceApiInterface::API_URL_SPRINTF, 'test-device-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $deviceTransformer = self::createMock(DeviceTransformerInterface::class);
+        $deviceTransformer->expects(self::exactly(2))->method('transform')
+            ->with($data)
+            ->willReturn($device);
+
+        $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
+
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'));
+
+        // First call populates the cache; the second bypasses it and hits the API again.
+        self::assertSame($device, $deviceApi->getOneById('test-device-id'));
+        self::assertSame($device, $deviceApi->getOneById('test-device-id', true));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testGetOneByIdUnexpectedResponse(bool $skipCache): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')
+            ->with(
+                sprintf(DeviceApiInterface::API_URL_SPRINTF, 'test-device-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
+        $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
+
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(DeviceApiInterface::UNEXPECTED_RESPONSE);
+        $deviceApi->getOneById('test-device-id', $skipCache);
     }
 }

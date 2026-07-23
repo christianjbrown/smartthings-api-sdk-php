@@ -31,6 +31,7 @@ interface SmartThingsInterface
     public const string SERVICE_LOCATION_API = 'smartthings.api.location_api';
     public const string SERVICE_LOCATION_ROOM_API = 'smartthings.api.location_room_api';
     public const string SERVICE_LOCATION_ROOM_TRANSFORMER = 'smartthings.transformer.location_room_transformer';
+    public const string SERVICE_LOCATION_ROOMS_TRANSFORMER = 'smartthings.transformer.location_rooms_transformer';
     public const string SERVICE_LOCATION_TRANSFORMER = 'smartthings.transformer.location_transformer';
     public const string SERVICE_LOCATIONS_TRANSFORMER = 'smartthings.transformer.locations_transformer';
 

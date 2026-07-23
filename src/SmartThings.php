@@ -29,6 +29,7 @@ use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTra
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
+use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationTransformer;
@@ -123,6 +124,7 @@ final class SmartThings implements SmartThingsInterface
             ->setArguments(
                 [
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_DEVICE_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_DEVICES_TRANSFORMER),
                     $this->token,
                 ]
@@ -149,6 +151,7 @@ final class SmartThings implements SmartThingsInterface
                 [
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_LOCATION_ROOM_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_LOCATION_ROOMS_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -240,5 +243,11 @@ final class SmartThings implements SmartThingsInterface
             );
 
         $this->container->register(self::SERVICE_LOCATION_ROOM_TRANSFORMER, LocationRoomTransformer::class);
+        $this->container->register(self::SERVICE_LOCATION_ROOMS_TRANSFORMER, LocationRoomsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_LOCATION_ROOM_TRANSFORMER),
+                ]
+            );
     }
 }

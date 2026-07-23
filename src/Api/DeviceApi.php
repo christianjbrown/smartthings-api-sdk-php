@@ -9,8 +9,10 @@ use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceInterface;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\DeviceTransformerInterface;
 
 use function is_array;
+use function rawurlencode;
 use function sprintf;
 
 final class DeviceApi implements DeviceApiInterface
@@ -19,13 +21,20 @@ final class DeviceApi implements DeviceApiInterface
      * @var array<string, array<int, DeviceInterface>>
      */
     private array $cache = [];
+
+    /**
+     * @var array<string, DeviceInterface>
+     */
+    private array $deviceCache = [];
     private DevicesTransformerInterface $devicesTransformer;
+    private DeviceTransformerInterface $deviceTransformer;
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DevicesTransformerInterface $devicesTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceTransformerInterface $deviceTransformer, DevicesTransformerInterface $devicesTransformer, TokenInterface $token)
     {
         $this->requestSender = $requestSender;
+        $this->deviceTransformer = $deviceTransformer;
         $this->devicesTransformer = $devicesTransformer;
         $this->token = $token;
     }
@@ -62,6 +71,33 @@ final class DeviceApi implements DeviceApiInterface
         $this->cache[$cacheKey] = $devices;
 
         return $devices;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function getOneById(string $deviceId, bool $skipCache = false): DeviceInterface
+    {
+        if (!$skipCache) {
+            if (isset($this->deviceCache[$deviceId])) {
+                return $this->deviceCache[$deviceId];
+            }
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($deviceId));
+        $data = $this->requestSender->get($url, [], $headers);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $device = $this->deviceTransformer->transform($data);
+        $this->deviceCache[$deviceId] = $device;
+
+        return $device;
     }
 
     /**

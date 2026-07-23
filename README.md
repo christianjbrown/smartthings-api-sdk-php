@@ -6,10 +6,19 @@ A strongly-typed PHP client for the [SmartThings API](https://developer.smartthi
 
 The client is **read-only** and currently supports:
 
-- **Listing devices** — id, name, label, location and room ids, and each component's capabilities.
+- **Listing devices** — id, name, label, location and room ids, and each component's capabilities — or reading a single device by id (`getOneById`).
 - **Reading a device's status** — currently the `temperatureMeasurement`, `relativeHumidityMeasurement`, and `battery` capabilities (value, unit, and timestamp) from the device's `main` component.
 - **Listing locations** — id and name, or reading a single location by id (`getOneById`).
-- **Reading a room** — id, name, and location id, either from a device (`getOneByDevice`) or by a location and room id (`getOneByLocationAndId`).
+- **Reading rooms** — listing every room in a location (`getMultiple`), or reading a single room, either from a device (`getOneByDevice`) or by a location and room id (`getOneByLocationAndId`). Each room carries its id, name, and location id.
+
+### Supported endpoints
+
+| Resource | Client | Endpoint(s) | Returns |
+| --- | --- | --- | --- |
+| Devices | `getDeviceApi()` | `GET /devices`, `GET /devices/{deviceId}` | `DeviceInterface[]` / `DeviceInterface` |
+| Device status | `getDeviceStatusApi()` | `GET /devices/{deviceId}/status` | `DeviceStatusInterface` |
+| Locations | `getLocationApi()` | `GET /locations`, `GET /locations/{locationId}` | `LocationInterface[]` / `LocationInterface` |
+| Rooms | `getLocationRoomApi()` | `GET /locations/{locationId}/rooms`, `GET /locations/{locationId}/rooms/{roomId}` | `LocationRoomInterface[]` / `LocationRoomInterface` |
 
 
 
@@ -84,9 +93,12 @@ foreach ($devices as $device) {
 }
 ```
 
-You can also read a device's status by id, list locations, or fetch a room directly:
+You can also read a single device or its status by id, list locations, or list and fetch rooms directly:
 
 ```php
+$device = $deviceApi->getOneById('a-device-id');           // DeviceInterface
+echo $device->getLabel() ?? $device->getName(), "\n";
+
 $status = $deviceStatusApi->getOneById('a-device-id');     // DeviceStatusInterface
 
 $locations = $locationApi->getMultiple();                       // LocationInterface[]
@@ -96,6 +108,11 @@ foreach ($locations as $location) {
 
 $location = $locationApi->getOneById('a-location-id');      // LocationInterface
 echo $location->getName(), "\n";
+
+$rooms = $locationRoomApi->getMultiple($locations[0]);          // LocationRoomInterface[]
+foreach ($rooms as $room) {
+    echo $room->getName(), "\n";
+}
 
 $room = $locationRoomApi->getOneByLocationAndId($locations[0], 'a-room-id'); // LocationRoomInterface
 echo $room->getName(), "\n";
@@ -148,6 +165,7 @@ use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryBatteryTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationTransformer;
+use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 
 $apiToken = 'your-smartthings-personal-access-token';
@@ -155,20 +173,22 @@ $apiToken = 'your-smartthings-personal-access-token';
 // Shared JSON request sender (wires Guzzle for you).
 $requestSender = (new ApiClient())->getJsonApiRequestSender();
 
-// Devices client.
-$deviceApi = new DeviceApi(
-    $requestSender,
-    new DevicesTransformer(
-        new DeviceTransformer(
-            new DeviceComponentsTransformer(
-                new DeviceComponentTransformer(
-                    new DeviceComponentCapabilitiesTransformer(
-                        new DeviceComponentCapabilityTransformer()
-                    )
-                )
+// Devices client. The single device transformer is shared: the list endpoint wraps
+// it in a DevicesTransformer, and getOneById() uses it directly.
+$deviceTransformer = new DeviceTransformer(
+    new DeviceComponentsTransformer(
+        new DeviceComponentTransformer(
+            new DeviceComponentCapabilitiesTransformer(
+                new DeviceComponentCapabilityTransformer()
             )
         )
-    ),
+    )
+);
+
+$deviceApi = new DeviceApi(
+    $requestSender,
+    $deviceTransformer,
+    new DevicesTransformer($deviceTransformer),
     $apiToken
 );
 
@@ -199,10 +219,14 @@ $locationApi = new LocationApi(
     $apiToken
 );
 
-// Location rooms client.
+// Location rooms client. The single room transformer is shared: the list endpoint
+// wraps it in a LocationRoomsTransformer, and the single-room reads use it directly.
+$locationRoomTransformer = new LocationRoomTransformer();
+
 $locationRoomApi = new LocationRoomApi(
     $requestSender,
-    new LocationRoomTransformer(),
+    $locationRoomTransformer,
+    new LocationRoomsTransformer($locationRoomTransformer),
     $apiToken
 );
 ```

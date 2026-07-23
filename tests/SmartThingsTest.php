@@ -23,6 +23,7 @@ use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTra
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
+use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationTransformer;
@@ -51,6 +52,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DeviceTransformer::class)]
 #[UsesClass(LocationsTransformer::class)]
 #[UsesClass(LocationTransformer::class)]
+#[UsesClass(LocationRoomsTransformer::class)]
 #[UsesClass(LocationRoomTransformer::class)]
 final class SmartThingsTest extends TestCase
 {
