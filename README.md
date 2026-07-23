@@ -23,6 +23,7 @@ The client is **read-only** and currently supports:
 - **Reading subscriptions** — listing an installed app's subscriptions (`getMultiple`) or a single subscription by id (`getOneById`). Each carries its id, installed app id, and source type.
 - **Reading schedules** — listing an installed app's schedules (`getMultiple`) or a single schedule by name (`getOneByName`). Each carries its name and installed app id.
 - **Reading virtual devices** — listing the account's virtual devices, optionally filtered by location (`getMultiple`). Each is returned as a `DeviceInterface`, the same typed model as a physical device.
+- **Reading organizations** — listing the account's organizations (`getMultiple`) or a single organization by id (`getOneById`). Each carries its organization id, name, label, manufacturer name, and default-user-org flag.
 - **Reading device history** — device event history (`getMultiple`), optionally filtered by device and/or location, oldest-first, transparently paged across the API's `_links.next` chain (with an optional page cap). Each event carries its device id, location id, component, capability, attribute, value, and epoch (the SmartThings history window is roughly the last 7 days).
 
 ### Supported endpoints
@@ -47,6 +48,7 @@ The client is **read-only** and currently supports:
 | Installed apps | `getInstalledAppApi()` | `GET /installedapps`, `GET /installedapps/{id}`, `GET /installedapps/me`, `GET /installedapps/{id}/configs`, `GET /installedapps/{id}/configs/{configurationId}` | `InstalledAppInterface[]` / `InstalledAppInterface` / `InstalledAppConfigInterface[]` / `InstalledAppConfigInterface` |
 | Subscriptions | `getSubscriptionApi()` | `GET /installedapps/{id}/subscriptions`, `GET /installedapps/{id}/subscriptions/{subscriptionId}` | `SubscriptionInterface[]` / `SubscriptionInterface` |
 | Schedules | `getScheduleApi()` | `GET /installedapps/{id}/schedules`, `GET /installedapps/{id}/schedules/{scheduleName}` | `ScheduleInterface[]` / `ScheduleInterface` |
+| Organizations | `getOrganizationApi()` | `GET /organizations`, `GET /organizations/{organizationId}` | `OrganizationInterface[]` / `OrganizationInterface` |
 
 
 

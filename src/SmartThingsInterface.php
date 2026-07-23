@@ -16,6 +16,7 @@ use ChristianBrown\SmartThings\Api\InstalledAppApiInterface;
 use ChristianBrown\SmartThings\Api\LocationApiInterface;
 use ChristianBrown\SmartThings\Api\LocationModeApiInterface;
 use ChristianBrown\SmartThings\Api\LocationRoomApiInterface;
+use ChristianBrown\SmartThings\Api\OrganizationApiInterface;
 use ChristianBrown\SmartThings\Api\PresentationApiInterface;
 use ChristianBrown\SmartThings\Api\RuleApiInterface;
 use ChristianBrown\SmartThings\Api\SceneApiInterface;
@@ -78,6 +79,9 @@ interface SmartThingsInterface
     public const string SERVICE_LOCATIONS_TRANSFORMER = 'smartthings.transformer.locations_transformer';
     public const string SERVICE_MODE_TRANSFORMER = 'smartthings.transformer.mode_transformer';
     public const string SERVICE_MODES_TRANSFORMER = 'smartthings.transformer.modes_transformer';
+    public const string SERVICE_ORGANIZATION_API = 'smartthings.api.organization_api';
+    public const string SERVICE_ORGANIZATION_TRANSFORMER = 'smartthings.transformer.organization_transformer';
+    public const string SERVICE_ORGANIZATIONS_TRANSFORMER = 'smartthings.transformer.organizations_transformer';
     public const string SERVICE_PRESENTATION_API = 'smartthings.api.presentation_api';
     public const string SERVICE_PRESENTATION_TRANSFORMER = 'smartthings.transformer.presentation_transformer';
     public const string SERVICE_RULE_API = 'smartthings.api.rule_api';
@@ -117,6 +121,8 @@ interface SmartThingsInterface
     public function getLocationModeApi(): LocationModeApiInterface;
 
     public function getLocationRoomApi(): LocationRoomApiInterface;
+
+    public function getOrganizationApi(): OrganizationApiInterface;
 
     public function getPresentationApi(): PresentationApiInterface;
 
