@@ -43,6 +43,7 @@ final class InstalledAppApi implements InstalledAppApiInterface
      * @var array<string, array<int, InstalledAppInterface>>
      */
     private array $listCache = [];
+    private ?InstalledAppInterface $meCache = null;
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
@@ -104,6 +105,32 @@ final class InstalledAppApi implements InstalledAppApiInterface
         $this->configsCache[$installedAppId] = $configs;
 
         return $configs;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function getMe(bool $skipCache = false): InstalledAppInterface
+    {
+        if (!$skipCache) {
+            if (null !== $this->meCache) {
+                return $this->meCache;
+            }
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $data = $this->requestSender->get(self::API_URL_ME, [], $headers);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $installedApp = $this->installedAppTransformer->transform($data);
+        $this->meCache = $installedApp;
+
+        return $installedApp;
     }
 
     /**

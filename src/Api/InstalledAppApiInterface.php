@@ -12,6 +12,7 @@ interface InstalledAppApiInterface extends ApiInterface
     public const string API_URL = 'https://api.smartthings.com/v1/installedapps';
     public const string API_URL_CONFIG_SPRINTF = 'https://api.smartthings.com/v1/installedapps/%s/configs/%s';
     public const string API_URL_CONFIGS_SPRINTF = 'https://api.smartthings.com/v1/installedapps/%s/configs';
+    public const string API_URL_ME = 'https://api.smartthings.com/v1/installedapps/me';
     public const string API_URL_SPRINTF = 'https://api.smartthings.com/v1/installedapps/%s';
     public const string CACHE_KEY_SPRINTF = '%s/%s';
     public const string KEY_ITEMS = 'items';
@@ -25,6 +26,8 @@ interface InstalledAppApiInterface extends ApiInterface
      * @return array<int, InstalledAppConfigInterface>
      */
     public function getConfigs(string $installedAppId, bool $skipCache = false): array;
+
+    public function getMe(bool $skipCache = false): InstalledAppInterface;
 
     /**
      * @return array<int, InstalledAppInterface>

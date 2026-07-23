@@ -291,6 +291,112 @@ final class InstalledAppApiTest extends TestCase
      * @throws RequestExceptionInterface
      * @throws Exception
      */
+    public function testGetMe(): void
+    {
+        $data = ['test-installed-app-data'];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')
+            ->with(
+                InstalledAppApiInterface::API_URL_ME,
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $installedApp = self::createStub(InstalledAppInterface::class);
+
+        $installedAppTransformer = self::createMock(InstalledAppTransformerInterface::class);
+        $installedAppTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($installedApp);
+
+        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'));
+        $actual = $api->getMe();
+
+        self::assertSame($installedApp, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetMeCaches(): void
+    {
+        $data = ['test-installed-app-data'];
+
+        $installedApp = self::createStub(InstalledAppInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())
+            ->method('get')
+            ->willReturn($data);
+
+        $installedAppTransformer = self::createMock(InstalledAppTransformerInterface::class);
+        $installedAppTransformer->expects(self::once())
+            ->method('transform')
+            ->with($data)
+            ->willReturn($installedApp);
+
+        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'));
+
+        // Second call is served from the cache without hitting the API.
+        self::assertSame($installedApp, $api->getMe());
+        self::assertSame($installedApp, $api->getMe());
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetMeSkipsCache(): void
+    {
+        $data = ['test-installed-app-data'];
+
+        $installedApp = self::createStub(InstalledAppInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))
+            ->method('get')
+            ->willReturn($data);
+
+        $installedAppTransformer = self::createMock(InstalledAppTransformerInterface::class);
+        $installedAppTransformer->expects(self::exactly(2))->method('transform')
+            ->with($data)
+            ->willReturn($installedApp);
+
+        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'));
+
+        // First call populates the cache; the second bypasses it and hits the API again.
+        self::assertSame($installedApp, $api->getMe());
+        self::assertSame($installedApp, $api->getMe(true));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testGetMeUnexpectedResponse(bool $skipCache): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')
+            ->willReturn([]);
+
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(InstalledAppApiInterface::UNEXPECTED_RESPONSE);
+        $api->getMe($skipCache);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
     public function testGetMultiple(): void
     {
         $data = [

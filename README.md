@@ -19,7 +19,7 @@ The client is **read-only** and currently supports:
 - **Reading device profiles** — listing the account's device profiles (`getMultiple`) or a single profile by id (`getOneById`). Each carries its id, name, and status.
 - **Reading presentations** — a device presentation by presentation id (`getOne`), a stored device config (`getDeviceConfig`), or the default config generated from a device type (`getDeviceConfigByType`). Each carries its presentation id, manufacturer name, and type.
 - **Reading apps** — listing the account's apps (`getMultiple`), one app by name or id (`getOneById`), an app's OAuth config (`getOauth` — client name, scopes, redirect URIs), or its settings map (`getSettings`).
-- **Reading installed apps** — listing installed app instances, optionally by location (`getMultiple`), one instance by id (`getOneById`), its configurations (`getConfigs`), or a single configuration (`getConfig`).
+- **Reading installed apps** — listing installed app instances, optionally by location (`getMultiple`), one instance by id (`getOneById`), the instance for the current token (`getMe`), its configurations (`getConfigs`), or a single configuration (`getConfig`).
 - **Reading subscriptions** — listing an installed app's subscriptions (`getMultiple`) or a single subscription by id (`getOneById`). Each carries its id, installed app id, and source type.
 - **Reading schedules** — listing an installed app's schedules (`getMultiple`) or a single schedule by name (`getOneByName`). Each carries its name and installed app id.
 - **Reading device history** — device event history (`getMultiple`), optionally filtered by device and/or location, oldest-first, transparently paged across the API's `_links.next` chain (with an optional page cap). Each event carries its device id, location id, component, capability, attribute, value, and epoch (the SmartThings history window is roughly the last 7 days).
@@ -42,7 +42,7 @@ The client is **read-only** and currently supports:
 | Device profiles | `getDeviceProfileApi()` | `GET /deviceprofiles`, `GET /deviceprofiles/{deviceProfileId}` | `DeviceProfileInterface[]` / `DeviceProfileInterface` |
 | Presentation | `getPresentationApi()` | `GET /presentation`, `GET /presentation/deviceconfig`, `GET /presentation/types/{typeIntegrationId}/deviceconfig` | `PresentationInterface` |
 | Apps | `getAppApi()` | `GET /apps`, `GET /apps/{appNameOrId}`, `GET /apps/{appNameOrId}/oauth`, `GET /apps/{appNameOrId}/settings` | `AppInterface[]` / `AppInterface` / `AppOauthInterface` / `AppSettingsInterface` |
-| Installed apps | `getInstalledAppApi()` | `GET /installedapps`, `GET /installedapps/{id}`, `GET /installedapps/{id}/configs`, `GET /installedapps/{id}/configs/{configurationId}` | `InstalledAppInterface[]` / `InstalledAppInterface` / `InstalledAppConfigInterface[]` / `InstalledAppConfigInterface` |
+| Installed apps | `getInstalledAppApi()` | `GET /installedapps`, `GET /installedapps/{id}`, `GET /installedapps/me`, `GET /installedapps/{id}/configs`, `GET /installedapps/{id}/configs/{configurationId}` | `InstalledAppInterface[]` / `InstalledAppInterface` / `InstalledAppConfigInterface[]` / `InstalledAppConfigInterface` |
 | Subscriptions | `getSubscriptionApi()` | `GET /installedapps/{id}/subscriptions`, `GET /installedapps/{id}/subscriptions/{subscriptionId}` | `SubscriptionInterface[]` / `SubscriptionInterface` |
 | Schedules | `getScheduleApi()` | `GET /installedapps/{id}/schedules`, `GET /installedapps/{id}/schedules/{scheduleName}` | `ScheduleInterface[]` / `ScheduleInterface` |
 
