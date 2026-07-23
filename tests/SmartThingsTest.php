@@ -30,6 +30,7 @@ use ChristianBrown\SmartThings\Transformer\AppTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespaceTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
@@ -100,6 +101,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CapabilitiesTransformer::class)]
 #[UsesClass(CapabilityNamespacesTransformer::class)]
 #[UsesClass(CapabilityNamespaceTransformer::class)]
+#[UsesClass(CapabilityPresentationTransformer::class)]
 #[UsesClass(CapabilityTransformer::class)]
 #[UsesClass(DeviceComponentCapabilitiesTransformer::class)]
 #[UsesClass(DeviceComponentCapabilityTransformer::class)]

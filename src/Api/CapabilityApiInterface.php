@@ -6,12 +6,14 @@ namespace ChristianBrown\SmartThings\Api;
 
 use ChristianBrown\SmartThings\Model\CapabilityInterface;
 use ChristianBrown\SmartThings\Model\CapabilityNamespaceInterface;
+use ChristianBrown\SmartThings\Model\CapabilityPresentationInterface;
 
 interface CapabilityApiInterface extends ApiInterface
 {
     public const string API_URL = 'https://api.smartthings.com/v1/capabilities';
     public const string API_URL_NAMESPACE_SPRINTF = 'https://api.smartthings.com/v1/capabilities/namespaces/%s';
     public const string API_URL_NAMESPACES = 'https://api.smartthings.com/v1/capabilities/namespaces';
+    public const string API_URL_PRESENTATION_SPRINTF = 'https://api.smartthings.com/v1/capabilities/%s/%s/presentation';
     public const string API_URL_SPRINTF = 'https://api.smartthings.com/v1/capabilities/%s/%s';
     public const string API_URL_VERSIONS_SPRINTF = 'https://api.smartthings.com/v1/capabilities/%s';
     public const string CACHE_KEY_SPRINTF = '%s/%d';
@@ -35,6 +37,8 @@ interface CapabilityApiInterface extends ApiInterface
     public function getNamespaces(bool $skipCache = false): array;
 
     public function getOneByIdAndVersion(string $capabilityId, int $version, bool $skipCache = false): CapabilityInterface;
+
+    public function getPresentation(string $capabilityId, int $version, bool $skipCache = false): CapabilityPresentationInterface;
 
     /**
      * @return array<int, CapabilityInterface>

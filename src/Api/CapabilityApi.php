@@ -9,8 +9,10 @@ use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilityInterface;
 use ChristianBrown\SmartThings\Model\CapabilityNamespaceInterface;
+use ChristianBrown\SmartThings\Model\CapabilityPresentationInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformerInterface;
 
 use function is_array;
@@ -25,6 +27,7 @@ final class CapabilityApi implements CapabilityApiInterface
     private array $cache = [];
     private CapabilitiesTransformerInterface $capabilitiesTransformer;
     private CapabilityNamespacesTransformerInterface $capabilityNamespacesTransformer;
+    private CapabilityPresentationTransformerInterface $capabilityPresentationTransformer;
     private CapabilityTransformerInterface $capabilityTransformer;
 
     /**
@@ -41,6 +44,11 @@ final class CapabilityApi implements CapabilityApiInterface
      * @var ?array<int, CapabilityNamespaceInterface>
      */
     private ?array $namespacesCache = null;
+
+    /**
+     * @var array<string, CapabilityPresentationInterface>
+     */
+    private array $presentationCache = [];
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
@@ -49,12 +57,13 @@ final class CapabilityApi implements CapabilityApiInterface
      */
     private array $versionsCache = [];
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, CapabilityTransformerInterface $capabilityTransformer, CapabilitiesTransformerInterface $capabilitiesTransformer, CapabilityNamespacesTransformerInterface $capabilityNamespacesTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, CapabilityTransformerInterface $capabilityTransformer, CapabilitiesTransformerInterface $capabilitiesTransformer, CapabilityNamespacesTransformerInterface $capabilityNamespacesTransformer, CapabilityPresentationTransformerInterface $capabilityPresentationTransformer, TokenInterface $token)
     {
         $this->requestSender = $requestSender;
         $this->capabilityTransformer = $capabilityTransformer;
         $this->capabilitiesTransformer = $capabilitiesTransformer;
         $this->capabilityNamespacesTransformer = $capabilityNamespacesTransformer;
+        $this->capabilityPresentationTransformer = $capabilityPresentationTransformer;
         $this->token = $token;
     }
 
@@ -155,6 +164,34 @@ final class CapabilityApi implements CapabilityApiInterface
         $this->cache[$cacheKey] = $capability;
 
         return $capability;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function getPresentation(string $capabilityId, int $version, bool $skipCache = false): CapabilityPresentationInterface
+    {
+        $cacheKey = sprintf(self::CACHE_KEY_SPRINTF, $capabilityId, $version);
+        if (!$skipCache) {
+            if (isset($this->presentationCache[$cacheKey])) {
+                return $this->presentationCache[$cacheKey];
+            }
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_PRESENTATION_SPRINTF, rawurlencode($capabilityId), $version);
+        $data = $this->requestSender->get($url, [], $headers);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $presentation = $this->capabilityPresentationTransformer->transform($data);
+        $this->presentationCache[$cacheKey] = $presentation;
+
+        return $presentation;
     }
 
     /**
