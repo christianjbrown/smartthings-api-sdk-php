@@ -15,6 +15,7 @@ The client is **read-only** and currently supports:
 - **Reading scenes** — listing scenes for the account, optionally filtered by location (`getMultiple`), or a single scene by id (`getOneById`). Each scene carries its id, name, and location id.
 - **Reading rules** — listing a location's rules (`getMultiple`) or a single rule by id (`getOneById`); both require a location id. Each rule carries its id, name, and status.
 - **Reading capabilities** — listing all platform capabilities (`getMultiple`), the custom capabilities in a namespace (`getMultipleByNamespace`), or one capability definition by id and version (`getOneByIdAndVersion`). Each carries its id, name, status, and version.
+- **Reading device profiles** — listing the account's device profiles (`getMultiple`) or a single profile by id (`getOneById`). Each carries its id, name, and status.
 
 ### Supported endpoints
 
@@ -29,6 +30,7 @@ The client is **read-only** and currently supports:
 | Scenes | `getSceneApi()` | `GET /scenes`, `GET /scenes/{sceneId}` | `SceneInterface[]` / `SceneInterface` |
 | Rules | `getRuleApi()` | `GET /rules?locationId=…`, `GET /rules/{ruleId}?locationId=…` | `RuleInterface[]` / `RuleInterface` |
 | Capabilities | `getCapabilityApi()` | `GET /capabilities`, `GET /capabilities/namespaces/{namespace}`, `GET /capabilities/{id}/{version}` | `CapabilityInterface[]` / `CapabilityInterface` |
+| Device profiles | `getDeviceProfileApi()` | `GET /deviceprofiles`, `GET /deviceprofiles/{deviceProfileId}` | `DeviceProfileInterface[]` / `DeviceProfileInterface` |
 
 
 
@@ -71,6 +73,7 @@ $locationRoomApi = $smartThings->getLocationRoomApi();  // LocationRoomApiInterf
 $sceneApi        = $smartThings->getSceneApi();  // SceneApiInterface
 $ruleApi         = $smartThings->getRuleApi();  // RuleApiInterface
 $capabilityApi   = $smartThings->getCapabilityApi();  // CapabilityApiInterface
+$deviceProfileApi = $smartThings->getDeviceProfileApi();  // DeviceProfileApiInterface
 ```
 
 If you'd rather wire the clients by hand, see [Wiring the clients](#wiring-the-clients) below.
@@ -167,6 +170,7 @@ use ChristianBrown\ApiClient\ApiClient;
 use ChristianBrown\SmartThings\Api\CapabilityApi;
 use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceHealthApi;
+use ChristianBrown\SmartThings\Api\DeviceProfileApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationModeApi;
@@ -189,6 +193,8 @@ use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasureme
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryBatteryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHealthTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceProfilesTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceProfileTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
@@ -257,6 +263,17 @@ $deviceStatusApi = new DeviceStatusApi(
 $deviceHealthApi = new DeviceHealthApi(
     $requestSender,
     new DeviceHealthTransformer(),
+    $apiToken
+);
+
+// Device profiles client. The single profile transformer is shared: the list
+// endpoint wraps it in a DeviceProfilesTransformer, and getOneById() uses it directly.
+$deviceProfileTransformer = new DeviceProfileTransformer();
+
+$deviceProfileApi = new DeviceProfileApi(
+    $requestSender,
+    $deviceProfileTransformer,
+    new DeviceProfilesTransformer($deviceProfileTransformer),
     $apiToken
 );
 

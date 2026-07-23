@@ -7,6 +7,7 @@ namespace ChristianBrown\SmartThings;
 use ChristianBrown\SmartThings\Api\CapabilityApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceHealthApiInterface;
+use ChristianBrown\SmartThings\Api\DeviceProfileApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceStatusApiInterface;
 use ChristianBrown\SmartThings\Api\LocationApiInterface;
 use ChristianBrown\SmartThings\Api\LocationModeApiInterface;
@@ -27,6 +28,9 @@ interface SmartThingsInterface
     public const string SERVICE_DEVICE_COMPONENTS_TRANSFORMER = 'smartthings.transformer.device_components_transformer';
     public const string SERVICE_DEVICE_HEALTH_API = 'smartthings.api.device_health_api';
     public const string SERVICE_DEVICE_HEALTH_TRANSFORMER = 'smartthings.transformer.device_health_transformer';
+    public const string SERVICE_DEVICE_PROFILE_API = 'smartthings.api.device_profile_api';
+    public const string SERVICE_DEVICE_PROFILE_TRANSFORMER = 'smartthings.transformer.device_profile_transformer';
+    public const string SERVICE_DEVICE_PROFILES_TRANSFORMER = 'smartthings.transformer.device_profiles_transformer';
     public const string SERVICE_DEVICE_STATUS_API = 'smartthings.api.device_status_api';
     public const string SERVICE_DEVICE_STATUS_BATTERY_BATTERY_TRANSFORMER = 'smartthings.transformer.device_status_battery_battery_transformer';
     public const string SERVICE_DEVICE_STATUS_BATTERY_TRANSFORMER = 'smartthings.transformer.device_status_battery_transformer';
@@ -59,6 +63,8 @@ interface SmartThingsInterface
     public function getDeviceApi(): DeviceApiInterface;
 
     public function getDeviceHealthApi(): DeviceHealthApiInterface;
+
+    public function getDeviceProfileApi(): DeviceProfileApiInterface;
 
     public function getDeviceStatusApi(): DeviceStatusApiInterface;
 
