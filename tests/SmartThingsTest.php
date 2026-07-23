@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Tests;
 
 use ChristianBrown\SmartThings\Api\AppApi;
 use ChristianBrown\SmartThings\Api\CapabilityApi;
+use ChristianBrown\SmartThings\Api\ChannelApi;
 use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceHealthApi;
 use ChristianBrown\SmartThings\Api\DeviceHistoryApi;
@@ -37,6 +38,10 @@ use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespaceTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
+use ChristianBrown\SmartThings\Transformer\ChannelDriversTransformer;
+use ChristianBrown\SmartThings\Transformer\ChannelDriverTransformer;
+use ChristianBrown\SmartThings\Transformer\ChannelsTransformer;
+use ChristianBrown\SmartThings\Transformer\ChannelTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentsTransformer;
@@ -96,6 +101,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SmartThings::class)]
 #[UsesClass(AppApi::class)]
 #[UsesClass(CapabilityApi::class)]
+#[UsesClass(ChannelApi::class)]
 #[UsesClass(DeviceApi::class)]
 #[UsesClass(DeviceHealthApi::class)]
 #[UsesClass(DeviceHistoryApi::class)]
@@ -126,6 +132,10 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CapabilityNamespaceTransformer::class)]
 #[UsesClass(CapabilityPresentationTransformer::class)]
 #[UsesClass(CapabilityTransformer::class)]
+#[UsesClass(ChannelDriversTransformer::class)]
+#[UsesClass(ChannelDriverTransformer::class)]
+#[UsesClass(ChannelsTransformer::class)]
+#[UsesClass(ChannelTransformer::class)]
 #[UsesClass(DeviceComponentCapabilitiesTransformer::class)]
 #[UsesClass(DeviceComponentCapabilityTransformer::class)]
 #[UsesClass(DeviceComponentsTransformer::class)]
@@ -192,6 +202,13 @@ final class SmartThingsTest extends TestCase
         $smartThings = new SmartThings('token');
 
         self::assertInstanceOf(CapabilityApi::class, $smartThings->getCapabilityApi());
+    }
+
+    public function testGetChannelApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(ChannelApi::class, $smartThings->getChannelApi());
     }
 
     public function testGetDeviceApi(): void

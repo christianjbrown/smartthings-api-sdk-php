@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings;
 
 use ChristianBrown\SmartThings\Api\AppApiInterface;
 use ChristianBrown\SmartThings\Api\CapabilityApiInterface;
+use ChristianBrown\SmartThings\Api\ChannelApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceHealthApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceHistoryApiInterface;
@@ -41,6 +42,11 @@ interface SmartThingsInterface
     public const string SERVICE_CAPABILITY_NAMESPACES_TRANSFORMER = 'smartthings.transformer.capability_namespaces_transformer';
     public const string SERVICE_CAPABILITY_PRESENTATION_TRANSFORMER = 'smartthings.transformer.capability_presentation_transformer';
     public const string SERVICE_CAPABILITY_TRANSFORMER = 'smartthings.transformer.capability_transformer';
+    public const string SERVICE_CHANNEL_API = 'smartthings.api.channel_api';
+    public const string SERVICE_CHANNEL_DRIVER_TRANSFORMER = 'smartthings.transformer.channel_driver_transformer';
+    public const string SERVICE_CHANNEL_DRIVERS_TRANSFORMER = 'smartthings.transformer.channel_drivers_transformer';
+    public const string SERVICE_CHANNEL_TRANSFORMER = 'smartthings.transformer.channel_transformer';
+    public const string SERVICE_CHANNELS_TRANSFORMER = 'smartthings.transformer.channels_transformer';
     public const string SERVICE_DEVICE_API = 'smartthings.api.device_api';
     public const string SERVICE_DEVICE_COMPONENT_CAPABILITIES_TRANSFORMER = 'smartthings.transformer.device_component_capabilities_transformer';
     public const string SERVICE_DEVICE_COMPONENT_CAPABILITY_TRANSFORMER = 'smartthings.transformer.device_component_capability_transformer';
@@ -118,6 +124,8 @@ interface SmartThingsInterface
     public function getAppApi(): AppApiInterface;
 
     public function getCapabilityApi(): CapabilityApiInterface;
+
+    public function getChannelApi(): ChannelApiInterface;
 
     public function getDeviceApi(): DeviceApiInterface;
 

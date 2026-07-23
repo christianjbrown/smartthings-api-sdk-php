@@ -10,6 +10,8 @@ use ChristianBrown\SmartThings\Api\AppApi;
 use ChristianBrown\SmartThings\Api\AppApiInterface;
 use ChristianBrown\SmartThings\Api\CapabilityApi;
 use ChristianBrown\SmartThings\Api\CapabilityApiInterface;
+use ChristianBrown\SmartThings\Api\ChannelApi;
+use ChristianBrown\SmartThings\Api\ChannelApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceHealthApi;
@@ -61,6 +63,10 @@ use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespaceTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
+use ChristianBrown\SmartThings\Transformer\ChannelDriversTransformer;
+use ChristianBrown\SmartThings\Transformer\ChannelDriverTransformer;
+use ChristianBrown\SmartThings\Transformer\ChannelsTransformer;
+use ChristianBrown\SmartThings\Transformer\ChannelTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentsTransformer;
@@ -154,6 +160,20 @@ final class SmartThings implements SmartThingsInterface
          * @var CapabilityApiInterface $service
          */
         $service = $this->container->get(self::SERVICE_CAPABILITY_API);
+
+        return $service;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getChannelApi(): ChannelApiInterface
+    {
+        /**
+         * @var ChannelApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_CHANNEL_API);
 
         return $service;
     }
@@ -446,6 +466,7 @@ final class SmartThings implements SmartThingsInterface
         $this->registerCore();
         $this->registerAppTransformers();
         $this->registerCapabilityTransformers();
+        $this->registerChannelTransformers();
         $this->registerDeviceTransformers();
         $this->registerDeviceHealthTransformers();
         $this->registerDeviceHistoryTransformers();
@@ -488,6 +509,17 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_CAPABILITIES_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_CAPABILITY_NAMESPACES_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_CAPABILITY_PRESENTATION_TRANSFORMER),
+                    $this->token,
+                ]
+            );
+        $this->container->register(self::SERVICE_CHANNEL_API, ChannelApi::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_CHANNEL_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_CHANNELS_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_CHANNEL_DRIVERS_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_DRIVER_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -701,6 +733,24 @@ final class SmartThings implements SmartThingsInterface
                 ]
             );
         $this->container->register(self::SERVICE_CAPABILITY_PRESENTATION_TRANSFORMER, CapabilityPresentationTransformer::class);
+    }
+
+    private function registerChannelTransformers(): void
+    {
+        $this->container->register(self::SERVICE_CHANNEL_TRANSFORMER, ChannelTransformer::class);
+        $this->container->register(self::SERVICE_CHANNELS_TRANSFORMER, ChannelsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_CHANNEL_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_CHANNEL_DRIVER_TRANSFORMER, ChannelDriverTransformer::class);
+        $this->container->register(self::SERVICE_CHANNEL_DRIVERS_TRANSFORMER, ChannelDriversTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_CHANNEL_DRIVER_TRANSFORMER),
+                ]
+            );
     }
 
     private function registerCore(): void
