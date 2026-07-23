@@ -36,6 +36,11 @@ final class CapabilityApi implements CapabilityApiInterface
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
+    /**
+     * @var array<string, array<int, CapabilityInterface>>
+     */
+    private array $versionsCache = [];
+
     public function __construct(JsonApiRequestSenderInterface $requestSender, CapabilityTransformerInterface $capabilityTransformer, CapabilitiesTransformerInterface $capabilitiesTransformer, TokenInterface $token)
     {
         $this->requestSender = $requestSender;
@@ -111,6 +116,27 @@ final class CapabilityApi implements CapabilityApiInterface
         $this->cache[$cacheKey] = $capability;
 
         return $capability;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     *
+     * @return array<int, CapabilityInterface>
+     */
+    public function getVersions(string $capabilityId, bool $skipCache = false): array
+    {
+        if (!$skipCache) {
+            if (isset($this->versionsCache[$capabilityId])) {
+                return $this->versionsCache[$capabilityId];
+            }
+        }
+
+        $url = sprintf(self::API_URL_VERSIONS_SPRINTF, rawurlencode($capabilityId));
+        $capabilities = $this->fetchList($url);
+        $this->versionsCache[$capabilityId] = $capabilities;
+
+        return $capabilities;
     }
 
     /**
