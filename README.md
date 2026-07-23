@@ -8,6 +8,7 @@ The client is **read-only** and currently supports:
 
 - **Listing devices** — id, name, label, location and room ids, and each component's capabilities — or reading a single device by id (`getOneById`).
 - **Reading a device's status** — currently the `temperatureMeasurement`, `relativeHumidityMeasurement`, and `battery` capabilities (value, unit, and timestamp) from the device's `main` component.
+- **Reading a device's health** — the connection `state` (`ONLINE`/`OFFLINE`/`UNHEALTHY`) and the `lastUpdatedDate`, by id (`getOneById`) or from a device (`getOneByDevice`).
 - **Listing locations** — id and name, or reading a single location by id (`getOneById`).
 - **Reading rooms** — listing every room in a location (`getMultiple`), or reading a single room, either from a device (`getOneByDevice`) or by a location and room id (`getOneByLocationAndId`). Each room carries its id, name, and location id.
 
@@ -17,6 +18,7 @@ The client is **read-only** and currently supports:
 | --- | --- | --- | --- |
 | Devices | `getDeviceApi()` | `GET /devices`, `GET /devices/{deviceId}` | `DeviceInterface[]` / `DeviceInterface` |
 | Device status | `getDeviceStatusApi()` | `GET /devices/{deviceId}/status` | `DeviceStatusInterface` |
+| Device health | `getDeviceHealthApi()` | `GET /devices/{deviceId}/health` | `DeviceHealthInterface` |
 | Locations | `getLocationApi()` | `GET /locations`, `GET /locations/{locationId}` | `LocationInterface[]` / `LocationInterface` |
 | Rooms | `getLocationRoomApi()` | `GET /locations/{locationId}/rooms`, `GET /locations/{locationId}/rooms/{roomId}` | `LocationRoomInterface[]` / `LocationRoomInterface` |
 
@@ -54,6 +56,7 @@ use ChristianBrown\SmartThings\SmartThings;
 $smartThings     = new SmartThings('your-smartthings-personal-access-token');
 $deviceApi       = $smartThings->getDeviceApi();  // DeviceApiInterface
 $deviceStatusApi = $smartThings->getDeviceStatusApi();  // DeviceStatusApiInterface
+$deviceHealthApi = $smartThings->getDeviceHealthApi();  // DeviceHealthApiInterface
 $locationApi     = $smartThings->getLocationApi();  // LocationApiInterface
 $locationRoomApi = $smartThings->getLocationRoomApi();  // LocationRoomApiInterface
 ```
@@ -90,6 +93,9 @@ foreach ($devices as $device) {
     if ($battery !== null) {
         printf("  Battery: %d%s\n", $battery->getValue(), $battery->getUnit());
     }
+
+    $health = $deviceHealthApi->getOneByDevice($device);     // DeviceHealthInterface
+    printf("  Health: %s\n", $health->getState() ?? 'unknown');   // e.g. "ONLINE"
 }
 ```
 
@@ -147,6 +153,7 @@ Under the hood, `SmartThings` wires the clients and their transformer chains thr
 ```php
 use ChristianBrown\ApiClient\ApiClient;
 use ChristianBrown\SmartThings\Api\DeviceApi;
+use ChristianBrown\SmartThings\Api\DeviceHealthApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
@@ -163,6 +170,7 @@ use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasureme
 use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasurementHumidityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryBatteryTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceHealthTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
@@ -206,6 +214,13 @@ $deviceStatusApi = new DeviceStatusApi(
             new DeviceStatusBatteryBatteryTransformer()
         )
     ),
+    $apiToken
+);
+
+// Device health client.
+$deviceHealthApi = new DeviceHealthApi(
+    $requestSender,
+    new DeviceHealthTransformer(),
     $apiToken
 );
 
