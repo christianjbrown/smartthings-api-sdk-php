@@ -34,10 +34,10 @@ final class DeviceTransformer implements DeviceTransformerInterface
         }
         $device = new Device($data[self::KEY_DEVICE_ID]);
 
-        $this->applyLabel($device, $data);
-        $this->applyLocationId($device, $data);
-        $this->applyName($device, $data);
-        $this->applyRoomId($device, $data);
+        self::applyLabel($device, $data);
+        self::applyLocationId($device, $data);
+        self::applyName($device, $data);
+        self::applyRoomId($device, $data);
         $this->applyComponents($device, $data);
 
         return $device;
@@ -61,7 +61,7 @@ final class DeviceTransformer implements DeviceTransformerInterface
     /**
      * @phpstan-param mixed[] $data
      */
-    private function applyLabel(Device $device, array $data): void
+    private static function applyLabel(Device $device, array $data): void
     {
         if (empty($data[self::KEY_LABEL])) {
             return;
@@ -75,7 +75,7 @@ final class DeviceTransformer implements DeviceTransformerInterface
     /**
      * @phpstan-param mixed[] $data
      */
-    private function applyLocationId(Device $device, array $data): void
+    private static function applyLocationId(Device $device, array $data): void
     {
         if (empty($data[self::KEY_LOCATION_ID])) {
             return;
@@ -89,7 +89,7 @@ final class DeviceTransformer implements DeviceTransformerInterface
     /**
      * @phpstan-param mixed[] $data
      */
-    private function applyName(Device $device, array $data): void
+    private static function applyName(Device $device, array $data): void
     {
         if (empty($data[self::KEY_NAME])) {
             return;
@@ -103,7 +103,7 @@ final class DeviceTransformer implements DeviceTransformerInterface
     /**
      * @phpstan-param mixed[] $data
      */
-    private function applyRoomId(Device $device, array $data): void
+    private static function applyRoomId(Device $device, array $data): void
     {
         if (empty($data[self::KEY_ROOM_ID])) {
             return;

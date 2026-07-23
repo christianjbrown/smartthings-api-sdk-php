@@ -103,6 +103,9 @@ Three layers under `src/`, mirrored 1:1 under `tests/`, plus the top-level `Smar
   `Api`/`Transformer` interface — the exception classes carry no constants. Request errors still surface
   as `RequestExceptionInterface` from the api-client lib. Public methods that can throw carry `@throws`
   docblocks naming the concrete exception(s).
+- **A method that does not use `$this` must be `static`** (called via `self::`) — a stateless helper
+  is static. Enforced for private methods by the shared `RequireStaticPrivateMethodRule` PHPStan rule
+  (via `php-code-quality-scripts`' `config/phpstan.neon`); interface/override methods stay instance.
 
 ## Testing
 

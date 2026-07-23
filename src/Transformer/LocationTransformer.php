@@ -26,7 +26,7 @@ final class LocationTransformer implements LocationTransformerInterface
         }
         $location = new Location($data[self::KEY_LOCATION_ID]);
 
-        $this->applyName($location, $data);
+        self::applyName($location, $data);
 
         return $location;
     }
@@ -34,7 +34,7 @@ final class LocationTransformer implements LocationTransformerInterface
     /**
      * @phpstan-param mixed[] $data
      */
-    private function applyName(Location $location, array $data): void
+    private static function applyName(Location $location, array $data): void
     {
         if (empty($data[self::KEY_NAME])) {
             return;

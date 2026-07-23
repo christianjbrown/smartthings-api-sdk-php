@@ -26,8 +26,8 @@ final class LocationRoomTransformer implements LocationRoomTransformerInterface
         }
         $room = new LocationRoom($data[self::KEY_ROOM_ID]);
 
-        $this->applyLocationId($room, $data);
-        $this->applyName($room, $data);
+        self::applyLocationId($room, $data);
+        self::applyName($room, $data);
 
         return $room;
     }
@@ -35,7 +35,7 @@ final class LocationRoomTransformer implements LocationRoomTransformerInterface
     /**
      * @phpstan-param mixed[] $data
      */
-    private function applyLocationId(LocationRoom $room, array $data): void
+    private static function applyLocationId(LocationRoom $room, array $data): void
     {
         if (empty($data[self::KEY_LOCATION_ID])) {
             return;
@@ -49,7 +49,7 @@ final class LocationRoomTransformer implements LocationRoomTransformerInterface
     /**
      * @phpstan-param mixed[] $data
      */
-    private function applyName(LocationRoom $room, array $data): void
+    private static function applyName(LocationRoom $room, array $data): void
     {
         if (empty($data[self::KEY_NAME])) {
             return;

@@ -50,7 +50,7 @@ final class DeviceApi implements DeviceApiInterface
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $data = $this->requestSender->get(self::API_URL, $this->buildQuery($locationId), $headers);
+        $data = $this->requestSender->get(self::API_URL, self::buildQuery($locationId), $headers);
 
         if (empty($data[self::KEY_ITEMS])) {
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
@@ -67,7 +67,7 @@ final class DeviceApi implements DeviceApiInterface
     /**
      * @return array<string, string>
      */
-    private function buildQuery(?string $locationId): array
+    private static function buildQuery(?string $locationId): array
     {
         // Isolated so the optional filter is its own path, not multiplied
         // against the cache and response-shape guards in getMultiple().
