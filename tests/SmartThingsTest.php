@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests;
 
+use ChristianBrown\SmartThings\Api\CapabilityApi;
 use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceHealthApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
@@ -14,6 +15,8 @@ use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\SmartThings;
+use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentsTransformer;
@@ -43,6 +46,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SmartThings::class)]
+#[UsesClass(CapabilityApi::class)]
 #[UsesClass(DeviceApi::class)]
 #[UsesClass(DeviceHealthApi::class)]
 #[UsesClass(DeviceStatusApi::class)]
@@ -52,6 +56,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(RuleApi::class)]
 #[UsesClass(SceneApi::class)]
 #[UsesClass(Token::class)]
+#[UsesClass(CapabilitiesTransformer::class)]
+#[UsesClass(CapabilityTransformer::class)]
 #[UsesClass(DeviceComponentCapabilitiesTransformer::class)]
 #[UsesClass(DeviceComponentCapabilityTransformer::class)]
 #[UsesClass(DeviceComponentsTransformer::class)]
@@ -78,6 +84,13 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(SceneTransformer::class)]
 final class SmartThingsTest extends TestCase
 {
+    public function testGetCapabilityApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(CapabilityApi::class, $smartThings->getCapabilityApi());
+    }
+
     public function testGetDeviceApi(): void
     {
         $smartThings = new SmartThings('token');

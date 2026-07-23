@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings;
 
+use ChristianBrown\SmartThings\Api\CapabilityApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceHealthApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceStatusApiInterface;
@@ -16,6 +17,9 @@ use ChristianBrown\SmartThings\Api\SceneApiInterface;
 interface SmartThingsInterface
 {
     public const string SERVICE_API_CLIENT = 'smartthings.api_client';
+    public const string SERVICE_CAPABILITIES_TRANSFORMER = 'smartthings.transformer.capabilities_transformer';
+    public const string SERVICE_CAPABILITY_API = 'smartthings.api.capability_api';
+    public const string SERVICE_CAPABILITY_TRANSFORMER = 'smartthings.transformer.capability_transformer';
     public const string SERVICE_DEVICE_API = 'smartthings.api.device_api';
     public const string SERVICE_DEVICE_COMPONENT_CAPABILITIES_TRANSFORMER = 'smartthings.transformer.device_component_capabilities_transformer';
     public const string SERVICE_DEVICE_COMPONENT_CAPABILITY_TRANSFORMER = 'smartthings.transformer.device_component_capability_transformer';
@@ -49,6 +53,8 @@ interface SmartThingsInterface
     public const string SERVICE_SCENE_API = 'smartthings.api.scene_api';
     public const string SERVICE_SCENE_TRANSFORMER = 'smartthings.transformer.scene_transformer';
     public const string SERVICE_SCENES_TRANSFORMER = 'smartthings.transformer.scenes_transformer';
+
+    public function getCapabilityApi(): CapabilityApiInterface;
 
     public function getDeviceApi(): DeviceApiInterface;
 

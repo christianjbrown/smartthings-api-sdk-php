@@ -14,6 +14,7 @@ The client is **read-only** and currently supports:
 - **Reading modes** — listing a location's modes (`getMultiple`), reading the currently active mode (`getCurrent`), or a single mode by id (`getOneByLocationAndId`). Each mode carries its id, label, and name.
 - **Reading scenes** — listing scenes for the account, optionally filtered by location (`getMultiple`), or a single scene by id (`getOneById`). Each scene carries its id, name, and location id.
 - **Reading rules** — listing a location's rules (`getMultiple`) or a single rule by id (`getOneById`); both require a location id. Each rule carries its id, name, and status.
+- **Reading capabilities** — listing all platform capabilities (`getMultiple`), the custom capabilities in a namespace (`getMultipleByNamespace`), or one capability definition by id and version (`getOneByIdAndVersion`). Each carries its id, name, status, and version.
 
 ### Supported endpoints
 
@@ -27,6 +28,7 @@ The client is **read-only** and currently supports:
 | Modes | `getLocationModeApi()` | `GET /locations/{locationId}/modes`, `GET /locations/{locationId}/modes/current`, `GET /locations/{locationId}/modes/{modeId}` | `ModeInterface[]` / `ModeInterface` |
 | Scenes | `getSceneApi()` | `GET /scenes`, `GET /scenes/{sceneId}` | `SceneInterface[]` / `SceneInterface` |
 | Rules | `getRuleApi()` | `GET /rules?locationId=…`, `GET /rules/{ruleId}?locationId=…` | `RuleInterface[]` / `RuleInterface` |
+| Capabilities | `getCapabilityApi()` | `GET /capabilities`, `GET /capabilities/namespaces/{namespace}`, `GET /capabilities/{id}/{version}` | `CapabilityInterface[]` / `CapabilityInterface` |
 
 
 
@@ -68,6 +70,7 @@ $locationModeApi = $smartThings->getLocationModeApi();  // LocationModeApiInterf
 $locationRoomApi = $smartThings->getLocationRoomApi();  // LocationRoomApiInterface
 $sceneApi        = $smartThings->getSceneApi();  // SceneApiInterface
 $ruleApi         = $smartThings->getRuleApi();  // RuleApiInterface
+$capabilityApi   = $smartThings->getCapabilityApi();  // CapabilityApiInterface
 ```
 
 If you'd rather wire the clients by hand, see [Wiring the clients](#wiring-the-clients) below.
@@ -161,6 +164,7 @@ Under the hood, `SmartThings` wires the clients and their transformer chains thr
 
 ```php
 use ChristianBrown\ApiClient\ApiClient;
+use ChristianBrown\SmartThings\Api\CapabilityApi;
 use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceHealthApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
@@ -169,6 +173,8 @@ use ChristianBrown\SmartThings\Api\LocationModeApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
 use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
+use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentsTransformer;
@@ -198,6 +204,18 @@ $apiToken = 'your-smartthings-personal-access-token';
 
 // Shared JSON request sender (wires Guzzle for you).
 $requestSender = (new ApiClient())->getJsonApiRequestSender();
+
+// Capabilities client. The single capability transformer is shared: the list
+// endpoints wrap it in a CapabilitiesTransformer, and getOneByIdAndVersion() uses
+// it directly.
+$capabilityTransformer = new CapabilityTransformer();
+
+$capabilityApi = new CapabilityApi(
+    $requestSender,
+    $capabilityTransformer,
+    new CapabilitiesTransformer($capabilityTransformer),
+    $apiToken
+);
 
 // Devices client. The single device transformer is shared: the list endpoint wraps
 // it in a DevicesTransformer, and getOneById() uses it directly.
