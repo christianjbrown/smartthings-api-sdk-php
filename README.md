@@ -21,6 +21,7 @@ The client is **read-only** and currently supports:
 - **Reading installed apps** — listing installed app instances, optionally by location (`getMultiple`), one instance by id (`getOneById`), its configurations (`getConfigs`), or a single configuration (`getConfig`).
 - **Reading subscriptions** — listing an installed app's subscriptions (`getMultiple`) or a single subscription by id (`getOneById`). Each carries its id, installed app id, and source type.
 - **Reading schedules** — listing an installed app's schedules (`getMultiple`) or a single schedule by name (`getOneByName`). Each carries its name and installed app id.
+- **Reading device history** — device event history (`getMultiple`), optionally filtered by device and/or location, oldest-first, transparently paged across the API's `_links.next` chain (with an optional page cap). Each event carries its device id, location id, component, capability, attribute, value, and epoch (the SmartThings history window is roughly the last 7 days).
 
 ### Supported endpoints
 
@@ -29,6 +30,7 @@ The client is **read-only** and currently supports:
 | Devices | `getDeviceApi()` | `GET /devices`, `GET /devices/{deviceId}` | `DeviceInterface[]` / `DeviceInterface` |
 | Device status | `getDeviceStatusApi()` | `GET /devices/{deviceId}/status`, `GET /devices/{deviceId}/components/{componentId}/status`, `GET /devices/{deviceId}/components/{componentId}/capabilities/{capabilityId}/status` | `DeviceStatusInterface` |
 | Device health | `getDeviceHealthApi()` | `GET /devices/{deviceId}/health` | `DeviceHealthInterface` |
+| Device history | `getDeviceHistoryApi()` | `GET /history/devices` (paged) | `DeviceHistoryEventInterface[]` |
 | Locations | `getLocationApi()` | `GET /locations`, `GET /locations/{locationId}` | `LocationInterface[]` / `LocationInterface` |
 | Rooms | `getLocationRoomApi()` | `GET /locations/{locationId}/rooms`, `GET /locations/{locationId}/rooms/{roomId}` | `LocationRoomInterface[]` / `LocationRoomInterface` |
 | Modes | `getLocationModeApi()` | `GET /locations/{locationId}/modes`, `GET /locations/{locationId}/modes/current`, `GET /locations/{locationId}/modes/{modeId}` | `ModeInterface[]` / `ModeInterface` |
@@ -77,6 +79,7 @@ $smartThings     = new SmartThings('your-smartthings-personal-access-token');
 $deviceApi       = $smartThings->getDeviceApi();  // DeviceApiInterface
 $deviceStatusApi = $smartThings->getDeviceStatusApi();  // DeviceStatusApiInterface
 $deviceHealthApi = $smartThings->getDeviceHealthApi();  // DeviceHealthApiInterface
+$deviceHistoryApi = $smartThings->getDeviceHistoryApi();  // DeviceHistoryApiInterface
 $locationApi     = $smartThings->getLocationApi();  // LocationApiInterface
 $locationModeApi = $smartThings->getLocationModeApi();  // LocationModeApiInterface
 $locationRoomApi = $smartThings->getLocationRoomApi();  // LocationRoomApiInterface
@@ -186,6 +189,7 @@ use ChristianBrown\SmartThings\Api\AppApi;
 use ChristianBrown\SmartThings\Api\CapabilityApi;
 use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceHealthApi;
+use ChristianBrown\SmartThings\Api\DeviceHistoryApi;
 use ChristianBrown\SmartThings\Api\DeviceProfileApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\InstalledAppApi;
@@ -221,6 +225,8 @@ use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasureme
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryBatteryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHealthTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceHistoryEventsTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceHistoryEventTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfilesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
@@ -309,6 +315,16 @@ $deviceStatusApi = new DeviceStatusApi(
 $deviceHealthApi = new DeviceHealthApi(
     $requestSender,
     new DeviceHealthTransformer(),
+    $apiToken
+);
+
+// Device history client. It transparently follows the API's `_links.next` paging
+// chain, so the single events transformer receives every page's aggregated items.
+$deviceHistoryEventTransformer = new DeviceHistoryEventTransformer();
+
+$deviceHistoryApi = new DeviceHistoryApi(
+    $requestSender,
+    new DeviceHistoryEventsTransformer($deviceHistoryEventTransformer),
     $apiToken
 );
 

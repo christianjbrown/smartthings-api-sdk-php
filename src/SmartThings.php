@@ -14,6 +14,8 @@ use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceHealthApi;
 use ChristianBrown\SmartThings\Api\DeviceHealthApiInterface;
+use ChristianBrown\SmartThings\Api\DeviceHistoryApi;
+use ChristianBrown\SmartThings\Api\DeviceHistoryApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceProfileApi;
 use ChristianBrown\SmartThings\Api\DeviceProfileApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
@@ -49,6 +51,8 @@ use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHealthTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceHistoryEventsTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceHistoryEventTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfilesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryBatteryTransformer;
@@ -148,6 +152,20 @@ final class SmartThings implements SmartThingsInterface
          * @var DeviceHealthApiInterface $service
          */
         $service = $this->container->get(self::SERVICE_DEVICE_HEALTH_API);
+
+        return $service;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getDeviceHistoryApi(): DeviceHistoryApiInterface
+    {
+        /**
+         * @var DeviceHistoryApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_DEVICE_HISTORY_API);
 
         return $service;
     }
@@ -316,6 +334,7 @@ final class SmartThings implements SmartThingsInterface
         $this->registerCapabilityTransformers();
         $this->registerDeviceTransformers();
         $this->registerDeviceHealthTransformers();
+        $this->registerDeviceHistoryTransformers();
         $this->registerDeviceProfileTransformers();
         $this->registerDeviceStatusTransformers();
         $this->registerInstalledAppTransformers();
@@ -365,6 +384,14 @@ final class SmartThings implements SmartThingsInterface
                 [
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_DEVICE_HEALTH_TRANSFORMER),
+                    $this->token,
+                ]
+            );
+        $this->container->register(self::SERVICE_DEVICE_HISTORY_API, DeviceHistoryApi::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_DEVICE_HISTORY_EVENTS_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -503,6 +530,17 @@ final class SmartThings implements SmartThingsInterface
     private function registerDeviceHealthTransformers(): void
     {
         $this->container->register(self::SERVICE_DEVICE_HEALTH_TRANSFORMER, DeviceHealthTransformer::class);
+    }
+
+    private function registerDeviceHistoryTransformers(): void
+    {
+        $this->container->register(self::SERVICE_DEVICE_HISTORY_EVENT_TRANSFORMER, DeviceHistoryEventTransformer::class);
+        $this->container->register(self::SERVICE_DEVICE_HISTORY_EVENTS_TRANSFORMER, DeviceHistoryEventsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_DEVICE_HISTORY_EVENT_TRANSFORMER),
+                ]
+            );
     }
 
     private function registerDeviceProfileTransformers(): void

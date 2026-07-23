@@ -55,6 +55,14 @@ Three layers under `src/`, mirrored 1:1 under `tests/`, plus the top-level `Smar
   transformer, and return a typed model. List endpoints validate the `items`/`components` wrapper key;
   single-object endpoints (`LocationApi::getOneById`, `LocationRoomApi`'s `getOne`) guard against an
   empty response before delegating. Clients cache by id (`LocationRoomApi` caches by roomId).
+  **Pagination**: `DeviceHistoryApi::getMultiple` is the one paged client — an isolated `fetchAllPages`
+  loop follows the response's `_links.next.href` chain, aggregating every page's `items` (via
+  `array_merge`) until the API drops the next link or a caller-supplied `$maxPages` cap is hit; a
+  stateless `extractNextHref` guards each level of the `_links`/`next`/`href` walk, and an **empty
+  `items` array is a valid, non-error result** there (so it uses `isset`/`is_array`, not `empty()`).
+  Note: those guards are written as **separate sequential `if`s, never a compound `if (A || B)`** —
+  xdebug path coverage explodes combinatorially on `||`/`&&`, so keeping one condition per `if` is
+  what lets the paged client still hit 100% path coverage.
 - **`Transformer/`** — turn raw decoded-JSON arrays into `Model` objects. Nested transformers are
   constructor-injected and composed into a chain (e.g. `DevicesTransformer` → `DeviceTransformer` →
   `DeviceComponentsTransformer` → … → leaf). `DeviceStatusTransformer` supports the
