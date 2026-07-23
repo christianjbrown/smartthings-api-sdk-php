@@ -11,6 +11,7 @@ The client is **read-only** and currently supports:
 - **Reading a device's health** — the connection `state` (`ONLINE`/`OFFLINE`/`UNHEALTHY`) and the `lastUpdatedDate`, by id (`getOneById`) or from a device (`getOneByDevice`).
 - **Listing locations** — id and name, or reading a single location by id (`getOneById`).
 - **Reading rooms** — listing every room in a location (`getMultiple`), or reading a single room, either from a device (`getOneByDevice`) or by a location and room id (`getOneByLocationAndId`). Each room carries its id, name, and location id.
+- **Reading modes** — listing a location's modes (`getMultiple`), reading the currently active mode (`getCurrent`), or a single mode by id (`getOneByLocationAndId`). Each mode carries its id, label, and name.
 
 ### Supported endpoints
 
@@ -21,6 +22,7 @@ The client is **read-only** and currently supports:
 | Device health | `getDeviceHealthApi()` | `GET /devices/{deviceId}/health` | `DeviceHealthInterface` |
 | Locations | `getLocationApi()` | `GET /locations`, `GET /locations/{locationId}` | `LocationInterface[]` / `LocationInterface` |
 | Rooms | `getLocationRoomApi()` | `GET /locations/{locationId}/rooms`, `GET /locations/{locationId}/rooms/{roomId}` | `LocationRoomInterface[]` / `LocationRoomInterface` |
+| Modes | `getLocationModeApi()` | `GET /locations/{locationId}/modes`, `GET /locations/{locationId}/modes/current`, `GET /locations/{locationId}/modes/{modeId}` | `ModeInterface[]` / `ModeInterface` |
 
 
 
@@ -58,6 +60,7 @@ $deviceApi       = $smartThings->getDeviceApi();  // DeviceApiInterface
 $deviceStatusApi = $smartThings->getDeviceStatusApi();  // DeviceStatusApiInterface
 $deviceHealthApi = $smartThings->getDeviceHealthApi();  // DeviceHealthApiInterface
 $locationApi     = $smartThings->getLocationApi();  // LocationApiInterface
+$locationModeApi = $smartThings->getLocationModeApi();  // LocationModeApiInterface
 $locationRoomApi = $smartThings->getLocationRoomApi();  // LocationRoomApiInterface
 ```
 
@@ -156,6 +159,7 @@ use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceHealthApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\LocationApi;
+use ChristianBrown\SmartThings\Api\LocationModeApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
@@ -175,6 +179,8 @@ use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
+use ChristianBrown\SmartThings\Transformer\ModesTransformer;
+use ChristianBrown\SmartThings\Transformer\ModeTransformer;
 
 $apiToken = 'your-smartthings-personal-access-token';
 
@@ -231,6 +237,17 @@ $locationApi = new LocationApi(
     new LocationsTransformer(
         new LocationTransformer()
     ),
+    $apiToken
+);
+
+// Location modes client. The single mode transformer is shared: the list endpoint
+// wraps it in a ModesTransformer, and the single/current reads use it directly.
+$modeTransformer = new ModeTransformer();
+
+$locationModeApi = new LocationModeApi(
+    $requestSender,
+    $modeTransformer,
+    new ModesTransformer($modeTransformer),
     $apiToken
 );
 

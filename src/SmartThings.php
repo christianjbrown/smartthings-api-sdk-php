@@ -14,6 +14,8 @@ use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApiInterface;
 use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationApiInterface;
+use ChristianBrown\SmartThings\Api\LocationModeApi;
+use ChristianBrown\SmartThings\Api\LocationModeApiInterface;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
@@ -36,6 +38,8 @@ use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationTransformer;
+use ChristianBrown\SmartThings\Transformer\ModesTransformer;
+use ChristianBrown\SmartThings\Transformer\ModeTransformer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -113,6 +117,20 @@ final class SmartThings implements SmartThingsInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    public function getLocationModeApi(): LocationModeApiInterface
+    {
+        /**
+         * @var LocationModeApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_LOCATION_MODE_API);
+
+        return $service;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function getLocationRoomApi(): LocationRoomApiInterface
     {
         /**
@@ -133,6 +151,7 @@ final class SmartThings implements SmartThingsInterface
         $this->registerDeviceHealthTransformers();
         $this->registerDeviceStatusTransformers();
         $this->registerLocationTransformers();
+        $this->registerModeTransformers();
         $this->registerApiClients();
     }
 
@@ -169,6 +188,15 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_LOCATION_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_LOCATIONS_TRANSFORMER),
+                    $this->token,
+                ]
+            );
+        $this->container->register(self::SERVICE_LOCATION_MODE_API, LocationModeApi::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_MODE_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_MODES_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -278,6 +306,17 @@ final class SmartThings implements SmartThingsInterface
             ->setArguments(
                 [
                     $this->container->getDefinition(self::SERVICE_LOCATION_ROOM_TRANSFORMER),
+                ]
+            );
+    }
+
+    private function registerModeTransformers(): void
+    {
+        $this->container->register(self::SERVICE_MODE_TRANSFORMER, ModeTransformer::class);
+        $this->container->register(self::SERVICE_MODES_TRANSFORMER, ModesTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_MODE_TRANSFORMER),
                 ]
             );
     }

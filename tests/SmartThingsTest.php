@@ -8,6 +8,7 @@ use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceHealthApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\LocationApi;
+use ChristianBrown\SmartThings\Api\LocationModeApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\SmartThings;
@@ -29,6 +30,8 @@ use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationTransformer;
+use ChristianBrown\SmartThings\Transformer\ModesTransformer;
+use ChristianBrown\SmartThings\Transformer\ModeTransformer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -38,6 +41,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DeviceHealthApi::class)]
 #[UsesClass(DeviceStatusApi::class)]
 #[UsesClass(LocationApi::class)]
+#[UsesClass(LocationModeApi::class)]
 #[UsesClass(LocationRoomApi::class)]
 #[UsesClass(Token::class)]
 #[UsesClass(DeviceComponentCapabilitiesTransformer::class)]
@@ -58,6 +62,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(LocationTransformer::class)]
 #[UsesClass(LocationRoomsTransformer::class)]
 #[UsesClass(LocationRoomTransformer::class)]
+#[UsesClass(ModesTransformer::class)]
+#[UsesClass(ModeTransformer::class)]
 final class SmartThingsTest extends TestCase
 {
     public function testGetDeviceApi(): void
@@ -86,6 +92,13 @@ final class SmartThingsTest extends TestCase
         $smartThings = new SmartThings('token');
 
         self::assertInstanceOf(LocationApi::class, $smartThings->getLocationApi());
+    }
+
+    public function testGetLocationModeApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(LocationModeApi::class, $smartThings->getLocationModeApi());
     }
 
     public function testGetLocationRoomApi(): void
