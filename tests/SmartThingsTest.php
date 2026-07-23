@@ -17,6 +17,7 @@ use ChristianBrown\SmartThings\Api\LocationRoomApi;
 use ChristianBrown\SmartThings\Api\PresentationApi;
 use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
+use ChristianBrown\SmartThings\Api\ScheduleApi;
 use ChristianBrown\SmartThings\Api\SubscriptionApi;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\SmartThings;
@@ -57,6 +58,8 @@ use ChristianBrown\SmartThings\Transformer\RulesTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleTransformer;
 use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
+use ChristianBrown\SmartThings\Transformer\SchedulesTransformer;
+use ChristianBrown\SmartThings\Transformer\ScheduleTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -77,6 +80,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(PresentationApi::class)]
 #[UsesClass(RuleApi::class)]
 #[UsesClass(SceneApi::class)]
+#[UsesClass(ScheduleApi::class)]
 #[UsesClass(SubscriptionApi::class)]
 #[UsesClass(Token::class)]
 #[UsesClass(AppOauthTransformer::class)]
@@ -116,6 +120,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(RuleTransformer::class)]
 #[UsesClass(ScenesTransformer::class)]
 #[UsesClass(SceneTransformer::class)]
+#[UsesClass(SchedulesTransformer::class)]
+#[UsesClass(ScheduleTransformer::class)]
 #[UsesClass(SubscriptionsTransformer::class)]
 #[UsesClass(SubscriptionTransformer::class)]
 final class SmartThingsTest extends TestCase
@@ -209,6 +215,13 @@ final class SmartThingsTest extends TestCase
         $smartThings = new SmartThings('token');
 
         self::assertInstanceOf(SceneApi::class, $smartThings->getSceneApi());
+    }
+
+    public function testGetScheduleApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(ScheduleApi::class, $smartThings->getScheduleApi());
     }
 
     public function testGetSubscriptionApi(): void

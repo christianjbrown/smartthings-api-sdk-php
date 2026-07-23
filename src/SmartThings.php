@@ -32,6 +32,8 @@ use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\RuleApiInterface;
 use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\SceneApiInterface;
+use ChristianBrown\SmartThings\Api\ScheduleApi;
+use ChristianBrown\SmartThings\Api\ScheduleApiInterface;
 use ChristianBrown\SmartThings\Api\SubscriptionApi;
 use ChristianBrown\SmartThings\Api\SubscriptionApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
@@ -73,6 +75,8 @@ use ChristianBrown\SmartThings\Transformer\RulesTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleTransformer;
 use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
+use ChristianBrown\SmartThings\Transformer\SchedulesTransformer;
+use ChristianBrown\SmartThings\Transformer\ScheduleTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
 use Psr\Container\ContainerExceptionInterface;
@@ -278,6 +282,20 @@ final class SmartThings implements SmartThingsInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    public function getScheduleApi(): ScheduleApiInterface
+    {
+        /**
+         * @var ScheduleApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_SCHEDULE_API);
+
+        return $service;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function getSubscriptionApi(): SubscriptionApiInterface
     {
         /**
@@ -306,6 +324,7 @@ final class SmartThings implements SmartThingsInterface
         $this->registerPresentationTransformers();
         $this->registerRuleTransformers();
         $this->registerSceneTransformers();
+        $this->registerScheduleTransformers();
         $this->registerSubscriptionTransformers();
         $this->registerApiClients();
     }
@@ -427,6 +446,15 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_SCENE_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_SCENES_TRANSFORMER),
+                    $this->token,
+                ]
+            );
+        $this->container->register(self::SERVICE_SCHEDULE_API, ScheduleApi::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_SCHEDULE_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_SCHEDULES_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -627,6 +655,17 @@ final class SmartThings implements SmartThingsInterface
             ->setArguments(
                 [
                     $this->container->getDefinition(self::SERVICE_SCENE_TRANSFORMER),
+                ]
+            );
+    }
+
+    private function registerScheduleTransformers(): void
+    {
+        $this->container->register(self::SERVICE_SCHEDULE_TRANSFORMER, ScheduleTransformer::class);
+        $this->container->register(self::SERVICE_SCHEDULES_TRANSFORMER, SchedulesTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_SCHEDULE_TRANSFORMER),
                 ]
             );
     }

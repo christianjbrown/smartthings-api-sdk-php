@@ -20,6 +20,7 @@ The client is **read-only** and currently supports:
 - **Reading apps** — listing the account's apps (`getMultiple`), one app by name or id (`getOneById`), an app's OAuth config (`getOauth` — client name, scopes, redirect URIs), or its settings map (`getSettings`).
 - **Reading installed apps** — listing installed app instances, optionally by location (`getMultiple`), one instance by id (`getOneById`), its configurations (`getConfigs`), or a single configuration (`getConfig`).
 - **Reading subscriptions** — listing an installed app's subscriptions (`getMultiple`) or a single subscription by id (`getOneById`). Each carries its id, installed app id, and source type.
+- **Reading schedules** — listing an installed app's schedules (`getMultiple`) or a single schedule by name (`getOneByName`). Each carries its name and installed app id.
 
 ### Supported endpoints
 
@@ -39,6 +40,7 @@ The client is **read-only** and currently supports:
 | Apps | `getAppApi()` | `GET /apps`, `GET /apps/{appNameOrId}`, `GET /apps/{appNameOrId}/oauth`, `GET /apps/{appNameOrId}/settings` | `AppInterface[]` / `AppInterface` / `AppOauthInterface` / `AppSettingsInterface` |
 | Installed apps | `getInstalledAppApi()` | `GET /installedapps`, `GET /installedapps/{id}`, `GET /installedapps/{id}/configs`, `GET /installedapps/{id}/configs/{configurationId}` | `InstalledAppInterface[]` / `InstalledAppInterface` / `InstalledAppConfigInterface[]` / `InstalledAppConfigInterface` |
 | Subscriptions | `getSubscriptionApi()` | `GET /installedapps/{id}/subscriptions`, `GET /installedapps/{id}/subscriptions/{subscriptionId}` | `SubscriptionInterface[]` / `SubscriptionInterface` |
+| Schedules | `getScheduleApi()` | `GET /installedapps/{id}/schedules`, `GET /installedapps/{id}/schedules/{scheduleName}` | `ScheduleInterface[]` / `ScheduleInterface` |
 
 
 
@@ -86,6 +88,7 @@ $presentationApi = $smartThings->getPresentationApi();  // PresentationApiInterf
 $appApi          = $smartThings->getAppApi();  // AppApiInterface
 $installedAppApi = $smartThings->getInstalledAppApi();  // InstalledAppApiInterface
 $subscriptionApi = $smartThings->getSubscriptionApi();  // SubscriptionApiInterface
+$scheduleApi     = $smartThings->getScheduleApi();  // ScheduleApiInterface
 ```
 
 If you'd rather wire the clients by hand, see [Wiring the clients](#wiring-the-clients) below.
@@ -192,6 +195,7 @@ use ChristianBrown\SmartThings\Api\LocationRoomApi;
 use ChristianBrown\SmartThings\Api\PresentationApi;
 use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
+use ChristianBrown\SmartThings\Api\ScheduleApi;
 use ChristianBrown\SmartThings\Api\SubscriptionApi;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
 use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
@@ -230,6 +234,8 @@ use ChristianBrown\SmartThings\Transformer\RulesTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleTransformer;
 use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
+use ChristianBrown\SmartThings\Transformer\SchedulesTransformer;
+use ChristianBrown\SmartThings\Transformer\ScheduleTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
 
@@ -394,6 +400,17 @@ $subscriptionApi = new SubscriptionApi(
     $requestSender,
     $subscriptionTransformer,
     new SubscriptionsTransformer($subscriptionTransformer),
+    $apiToken
+);
+
+// Schedules client. The single schedule transformer is shared: the list endpoint
+// wraps it in a SchedulesTransformer, and getOneByName() uses it directly.
+$scheduleTransformer = new ScheduleTransformer();
+
+$scheduleApi = new ScheduleApi(
+    $requestSender,
+    $scheduleTransformer,
+    new SchedulesTransformer($scheduleTransformer),
     $apiToken
 );
 
