@@ -48,6 +48,8 @@ use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\SceneApiInterface;
 use ChristianBrown\SmartThings\Api\ScheduleApi;
 use ChristianBrown\SmartThings\Api\ScheduleApiInterface;
+use ChristianBrown\SmartThings\Api\SchemaConnectorApi;
+use ChristianBrown\SmartThings\Api\SchemaConnectorApiInterface;
 use ChristianBrown\SmartThings\Api\ServiceApi;
 use ChristianBrown\SmartThings\Api\ServiceApiInterface;
 use ChristianBrown\SmartThings\Api\SubscriptionApi;
@@ -103,6 +105,8 @@ use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppsTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
@@ -118,6 +122,9 @@ use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
 use ChristianBrown\SmartThings\Transformer\SchedulesTransformer;
 use ChristianBrown\SmartThings\Transformer\ScheduleTransformer;
+use ChristianBrown\SmartThings\Transformer\SchemaAppsTransformer;
+use ChristianBrown\SmartThings\Transformer\SchemaAppTransformer;
+use ChristianBrown\SmartThings\Transformer\SchemaPageTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityNamesTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoSubscriptionsTransformer;
@@ -442,6 +449,20 @@ final class SmartThings implements SmartThingsInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    public function getSchemaConnectorApi(): SchemaConnectorApiInterface
+    {
+        /**
+         * @var SchemaConnectorApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_SCHEMA_CONNECTOR_API);
+
+        return $service;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function getServiceApi(): ServiceApiInterface
     {
         /**
@@ -506,6 +527,7 @@ final class SmartThings implements SmartThingsInterface
         $this->registerRuleTransformers();
         $this->registerSceneTransformers();
         $this->registerScheduleTransformers();
+        $this->registerSchemaConnectorTransformers();
         $this->registerServiceTransformers();
         $this->registerSubscriptionTransformers();
         $this->registerApiClients();
@@ -706,6 +728,18 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_SCHEDULE_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_SCHEDULES_TRANSFORMER),
+                    $this->token,
+                ]
+            );
+        $this->container->register(self::SERVICE_SCHEMA_CONNECTOR_API, SchemaConnectorApi::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_SCHEMA_APP_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_SCHEMA_APPS_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_INSTALLED_SCHEMA_APP_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_INSTALLED_SCHEMA_APPS_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_SCHEMA_PAGE_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -1038,6 +1072,25 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_SCHEDULE_TRANSFORMER),
                 ]
             );
+    }
+
+    private function registerSchemaConnectorTransformers(): void
+    {
+        $this->container->register(self::SERVICE_SCHEMA_APP_TRANSFORMER, SchemaAppTransformer::class);
+        $this->container->register(self::SERVICE_SCHEMA_APPS_TRANSFORMER, SchemaAppsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_SCHEMA_APP_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_INSTALLED_SCHEMA_APP_TRANSFORMER, InstalledSchemaAppTransformer::class);
+        $this->container->register(self::SERVICE_INSTALLED_SCHEMA_APPS_TRANSFORMER, InstalledSchemaAppsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_INSTALLED_SCHEMA_APP_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_SCHEMA_PAGE_TRANSFORMER, SchemaPageTransformer::class);
     }
 
     private function registerServiceTransformers(): void

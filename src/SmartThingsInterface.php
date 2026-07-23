@@ -25,6 +25,7 @@ use ChristianBrown\SmartThings\Api\PresentationApiInterface;
 use ChristianBrown\SmartThings\Api\RuleApiInterface;
 use ChristianBrown\SmartThings\Api\SceneApiInterface;
 use ChristianBrown\SmartThings\Api\ScheduleApiInterface;
+use ChristianBrown\SmartThings\Api\SchemaConnectorApiInterface;
 use ChristianBrown\SmartThings\Api\ServiceApiInterface;
 use ChristianBrown\SmartThings\Api\SubscriptionApiInterface;
 use ChristianBrown\SmartThings\Api\VirtualDeviceApiInterface;
@@ -92,6 +93,8 @@ interface SmartThingsInterface
     public const string SERVICE_INSTALLED_APP_CONFIGS_TRANSFORMER = 'smartthings.transformer.installed_app_configs_transformer';
     public const string SERVICE_INSTALLED_APP_TRANSFORMER = 'smartthings.transformer.installed_app_transformer';
     public const string SERVICE_INSTALLED_APPS_TRANSFORMER = 'smartthings.transformer.installed_apps_transformer';
+    public const string SERVICE_INSTALLED_SCHEMA_APP_TRANSFORMER = 'smartthings.transformer.installed_schema_app_transformer';
+    public const string SERVICE_INSTALLED_SCHEMA_APPS_TRANSFORMER = 'smartthings.transformer.installed_schema_apps_transformer';
     public const string SERVICE_JSON_API_REQUEST_SENDER = 'smartthings.json_api_request_sender';
     public const string SERVICE_LOCATION_API = 'smartthings.api.location_api';
     public const string SERVICE_LOCATION_MODE_API = 'smartthings.api.location_mode_api';
@@ -116,6 +119,10 @@ interface SmartThingsInterface
     public const string SERVICE_SCHEDULE_API = 'smartthings.api.schedule_api';
     public const string SERVICE_SCHEDULE_TRANSFORMER = 'smartthings.transformer.schedule_transformer';
     public const string SERVICE_SCHEDULES_TRANSFORMER = 'smartthings.transformer.schedules_transformer';
+    public const string SERVICE_SCHEMA_APP_TRANSFORMER = 'smartthings.transformer.schema_app_transformer';
+    public const string SERVICE_SCHEMA_APPS_TRANSFORMER = 'smartthings.transformer.schema_apps_transformer';
+    public const string SERVICE_SCHEMA_CONNECTOR_API = 'smartthings.api.schema_connector_api';
+    public const string SERVICE_SCHEMA_PAGE_TRANSFORMER = 'smartthings.transformer.schema_page_transformer';
     public const string SERVICE_SERVICE_API = 'smartthings.api.service_api';
     public const string SERVICE_SERVICE_CAPABILITY_DATA_TRANSFORMER = 'smartthings.transformer.service_capability_data_transformer';
     public const string SERVICE_SERVICE_CAPABILITY_NAMES_TRANSFORMER = 'smartthings.transformer.service_capability_names_transformer';
@@ -170,6 +177,8 @@ interface SmartThingsInterface
     public function getSceneApi(): SceneApiInterface;
 
     public function getScheduleApi(): ScheduleApiInterface;
+
+    public function getSchemaConnectorApi(): SchemaConnectorApiInterface;
 
     public function getServiceApi(): ServiceApiInterface;
 

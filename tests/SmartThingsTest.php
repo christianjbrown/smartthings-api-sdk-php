@@ -25,6 +25,7 @@ use ChristianBrown\SmartThings\Api\PresentationApi;
 use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\ScheduleApi;
+use ChristianBrown\SmartThings\Api\SchemaConnectorApi;
 use ChristianBrown\SmartThings\Api\ServiceApi;
 use ChristianBrown\SmartThings\Api\SubscriptionApi;
 use ChristianBrown\SmartThings\Api\Token;
@@ -77,6 +78,8 @@ use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppsTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
@@ -92,6 +95,9 @@ use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
 use ChristianBrown\SmartThings\Transformer\SchedulesTransformer;
 use ChristianBrown\SmartThings\Transformer\ScheduleTransformer;
+use ChristianBrown\SmartThings\Transformer\SchemaAppsTransformer;
+use ChristianBrown\SmartThings\Transformer\SchemaAppTransformer;
+use ChristianBrown\SmartThings\Transformer\SchemaPageTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityNamesTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoSubscriptionsTransformer;
@@ -127,6 +133,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(RuleApi::class)]
 #[UsesClass(SceneApi::class)]
 #[UsesClass(ScheduleApi::class)]
+#[UsesClass(SchemaConnectorApi::class)]
 #[UsesClass(ServiceApi::class)]
 #[UsesClass(SubscriptionApi::class)]
 #[UsesClass(VirtualDeviceApi::class)]
@@ -193,6 +200,11 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(SceneTransformer::class)]
 #[UsesClass(SchedulesTransformer::class)]
 #[UsesClass(ScheduleTransformer::class)]
+#[UsesClass(SchemaAppsTransformer::class)]
+#[UsesClass(SchemaAppTransformer::class)]
+#[UsesClass(SchemaPageTransformer::class)]
+#[UsesClass(InstalledSchemaAppsTransformer::class)]
+#[UsesClass(InstalledSchemaAppTransformer::class)]
 #[UsesClass(ServiceCapabilityDataTransformer::class)]
 #[UsesClass(ServiceCapabilityNamesTransformer::class)]
 #[UsesClass(ServiceLocationInfoSubscriptionsTransformer::class)]
@@ -349,6 +361,13 @@ final class SmartThingsTest extends TestCase
         $smartThings = new SmartThings('token');
 
         self::assertInstanceOf(ScheduleApi::class, $smartThings->getScheduleApi());
+    }
+
+    public function testGetSchemaConnectorApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(SchemaConnectorApi::class, $smartThings->getSchemaConnectorApi());
     }
 
     public function testGetServiceApi(): void
