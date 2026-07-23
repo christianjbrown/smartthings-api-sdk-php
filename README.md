@@ -10,6 +10,7 @@ The client is **read-only** and currently supports:
 - **Reading a device's status** — currently the `temperatureMeasurement`, `relativeHumidityMeasurement`, and `battery` capabilities (value, unit, and timestamp) from the device's `main` component (`getOneById`/`getOneByDevice`), a single component (`getOneByComponent`), or a single capability on a component (`getOneByCapability`).
 - **Reading a device's health** — the connection `state` (`ONLINE`/`OFFLINE`/`UNHEALTHY`) and the `lastUpdatedDate`, by id (`getOneById`) or from a device (`getOneByDevice`).
 - **Reading a device's preferences** — the device's current preference values, by id (`getOneById`) or from a device (`getOneByDevice`). Each preference carries its name, `preferenceType`, and value.
+- **Reading device preference definitions** — the account's custom device-preference definitions, optionally filtered by namespace (`getMultiple`), or a single definition by id (`getOneById`). Each carries its preference id, name, title, description, `preferenceType`, and required flag.
 - **Listing locations** — id and name, or reading a single location by id (`getOneById`).
 - **Reading rooms** — listing every room in a location (`getMultiple`), reading a single room, either from a device (`getOneByDevice`) or by a location and room id (`getOneByLocationAndId`), or listing the devices in a room (`getDevicesInRoom`). Each room carries its id, name, and location id.
 - **Reading modes** — listing a location's modes (`getMultiple`), reading the currently active mode (`getCurrent`), or a single mode by id (`getOneByLocationAndId`). Each mode carries its id, label, and name.
@@ -35,6 +36,7 @@ The client is **read-only** and currently supports:
 | Device status | `getDeviceStatusApi()` | `GET /devices/{deviceId}/status`, `GET /devices/{deviceId}/components/{componentId}/status`, `GET /devices/{deviceId}/components/{componentId}/capabilities/{capabilityId}/status` | `DeviceStatusInterface` |
 | Device health | `getDeviceHealthApi()` | `GET /devices/{deviceId}/health` | `DeviceHealthInterface` |
 | Device preferences | `getDevicePreferencesApi()` | `GET /devices/{deviceId}/preferences` | `DevicePreferenceInterface[]` |
+| Device preference definitions | `getDevicePreferenceDefinitionApi()` | `GET /devicepreferences`, `GET /devicepreferences/{preferenceId}` | `DevicePreferenceDefinitionInterface[]` / `DevicePreferenceDefinitionInterface` |
 | Device history | `getDeviceHistoryApi()` | `GET /history/devices` (paged) | `DeviceHistoryEventInterface[]` |
 | Locations | `getLocationApi()` | `GET /locations`, `GET /locations/{locationId}` | `LocationInterface[]` / `LocationInterface` |
 | Rooms | `getLocationRoomApi()` | `GET /locations/{locationId}/rooms`, `GET /locations/{locationId}/rooms/{roomId}`, `GET /locations/{locationId}/rooms/{roomId}/devices` | `LocationRoomInterface[]` / `LocationRoomInterface` / `DeviceInterface[]` |

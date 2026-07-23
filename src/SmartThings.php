@@ -16,6 +16,8 @@ use ChristianBrown\SmartThings\Api\DeviceHealthApi;
 use ChristianBrown\SmartThings\Api\DeviceHealthApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceHistoryApi;
 use ChristianBrown\SmartThings\Api\DeviceHistoryApiInterface;
+use ChristianBrown\SmartThings\Api\DevicePreferenceDefinitionApi;
+use ChristianBrown\SmartThings\Api\DevicePreferenceDefinitionApiInterface;
 use ChristianBrown\SmartThings\Api\DevicePreferencesApi;
 use ChristianBrown\SmartThings\Api\DevicePreferencesApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceProfileApi;
@@ -62,6 +64,8 @@ use ChristianBrown\SmartThings\Transformer\DeviceComponentTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHealthTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHistoryEventsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHistoryEventTransformer;
+use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionsTransformer;
+use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicePreferencesTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfilesTransformer;
@@ -179,6 +183,20 @@ final class SmartThings implements SmartThingsInterface
          * @var DeviceHistoryApiInterface $service
          */
         $service = $this->container->get(self::SERVICE_DEVICE_HISTORY_API);
+
+        return $service;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getDevicePreferenceDefinitionApi(): DevicePreferenceDefinitionApiInterface
+    {
+        /**
+         * @var DevicePreferenceDefinitionApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_DEVICE_PREFERENCE_DEFINITION_API);
 
         return $service;
     }
@@ -390,6 +408,7 @@ final class SmartThings implements SmartThingsInterface
         $this->registerDeviceTransformers();
         $this->registerDeviceHealthTransformers();
         $this->registerDeviceHistoryTransformers();
+        $this->registerDevicePreferenceDefinitionTransformers();
         $this->registerDevicePreferenceTransformers();
         $this->registerDeviceProfileTransformers();
         $this->registerDeviceStatusTransformers();
@@ -451,6 +470,15 @@ final class SmartThings implements SmartThingsInterface
                 [
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_DEVICE_HISTORY_EVENTS_TRANSFORMER),
+                    $this->token,
+                ]
+            );
+        $this->container->register(self::SERVICE_DEVICE_PREFERENCE_DEFINITION_API, DevicePreferenceDefinitionApi::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->container->getDefinition(self::SERVICE_DEVICE_PREFERENCE_DEFINITION_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_DEVICE_PREFERENCE_DEFINITIONS_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -632,6 +660,17 @@ final class SmartThings implements SmartThingsInterface
             ->setArguments(
                 [
                     $this->container->getDefinition(self::SERVICE_DEVICE_HISTORY_EVENT_TRANSFORMER),
+                ]
+            );
+    }
+
+    private function registerDevicePreferenceDefinitionTransformers(): void
+    {
+        $this->container->register(self::SERVICE_DEVICE_PREFERENCE_DEFINITION_TRANSFORMER, DevicePreferenceDefinitionTransformer::class);
+        $this->container->register(self::SERVICE_DEVICE_PREFERENCE_DEFINITIONS_TRANSFORMER, DevicePreferenceDefinitionsTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_DEVICE_PREFERENCE_DEFINITION_TRANSFORMER),
                 ]
             );
     }

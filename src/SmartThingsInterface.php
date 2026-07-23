@@ -9,6 +9,7 @@ use ChristianBrown\SmartThings\Api\CapabilityApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceHealthApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceHistoryApiInterface;
+use ChristianBrown\SmartThings\Api\DevicePreferenceDefinitionApiInterface;
 use ChristianBrown\SmartThings\Api\DevicePreferencesApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceProfileApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceStatusApiInterface;
@@ -48,6 +49,9 @@ interface SmartThingsInterface
     public const string SERVICE_DEVICE_HISTORY_API = 'smartthings.api.device_history_api';
     public const string SERVICE_DEVICE_HISTORY_EVENT_TRANSFORMER = 'smartthings.transformer.device_history_event_transformer';
     public const string SERVICE_DEVICE_HISTORY_EVENTS_TRANSFORMER = 'smartthings.transformer.device_history_events_transformer';
+    public const string SERVICE_DEVICE_PREFERENCE_DEFINITION_API = 'smartthings.api.device_preference_definition_api';
+    public const string SERVICE_DEVICE_PREFERENCE_DEFINITION_TRANSFORMER = 'smartthings.transformer.device_preference_definition_transformer';
+    public const string SERVICE_DEVICE_PREFERENCE_DEFINITIONS_TRANSFORMER = 'smartthings.transformer.device_preference_definitions_transformer';
     public const string SERVICE_DEVICE_PREFERENCE_TRANSFORMER = 'smartthings.transformer.device_preference_transformer';
     public const string SERVICE_DEVICE_PREFERENCES_API = 'smartthings.api.device_preferences_api';
     public const string SERVICE_DEVICE_PREFERENCES_TRANSFORMER = 'smartthings.transformer.device_preferences_transformer';
@@ -107,6 +111,8 @@ interface SmartThingsInterface
     public function getDeviceHealthApi(): DeviceHealthApiInterface;
 
     public function getDeviceHistoryApi(): DeviceHistoryApiInterface;
+
+    public function getDevicePreferenceDefinitionApi(): DevicePreferenceDefinitionApiInterface;
 
     public function getDevicePreferencesApi(): DevicePreferencesApiInterface;
 
