@@ -10,6 +10,7 @@ use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationModeApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
+use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\SmartThings;
@@ -33,6 +34,8 @@ use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationTransformer;
 use ChristianBrown\SmartThings\Transformer\ModesTransformer;
 use ChristianBrown\SmartThings\Transformer\ModeTransformer;
+use ChristianBrown\SmartThings\Transformer\RulesTransformer;
+use ChristianBrown\SmartThings\Transformer\RuleTransformer;
 use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -46,6 +49,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(LocationApi::class)]
 #[UsesClass(LocationModeApi::class)]
 #[UsesClass(LocationRoomApi::class)]
+#[UsesClass(RuleApi::class)]
 #[UsesClass(SceneApi::class)]
 #[UsesClass(Token::class)]
 #[UsesClass(DeviceComponentCapabilitiesTransformer::class)]
@@ -68,6 +72,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(LocationRoomTransformer::class)]
 #[UsesClass(ModesTransformer::class)]
 #[UsesClass(ModeTransformer::class)]
+#[UsesClass(RulesTransformer::class)]
+#[UsesClass(RuleTransformer::class)]
 #[UsesClass(ScenesTransformer::class)]
 #[UsesClass(SceneTransformer::class)]
 final class SmartThingsTest extends TestCase
@@ -112,6 +118,13 @@ final class SmartThingsTest extends TestCase
         $smartThings = new SmartThings('token');
 
         self::assertInstanceOf(LocationRoomApi::class, $smartThings->getLocationRoomApi());
+    }
+
+    public function testGetRuleApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(RuleApi::class, $smartThings->getRuleApi());
     }
 
     public function testGetSceneApi(): void
