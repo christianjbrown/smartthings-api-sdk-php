@@ -80,6 +80,9 @@ use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppTransformer;
+use ChristianBrown\SmartThings\Transformer\LocaleReferencesTransformer;
+use ChristianBrown\SmartThings\Transformer\LocaleReferenceTransformer;
+use ChristianBrown\SmartThings\Transformer\LocalizationTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
@@ -183,6 +186,9 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DeviceTransformer::class)]
 #[UsesClass(InstalledAppConfigsTransformer::class)]
 #[UsesClass(InstalledAppConfigTransformer::class)]
+#[UsesClass(LocaleReferencesTransformer::class)]
+#[UsesClass(LocaleReferenceTransformer::class)]
+#[UsesClass(LocalizationTransformer::class)]
 #[UsesClass(InstalledAppsTransformer::class)]
 #[UsesClass(InstalledAppTransformer::class)]
 #[UsesClass(LocationsTransformer::class)]

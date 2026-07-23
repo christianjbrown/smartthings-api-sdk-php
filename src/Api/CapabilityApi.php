@@ -10,10 +10,14 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilityInterface;
 use ChristianBrown\SmartThings\Model\CapabilityNamespaceInterface;
 use ChristianBrown\SmartThings\Model\CapabilityPresentationInterface;
+use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
+use ChristianBrown\SmartThings\Model\LocalizationInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\LocaleReferencesTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\LocalizationTransformerInterface;
 
 use function is_array;
 use function rawurlencode;
@@ -34,6 +38,13 @@ final class CapabilityApi implements CapabilityApiInterface
      * @var ?array<int, CapabilityInterface>
      */
     private ?array $listCache = null;
+    private LocaleReferencesTransformerInterface $localeReferencesTransformer;
+
+    /**
+     * @var array<string, array<int, LocaleReferenceInterface>>
+     */
+    private array $localesCache = [];
+    private LocalizationTransformerInterface $localizationTransformer;
 
     /**
      * @var array<string, array<int, CapabilityInterface>>
@@ -53,18 +64,58 @@ final class CapabilityApi implements CapabilityApiInterface
     private TokenInterface $token;
 
     /**
+     * @var array<string, LocalizationInterface>
+     */
+    private array $translationsCache = [];
+
+    /**
      * @var array<string, array<int, CapabilityInterface>>
      */
     private array $versionsCache = [];
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, CapabilityTransformerInterface $capabilityTransformer, CapabilitiesTransformerInterface $capabilitiesTransformer, CapabilityNamespacesTransformerInterface $capabilityNamespacesTransformer, CapabilityPresentationTransformerInterface $capabilityPresentationTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, CapabilityTransformerInterface $capabilityTransformer, CapabilitiesTransformerInterface $capabilitiesTransformer, CapabilityNamespacesTransformerInterface $capabilityNamespacesTransformer, CapabilityPresentationTransformerInterface $capabilityPresentationTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token)
     {
         $this->requestSender = $requestSender;
         $this->capabilityTransformer = $capabilityTransformer;
         $this->capabilitiesTransformer = $capabilitiesTransformer;
         $this->capabilityNamespacesTransformer = $capabilityNamespacesTransformer;
         $this->capabilityPresentationTransformer = $capabilityPresentationTransformer;
+        $this->localeReferencesTransformer = $localeReferencesTransformer;
+        $this->localizationTransformer = $localizationTransformer;
         $this->token = $token;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     *
+     * @return array<int, LocaleReferenceInterface>
+     */
+    public function getLocales(string $capabilityId, int $version, bool $skipCache = false): array
+    {
+        $cacheKey = sprintf(self::CACHE_KEY_SPRINTF, $capabilityId, $version);
+        if (!$skipCache) {
+            if (isset($this->localesCache[$cacheKey])) {
+                return $this->localesCache[$cacheKey];
+            }
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_LOCALES_SPRINTF, rawurlencode($capabilityId), $version);
+        $data = $this->requestSender->get($url, [], $headers);
+
+        if (empty($data[self::KEY_ITEMS])) {
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
+        }
+        if (!is_array($data[self::KEY_ITEMS])) {
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
+        }
+        $locales = $this->localeReferencesTransformer->transform($data[self::KEY_ITEMS]);
+        $this->localesCache[$cacheKey] = $locales;
+
+        return $locales;
     }
 
     /**
@@ -192,6 +243,34 @@ final class CapabilityApi implements CapabilityApiInterface
         $this->presentationCache[$cacheKey] = $presentation;
 
         return $presentation;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function getTranslations(string $capabilityId, int $version, string $tag, bool $skipCache = false): LocalizationInterface
+    {
+        $cacheKey = sprintf(self::TRANSLATIONS_CACHE_KEY_SPRINTF, $capabilityId, $version, $tag);
+        if (!$skipCache) {
+            if (isset($this->translationsCache[$cacheKey])) {
+                return $this->translationsCache[$cacheKey];
+            }
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_TRANSLATIONS_SPRINTF, rawurlencode($capabilityId), $version, rawurlencode($tag));
+        $data = $this->requestSender->get($url, [], $headers);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $localization = $this->localizationTransformer->transform($data);
+        $this->translationsCache[$cacheKey] = $localization;
+
+        return $localization;
     }
 
     /**

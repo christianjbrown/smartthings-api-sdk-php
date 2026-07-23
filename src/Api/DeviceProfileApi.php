@@ -8,8 +8,12 @@ use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceProfileInterface;
+use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
+use ChristianBrown\SmartThings\Model\LocalizationInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceProfilesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\LocaleReferencesTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\LocalizationTransformerInterface;
 
 use function is_array;
 use function rawurlencode;
@@ -28,15 +32,61 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
      * @var ?array<int, DeviceProfileInterface>
      */
     private ?array $listCache = null;
+    private LocaleReferencesTransformerInterface $localeReferencesTransformer;
+
+    /**
+     * @var array<string, array<int, LocaleReferenceInterface>>
+     */
+    private array $localesCache = [];
+    private LocalizationTransformerInterface $localizationTransformer;
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceProfileTransformerInterface $deviceProfileTransformer, DeviceProfilesTransformerInterface $deviceProfilesTransformer, TokenInterface $token)
+    /**
+     * @var array<string, LocalizationInterface>
+     */
+    private array $translationsCache = [];
+
+    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceProfileTransformerInterface $deviceProfileTransformer, DeviceProfilesTransformerInterface $deviceProfilesTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token)
     {
         $this->requestSender = $requestSender;
         $this->deviceProfileTransformer = $deviceProfileTransformer;
         $this->deviceProfilesTransformer = $deviceProfilesTransformer;
+        $this->localeReferencesTransformer = $localeReferencesTransformer;
+        $this->localizationTransformer = $localizationTransformer;
         $this->token = $token;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     *
+     * @return array<int, LocaleReferenceInterface>
+     */
+    public function getLocales(string $deviceProfileId, bool $skipCache = false): array
+    {
+        if (!$skipCache) {
+            if (isset($this->localesCache[$deviceProfileId])) {
+                return $this->localesCache[$deviceProfileId];
+            }
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_LOCALES_SPRINTF, rawurlencode($deviceProfileId));
+        $data = $this->requestSender->get($url, [], $headers);
+
+        if (empty($data[self::KEY_ITEMS])) {
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
+        }
+        if (!is_array($data[self::KEY_ITEMS])) {
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
+        }
+        $locales = $this->localeReferencesTransformer->transform($data[self::KEY_ITEMS]);
+        $this->localesCache[$deviceProfileId] = $locales;
+
+        return $locales;
     }
 
     /**
@@ -95,5 +145,33 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
         $this->cache[$deviceProfileId] = $profile;
 
         return $profile;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function getTranslations(string $deviceProfileId, string $tag, bool $skipCache = false): LocalizationInterface
+    {
+        $cacheKey = sprintf(self::CACHE_KEY_SPRINTF, $deviceProfileId, $tag);
+        if (!$skipCache) {
+            if (isset($this->translationsCache[$cacheKey])) {
+                return $this->translationsCache[$cacheKey];
+            }
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_TRANSLATIONS_SPRINTF, rawurlencode($deviceProfileId), rawurlencode($tag));
+        $data = $this->requestSender->get($url, [], $headers);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $localization = $this->localizationTransformer->transform($data);
+        $this->translationsCache[$cacheKey] = $localization;
+
+        return $localization;
     }
 }

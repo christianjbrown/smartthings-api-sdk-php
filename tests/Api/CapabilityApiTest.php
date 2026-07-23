@@ -15,10 +15,14 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilityInterface;
 use ChristianBrown\SmartThings\Model\CapabilityNamespaceInterface;
 use ChristianBrown\SmartThings\Model\CapabilityPresentationInterface;
+use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
+use ChristianBrown\SmartThings\Model\LocalizationInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\LocaleReferencesTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\LocalizationTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\Exception;
@@ -32,6 +36,103 @@ use function sprintf;
 #[CoversClass(Token::class)]
 final class CapabilityApiTest extends TestCase
 {
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetLocales(): void
+    {
+        $data = [
+            CapabilityApiInterface::KEY_ITEMS => ['test-item-1', 'test-item-2'],
+        ];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')
+            ->with(
+                sprintf(CapabilityApiInterface::API_URL_LOCALES_SPRINTF, 'switch', 1),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $locales = [self::createStub(LocaleReferenceInterface::class)];
+
+        $localeReferencesTransformer = self::createMock(LocaleReferencesTransformerInterface::class);
+        $localeReferencesTransformer->expects(self::once())->method('transform')
+            ->with($data[CapabilityApiInterface::KEY_ITEMS])
+            ->willReturn($locales);
+
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+
+        self::assertSame($locales, $capabilityApi->getLocales('switch', 1));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetLocalesCaches(): void
+    {
+        $locales = [self::createStub(LocaleReferenceInterface::class)];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')->willReturn([CapabilityApiInterface::KEY_ITEMS => ['test-item-1']]);
+
+        $localeReferencesTransformer = self::createMock(LocaleReferencesTransformerInterface::class);
+        $localeReferencesTransformer->expects(self::once())->method('transform')->willReturn($locales);
+
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+
+        // Second call for the same id and version is served from the cache without hitting the API.
+        self::assertSame($locales, $capabilityApi->getLocales('switch', 1));
+        self::assertSame($locales, $capabilityApi->getLocales('switch', 1));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetLocalesSkipsCache(): void
+    {
+        $locales = [self::createStub(LocaleReferenceInterface::class)];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')->willReturn([CapabilityApiInterface::KEY_ITEMS => ['test-item-1']]);
+
+        $localeReferencesTransformer = self::createMock(LocaleReferencesTransformerInterface::class);
+        $localeReferencesTransformer->expects(self::exactly(2))->method('transform')->willReturn($locales);
+
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+
+        // First call populates the cache; the second bypasses it and hits the API again.
+        self::assertSame($locales, $capabilityApi->getLocales('switch', 1));
+        self::assertSame($locales, $capabilityApi->getLocales('switch', 1, true));
+    }
+
+    /**
+     * @param mixed[] $data
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    #[TestWith([['test-items-key-missing'], false])]
+    #[TestWith([[CapabilityApiInterface::KEY_ITEMS => 'test-not-array'], false])]
+    #[TestWith([['test-items-key-missing'], true])]
+    #[TestWith([[CapabilityApiInterface::KEY_ITEMS => 'test-not-array'], true])]
+    public function testGetLocalesUnexpectedResponse(array $data, bool $skipCache): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')->willReturn($data);
+
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(sprintf(CapabilityApiInterface::UNEXPECTED_RESPONSE_SPRINTF, CapabilityApiInterface::KEY_ITEMS));
+        $capabilityApi->getLocales('switch', 1, $skipCache);
+    }
+
     /**
      * @throws RequestExceptionInterface
      * @throws Exception
@@ -62,7 +163,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data[CapabilityApiInterface::KEY_ITEMS])
             ->willReturn($capabilities);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
         $actual = $capabilityApi->getMultiple();
 
         self::assertSame($capabilities, $actual);
@@ -98,7 +199,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data[CapabilityApiInterface::KEY_ITEMS])
             ->willReturn($capabilities);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
         $actual = $capabilityApi->getMultipleByNamespace('test-namespace');
 
         self::assertSame($capabilities, $actual);
@@ -129,7 +230,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data[CapabilityApiInterface::KEY_ITEMS])
             ->willReturn($capabilities);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         // Second call for the same namespace is served from the cache without hitting the API.
         self::assertSame($capabilities, $capabilityApi->getMultipleByNamespace('test-namespace'));
@@ -168,7 +269,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data[CapabilityApiInterface::KEY_ITEMS])
             ->willReturn($capabilities);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
         $actual = $capabilityApi->getMultipleByNamespace($namespace);
 
         self::assertSame($capabilities, $actual);
@@ -198,7 +299,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data[CapabilityApiInterface::KEY_ITEMS])
             ->willReturn($capabilities);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($capabilities, $capabilityApi->getMultipleByNamespace('test-namespace'));
@@ -224,7 +325,7 @@ final class CapabilityApiTest extends TestCase
         $capabilityTransformer = self::createStub(CapabilityTransformerInterface::class);
         $capabilitiesTransformer = self::createStub(CapabilitiesTransformerInterface::class);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(CapabilityApiInterface::UNEXPECTED_RESPONSE_SPRINTF, CapabilityApiInterface::KEY_ITEMS));
@@ -256,7 +357,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data[CapabilityApiInterface::KEY_ITEMS])
             ->willReturn($capabilities);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         // Second call is served from the cache without hitting the API.
         self::assertSame($capabilities, $capabilityApi->getMultiple());
@@ -287,7 +388,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data[CapabilityApiInterface::KEY_ITEMS])
             ->willReturn($capabilities);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($capabilities, $capabilityApi->getMultiple());
@@ -320,7 +421,7 @@ final class CapabilityApiTest extends TestCase
         $capabilityTransformer = self::createStub(CapabilityTransformerInterface::class);
         $capabilitiesTransformer = self::createStub(CapabilitiesTransformerInterface::class);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(CapabilityApiInterface::UNEXPECTED_RESPONSE_SPRINTF, CapabilityApiInterface::KEY_ITEMS));
@@ -353,7 +454,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data)
             ->willReturn($namespaces);
 
-        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), $namespacesTransformer, self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), $namespacesTransformer, self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
         $actual = $capabilityApi->getNamespaces();
 
         self::assertSame($namespaces, $actual);
@@ -380,7 +481,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data)
             ->willReturn($namespaces);
 
-        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), $namespacesTransformer, self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), $namespacesTransformer, self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         // Second call is served from the cache without hitting the API.
         self::assertSame($namespaces, $capabilityApi->getNamespaces());
@@ -407,7 +508,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data)
             ->willReturn($namespaces);
 
-        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), $namespacesTransformer, self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), $namespacesTransformer, self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($namespaces, $capabilityApi->getNamespaces());
@@ -426,7 +527,7 @@ final class CapabilityApiTest extends TestCase
         $requestSender->expects(self::once())->method('get')
             ->willReturn([]);
 
-        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(CapabilityApiInterface::UNEXPECTED_RESPONSE);
@@ -461,7 +562,7 @@ final class CapabilityApiTest extends TestCase
 
         $capabilitiesTransformer = self::createStub(CapabilitiesTransformerInterface::class);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
         $actual = $capabilityApi->getOneByIdAndVersion('test-capability-id', 1);
 
         self::assertSame($capability, $actual);
@@ -490,7 +591,7 @@ final class CapabilityApiTest extends TestCase
 
         $capabilitiesTransformer = self::createStub(CapabilitiesTransformerInterface::class);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         // Second call for the same id/version is served from the cache without hitting the API.
         self::assertSame($capability, $capabilityApi->getOneByIdAndVersion('test-capability-id', 1));
@@ -527,7 +628,7 @@ final class CapabilityApiTest extends TestCase
 
         $capabilitiesTransformer = self::createStub(CapabilitiesTransformerInterface::class);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
         $actual = $capabilityApi->getOneByIdAndVersion($capabilityId, $version);
 
         self::assertSame($capability, $actual);
@@ -555,7 +656,7 @@ final class CapabilityApiTest extends TestCase
 
         $capabilitiesTransformer = self::createStub(CapabilitiesTransformerInterface::class);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($capability, $capabilityApi->getOneByIdAndVersion('test-capability-id', 1));
@@ -584,7 +685,7 @@ final class CapabilityApiTest extends TestCase
         $capabilityTransformer = self::createStub(CapabilityTransformerInterface::class);
         $capabilitiesTransformer = self::createStub(CapabilitiesTransformerInterface::class);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(CapabilityApiInterface::UNEXPECTED_RESPONSE);
@@ -617,7 +718,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data)
             ->willReturn($presentation);
 
-        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), $presentationTransformer, new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), $presentationTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
         $actual = $capabilityApi->getPresentation('switch', 1);
 
         self::assertSame($presentation, $actual);
@@ -644,7 +745,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data)
             ->willReturn($presentation);
 
-        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), $presentationTransformer, new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), $presentationTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         // Second call for the same id and version is served from the cache without hitting the API.
         self::assertSame($presentation, $capabilityApi->getPresentation('switch', 1));
@@ -679,7 +780,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data)
             ->willReturn($presentation);
 
-        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), $presentationTransformer, new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), $presentationTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
         $actual = $capabilityApi->getPresentation($capabilityId, 1);
 
         self::assertSame($presentation, $actual);
@@ -705,7 +806,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data)
             ->willReturn($presentation);
 
-        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), $presentationTransformer, new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), $presentationTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($presentation, $capabilityApi->getPresentation('switch', 1));
@@ -724,11 +825,100 @@ final class CapabilityApiTest extends TestCase
         $requestSender->expects(self::once())->method('get')
             ->willReturn([]);
 
-        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(CapabilityApiInterface::UNEXPECTED_RESPONSE);
         $capabilityApi->getPresentation('switch', 1, $skipCache);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetTranslations(): void
+    {
+        $data = ['test-localization-data'];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')
+            ->with(
+                sprintf(CapabilityApiInterface::API_URL_TRANSLATIONS_SPRINTF, 'switch', 1, 'ko'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $localization = self::createStub(LocalizationInterface::class);
+
+        $localizationTransformer = self::createMock(LocalizationTransformerInterface::class);
+        $localizationTransformer->expects(self::once())->method('transform')->with($data)->willReturn($localization);
+
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'));
+
+        self::assertSame($localization, $capabilityApi->getTranslations('switch', 1, 'ko'));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetTranslationsCaches(): void
+    {
+        $localization = self::createStub(LocalizationInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')->willReturn(['test-localization-data']);
+
+        $localizationTransformer = self::createMock(LocalizationTransformerInterface::class);
+        $localizationTransformer->expects(self::once())->method('transform')->willReturn($localization);
+
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'));
+
+        // Second call for the same id, version and tag is served from the cache without hitting the API.
+        self::assertSame($localization, $capabilityApi->getTranslations('switch', 1, 'ko'));
+        self::assertSame($localization, $capabilityApi->getTranslations('switch', 1, 'ko'));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetTranslationsSkipsCache(): void
+    {
+        $localization = self::createStub(LocalizationInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')->willReturn(['test-localization-data']);
+
+        $localizationTransformer = self::createMock(LocalizationTransformerInterface::class);
+        $localizationTransformer->expects(self::exactly(2))->method('transform')->willReturn($localization);
+
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'));
+
+        // First call populates the cache; the second bypasses it and hits the API again.
+        self::assertSame($localization, $capabilityApi->getTranslations('switch', 1, 'ko'));
+        self::assertSame($localization, $capabilityApi->getTranslations('switch', 1, 'ko', true));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testGetTranslationsUnexpectedResponse(bool $skipCache): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')->willReturn([]);
+
+        $capabilityApi = new CapabilityApi($requestSender, self::createStub(CapabilityTransformerInterface::class), self::createStub(CapabilitiesTransformerInterface::class), self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(CapabilityApiInterface::UNEXPECTED_RESPONSE);
+        $capabilityApi->getTranslations('switch', 1, 'ko', $skipCache);
     }
 
     /**
@@ -761,7 +951,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data[CapabilityApiInterface::KEY_ITEMS])
             ->willReturn($capabilities);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
         $actual = $capabilityApi->getVersions('test-capability-id');
 
         self::assertSame($capabilities, $actual);
@@ -792,7 +982,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data[CapabilityApiInterface::KEY_ITEMS])
             ->willReturn($capabilities);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         // Second call for the same capability id is served from the cache without hitting the API.
         self::assertSame($capabilities, $capabilityApi->getVersions('test-capability-id'));
@@ -831,7 +1021,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data[CapabilityApiInterface::KEY_ITEMS])
             ->willReturn($capabilities);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
         $actual = $capabilityApi->getVersions($capabilityId);
 
         self::assertSame($capabilities, $actual);
@@ -861,7 +1051,7 @@ final class CapabilityApiTest extends TestCase
             ->with($data[CapabilityApiInterface::KEY_ITEMS])
             ->willReturn($capabilities);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($capabilities, $capabilityApi->getVersions('test-capability-id'));
@@ -887,7 +1077,7 @@ final class CapabilityApiTest extends TestCase
         $capabilityTransformer = self::createStub(CapabilityTransformerInterface::class);
         $capabilitiesTransformer = self::createStub(CapabilitiesTransformerInterface::class);
 
-        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), new Token('test-api-token'));
+        $capabilityApi = new CapabilityApi($requestSender, $capabilityTransformer, $capabilitiesTransformer, self::createStub(CapabilityNamespacesTransformerInterface::class), self::createStub(CapabilityPresentationTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(CapabilityApiInterface::UNEXPECTED_RESPONSE_SPRINTF, CapabilityApiInterface::KEY_ITEMS));

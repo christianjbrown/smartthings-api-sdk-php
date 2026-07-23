@@ -107,6 +107,9 @@ use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppTransformer;
+use ChristianBrown\SmartThings\Transformer\LocaleReferencesTransformer;
+use ChristianBrown\SmartThings\Transformer\LocaleReferenceTransformer;
+use ChristianBrown\SmartThings\Transformer\LocalizationTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
@@ -520,6 +523,7 @@ final class SmartThings implements SmartThingsInterface
         $this->registerDriverTransformers();
         $this->registerHubTransformers();
         $this->registerInstalledAppTransformers();
+        $this->registerI18nTransformers();
         $this->registerLocationTransformers();
         $this->registerModeTransformers();
         $this->registerOrganizationTransformers();
@@ -554,6 +558,8 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_CAPABILITIES_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_CAPABILITY_NAMESPACES_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_CAPABILITY_PRESENTATION_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_LOCALE_REFERENCES_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_LOCALIZATION_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -599,6 +605,8 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_DEVICE_PREFERENCE_DEFINITION_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_DEVICE_PREFERENCE_DEFINITIONS_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_LOCALE_REFERENCES_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_LOCALIZATION_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -616,6 +624,8 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_JSON_API_REQUEST_SENDER),
                     $this->container->getDefinition(self::SERVICE_DEVICE_PROFILE_TRANSFORMER),
                     $this->container->getDefinition(self::SERVICE_DEVICE_PROFILES_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_LOCALE_REFERENCES_TRANSFORMER),
+                    $this->container->getDefinition(self::SERVICE_LOCALIZATION_TRANSFORMER),
                     $this->token,
                 ]
             );
@@ -975,6 +985,18 @@ final class SmartThings implements SmartThingsInterface
                     $this->container->getDefinition(self::SERVICE_HUB_ENROLLED_CHANNEL_TRANSFORMER),
                 ]
             );
+    }
+
+    private function registerI18nTransformers(): void
+    {
+        $this->container->register(self::SERVICE_LOCALE_REFERENCE_TRANSFORMER, LocaleReferenceTransformer::class);
+        $this->container->register(self::SERVICE_LOCALE_REFERENCES_TRANSFORMER, LocaleReferencesTransformer::class)
+            ->setArguments(
+                [
+                    $this->container->getDefinition(self::SERVICE_LOCALE_REFERENCE_TRANSFORMER),
+                ]
+            );
+        $this->container->register(self::SERVICE_LOCALIZATION_TRANSFORMER, LocalizationTransformer::class);
     }
 
     private function registerInstalledAppTransformers(): void

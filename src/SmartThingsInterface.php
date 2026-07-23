@@ -96,6 +96,9 @@ interface SmartThingsInterface
     public const string SERVICE_INSTALLED_SCHEMA_APP_TRANSFORMER = 'smartthings.transformer.installed_schema_app_transformer';
     public const string SERVICE_INSTALLED_SCHEMA_APPS_TRANSFORMER = 'smartthings.transformer.installed_schema_apps_transformer';
     public const string SERVICE_JSON_API_REQUEST_SENDER = 'smartthings.json_api_request_sender';
+    public const string SERVICE_LOCALE_REFERENCE_TRANSFORMER = 'smartthings.transformer.locale_reference_transformer';
+    public const string SERVICE_LOCALE_REFERENCES_TRANSFORMER = 'smartthings.transformer.locale_references_transformer';
+    public const string SERVICE_LOCALIZATION_TRANSFORMER = 'smartthings.transformer.localization_transformer';
     public const string SERVICE_LOCATION_API = 'smartthings.api.location_api';
     public const string SERVICE_LOCATION_MODE_API = 'smartthings.api.location_mode_api';
     public const string SERVICE_LOCATION_ROOM_API = 'smartthings.api.location_room_api';
