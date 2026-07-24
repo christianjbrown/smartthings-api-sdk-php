@@ -1,6 +1,6 @@
-# SmartThings API Client
+# SmartThings API SDK
 
-[![CI](https://github.com/christianjbrown/php-smartthings-api-lib/actions/workflows/ci.yml/badge.svg)](https://github.com/christianjbrown/php-smartthings-api-lib/actions/workflows/ci.yml)
+[![CI](https://github.com/christianjbrown/smartthings-api-sdk-php/actions/workflows/ci.yml/badge.svg)](https://github.com/christianjbrown/smartthings-api-sdk-php/actions/workflows/ci.yml)
 
 A strongly-typed PHP client for the [SmartThings API](https://developer.smartthings.com/). It lists the devices in your SmartThings account and reads a device's status, returning plain, typed model objects rather than raw arrays.
 
@@ -80,7 +80,7 @@ The client is **read-only** and currently supports:
 For your composer-enabled project:
 
 ```bash
-composer require christianjbrown/php-smartthings-api-lib
+composer require christianjbrown/smartthings-api-sdk
 ```
 
 
@@ -195,9 +195,9 @@ There are two concrete types:
 - **`UnexpectedResponseException`** (extends `RuntimeException`) — the SmartThings API returned a body the client or a transformer couldn't parse (a missing/mis-typed field, an empty response).
 - **`MissingInputException`** (extends `InvalidArgumentException`) — bad caller input, e.g. passing a `DeviceInterface` with no location or room id to `LocationRoomApi::getOneByDevice()`.
 
-Both live in `src/Exception/`. Request-level failures (network errors, non-2xx responses) still surface as `RequestExceptionInterface` from [`christianjbrown/php-api-client-lib`](https://github.com/christianjbrown/php-api-client-lib), which is outside this library's exception hierarchy.
+Both live in `src/Exception/`. Request-level failures (network errors, non-2xx responses) still surface as `RequestExceptionInterface` from [`christianjbrown/api-client`](https://github.com/christianjbrown/api-client-php), which is outside this library's exception hierarchy.
 
-Under the hood, `SmartThings` wires the clients and their transformer chains through a [Symfony dependency-injection](https://symfony.com/doc/current/components/dependency_injection.html) container. If you don't want the container, you can build the same chains by hand — as shown below. The HTTP request sender comes from [`christianjbrown/php-api-client-lib`](https://github.com/christianjbrown/php-api-client-lib).
+Under the hood, `SmartThings` wires the clients and their transformer chains through a [Symfony dependency-injection](https://symfony.com/doc/current/components/dependency_injection.html) container. If you don't want the container, you can build the same chains by hand — as shown below. The HTTP request sender comes from [`christianjbrown/api-client`](https://github.com/christianjbrown/api-client-php).
 
 <details id="wiring-the-clients">
 <summary><strong>Wiring the clients</strong></summary>

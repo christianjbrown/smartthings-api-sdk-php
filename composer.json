@@ -1,5 +1,5 @@
 {
-    "name": "christianjbrown/php-smartthings-api-lib",
+    "name": "christianjbrown/smartthings-api-sdk",
     "description": "A strongly-typed, read-only PHP 8.5+ client for the SmartThings API that returns typed model objects instead of raw arrays.",
     "type": "library",
     "license": "MIT",
@@ -17,12 +17,12 @@
     ],
     "require": {
         "php": "^8.5",
-        "christianjbrown/php-api-client-lib": "dev-main",
+        "christianjbrown/api-client": "dev-main",
         "psr/container": "^2.0",
         "symfony/dependency-injection": "^8.0"
     },
     "require-dev": {
-        "christianjbrown/php-code-quality-scripts": "dev-main",
+        "christianjbrown/code-quality-scripts": "dev-main",
         "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^13.0"
     },
@@ -65,11 +65,11 @@
     "repositories": [
         {
             "type": "github",
-            "url": "git@github.com:christianjbrown/php-api-client-lib.git"
+            "url": "git@github.com:christianjbrown/api-client-php.git"
         },
         {
             "type": "github",
-            "url": "git@github.com:christianjbrown/php-code-quality-scripts.git"
+            "url": "git@github.com:christianjbrown/code-quality-scripts-php.git"
         }
     ]
 }

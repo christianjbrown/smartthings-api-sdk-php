@@ -28,7 +28,7 @@ gitignored and Composer-installed, so run `composer install` first.
 
 After adding autoloadable files, run `composer dump-autoload` if the class isn't found.
 
-Style tooling comes from the `christianjbrown/php-code-quality-scripts` dev dependency: `check-style`
+Style tooling comes from the `christianjbrown/code-quality-scripts` dev dependency: `check-style`
 lints with **PHP_CodeSniffer 4** using the **`ChristianBrown` standard** (slevomat sniffs plus
 PSR/PEAR/Squiz/Generic), and **php-cs-fixer** (`@PhpCsFixer`/`@Symfony`) handles formatting; the
 `bin/php-cs*` scripts are thin wrappers over it.
@@ -49,7 +49,7 @@ Three layers under `src/`, mirrored 1:1 under `tests/`, plus the top-level `Smar
   as a service (ids on `SmartThingsInterface` as `SERVICE_*` constants), and exposes `getDeviceApi()`,
   `getDeviceStatusApi()`, `getLocationApi()`, and `getLocationRoomApi()`.
 - **`Api/`** — HTTP clients (`DeviceApi`, `DeviceStatusApi`, `LocationApi`, `LocationRoomApi`). Each is
-  constructed with a `JsonApiRequestSenderInterface` (from `christianjbrown/php-api-client-lib` — no
+  constructed with a `JsonApiRequestSenderInterface` (from `christianjbrown/api-client` — no
   Guzzle/PSR-18 used directly), its transformer(s), and a `string $apiToken`. They send an
   `Authorization: Bearer <token>` header, defensively validate the response shape, delegate to the
   transformer, and return a typed model. List endpoints validate the `items`/`components` wrapper key;
@@ -113,7 +113,7 @@ Three layers under `src/`, mirrored 1:1 under `tests/`, plus the top-level `Smar
   docblocks naming the concrete exception(s).
 - **A method that does not use `$this` must be `static`** (called via `self::`) — a stateless helper
   is static. Enforced for private methods by the shared `RequireStaticPrivateMethodRule` PHPStan rule
-  (via `php-code-quality-scripts`' `config/phpstan.neon`); interface/override methods stay instance.
+  (via `code-quality-scripts`' `config/phpstan.neon`); interface/override methods stay instance.
 
 ## Testing
 
