@@ -61,9 +61,12 @@ final class ApiClientRegistrarTest extends TestCase
         $container->register(SmartThingsInterface::SERVICE_LOCALE_REFERENCES_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_LOCALIZATION_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_LOCATIONS_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_LOCATION_CREATE_REQUEST_SERIALIZER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_LOCATION_PATCH_REQUEST_SERIALIZER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_LOCATION_ROOMS_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_LOCATION_ROOM_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_LOCATION_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_LOCATION_UPDATE_REQUEST_SERIALIZER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_MODES_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_MODE_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_ORGANIZATIONS_TRANSFORMER, stdClass::class);

@@ -187,6 +187,9 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_LOCATION_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_LOCATIONS_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_LOCATION_CREATE_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_LOCATION_UPDATE_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_LOCATION_PATCH_REQUEST_SERIALIZER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_LOCATION_MODE_API, LocationModeApi::class)

@@ -20,8 +20,11 @@ final class LocationRegistrarTest extends TestCase
         (new LocationRegistrar())->register($container);
 
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_LOCATIONS_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_LOCATION_CREATE_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_LOCATION_PATCH_REQUEST_SERIALIZER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_LOCATION_ROOMS_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_LOCATION_ROOM_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_LOCATION_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_LOCATION_UPDATE_REQUEST_SERIALIZER));
     }
 }
