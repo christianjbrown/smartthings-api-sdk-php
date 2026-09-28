@@ -4,16 +4,24 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Api;
 
+use ChristianBrown\SmartThings\Model\SceneExecutionResultInterface;
 use ChristianBrown\SmartThings\Model\SceneInterface;
 
 interface SceneApiInterface extends ApiInterface
 {
     public const string API_URL = 'https://api.smartthings.com/v1/scenes';
+    public const string API_URL_EXECUTE_SPRINTF = 'https://api.smartthings.com/v1/scenes/%s/execute';
     public const string API_URL_SPRINTF = 'https://api.smartthings.com/v1/scenes/%s';
     public const string KEY_ITEMS = 'items';
     public const string KEY_LOCATION_ID = 'locationId';
     public const string UNEXPECTED_RESPONSE = 'Response not set or not an array';
     public const string UNEXPECTED_RESPONSE_SPRINTF = '%s not set or not an array';
+
+    /**
+     * Executes a scene, running each action it defines. This does not cache: every
+     * call re-triggers the scene's side effects.
+     */
+    public function execute(string $sceneId): SceneExecutionResultInterface;
 
     /**
      * @return array<int, SceneInterface>

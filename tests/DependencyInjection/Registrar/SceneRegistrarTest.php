@@ -20,6 +20,7 @@ final class SceneRegistrarTest extends TestCase
         (new SceneRegistrar())->register($container);
 
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCENES_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCENE_EXECUTION_RESULT_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCENE_TRANSFORMER));
     }
 }

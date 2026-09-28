@@ -92,6 +92,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_RULE_TRANSFORMER = 'smartthings.transformer.rule_transformer';
     public const string SERVICE_RULES_TRANSFORMER = 'smartthings.transformer.rules_transformer';
     public const string SERVICE_SCENE_API = 'smartthings.api.scene_api';
+    public const string SERVICE_SCENE_EXECUTION_RESULT_TRANSFORMER = 'smartthings.transformer.scene_execution_result_transformer';
     public const string SERVICE_SCENE_TRANSFORMER = 'smartthings.transformer.scene_transformer';
     public const string SERVICE_SCENES_TRANSFORMER = 'smartthings.transformer.scenes_transformer';
     public const string SERVICE_SCHEDULE_API = 'smartthings.api.schedule_api';
