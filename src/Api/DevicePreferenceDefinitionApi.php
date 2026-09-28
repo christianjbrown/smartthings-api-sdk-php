@@ -10,6 +10,9 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DevicePreferenceDefinitionInterface;
 use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
 use ChristianBrown\SmartThings\Model\LocalizationInterface;
+use ChristianBrown\SmartThings\Model\PreferenceRequestInterface;
+use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\LocaleReferencesTransformerInterface;
@@ -39,6 +42,7 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
      */
     private array $localesCache = [];
     private LocalizationTransformerInterface $localizationTransformer;
+    private ?PreferenceRequestSerializerInterface $preferenceRequestSerializer;
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
@@ -47,7 +51,7 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
      */
     private array $translationsCache = [];
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DevicePreferenceDefinitionTransformerInterface $devicePreferenceDefinitionTransformer, DevicePreferenceDefinitionsTransformerInterface $devicePreferenceDefinitionsTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, DevicePreferenceDefinitionTransformerInterface $devicePreferenceDefinitionTransformer, DevicePreferenceDefinitionsTransformerInterface $devicePreferenceDefinitionsTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token, ?PreferenceRequestSerializerInterface $preferenceRequestSerializer = null)
     {
         $this->requestSender = $requestSender;
         $this->devicePreferenceDefinitionTransformer = $devicePreferenceDefinitionTransformer;
@@ -55,6 +59,44 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
         $this->localeReferencesTransformer = $localeReferencesTransformer;
         $this->localizationTransformer = $localizationTransformer;
         $this->token = $token;
+        $this->preferenceRequestSerializer = $preferenceRequestSerializer;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function createPreference(PreferenceRequestInterface $request): DevicePreferenceDefinitionInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $body = $this->resolvePreferenceRequestSerializer()->serialize($request);
+        $data = $this->requestSender->post(self::API_URL, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $definition = $this->devicePreferenceDefinitionTransformer->transform($data);
+        $this->listCache = [];
+
+        return $definition;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deletePreferenceById(string $preferenceId): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($preferenceId));
+        $this->requestSender->delete($url, [], $headers);
+        unset($this->cache[$preferenceId]);
+        $this->listCache = [];
     }
 
     /**
@@ -187,6 +229,31 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
     }
 
     /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function updatePreferenceById(string $preferenceId, PreferenceRequestInterface $request): DevicePreferenceDefinitionInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($preferenceId));
+        $body = $this->resolvePreferenceRequestSerializer()->serialize($request);
+        $data = $this->requestSender->put($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $definition = $this->devicePreferenceDefinitionTransformer->transform($data);
+        $this->cache[$preferenceId] = $definition;
+        $this->listCache = [];
+
+        return $definition;
+    }
+
+    /**
      * @return array<string, string>
      */
     private static function buildQuery(?string $namespace): array
@@ -198,5 +265,14 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
         }
 
         return [self::KEY_NAMESPACE => $namespace];
+    }
+
+    /**
+     * Falls back to the default serializer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolvePreferenceRequestSerializer(): PreferenceRequestSerializerInterface
+    {
+        return $this->preferenceRequestSerializer ?? new PreferenceRequestSerializer();
     }
 }
