@@ -51,6 +51,32 @@ final class LocationModeApi implements LocationModeApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
+    public function changeCurrent(LocationInterface $location, string $modeId): ModeInterface
+    {
+        $locationId = $location->getLocationId();
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_CURRENT_SPRINTF, rawurlencode($locationId));
+        $body = [self::KEY_MODE_ID => $modeId];
+        $data = $this->requestSender->put($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $mode = $this->modeTransformer->transform($data);
+        $this->currentCache[$locationId] = $mode;
+
+        return $mode;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
     public function getCurrent(LocationInterface $location, bool $skipCache = false): ModeInterface
     {
         $locationId = $location->getLocationId();

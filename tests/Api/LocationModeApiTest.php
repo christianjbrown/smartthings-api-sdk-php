@@ -32,6 +32,105 @@ final class LocationModeApiTest extends TestCase
      * @throws RequestExceptionInterface
      * @throws Exception
      */
+    public function testChangeCurrent(): void
+    {
+        $data = ['test-mode-data'];
+
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $mode = self::createStub(ModeInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(LocationModeApiInterface::API_URL_CURRENT_SPRINTF, 'test-location-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                [LocationModeApiInterface::KEY_MODE_ID => 'test-mode-id']
+            )
+            ->willReturn($data);
+
+        $modeTransformer = self::createMock(ModeTransformerInterface::class);
+        $modeTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($mode);
+
+        $modesTransformer = self::createStub(ModesTransformerInterface::class);
+
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $actual = $modeApi->changeCurrent($location, 'test-mode-id');
+
+        self::assertSame($mode, $actual);
+    }
+
+    /**
+     * changeCurrent() refreshes the current-mode cache, so a subsequent getCurrent()
+     * for the same location is served from it without hitting the API again.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testChangeCurrentPopulatesCurrentCache(): void
+    {
+        $data = ['test-mode-data'];
+
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $mode = self::createStub(ModeInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())
+            ->method('put')
+            ->willReturn($data);
+
+        $modeTransformer = self::createMock(ModeTransformerInterface::class);
+        $modeTransformer->expects(self::once())
+            ->method('transform')
+            ->with($data)
+            ->willReturn($mode);
+
+        $modesTransformer = self::createStub(ModesTransformerInterface::class);
+
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+
+        self::assertSame($mode, $modeApi->changeCurrent($location, 'test-mode-id'));
+        self::assertSame($mode, $modeApi->getCurrent($location));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testChangeCurrentUnexpectedResponse(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn([]);
+
+        $modeTransformer = self::createStub(ModeTransformerInterface::class);
+        $modesTransformer = self::createStub(ModesTransformerInterface::class);
+
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(LocationModeApiInterface::UNEXPECTED_RESPONSE);
+        $modeApi->changeCurrent($location, 'test-mode-id');
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
     public function testGetCurrent(): void
     {
         $data = ['test-mode-data'];
