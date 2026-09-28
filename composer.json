@@ -27,10 +27,6 @@
         "phpstan/phpstan-phpunit": "^2.0",
         "phpunit/phpunit": "^13.0"
     },
-    "conflict": {
-        "fidry/cpu-core-counter": "1.4.0",
-        "nikic/php-parser": "5.9.0"
-    },
     "autoload": {
         "psr-4": {
             "ChristianBrown\\SmartThings\\": "src/"
