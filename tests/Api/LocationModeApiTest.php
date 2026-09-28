@@ -131,6 +131,169 @@ final class LocationModeApiTest extends TestCase
      * @throws RequestExceptionInterface
      * @throws Exception
      */
+    public function testCreateMode(): void
+    {
+        $data = ['test-mode-data'];
+
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $mode = self::createStub(ModeInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                sprintf(LocationModeApiInterface::API_URL_LIST_SPRINTF, 'test-location-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                [LocationModeApiInterface::KEY_LABEL => 'test-mode-label']
+            )
+            ->willReturn($data);
+
+        $modeTransformer = self::createMock(ModeTransformerInterface::class);
+        $modeTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($mode);
+
+        $modesTransformer = self::createStub(ModesTransformerInterface::class);
+
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $actual = $modeApi->createMode($location, 'test-mode-label');
+
+        self::assertSame($mode, $actual);
+    }
+
+    /**
+     * createMode() invalidates the cached mode list for this location, so a subsequent
+     * getMultiple() call hits the API again instead of returning a stale list.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateModeInvalidatesListCache(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $mode = self::createStub(ModeInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn([LocationModeApiInterface::KEY_ITEMS => ['test-item']]);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['test-mode-data']);
+
+        $modeTransformer = self::createStub(ModeTransformerInterface::class);
+        $modeTransformer->method('transform')
+            ->willReturn($mode);
+
+        $modesTransformer = self::createStub(ModesTransformerInterface::class);
+        $modesTransformer->method('transform')
+            ->willReturn([$mode]);
+
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+
+        $modeApi->getMultiple($location);
+        $modeApi->createMode($location, 'test-mode-label');
+        $modeApi->getMultiple($location);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateModeUnexpectedResponse(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn([]);
+
+        $modeTransformer = self::createStub(ModeTransformerInterface::class);
+        $modesTransformer = self::createStub(ModesTransformerInterface::class);
+
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(LocationModeApiInterface::UNEXPECTED_RESPONSE);
+        $modeApi->createMode($location, 'test-mode-label');
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteMode(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(LocationModeApiInterface::API_URL_SPRINTF, 'test-location-id', 'test-mode-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $modeTransformer = self::createStub(ModeTransformerInterface::class);
+        $modesTransformer = self::createStub(ModesTransformerInterface::class);
+
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi->deleteMode($location, 'test-mode-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * deleteMode() invalidates both the cached copy of this mode and the cached mode
+     * list for this location, so subsequent lookups hit the API again.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteModeInvalidatesCaches(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $mode = self::createStub(ModeInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-mode-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $modeTransformer = self::createStub(ModeTransformerInterface::class);
+        $modeTransformer->method('transform')
+            ->willReturn($mode);
+
+        $modesTransformer = self::createStub(ModesTransformerInterface::class);
+
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+
+        $modeApi->getOneByLocationAndId($location, 'test-mode-id');
+        $modeApi->deleteMode($location, 'test-mode-id');
+        $modeApi->getOneByLocationAndId($location, 'test-mode-id');
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
     public function testGetCurrent(): void
     {
         $data = ['test-mode-data'];
@@ -582,5 +745,104 @@ final class LocationModeApiTest extends TestCase
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationModeApiInterface::UNEXPECTED_RESPONSE);
         $modeApi->getOneByLocationAndId($location, 'test-mode-id', $skipCache);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateMode(): void
+    {
+        $data = ['test-mode-data'];
+
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $mode = self::createStub(ModeInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(LocationModeApiInterface::API_URL_SPRINTF, 'test-location-id', 'test-mode-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                [LocationModeApiInterface::KEY_LABEL => 'test-mode-label']
+            )
+            ->willReturn($data);
+
+        $modeTransformer = self::createMock(ModeTransformerInterface::class);
+        $modeTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($mode);
+
+        $modesTransformer = self::createStub(ModesTransformerInterface::class);
+
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $actual = $modeApi->updateMode($location, 'test-mode-id', 'test-mode-label');
+
+        self::assertSame($mode, $actual);
+    }
+
+    /**
+     * updateMode() refreshes the cached copy of this mode, so a subsequent
+     * getOneByLocationAndId() for the same id is served from it.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateModePopulatesCache(): void
+    {
+        $data = ['test-mode-data'];
+
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $mode = self::createStub(ModeInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())
+            ->method('put')
+            ->willReturn($data);
+
+        $modeTransformer = self::createMock(ModeTransformerInterface::class);
+        $modeTransformer->expects(self::once())
+            ->method('transform')
+            ->with($data)
+            ->willReturn($mode);
+
+        $modesTransformer = self::createStub(ModesTransformerInterface::class);
+
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+
+        self::assertSame($mode, $modeApi->updateMode($location, 'test-mode-id', 'test-mode-label'));
+        self::assertSame($mode, $modeApi->getOneByLocationAndId($location, 'test-mode-id'));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateModeUnexpectedResponse(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn([]);
+
+        $modeTransformer = self::createStub(ModeTransformerInterface::class);
+        $modesTransformer = self::createStub(ModesTransformerInterface::class);
+
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(LocationModeApiInterface::UNEXPECTED_RESPONSE);
+        $modeApi->updateMode($location, 'test-mode-id', 'test-mode-label');
     }
 }

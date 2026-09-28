@@ -77,6 +77,47 @@ final class LocationModeApi implements LocationModeApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
+    public function createMode(LocationInterface $location, string $label): ModeInterface
+    {
+        $locationId = $location->getLocationId();
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_LIST_SPRINTF, rawurlencode($locationId));
+        $body = [self::KEY_LABEL => $label];
+        $data = $this->requestSender->post($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $mode = $this->modeTransformer->transform($data);
+        unset($this->listCache[$locationId]);
+
+        return $mode;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteMode(LocationInterface $location, string $modeId): void
+    {
+        $locationId = $location->getLocationId();
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($locationId), rawurlencode($modeId));
+        $this->requestSender->delete($url, [], $headers);
+        unset($this->cache[$modeId], $this->listCache[$locationId]);
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
     public function getCurrent(LocationInterface $location, bool $skipCache = false): ModeInterface
     {
         $locationId = $location->getLocationId();
@@ -161,6 +202,33 @@ final class LocationModeApi implements LocationModeApiInterface
         }
         $mode = $this->modeTransformer->transform($data);
         $this->cache[$modeId] = $mode;
+
+        return $mode;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function updateMode(LocationInterface $location, string $modeId, string $label): ModeInterface
+    {
+        $locationId = $location->getLocationId();
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($locationId), rawurlencode($modeId));
+        $body = [self::KEY_LABEL => $label];
+        $data = $this->requestSender->put($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $mode = $this->modeTransformer->transform($data);
+        $this->cache[$modeId] = $mode;
+        unset($this->listCache[$locationId]);
 
         return $mode;
     }
