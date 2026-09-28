@@ -19,6 +19,7 @@ final class ScheduleRegistrarTest extends TestCase
 
         (new ScheduleRegistrar())->register($container);
 
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEDULE_REQUEST_SERIALIZER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEDULES_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEDULE_TRANSFORMER));
     }

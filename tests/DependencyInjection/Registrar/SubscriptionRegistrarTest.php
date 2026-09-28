@@ -19,6 +19,7 @@ final class SubscriptionRegistrarTest extends TestCase
 
         (new SubscriptionRegistrar())->register($container);
 
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SUBSCRIPTION_REQUEST_SERIALIZER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SUBSCRIPTIONS_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SUBSCRIPTION_TRANSFORMER));
     }

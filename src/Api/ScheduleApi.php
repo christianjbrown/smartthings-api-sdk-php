@@ -8,6 +8,9 @@ use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ScheduleInterface;
+use ChristianBrown\SmartThings\Model\ScheduleRequestInterface;
+use ChristianBrown\SmartThings\Serializer\ScheduleRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\ScheduleRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\SchedulesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ScheduleTransformerInterface;
 
@@ -27,16 +30,69 @@ final class ScheduleApi implements ScheduleApiInterface
      */
     private array $listCache = [];
     private JsonApiRequestSenderInterface $requestSender;
+    private ?ScheduleRequestSerializerInterface $scheduleRequestSerializer;
     private SchedulesTransformerInterface $schedulesTransformer;
     private ScheduleTransformerInterface $scheduleTransformer;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, ScheduleTransformerInterface $scheduleTransformer, SchedulesTransformerInterface $schedulesTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, ScheduleTransformerInterface $scheduleTransformer, SchedulesTransformerInterface $schedulesTransformer, TokenInterface $token, ?ScheduleRequestSerializerInterface $scheduleRequestSerializer = null)
     {
         $this->requestSender = $requestSender;
         $this->scheduleTransformer = $scheduleTransformer;
         $this->schedulesTransformer = $schedulesTransformer;
         $this->token = $token;
+        $this->scheduleRequestSerializer = $scheduleRequestSerializer;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function createSchedule(string $installedAppId, ScheduleRequestInterface $request): ScheduleInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_LIST_SPRINTF, rawurlencode($installedAppId));
+        $body = $this->resolveScheduleRequestSerializer()->serialize($request);
+        $data = $this->requestSender->post($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->scheduleTransformer->transform($data);
+        unset($this->listCache[$installedAppId]);
+
+        return $result;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteSchedule(string $installedAppId, string $scheduleName): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($installedAppId), rawurlencode($scheduleName));
+        $this->requestSender->delete($url, [], $headers);
+        unset($this->cache[sprintf(self::CACHE_KEY_SPRINTF, $installedAppId, $scheduleName)], $this->listCache[$installedAppId]);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteSchedules(string $installedAppId): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_LIST_SPRINTF, rawurlencode($installedAppId));
+        $this->requestSender->delete($url, [], $headers);
+        $this->cache = [];
+        unset($this->listCache[$installedAppId]);
     }
 
     /**
@@ -101,5 +157,14 @@ final class ScheduleApi implements ScheduleApiInterface
         $this->cache[$cacheKey] = $schedule;
 
         return $schedule;
+    }
+
+    /**
+     * Falls back to the default serializer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolveScheduleRequestSerializer(): ScheduleRequestSerializerInterface
+    {
+        return $this->scheduleRequestSerializer ?? new ScheduleRequestSerializer();
     }
 }

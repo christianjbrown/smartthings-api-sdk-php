@@ -181,6 +181,8 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_INSTALLED_APP_CONFIG_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_INSTALLED_APP_CONFIGS_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_CREATE_INSTALLED_APP_EVENTS_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_COORDINATE_ALIAS_REQUEST_SERIALIZER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_LOCATION_API, LocationApi::class)
@@ -259,6 +261,7 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_SCHEDULE_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_SCHEDULES_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_SCHEDULE_REQUEST_SERIALIZER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_CONNECTOR_API, SchemaConnectorApi::class)
@@ -290,6 +293,7 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_SUBSCRIPTION_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_SUBSCRIPTIONS_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_SUBSCRIPTION_REQUEST_SERIALIZER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_VIRTUAL_DEVICE_API, VirtualDeviceApi::class)

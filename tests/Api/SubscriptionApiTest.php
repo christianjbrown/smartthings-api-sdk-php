@@ -12,22 +12,154 @@ use ChristianBrown\SmartThings\Api\SubscriptionApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
+use ChristianBrown\SmartThings\Model\CapabilitySubscriptionDetail;
+use ChristianBrown\SmartThings\Model\DeviceHealthDetail;
+use ChristianBrown\SmartThings\Model\DeviceLifecycleDetail;
+use ChristianBrown\SmartThings\Model\DeviceSubscriptionDetail;
+use ChristianBrown\SmartThings\Model\HubHealthDetail;
+use ChristianBrown\SmartThings\Model\ModeSubscriptionDetail;
+use ChristianBrown\SmartThings\Model\SceneLifecycleDetail;
+use ChristianBrown\SmartThings\Model\SecurityArmStateDetail;
 use ChristianBrown\SmartThings\Model\SubscriptionInterface;
+use ChristianBrown\SmartThings\Model\SubscriptionRequest;
+use ChristianBrown\SmartThings\Model\SubscriptionRequestInterface;
+use ChristianBrown\SmartThings\Serializer\SubscriptionRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\SubscriptionRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\SubscriptionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\Exception;
-
 use PHPUnit\Framework\TestCase;
 
 use function rawurlencode;
 use function sprintf;
 
+#[CoversClass(SubscriptionRequestSerializer::class)]
+#[CoversClass(SceneLifecycleDetail::class)]
+#[CoversClass(HubHealthDetail::class)]
+#[CoversClass(SecurityArmStateDetail::class)]
+#[CoversClass(DeviceHealthDetail::class)]
+#[CoversClass(DeviceLifecycleDetail::class)]
+#[CoversClass(ModeSubscriptionDetail::class)]
+#[CoversClass(CapabilitySubscriptionDetail::class)]
+#[CoversClass(DeviceSubscriptionDetail::class)]
+#[CoversClass(SubscriptionRequest::class)]
 #[CoversClass(SubscriptionApi::class)]
 #[CoversClass(Token::class)]
 final class SubscriptionApiTest extends TestCase
 {
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteAllSubscriptions(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(SubscriptionApiInterface::API_URL_LIST_SPRINTF, 'test-installed-app-id'),
+                [SubscriptionApiInterface::KEY_DEVICE_ID => 'test-device-id', SubscriptionApiInterface::KEY_MODE_ID => 'test-mode-id'],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new SubscriptionApi($requestSender, self::createStub(SubscriptionTransformerInterface::class), self::createStub(SubscriptionsTransformerInterface::class), new Token('test-api-token'));
+        $api->deleteAllSubscriptions('test-installed-app-id', 'test-device-id', 'test-mode-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteAllSubscriptionsInvalidatesCaches(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $api = new SubscriptionApi($requestSender, self::createStub(SubscriptionTransformerInterface::class), self::createStub(SubscriptionsTransformerInterface::class), new Token('test-api-token'));
+
+        $api->getOneById('test-installed-app-id', 'test-subscription-id');
+        $api->deleteAllSubscriptions('test-installed-app-id');
+        $api->getOneById('test-installed-app-id', 'test-subscription-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteAllSubscriptionsWithoutOptionalQuery(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(SubscriptionApiInterface::API_URL_LIST_SPRINTF, 'test-installed-app-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new SubscriptionApi($requestSender, self::createStub(SubscriptionTransformerInterface::class), self::createStub(SubscriptionsTransformerInterface::class), new Token('test-api-token'));
+        $api->deleteAllSubscriptions('test-installed-app-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteSubscription(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(SubscriptionApiInterface::API_URL_SPRINTF, 'test-installed-app-id', 'test-subscription-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new SubscriptionApi($requestSender, self::createStub(SubscriptionTransformerInterface::class), self::createStub(SubscriptionsTransformerInterface::class), new Token('test-api-token'));
+        $api->deleteSubscription('test-installed-app-id', 'test-subscription-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteSubscriptionInvalidatesCaches(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $api = new SubscriptionApi($requestSender, self::createStub(SubscriptionTransformerInterface::class), self::createStub(SubscriptionsTransformerInterface::class), new Token('test-api-token'));
+
+        $api->getOneById('test-installed-app-id', 'test-subscription-id');
+        $api->deleteSubscription('test-installed-app-id', 'test-subscription-id');
+        $api->getOneById('test-installed-app-id', 'test-subscription-id');
+
+        $this->addToAssertionCount(1);
+    }
+
     /**
      * @throws RequestExceptionInterface
      * @throws Exception
@@ -316,5 +448,101 @@ final class SubscriptionApiTest extends TestCase
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(SubscriptionApiInterface::UNEXPECTED_RESPONSE);
         $api->getOneById('test-installed-app-id', 'test-subscription-id', $skipCache);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testSaveSubscription(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(SubscriptionRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                sprintf(SubscriptionApiInterface::API_URL_LIST_SPRINTF, 'test-installed-app-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(SubscriptionRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(SubscriptionInterface::class);
+
+        $transformer = self::createMock(SubscriptionTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new SubscriptionApi($requestSender, $transformer, self::createStub(SubscriptionsTransformerInterface::class), new Token('test-api-token'), $serializer);
+        $actual = $api->saveSubscription('test-installed-app-id', $request);
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testSaveSubscriptionInvalidatesListCache(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn([SubscriptionApiInterface::KEY_ITEMS => ['test-item']]);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['test-data']);
+
+        $api = new SubscriptionApi($requestSender, self::createStub(SubscriptionTransformerInterface::class), self::createStub(SubscriptionsTransformerInterface::class), new Token('test-api-token'));
+
+        $api->getMultiple('test-installed-app-id');
+        $api->saveSubscription('test-installed-app-id', self::createStub(SubscriptionRequestInterface::class));
+        $api->getMultiple('test-installed-app-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testSaveSubscriptionUnexpectedResponse(): void
+    {
+        $request = self::createStub(SubscriptionRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn([]);
+
+        $api = new SubscriptionApi($requestSender, self::createStub(SubscriptionTransformerInterface::class), self::createStub(SubscriptionsTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(SubscriptionApiInterface::UNEXPECTED_RESPONSE);
+        $api->saveSubscription('test-installed-app-id', $request);
+    }
+
+    /**
+     * Without an injected serializer the default one is used.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testSaveSubscriptionUsesDefaultSerializer(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['test-data']);
+
+        $api = new SubscriptionApi($requestSender, self::createStub(SubscriptionTransformerInterface::class), self::createStub(SubscriptionsTransformerInterface::class), new Token('test-api-token'));
+        $api->saveSubscription('test-installed-app-id', new SubscriptionRequest('test-source-type'));
+
+        $this->addToAssertionCount(1);
     }
 }

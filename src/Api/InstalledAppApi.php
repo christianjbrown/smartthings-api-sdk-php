@@ -7,13 +7,20 @@ namespace ChristianBrown\SmartThings\Api;
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
+use ChristianBrown\SmartThings\Model\CoordinateAliasRequestInterface;
+use ChristianBrown\SmartThings\Model\CreateInstalledAppEventsRequestInterface;
 use ChristianBrown\SmartThings\Model\InstalledAppConfigInterface;
 use ChristianBrown\SmartThings\Model\InstalledAppInterface;
+use ChristianBrown\SmartThings\Serializer\CoordinateAliasRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CoordinateAliasRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\CreateInstalledAppEventsRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CreateInstalledAppEventsRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledAppTransformerInterface;
 
+use function array_filter;
 use function is_array;
 use function rawurlencode;
 use function sprintf;
@@ -34,6 +41,8 @@ final class InstalledAppApi implements InstalledAppApiInterface
      * @var array<string, array<int, InstalledAppConfigInterface>>
      */
     private array $configsCache = [];
+    private ?CoordinateAliasRequestSerializerInterface $coordinateAliasRequestSerializer;
+    private ?CreateInstalledAppEventsRequestSerializerInterface $createInstalledAppEventsRequestSerializer;
     private InstalledAppConfigsTransformerInterface $installedAppConfigsTransformer;
     private InstalledAppConfigTransformerInterface $installedAppConfigTransformer;
     private InstalledAppsTransformerInterface $installedAppsTransformer;
@@ -47,7 +56,7 @@ final class InstalledAppApi implements InstalledAppApiInterface
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, InstalledAppTransformerInterface $installedAppTransformer, InstalledAppsTransformerInterface $installedAppsTransformer, InstalledAppConfigTransformerInterface $installedAppConfigTransformer, InstalledAppConfigsTransformerInterface $installedAppConfigsTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, InstalledAppTransformerInterface $installedAppTransformer, InstalledAppsTransformerInterface $installedAppsTransformer, InstalledAppConfigTransformerInterface $installedAppConfigTransformer, InstalledAppConfigsTransformerInterface $installedAppConfigsTransformer, TokenInterface $token, ?CreateInstalledAppEventsRequestSerializerInterface $createInstalledAppEventsRequestSerializer = null, ?CoordinateAliasRequestSerializerInterface $coordinateAliasRequestSerializer = null)
     {
         $this->requestSender = $requestSender;
         $this->installedAppTransformer = $installedAppTransformer;
@@ -55,6 +64,50 @@ final class InstalledAppApi implements InstalledAppApiInterface
         $this->installedAppConfigTransformer = $installedAppConfigTransformer;
         $this->installedAppConfigsTransformer = $installedAppConfigsTransformer;
         $this->token = $token;
+        $this->createInstalledAppEventsRequestSerializer = $createInstalledAppEventsRequestSerializer;
+        $this->coordinateAliasRequestSerializer = $coordinateAliasRequestSerializer;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function createEvents(string $installedAppId, CreateInstalledAppEventsRequestInterface $request): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_EVENTS_SPRINTF, rawurlencode($installedAppId));
+        $body = $this->resolveCreateInstalledAppEventsRequestSerializer()->serialize($request);
+        $this->requestSender->post($url, [], $headers, $body);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteCoordinateAlias(string $installedAppId, string $aliasName): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_ALIAS_SPRINTF, rawurlencode($installedAppId), rawurlencode($aliasName));
+        $this->requestSender->delete($url, [], $headers);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteInstallation(string $installedAppId): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($installedAppId));
+        $this->requestSender->delete($url, [], $headers);
+        unset($this->cache[$installedAppId], $this->configsCache[$installedAppId]);
+
+        $this->configCache = [];
+        $this->listCache = [];
+        $this->meCache = null;
     }
 
     /**
@@ -109,6 +162,23 @@ final class InstalledAppApi implements InstalledAppApiInterface
         $this->configsCache[$installedAppId] = $configs;
 
         return $configs;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     *
+     * @return mixed[]
+     */
+    public function getCoordinateAliasCapability(string $installedAppId, string $aliasName, string $name): array
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_ALIAS_CAPABILITY_SPRINTF, rawurlencode($installedAppId), rawurlencode($aliasName));
+        $query = array_filter([self::KEY_NAME => $name], static fn (?string $value): bool => null !== $value);
+        $data = $this->requestSender->get($url, $query, $headers);
+
+        return $data;
     }
 
     /**
@@ -195,6 +265,19 @@ final class InstalledAppApi implements InstalledAppApiInterface
     }
 
     /**
+     * @throws RequestExceptionInterface
+     */
+    public function putCoordinateAlias(string $installedAppId, string $aliasName, CoordinateAliasRequestInterface $request): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_ALIAS_SPRINTF, rawurlencode($installedAppId), rawurlencode($aliasName));
+        $body = $this->resolveCoordinateAliasRequestSerializer()->serialize($request);
+        $this->requestSender->put($url, [], $headers, $body);
+    }
+
+    /**
      * @return array<string, string>
      */
     private static function buildQuery(?string $locationId): array
@@ -231,5 +314,23 @@ final class InstalledAppApi implements InstalledAppApiInterface
         }
 
         return $data[self::KEY_ITEMS];
+    }
+
+    /**
+     * Falls back to the default serializer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolveCoordinateAliasRequestSerializer(): CoordinateAliasRequestSerializerInterface
+    {
+        return $this->coordinateAliasRequestSerializer ?? new CoordinateAliasRequestSerializer();
+    }
+
+    /**
+     * Falls back to the default serializer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolveCreateInstalledAppEventsRequestSerializer(): CreateInstalledAppEventsRequestSerializerInterface
+    {
+        return $this->createInstalledAppEventsRequestSerializer ?? new CreateInstalledAppEventsRequestSerializer();
     }
 }
