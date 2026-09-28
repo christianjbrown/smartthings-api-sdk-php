@@ -98,6 +98,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_RAW_JSON_API_REQUEST_SENDER = 'smartthings.raw_json_api_request_sender';
     public const string SERVICE_RULE_API = 'smartthings.api.rule_api';
     public const string SERVICE_RULE_EXECUTION_RESULT_TRANSFORMER = 'smartthings.transformer.rule_execution_result_transformer';
+    public const string SERVICE_RULE_REQUEST_SERIALIZER = 'smartthings.serializer.rule_request_serializer';
     public const string SERVICE_RULE_TRANSFORMER = 'smartthings.transformer.rule_transformer';
     public const string SERVICE_RULES_TRANSFORMER = 'smartthings.transformer.rules_transformer';
     public const string SERVICE_SCENE_API = 'smartthings.api.scene_api';

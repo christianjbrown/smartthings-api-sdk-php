@@ -16,6 +16,9 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\RuleExecutionResult;
 use ChristianBrown\SmartThings\Model\RuleExecutionResultInterface;
 use ChristianBrown\SmartThings\Model\RuleInterface;
+use ChristianBrown\SmartThings\Model\RuleRequest;
+use ChristianBrown\SmartThings\Serializer\RuleRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\RuleRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\RuleExecutionResultTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleExecutionResultTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\RulesTransformerInterface;
@@ -32,9 +35,269 @@ use function sprintf;
 #[CoversClass(RuleApi::class)]
 #[CoversClass(RuleExecutionResult::class)]
 #[CoversClass(RuleExecutionResultTransformer::class)]
+#[CoversClass(RuleRequest::class)]
+#[CoversClass(RuleRequestSerializer::class)]
 #[CoversClass(Token::class)]
 final class RuleApiTest extends TestCase
 {
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateRule(): void
+    {
+        $data = ['test-rule-data'];
+
+        $request = new RuleRequest('Test Rule', [['test-action']]);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                RuleApiInterface::API_URL,
+                [RuleApiInterface::KEY_LOCATION_ID => 'test-location-id'],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $ruleRequestSerializer = self::createMock(RuleRequestSerializerInterface::class);
+        $ruleRequestSerializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $rule = self::createStub(RuleInterface::class);
+
+        $ruleTransformer = self::createMock(RuleTransformerInterface::class);
+        $ruleTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($rule);
+
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'), null, $ruleRequestSerializer);
+        $actual = $ruleApi->createRule('test-location-id', $request);
+
+        self::assertSame($rule, $actual);
+    }
+
+    /**
+     * createRule() invalidates the cached rule list for this location, so a
+     * subsequent getMultiple() call hits the API again instead of returning a stale
+     * list.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateRuleInvalidatesListCache(): void
+    {
+        $rule = self::createStub(RuleInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn([RuleApiInterface::KEY_ITEMS => ['test-item']]);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['test-rule-data']);
+
+        $ruleTransformer = self::createStub(RuleTransformerInterface::class);
+        $ruleTransformer->method('transform')
+            ->willReturn($rule);
+
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+        $rulesTransformer->method('transform')
+            ->willReturn([$rule]);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'));
+
+        $ruleApi->getMultiple('test-location-id');
+        $ruleApi->createRule('test-location-id', new RuleRequest('Test Rule', [['test-action']]));
+        $ruleApi->getMultiple('test-location-id');
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateRuleMissingLocationId(): void
+    {
+        $ruleTransformer = self::createStub(RuleTransformerInterface::class);
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+        $requestSender = self::createStub(JsonApiRequestSenderInterface::class);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'));
+
+        $this->expectException(MissingInputException::class);
+        $this->expectExceptionMessage(RuleApiInterface::MISSING_LOCATION_ID);
+        $ruleApi->createRule('', new RuleRequest('Test Rule', [['test-action']]));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateRuleUnexpectedResponse(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn([]);
+
+        $ruleTransformer = self::createStub(RuleTransformerInterface::class);
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(RuleApiInterface::UNEXPECTED_RESPONSE);
+        $ruleApi->createRule('test-location-id', new RuleRequest('Test Rule', [['test-action']]));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteAllRules(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                RuleApiInterface::API_URL,
+                [RuleApiInterface::KEY_LOCATION_ID => 'test-location-id'],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $ruleTransformer = self::createStub(RuleTransformerInterface::class);
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'));
+        $ruleApi->deleteAllRules('test-location-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * deleteAllRules() clears every cached rule and the cached list for this
+     * location, so subsequent lookups hit the API again.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteAllRulesInvalidatesCaches(): void
+    {
+        $rule = self::createStub(RuleInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-rule-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $ruleTransformer = self::createStub(RuleTransformerInterface::class);
+        $ruleTransformer->method('transform')
+            ->willReturn($rule);
+
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'));
+
+        $ruleApi->getOneById('test-rule-id', 'test-location-id');
+        $ruleApi->deleteAllRules('test-location-id');
+        $ruleApi->getOneById('test-rule-id', 'test-location-id');
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteAllRulesMissingLocationId(): void
+    {
+        $ruleTransformer = self::createStub(RuleTransformerInterface::class);
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+        $requestSender = self::createStub(JsonApiRequestSenderInterface::class);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'));
+
+        $this->expectException(MissingInputException::class);
+        $this->expectExceptionMessage(RuleApiInterface::MISSING_LOCATION_ID);
+        $ruleApi->deleteAllRules('');
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteRule(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(RuleApiInterface::API_URL_SPRINTF, 'test-rule-id'),
+                [RuleApiInterface::KEY_LOCATION_ID => 'test-location-id'],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $ruleTransformer = self::createStub(RuleTransformerInterface::class);
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'));
+        $ruleApi->deleteRule('test-rule-id', 'test-location-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * deleteRule() invalidates the cached copy of this rule and the cached rule list
+     * for this location, so subsequent lookups hit the API again.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteRuleInvalidatesCaches(): void
+    {
+        $rule = self::createStub(RuleInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-rule-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $ruleTransformer = self::createStub(RuleTransformerInterface::class);
+        $ruleTransformer->method('transform')
+            ->willReturn($rule);
+
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'));
+
+        $ruleApi->getOneById('test-rule-id', 'test-location-id');
+        $ruleApi->deleteRule('test-rule-id', 'test-location-id');
+        $ruleApi->getOneById('test-rule-id', 'test-location-id');
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteRuleMissingLocationId(): void
+    {
+        $ruleTransformer = self::createStub(RuleTransformerInterface::class);
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+        $requestSender = self::createStub(JsonApiRequestSenderInterface::class);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'));
+
+        $this->expectException(MissingInputException::class);
+        $this->expectExceptionMessage(RuleApiInterface::MISSING_LOCATION_ID);
+        $ruleApi->deleteRule('test-rule-id', '');
+    }
+
     /**
      * @throws RequestExceptionInterface
      * @throws Exception
@@ -417,5 +680,113 @@ final class RuleApiTest extends TestCase
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(RuleApiInterface::UNEXPECTED_RESPONSE);
         $ruleApi->getOneById('test-rule-id', 'test-location-id', $skipCache);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateRule(): void
+    {
+        $data = ['test-rule-data'];
+
+        $request = new RuleRequest('Test Rule', [['test-action']]);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(RuleApiInterface::API_URL_SPRINTF, 'test-rule-id'),
+                [RuleApiInterface::KEY_LOCATION_ID => 'test-location-id'],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $ruleRequestSerializer = self::createMock(RuleRequestSerializerInterface::class);
+        $ruleRequestSerializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $rule = self::createStub(RuleInterface::class);
+
+        $ruleTransformer = self::createMock(RuleTransformerInterface::class);
+        $ruleTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($rule);
+
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'), null, $ruleRequestSerializer);
+        $actual = $ruleApi->updateRule('test-rule-id', 'test-location-id', $request);
+
+        self::assertSame($rule, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateRuleMissingLocationId(): void
+    {
+        $ruleTransformer = self::createStub(RuleTransformerInterface::class);
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+        $requestSender = self::createStub(JsonApiRequestSenderInterface::class);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'));
+
+        $this->expectException(MissingInputException::class);
+        $this->expectExceptionMessage(RuleApiInterface::MISSING_LOCATION_ID);
+        $ruleApi->updateRule('test-rule-id', '', new RuleRequest('Test Rule', [['test-action']]));
+    }
+
+    /**
+     * updateRule() refreshes the cached copy of this rule, so a subsequent
+     * getOneById() for the same id is served from it.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateRulePopulatesCache(): void
+    {
+        $rule = self::createStub(RuleInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())
+            ->method('put')
+            ->willReturn(['test-rule-data']);
+
+        $ruleTransformer = self::createMock(RuleTransformerInterface::class);
+        $ruleTransformer->expects(self::once())
+            ->method('transform')
+            ->willReturn($rule);
+
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'));
+
+        self::assertSame($rule, $ruleApi->updateRule('test-rule-id', 'test-location-id', new RuleRequest('Test Rule', [['test-action']])));
+        self::assertSame($rule, $ruleApi->getOneById('test-rule-id', 'test-location-id'));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateRuleUnexpectedResponse(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn([]);
+
+        $ruleTransformer = self::createStub(RuleTransformerInterface::class);
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(RuleApiInterface::UNEXPECTED_RESPONSE);
+        $ruleApi->updateRule('test-rule-id', 'test-location-id', new RuleRequest('Test Rule', [['test-action']]));
     }
 }
