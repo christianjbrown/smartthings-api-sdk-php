@@ -45,7 +45,9 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_DEVICE_PREFERENCES_API = 'smartthings.api.device_preferences_api';
     public const string SERVICE_DEVICE_PREFERENCES_TRANSFORMER = 'smartthings.transformer.device_preferences_transformer';
     public const string SERVICE_DEVICE_PROFILE_API = 'smartthings.api.device_profile_api';
+    public const string SERVICE_DEVICE_PROFILE_CREATE_REQUEST_SERIALIZER = 'smartthings.serializer.create_device_profile_request_serializer';
     public const string SERVICE_DEVICE_PROFILE_TRANSFORMER = 'smartthings.transformer.device_profile_transformer';
+    public const string SERVICE_DEVICE_PROFILE_UPDATE_REQUEST_SERIALIZER = 'smartthings.serializer.update_device_profile_request_serializer';
     public const string SERVICE_DEVICE_PROFILES_TRANSFORMER = 'smartthings.transformer.device_profiles_transformer';
     public const string SERVICE_DEVICE_STATUS_API = 'smartthings.api.device_status_api';
     public const string SERVICE_DEVICE_STATUS_BATTERY_BATTERY_TRANSFORMER = 'smartthings.transformer.device_status_battery_battery_transformer';

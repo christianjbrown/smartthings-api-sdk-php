@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Api;
 
+use ChristianBrown\SmartThings\Model\CreateDeviceProfileRequestInterface;
 use ChristianBrown\SmartThings\Model\DeviceProfileInterface;
 use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
 use ChristianBrown\SmartThings\Model\LocalizationInterface;
+use ChristianBrown\SmartThings\Model\UpdateDeviceProfileRequestInterface;
 
 interface DeviceProfileApiInterface extends ApiInterface
 {
@@ -18,6 +20,18 @@ interface DeviceProfileApiInterface extends ApiInterface
     public const string KEY_ITEMS = 'items';
     public const string UNEXPECTED_RESPONSE = 'Response not set or not an array';
     public const string UNEXPECTED_RESPONSE_SPRINTF = '%s not set or not an array';
+
+    /**
+     * Creates a Device Profile. Invalidates the cached profile list so a subsequent
+     * getMultiple() reflects the new profile.
+     */
+    public function createDeviceProfile(CreateDeviceProfileRequestInterface $request): DeviceProfileInterface;
+
+    /**
+     * Deletes a Device Profile by id. Invalidates any cached copy of this profile and
+     * the cached profile list.
+     */
+    public function deleteDeviceProfile(string $deviceProfileId): void;
 
     /**
      * @return array<int, LocaleReferenceInterface>
@@ -32,4 +46,10 @@ interface DeviceProfileApiInterface extends ApiInterface
     public function getOneById(string $deviceProfileId, bool $skipCache = false): DeviceProfileInterface;
 
     public function getTranslations(string $deviceProfileId, string $tag, bool $skipCache = false): LocalizationInterface;
+
+    /**
+     * Updates a currently deployed Device Profile. Refreshes the cached copy of this
+     * profile and invalidates the cached profile list.
+     */
+    public function updateDeviceProfile(string $deviceProfileId, UpdateDeviceProfileRequestInterface $request): DeviceProfileInterface;
 }
