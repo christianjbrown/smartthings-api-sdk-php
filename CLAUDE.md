@@ -46,10 +46,19 @@ before finishing.
 Three layers under `src/`, mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
 `ChristianBrown\SmartThings\` → `src/`, `ChristianBrown\SmartThings\Tests\` → `tests/`.
 
-- **`SmartThings`** (`src/SmartThings.php`) — the facade/entry point. Constructed with just a
-  `string $apiToken`, it builds a Symfony `ContainerBuilder`, registers every transformer and client
-  as a service (ids on `SmartThingsInterface` as `SERVICE_*` constants), and exposes `getDeviceApi()`,
-  `getDeviceStatusApi()`, `getLocationApi()`, and `getLocationRoomApi()`.
+- **`SmartThings`** (`src/SmartThings.php`) — the facade/entry point. Constructed with a
+  `string $apiToken` and an optional `ApiHostInterface` (defaults to production), it asks
+  `DependencyInjection\ContainerFactory` to build a Symfony `ContainerBuilder` and exposes a getter
+  per API client (`getDeviceApi()`, `getDeviceStatusApi()`, `getLocationApi()`, `getLocationRoomApi()`,
+  and 21 more — see `SmartThingsInterface`). Service ids live on `SmartThingsInterface` as `SERVICE_*`
+  constants. `ContainerFactory` runs a fixed, ordered list of small registrar classes under
+  `src/DependencyInjection/Registrar/`, one per resource group (core, devices, locations, automations,
+  capabilities, apps, edge, organizations/services, i18n, and so on), each implementing
+  `ServiceRegistrarInterface::register(ContainerBuilder $container): void`. Adding a new API group
+  means adding one registrar and one line in `ContainerFactory`, not editing a single giant method.
+  `SmartThingsInterface` itself is split into nine narrower role interfaces by domain (see
+  `src/SmartThings*Interface.php`), which it extends — existing code that type-hints against
+  `SmartThingsInterface` is unaffected.
 - **`Api/`** — HTTP clients (`DeviceApi`, `DeviceStatusApi`, `LocationApi`, `LocationRoomApi`). Each is
   constructed with a `JsonApiRequestSenderInterface` (from `christianjbrown/api-client` — no
   Guzzle/PSR-18 used directly), its transformer(s), and a `string $apiToken`. They send an
