@@ -1,6 +1,6 @@
 # SmartThings API SDK
 
-[![CI](https://github.com/christianjbrown/smartthings-api-sdk-php/actions/workflows/ci.yml/badge.svg)](https://github.com/christianjbrown/smartthings-api-sdk-php/actions/workflows/ci.yml)
+[![CI](https://github.com/christianjbrown/smartthings-api-sdk-php/actions/workflows/ci.yml/badge.svg)](https://github.com/christianjbrown/smartthings-api-sdk-php/actions/workflows/ci.yml) [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/christianjbrown/smartthings-api-sdk-php/actions/workflows/ci.yml) [![Packagist](https://img.shields.io/packagist/v/christianjbrown/smartthings-api-sdk)](https://packagist.org/packages/christianjbrown/smartthings-api-sdk) [![License](https://img.shields.io/packagist/l/christianjbrown/smartthings-api-sdk)](https://github.com/christianjbrown/smartthings-api-sdk-php/blob/main/LICENSE) [![PHP](https://img.shields.io/packagist/dependency-v/christianjbrown/smartthings-api-sdk/php)](https://packagist.org/packages/christianjbrown/smartthings-api-sdk)
 
 A strongly-typed PHP client for the [SmartThings API](https://developer.smartthings.com/). It lists the devices in your SmartThings account and reads a device's status, returning plain, typed model objects rather than raw arrays.
 
