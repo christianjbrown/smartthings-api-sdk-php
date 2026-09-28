@@ -5,9 +5,12 @@ small, uniform, and highly opinionated, so new code should be indistinguishable 
 
 ## What this is
 
-A strongly-typed, **read-only** PHP 8.5+ client for the [SmartThings API](https://developer.smartthings.com/).
-It lists devices and locations, reads a device's status, and reads rooms, returning typed model
-objects instead of raw arrays. The primary entry point is the `SmartThings` facade (`src/SmartThings.php`),
+A strongly-typed PHP 8.5+ client for the [SmartThings API](https://developer.smartthings.com/). It
+lists devices and locations, reads a device's status, and reads rooms, returning typed model objects
+instead of raw arrays. It also covers a growing set of write operations (device commands, switching a
+location's mode, executing scenes and rules — see `DeviceApi::executeCommands()`,
+`LocationModeApi::changeCurrent()`, `SceneApi::execute()`, `RuleApi::execute()`). The primary entry
+point is the `SmartThings` facade (`src/SmartThings.php`),
 which wires the clients and their transformer chains through a Symfony `ContainerBuilder` DI container.
 Hand-wiring the same chains without the container is still fully supported (see the "Wiring the clients"
 section of `README.md`).
@@ -43,7 +46,8 @@ before finishing.
 
 ## Architecture
 
-Three layers under `src/`, mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
+Four layers under `src/` (`Api/`, `Transformer/`, `Model/`, and `Serializer/` for request bodies),
+mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
 `ChristianBrown\SmartThings\` → `src/`, `ChristianBrown\SmartThings\Tests\` → `tests/`.
 
 - **`SmartThings`** (`src/SmartThings.php`) — the facade/entry point. Constructed with a
@@ -81,7 +85,18 @@ Three layers under `src/`, mirrored 1:1 under `tests/`, plus the top-level `Smar
   `capabilityKey => applier` map built in its constructor: `transform()` dispatches over the map with
   `array_map` (no `foreach`), so a new capability is added by registering one map entry — the dispatch
   logic itself stays closed for modification.
-- **`Model/`** — plain, mutable typed DTOs with getters and fluent setters.
+- **`Model/`** — plain, mutable typed DTOs with getters and fluent setters. Request-only models (e.g.
+  `DeviceCommand`) live here too, alongside the response models.
+- **`Serializer/`** — turns typed request models into the array body an `Api` client posts/puts. One
+  `serialize(array $models): array` method per class, same `final` class + matching `...Interface`
+  with `KEY_*` constants convention as `Transformer/`. `DeviceCommandSerializer` is the first example.
+- **Write operations** (`executeCommands`, `changeCurrent`, `execute`) follow the same client pattern
+  as reads: build headers, call the request sender (`post`/`put` instead of `get`), guard the response
+  shape, delegate to a transformer. A write's serializer/transformer collaborator is **appended to the
+  constructor as an optional, nullable parameter** (`?FooInterface $foo = null`) rather than a required
+  one, so existing hand-wired `new SomeApi(...)` call sites keep compiling; a private
+  `resolveFoo(): FooInterface` method returns `$this->foo ?? new Foo()` so the class still has a
+  working default, mirroring `SmartThings::__construct()`'s `$apiHost ?? new ApiHost()`.
 - **`Exception/`** — `final` exception classes + matching interfaces: `UnexpectedResponseException`
   (extends `RuntimeException`, thrown by clients and transformers for malformed responses) and
   `MissingInputException` (extends `InvalidArgumentException`, thrown for bad caller input).

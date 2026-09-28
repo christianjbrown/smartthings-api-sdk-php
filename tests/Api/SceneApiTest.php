@@ -12,7 +12,11 @@ use ChristianBrown\SmartThings\Api\SceneApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
+use ChristianBrown\SmartThings\Model\SceneExecutionResult;
+use ChristianBrown\SmartThings\Model\SceneExecutionResultInterface;
 use ChristianBrown\SmartThings\Model\SceneInterface;
+use ChristianBrown\SmartThings\Transformer\SceneExecutionResultTransformer;
+use ChristianBrown\SmartThings\Transformer\SceneExecutionResultTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ScenesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\SceneTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -25,9 +29,76 @@ use function rawurlencode;
 use function sprintf;
 
 #[CoversClass(SceneApi::class)]
+#[CoversClass(SceneExecutionResult::class)]
+#[CoversClass(SceneExecutionResultTransformer::class)]
 #[CoversClass(Token::class)]
 final class SceneApiTest extends TestCase
 {
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testExecute(): void
+    {
+        $data = ['status' => 'success'];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                sprintf(SceneApiInterface::API_URL_EXECUTE_SPRINTF, 'test-scene-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $result = self::createStub(SceneExecutionResultInterface::class);
+
+        $sceneExecutionResultTransformer = self::createMock(SceneExecutionResultTransformerInterface::class);
+        $sceneExecutionResultTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($result);
+
+        $sceneTransformer = self::createStub(SceneTransformerInterface::class);
+        $scenesTransformer = self::createStub(ScenesTransformerInterface::class);
+
+        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'), $sceneExecutionResultTransformer);
+        $actual = $sceneApi->execute('test-scene-id');
+
+        self::assertSame($result, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testExecuteEncodesIdAndDefaultsTransformer(): void
+    {
+        $data = ['status' => 'success'];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                sprintf(SceneApiInterface::API_URL_EXECUTE_SPRINTF, rawurlencode('a/b c')),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $sceneTransformer = self::createStub(SceneTransformerInterface::class);
+        $scenesTransformer = self::createStub(ScenesTransformerInterface::class);
+
+        // No SceneExecutionResultTransformerInterface supplied: the appended constructor
+        // parameter stays optional and the API falls back to the default transformer.
+        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'));
+        $actual = $sceneApi->execute('a/b c');
+
+        self::assertSame('success', $actual->getStatus());
+    }
+
     /**
      * @throws RequestExceptionInterface
      * @throws Exception

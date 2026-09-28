@@ -31,6 +31,8 @@ final class ApiClientRegistrarTest extends TestCase
         $container->register(SmartThingsInterface::SERVICE_CHANNEL_DRIVERS_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_CHANNEL_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICES_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_COMMAND_SERIALIZER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_COMMAND_RESULTS_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_HEALTH_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_HISTORY_EVENTS_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_PREFERENCES_TRANSFORMER, stdClass::class);
@@ -66,8 +68,10 @@ final class ApiClientRegistrarTest extends TestCase
         $container->register(SmartThingsInterface::SERVICE_ORGANIZATION_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_PRESENTATION_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_RULES_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_RULE_EXECUTION_RESULT_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_RULE_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SCENES_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_SCENE_EXECUTION_RESULT_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SCENE_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEDULES_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEDULE_TRANSFORMER, stdClass::class);

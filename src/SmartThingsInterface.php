@@ -24,6 +24,9 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_CHANNEL_TRANSFORMER = 'smartthings.transformer.channel_transformer';
     public const string SERVICE_CHANNELS_TRANSFORMER = 'smartthings.transformer.channels_transformer';
     public const string SERVICE_DEVICE_API = 'smartthings.api.device_api';
+    public const string SERVICE_DEVICE_COMMAND_RESULT_TRANSFORMER = 'smartthings.transformer.device_command_result_transformer';
+    public const string SERVICE_DEVICE_COMMAND_RESULTS_TRANSFORMER = 'smartthings.transformer.device_command_results_transformer';
+    public const string SERVICE_DEVICE_COMMAND_SERIALIZER = 'smartthings.serializer.device_command_serializer';
     public const string SERVICE_DEVICE_COMPONENT_CAPABILITIES_TRANSFORMER = 'smartthings.transformer.device_component_capabilities_transformer';
     public const string SERVICE_DEVICE_COMPONENT_CAPABILITY_TRANSFORMER = 'smartthings.transformer.device_component_capability_transformer';
     public const string SERVICE_DEVICE_COMPONENT_TRANSFORMER = 'smartthings.transformer.device_component_transformer';
@@ -89,9 +92,11 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_PRESENTATION_TRANSFORMER = 'smartthings.transformer.presentation_transformer';
     public const string SERVICE_RAW_JSON_API_REQUEST_SENDER = 'smartthings.raw_json_api_request_sender';
     public const string SERVICE_RULE_API = 'smartthings.api.rule_api';
+    public const string SERVICE_RULE_EXECUTION_RESULT_TRANSFORMER = 'smartthings.transformer.rule_execution_result_transformer';
     public const string SERVICE_RULE_TRANSFORMER = 'smartthings.transformer.rule_transformer';
     public const string SERVICE_RULES_TRANSFORMER = 'smartthings.transformer.rules_transformer';
     public const string SERVICE_SCENE_API = 'smartthings.api.scene_api';
+    public const string SERVICE_SCENE_EXECUTION_RESULT_TRANSFORMER = 'smartthings.transformer.scene_execution_result_transformer';
     public const string SERVICE_SCENE_TRANSFORMER = 'smartthings.transformer.scene_transformer';
     public const string SERVICE_SCENES_TRANSFORMER = 'smartthings.transformer.scenes_transformer';
     public const string SERVICE_SCHEDULE_API = 'smartthings.api.schedule_api';

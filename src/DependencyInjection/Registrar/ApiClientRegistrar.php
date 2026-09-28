@@ -87,6 +87,8 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_DEVICES_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_COMMAND_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_COMMAND_RESULTS_TRANSFORMER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_DEVICE_HEALTH_API, DeviceHealthApi::class)
@@ -227,6 +229,7 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_RULE_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_RULES_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_RULE_EXECUTION_RESULT_TRANSFORMER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_SCENE_API, SceneApi::class)
@@ -236,6 +239,7 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_SCENE_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_SCENES_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_SCENE_EXECUTION_RESULT_TRANSFORMER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_SCHEDULE_API, ScheduleApi::class)

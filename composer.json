@@ -1,6 +1,6 @@
 {
     "name": "christianjbrown/smartthings-api-sdk",
-    "description": "A strongly-typed, read-only PHP 8.5+ client for the SmartThings API that returns typed model objects instead of raw arrays.",
+    "description": "A strongly-typed PHP 8.5+ client for the SmartThings API that returns typed model objects instead of raw arrays.",
     "type": "library",
     "license": "MIT",
     "keywords": [
@@ -26,6 +26,10 @@
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpunit/phpunit": "^13.0"
+    },
+    "conflict": {
+        "fidry/cpu-core-counter": "1.4.0",
+        "nikic/php-parser": "5.9.0"
     },
     "autoload": {
         "psr-4": {

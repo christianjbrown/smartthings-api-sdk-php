@@ -20,6 +20,9 @@ final class DeviceRegistrarTest extends TestCase
         (new DeviceRegistrar())->register($container);
 
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICES_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_COMMAND_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_COMMAND_RESULT_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_COMMAND_RESULTS_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_COMPONENTS_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_COMPONENT_CAPABILITIES_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_COMPONENT_CAPABILITY_TRANSFORMER));

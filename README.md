@@ -2,20 +2,20 @@
 
 [![CI](https://github.com/christianjbrown/smartthings-api-sdk-php/actions/workflows/ci.yml/badge.svg)](https://github.com/christianjbrown/smartthings-api-sdk-php/actions/workflows/ci.yml) [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/christianjbrown/smartthings-api-sdk-php/actions/workflows/ci.yml) [![Packagist](https://img.shields.io/packagist/v/christianjbrown/smartthings-api-sdk)](https://packagist.org/packages/christianjbrown/smartthings-api-sdk) [![License](https://img.shields.io/packagist/l/christianjbrown/smartthings-api-sdk)](https://github.com/christianjbrown/smartthings-api-sdk-php/blob/main/LICENSE) [![PHP](https://img.shields.io/packagist/dependency-v/christianjbrown/smartthings-api-sdk/php)](https://packagist.org/packages/christianjbrown/smartthings-api-sdk)
 
-A strongly-typed PHP client for the [SmartThings API](https://developer.smartthings.com/). It lists the devices in your SmartThings account and reads a device's status, returning plain, typed model objects rather than raw arrays.
+A strongly-typed PHP client for the [SmartThings API](https://developer.smartthings.com/). It lists the devices in your SmartThings account, reads a device's status, and — for the operations below marked as writes — lets you act on them: run device commands, switch a location's mode, and execute scenes and rules. It returns plain, typed model objects rather than raw arrays.
 
-The client is **read-only** and currently supports:
+The client currently supports:
 
-- **Listing devices** — id, name, label, location and room ids, and each component's capabilities — or reading a single device by id (`getOneById`).
+- **Listing devices** — id, name, label, location and room ids, and each component's capabilities — or reading a single device by id (`getOneById`). **Write:** executing one or more capability commands on a device (`executeCommands`), returning each command's tracking id and status.
 - **Reading a device's status** — currently the `temperatureMeasurement`, `relativeHumidityMeasurement`, and `battery` capabilities (value, unit, and timestamp) from the device's `main` component (`getOneById`/`getOneByDevice`), a single component (`getOneByComponent`), or a single capability on a component (`getOneByCapability`).
 - **Reading a device's health** — the connection `state` (`ONLINE`/`OFFLINE`/`UNHEALTHY`) and the `lastUpdatedDate`, by id (`getOneById`) or from a device (`getOneByDevice`).
 - **Reading a device's preferences** — the device's current preference values, by id (`getOneById`) or from a device (`getOneByDevice`). Each preference carries its name, `preferenceType`, and value.
 - **Reading device preference definitions** — the account's custom device-preference definitions, optionally filtered by namespace (`getMultiple`), or a single definition by id (`getOneById`). Each carries its preference id, name, title, description, `preferenceType`, and required flag.
 - **Listing locations** — id and name, or reading a single location by id (`getOneById`).
 - **Reading rooms** — listing every room in a location (`getMultiple`), reading a single room, either from a device (`getOneByDevice`) or by a location and room id (`getOneByLocationAndId`), or listing the devices in a room (`getDevicesInRoom`). Each room carries its id, name, and location id.
-- **Reading modes** — listing a location's modes (`getMultiple`), reading the currently active mode (`getCurrent`), or a single mode by id (`getOneByLocationAndId`). Each mode carries its id, label, and name.
-- **Reading scenes** — listing scenes for the account, optionally filtered by location (`getMultiple`), or a single scene by id (`getOneById`). Each scene carries its id, name, and location id.
-- **Reading rules** — listing a location's rules (`getMultiple`) or a single rule by id (`getOneById`); both require a location id. Each rule carries its id, name, and status.
+- **Reading modes** — listing a location's modes (`getMultiple`), reading the currently active mode (`getCurrent`), or a single mode by id (`getOneByLocationAndId`). Each mode carries its id, label, and name. **Write:** switching the location's currently active mode (`changeCurrent`), which can trigger any automations for which the new mode is a trigger.
+- **Reading scenes** — listing scenes for the account, optionally filtered by location (`getMultiple`), or a single scene by id (`getOneById`). Each scene carries its id, name, and location id. **Write:** executing a scene (`execute`), running each of its actions.
+- **Reading rules** — listing a location's rules (`getMultiple`) or a single rule by id (`getOneById`); both require a location id. Each rule carries its id, name, and status. **Write:** triggering Rule execution (`execute`), returning the execution id and result.
 - **Reading capabilities** — listing all platform capabilities (`getMultiple`), the custom capabilities in a namespace (`getMultipleByNamespace`), every capability namespace (`getNamespaces`), the versions of a capability (`getVersions`), one capability definition by id and version (`getOneByIdAndVersion`), or a capability's presentation by id and version (`getPresentation`). Each capability carries its id, name, status, and version; each namespace its name, owner type, and owner id; each presentation its id and version.
 - **Reading device profiles** — listing the account's device profiles (`getMultiple`) or a single profile by id (`getOneById`). Each carries its id, name, and status.
 - **Reading presentations** — a device presentation by presentation id (`getOne`) or for a specific device (`getByDeviceId`, or `getByDevice` from a device), a stored device config (`getDeviceConfig`), or the default config generated from a device type (`getDeviceConfigByType`). Each carries its presentation id, manufacturer name, and type.
@@ -37,7 +37,7 @@ The client is **read-only** and currently supports:
 
 | Resource | Client | Endpoint(s) | Returns |
 | --- | --- | --- | --- |
-| Devices | `getDeviceApi()` | `GET /devices`, `GET /devices/{deviceId}` | `DeviceInterface[]` / `DeviceInterface` |
+| Devices | `getDeviceApi()` | `GET /devices`, `GET /devices/{deviceId}`, `POST /devices/{deviceId}/commands` | `DeviceInterface[]` / `DeviceInterface` / `DeviceCommandResultInterface[]` |
 | Virtual devices | `getVirtualDeviceApi()` | `GET /virtualdevices` | `DeviceInterface[]` |
 | Device status | `getDeviceStatusApi()` | `GET /devices/{deviceId}/status`, `GET /devices/{deviceId}/components/{componentId}/status`, `GET /devices/{deviceId}/components/{componentId}/capabilities/{capabilityId}/status` | `DeviceStatusInterface` |
 | Device health | `getDeviceHealthApi()` | `GET /devices/{deviceId}/health` | `DeviceHealthInterface` |
@@ -46,9 +46,9 @@ The client is **read-only** and currently supports:
 | Device history | `getDeviceHistoryApi()` | `GET /history/devices` (paged) | `DeviceHistoryEventInterface[]` |
 | Locations | `getLocationApi()` | `GET /locations`, `GET /locations/{locationId}` | `LocationInterface[]` / `LocationInterface` |
 | Rooms | `getLocationRoomApi()` | `GET /locations/{locationId}/rooms`, `GET /locations/{locationId}/rooms/{roomId}`, `GET /locations/{locationId}/rooms/{roomId}/devices` | `LocationRoomInterface[]` / `LocationRoomInterface` / `DeviceInterface[]` |
-| Modes | `getLocationModeApi()` | `GET /locations/{locationId}/modes`, `GET /locations/{locationId}/modes/current`, `GET /locations/{locationId}/modes/{modeId}` | `ModeInterface[]` / `ModeInterface` |
-| Scenes | `getSceneApi()` | `GET /scenes`, `GET /scenes/{sceneId}` | `SceneInterface[]` / `SceneInterface` |
-| Rules | `getRuleApi()` | `GET /rules?locationId=…`, `GET /rules/{ruleId}?locationId=…` | `RuleInterface[]` / `RuleInterface` |
+| Modes | `getLocationModeApi()` | `GET /locations/{locationId}/modes`, `GET /locations/{locationId}/modes/current`, `GET /locations/{locationId}/modes/{modeId}`, `PUT /locations/{locationId}/modes/current` | `ModeInterface[]` / `ModeInterface` |
+| Scenes | `getSceneApi()` | `GET /scenes`, `GET /scenes/{sceneId}`, `POST /scenes/{sceneId}/execute` | `SceneInterface[]` / `SceneInterface` / `SceneExecutionResultInterface` |
+| Rules | `getRuleApi()` | `GET /rules?locationId=…`, `GET /rules/{ruleId}?locationId=…`, `POST /rules/execute/{ruleId}` | `RuleInterface[]` / `RuleInterface` / `RuleExecutionResultInterface` |
 | Capabilities | `getCapabilityApi()` | `GET /capabilities`, `GET /capabilities/namespaces`, `GET /capabilities/namespaces/{namespace}`, `GET /capabilities/{id}`, `GET /capabilities/{id}/{version}`, `GET /capabilities/{id}/{version}/presentation`, `GET /capabilities/{id}/{version}/i18n`, `GET /capabilities/{id}/{version}/i18n/{tag}` | `CapabilityInterface[]` / `CapabilityInterface` / `CapabilityNamespaceInterface[]` / `CapabilityPresentationInterface` / `LocaleReferenceInterface[]` / `LocalizationInterface` |
 | Device profiles | `getDeviceProfileApi()` | `GET /deviceprofiles`, `GET /deviceprofiles/{deviceProfileId}`, `GET /deviceprofiles/{id}/i18n`, `GET /deviceprofiles/{id}/i18n/{tag}` | `DeviceProfileInterface[]` / `DeviceProfileInterface` / `LocaleReferenceInterface[]` / `LocalizationInterface` |
 | Presentation | `getPresentationApi()` | `GET /presentation`, `GET /presentation?deviceId=…`, `GET /presentation/deviceconfig`, `GET /presentation/types/{typeIntegrationId}/deviceconfig` | `PresentationInterface` |
@@ -174,6 +174,33 @@ foreach ($rooms as $room) {
 
 $room = $locationRoomApi->getOneByLocationAndId($locations[0], 'a-room-id'); // LocationRoomInterface
 echo $room->getName(), "\n";
+```
+
+### Writing: commands, modes, scenes, and rules
+
+```php
+use ChristianBrown\SmartThings\Model\DeviceCommand;
+
+// Run one or more capability commands on a device.
+$commandResults = $deviceApi->executeCommands('a-device-id', [
+    new DeviceCommand('switch', 'on'),
+    (new DeviceCommand('switchLevel', 'setLevel'))->setArguments([80]),
+]); // DeviceCommandResultInterface[]
+foreach ($commandResults as $commandResult) {
+    echo $commandResult->getStatus() ?? 'unknown', "\n"; // e.g. "ACCEPTED"
+}
+
+// Switch a location's currently active mode.
+$mode = $locationModeApi->changeCurrent($locations[0], 'a-mode-id'); // ModeInterface
+echo $mode->getLabel(), "\n";
+
+// Execute a scene.
+$sceneResult = $sceneApi->execute('a-scene-id'); // SceneExecutionResultInterface
+echo $sceneResult->getStatus() ?? 'unknown', "\n"; // e.g. "success"
+
+// Trigger a rule.
+$ruleResult = $ruleApi->execute('a-rule-id'); // RuleExecutionResultInterface
+echo $ruleResult->getResult() ?? 'unknown', "\n"; // e.g. "Success"
 ```
 
 ## :rotating_light: Error handling
