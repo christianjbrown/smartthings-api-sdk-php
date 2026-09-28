@@ -66,6 +66,8 @@ final class SchemaConnectorApi implements SchemaConnectorApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
@@ -90,6 +92,8 @@ final class SchemaConnectorApi implements SchemaConnectorApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -112,6 +116,8 @@ final class SchemaConnectorApi implements SchemaConnectorApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
@@ -138,6 +144,8 @@ final class SchemaConnectorApi implements SchemaConnectorApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -159,6 +167,8 @@ final class SchemaConnectorApi implements SchemaConnectorApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */

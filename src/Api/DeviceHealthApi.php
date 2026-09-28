@@ -32,6 +32,8 @@ final class DeviceHealthApi implements DeviceHealthApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
@@ -41,6 +43,8 @@ final class DeviceHealthApi implements DeviceHealthApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */

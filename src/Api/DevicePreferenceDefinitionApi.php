@@ -58,6 +58,8 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -90,6 +92,8 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -124,6 +128,8 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
@@ -151,6 +157,8 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */

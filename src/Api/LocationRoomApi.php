@@ -51,6 +51,8 @@ final class LocationRoomApi implements LocationRoomApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -83,6 +85,8 @@ final class LocationRoomApi implements LocationRoomApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -116,6 +120,8 @@ final class LocationRoomApi implements LocationRoomApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws MissingInputException
      * @throws UnexpectedResponseException
@@ -133,6 +139,8 @@ final class LocationRoomApi implements LocationRoomApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */

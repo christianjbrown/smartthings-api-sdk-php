@@ -24,6 +24,7 @@
     "require-dev": {
         "christianjbrown/code-quality-scripts": "dev-main",
         "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
         "phpunit/phpunit": "^13.0"
     },
     "autoload": {

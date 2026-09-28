@@ -59,6 +59,8 @@ final class ChannelApi implements ChannelApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
@@ -87,6 +89,8 @@ final class ChannelApi implements ChannelApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -109,6 +113,8 @@ final class ChannelApi implements ChannelApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -133,6 +139,8 @@ final class ChannelApi implements ChannelApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */

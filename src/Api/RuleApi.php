@@ -41,6 +41,8 @@ final class RuleApi implements RuleApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws MissingInputException
      * @throws UnexpectedResponseException
@@ -77,6 +79,8 @@ final class RuleApi implements RuleApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws MissingInputException
      * @throws UnexpectedResponseException

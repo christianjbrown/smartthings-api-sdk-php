@@ -40,6 +40,8 @@ final class SceneApi implements SceneApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -74,6 +76,8 @@ final class SceneApi implements SceneApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */

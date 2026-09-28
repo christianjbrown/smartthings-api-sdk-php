@@ -58,6 +58,8 @@ final class InstalledAppApi implements InstalledAppApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
@@ -86,6 +88,8 @@ final class InstalledAppApi implements InstalledAppApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -108,6 +112,8 @@ final class InstalledAppApi implements InstalledAppApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
@@ -134,6 +140,8 @@ final class InstalledAppApi implements InstalledAppApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -158,6 +166,8 @@ final class InstalledAppApi implements InstalledAppApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */

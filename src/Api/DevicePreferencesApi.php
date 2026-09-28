@@ -32,6 +32,8 @@ final class DevicePreferencesApi implements DevicePreferencesApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -43,6 +45,8 @@ final class DevicePreferencesApi implements DevicePreferencesApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *

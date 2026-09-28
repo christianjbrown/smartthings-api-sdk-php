@@ -46,6 +46,8 @@ final class LocationModeApi implements LocationModeApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
@@ -74,6 +76,8 @@ final class LocationModeApi implements LocationModeApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -107,6 +111,8 @@ final class LocationModeApi implements LocationModeApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */

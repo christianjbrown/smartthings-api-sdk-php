@@ -40,6 +40,8 @@ final class ScheduleApi implements ScheduleApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -72,6 +74,8 @@ final class ScheduleApi implements ScheduleApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */

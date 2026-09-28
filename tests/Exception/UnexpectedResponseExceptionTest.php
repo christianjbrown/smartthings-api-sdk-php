@@ -11,16 +11,21 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
+use function class_implements;
+use function class_parents;
+
 #[CoversClass(UnexpectedResponseException::class)]
 final class UnexpectedResponseExceptionTest extends TestCase
 {
     public function test(): void
     {
         $exception = new UnexpectedResponseException('test-message');
+        $interfaces = class_implements($exception);
+        $parents = class_parents($exception);
 
-        self::assertInstanceOf(UnexpectedResponseExceptionInterface::class, $exception);
-        self::assertInstanceOf(ExceptionInterface::class, $exception);
-        self::assertInstanceOf(RuntimeException::class, $exception);
+        self::assertArrayHasKey(UnexpectedResponseExceptionInterface::class, $interfaces);
+        self::assertArrayHasKey(ExceptionInterface::class, $interfaces);
+        self::assertArrayHasKey(RuntimeException::class, $parents);
         self::assertSame('test-message', $exception->getMessage());
     }
 }

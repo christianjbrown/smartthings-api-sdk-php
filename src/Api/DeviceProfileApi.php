@@ -58,6 +58,8 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -90,6 +92,8 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -121,6 +125,8 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
@@ -148,6 +154,8 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */

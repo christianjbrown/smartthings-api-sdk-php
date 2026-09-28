@@ -40,6 +40,8 @@ final class OrganizationApi implements OrganizationApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -71,6 +73,8 @@ final class OrganizationApi implements OrganizationApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
