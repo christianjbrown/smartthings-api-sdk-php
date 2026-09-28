@@ -33,7 +33,9 @@ final class ApiClientRegistrarTest extends TestCase
         $container->register(SmartThingsInterface::SERVICE_DEVICES_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_COMMAND_SERIALIZER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_COMMAND_RESULTS_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_EVENT_SERIALIZER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_HEALTH_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_INSTALL_REQUEST_SERIALIZER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_HISTORY_EVENTS_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_PREFERENCES_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_PREFERENCE_DEFINITIONS_TRANSFORMER, stdClass::class);
@@ -83,6 +85,7 @@ final class ApiClientRegistrarTest extends TestCase
         $container->register(SmartThingsInterface::SERVICE_SERVICE_LOCATION_INFO_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SUBSCRIPTIONS_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SUBSCRIPTION_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_UPDATE_DEVICE_REQUEST_SERIALIZER, stdClass::class);
 
         $token = self::createStub(TokenInterface::class);
 

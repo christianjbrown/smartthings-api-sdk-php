@@ -89,6 +89,9 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $this->token,
                     $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_COMMAND_SERIALIZER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_COMMAND_RESULTS_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_INSTALL_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_UPDATE_DEVICE_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_EVENT_SERIALIZER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_DEVICE_HEALTH_API, DeviceHealthApi::class)

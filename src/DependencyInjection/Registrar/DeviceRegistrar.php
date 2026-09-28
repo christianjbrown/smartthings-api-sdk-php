@@ -6,6 +6,9 @@ namespace ChristianBrown\SmartThings\DependencyInjection\Registrar;
 
 use ChristianBrown\SmartThings\DependencyInjection\ServiceRegistrarInterface;
 use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceEventSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceInstallRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateDeviceRequestSerializer;
 use ChristianBrown\SmartThings\SmartThingsInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceCommandResultsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCommandResultTransformer;
@@ -22,6 +25,9 @@ final class DeviceRegistrar implements ServiceRegistrarInterface
     public function register(ContainerBuilder $container): void
     {
         $container->register(SmartThingsInterface::SERVICE_DEVICE_COMMAND_SERIALIZER, DeviceCommandSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_EVENT_SERIALIZER, DeviceEventSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_INSTALL_REQUEST_SERIALIZER, DeviceInstallRequestSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_UPDATE_DEVICE_REQUEST_SERIALIZER, UpdateDeviceRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_COMMAND_RESULT_TRANSFORMER, DeviceCommandResultTransformer::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_COMMAND_RESULTS_TRANSFORMER, DeviceCommandResultsTransformer::class)
             ->setArguments(
