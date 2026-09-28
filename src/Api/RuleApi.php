@@ -8,7 +8,10 @@ use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\MissingInputException;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
+use ChristianBrown\SmartThings\Model\RuleExecutionResultInterface;
 use ChristianBrown\SmartThings\Model\RuleInterface;
+use ChristianBrown\SmartThings\Transformer\RuleExecutionResultTransformer;
+use ChristianBrown\SmartThings\Transformer\RuleExecutionResultTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\RulesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\RuleTransformerInterface;
 
@@ -28,16 +31,33 @@ final class RuleApi implements RuleApiInterface
      */
     private array $listCache = [];
     private JsonApiRequestSenderInterface $requestSender;
+    private ?RuleExecutionResultTransformerInterface $ruleExecutionResultTransformer;
     private RulesTransformerInterface $rulesTransformer;
     private RuleTransformerInterface $ruleTransformer;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, RuleTransformerInterface $ruleTransformer, RulesTransformerInterface $rulesTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, RuleTransformerInterface $ruleTransformer, RulesTransformerInterface $rulesTransformer, TokenInterface $token, ?RuleExecutionResultTransformerInterface $ruleExecutionResultTransformer = null)
     {
         $this->requestSender = $requestSender;
         $this->ruleTransformer = $ruleTransformer;
         $this->rulesTransformer = $rulesTransformer;
         $this->token = $token;
+        $this->ruleExecutionResultTransformer = $ruleExecutionResultTransformer;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function execute(string $ruleId): RuleExecutionResultInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_EXECUTE_SPRINTF, rawurlencode($ruleId));
+        $data = $this->requestSender->post($url, [], $headers);
+
+        return $this->resolveRuleExecutionResultTransformer()->transform($data);
     }
 
     /**
@@ -110,5 +130,14 @@ final class RuleApi implements RuleApiInterface
         $this->cache[$ruleId] = $rule;
 
         return $rule;
+    }
+
+    /**
+     * Falls back to the default transformer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolveRuleExecutionResultTransformer(): RuleExecutionResultTransformerInterface
+    {
+        return $this->ruleExecutionResultTransformer ?? new RuleExecutionResultTransformer();
     }
 }

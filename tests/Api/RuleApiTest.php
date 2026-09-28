@@ -13,7 +13,11 @@ use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\MissingInputException;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
+use ChristianBrown\SmartThings\Model\RuleExecutionResult;
+use ChristianBrown\SmartThings\Model\RuleExecutionResultInterface;
 use ChristianBrown\SmartThings\Model\RuleInterface;
+use ChristianBrown\SmartThings\Transformer\RuleExecutionResultTransformer;
+use ChristianBrown\SmartThings\Transformer\RuleExecutionResultTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\RulesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\RuleTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -26,9 +30,78 @@ use function rawurlencode;
 use function sprintf;
 
 #[CoversClass(RuleApi::class)]
+#[CoversClass(RuleExecutionResult::class)]
+#[CoversClass(RuleExecutionResultTransformer::class)]
 #[CoversClass(Token::class)]
 final class RuleApiTest extends TestCase
 {
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testExecute(): void
+    {
+        $data = ['executionId' => 'test-execution-id', 'id' => 'test-rule-id', 'result' => 'Success'];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                sprintf(RuleApiInterface::API_URL_EXECUTE_SPRINTF, 'test-rule-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $result = self::createStub(RuleExecutionResultInterface::class);
+
+        $ruleExecutionResultTransformer = self::createMock(RuleExecutionResultTransformerInterface::class);
+        $ruleExecutionResultTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($result);
+
+        $ruleTransformer = self::createStub(RuleTransformerInterface::class);
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'), $ruleExecutionResultTransformer);
+        $actual = $ruleApi->execute('test-rule-id');
+
+        self::assertSame($result, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testExecuteEncodesIdAndDefaultsTransformer(): void
+    {
+        $data = ['executionId' => 'test-execution-id', 'id' => 'a/b c', 'result' => 'Success'];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                sprintf(RuleApiInterface::API_URL_EXECUTE_SPRINTF, rawurlencode('a/b c')),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $ruleTransformer = self::createStub(RuleTransformerInterface::class);
+        $rulesTransformer = self::createStub(RulesTransformerInterface::class);
+
+        // No RuleExecutionResultTransformerInterface supplied: the appended constructor
+        // parameter stays optional and the API falls back to the default transformer.
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'));
+        $actual = $ruleApi->execute('a/b c');
+
+        self::assertSame('test-execution-id', $actual->getExecutionId());
+        self::assertSame('a/b c', $actual->getId());
+        self::assertSame('Success', $actual->getResult());
+    }
+
     /**
      * @throws RequestExceptionInterface
      * @throws Exception
