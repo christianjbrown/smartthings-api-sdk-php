@@ -54,6 +54,14 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_APP_OAUTH_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_APP_SETTINGS_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_CREATE_APP_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_CREATE_APP_RESPONSE_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_UPDATE_APP_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_UPDATE_APP_SETTINGS_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_UPDATE_APP_OAUTH_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_GENERATE_APP_OAUTH_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_GENERATE_APP_OAUTH_RESPONSE_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_UPDATE_SIGNATURE_TYPE_REQUEST_SERIALIZER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_CAPABILITY_API, CapabilityApi::class)

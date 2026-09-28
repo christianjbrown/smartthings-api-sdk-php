@@ -59,7 +59,13 @@ use ChristianBrown\SmartThings\DependencyInjection\Registrar\ScheduleRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SchemaConnectorRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ServiceApiRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SubscriptionRegistrar;
+use ChristianBrown\SmartThings\Serializer\CreateAppRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateAppOauthRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateAppRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateAppSettingsRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateSignatureTypeRequestSerializer;
 use ChristianBrown\SmartThings\SmartThings;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
 use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
@@ -74,6 +80,7 @@ use ChristianBrown\SmartThings\Transformer\ChannelDriversTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelDriverTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelsTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelTransformer;
+use ChristianBrown\SmartThings\Transformer\CreateAppResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCommandResultsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCommandResultTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
@@ -100,6 +107,7 @@ use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
 use ChristianBrown\SmartThings\Transformer\DriversTransformer;
 use ChristianBrown\SmartThings\Transformer\DriverTransformer;
+use ChristianBrown\SmartThings\Transformer\GenerateAppOauthResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\HubCharacteristicsTransformer;
 use ChristianBrown\SmartThings\Transformer\HubEnrolledChannelsTransformer;
 use ChristianBrown\SmartThings\Transformer\HubEnrolledChannelTransformer;
@@ -284,6 +292,14 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ServiceMeasurementTransformer::class)]
 #[UsesClass(SubscriptionsTransformer::class)]
 #[UsesClass(SubscriptionTransformer::class)]
+#[UsesClass(CreateAppResponseTransformer::class)]
+#[UsesClass(GenerateAppOauthResponseTransformer::class)]
+#[UsesClass(CreateAppRequestSerializer::class)]
+#[UsesClass(UpdateAppRequestSerializer::class)]
+#[UsesClass(UpdateAppSettingsRequestSerializer::class)]
+#[UsesClass(UpdateAppOauthRequestSerializer::class)]
+#[UsesClass(GenerateAppOauthRequestSerializer::class)]
+#[UsesClass(UpdateSignatureTypeRequestSerializer::class)]
 final class SmartThingsTest extends TestCase
 {
     public function testConstructAcceptsCustomApiHost(): void

@@ -24,6 +24,8 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_CHANNEL_TRANSFORMER = 'smartthings.transformer.channel_transformer';
     public const string SERVICE_CHANNELS_TRANSFORMER = 'smartthings.transformer.channels_transformer';
     public const string SERVICE_COORDINATE_ALIAS_REQUEST_SERIALIZER = 'smartthings.serializer.coordinate_alias_request_serializer';
+    public const string SERVICE_CREATE_APP_REQUEST_SERIALIZER = 'smartthings.serializer.create_app_request_serializer';
+    public const string SERVICE_CREATE_APP_RESPONSE_TRANSFORMER = 'smartthings.transformer.create_app_response_transformer';
     public const string SERVICE_CREATE_INSTALLED_APP_EVENTS_REQUEST_SERIALIZER = 'smartthings.serializer.create_installed_app_events_request_serializer';
     public const string SERVICE_DEVICE_API = 'smartthings.api.device_api';
     public const string SERVICE_DEVICE_COMMAND_RESULT_TRANSFORMER = 'smartthings.transformer.device_command_result_transformer';
@@ -64,6 +66,8 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_DRIVER_API = 'smartthings.api.driver_api';
     public const string SERVICE_DRIVER_TRANSFORMER = 'smartthings.transformer.driver_transformer';
     public const string SERVICE_DRIVERS_TRANSFORMER = 'smartthings.transformer.drivers_transformer';
+    public const string SERVICE_GENERATE_APP_OAUTH_REQUEST_SERIALIZER = 'smartthings.serializer.generate_app_oauth_request_serializer';
+    public const string SERVICE_GENERATE_APP_OAUTH_RESPONSE_TRANSFORMER = 'smartthings.transformer.generate_app_oauth_response_transformer';
     public const string SERVICE_HUB_API = 'smartthings.api.hub_api';
     public const string SERVICE_HUB_CHARACTERISTICS_TRANSFORMER = 'smartthings.transformer.hub_characteristics_transformer';
     public const string SERVICE_HUB_ENROLLED_CHANNEL_TRANSFORMER = 'smartthings.transformer.hub_enrolled_channel_transformer';
@@ -130,6 +134,10 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_SUBSCRIPTION_REQUEST_SERIALIZER = 'smartthings.serializer.subscription_request_serializer';
     public const string SERVICE_SUBSCRIPTION_TRANSFORMER = 'smartthings.transformer.subscription_transformer';
     public const string SERVICE_SUBSCRIPTIONS_TRANSFORMER = 'smartthings.transformer.subscriptions_transformer';
+    public const string SERVICE_UPDATE_APP_OAUTH_REQUEST_SERIALIZER = 'smartthings.serializer.update_app_oauth_request_serializer';
+    public const string SERVICE_UPDATE_APP_REQUEST_SERIALIZER = 'smartthings.serializer.update_app_request_serializer';
+    public const string SERVICE_UPDATE_APP_SETTINGS_REQUEST_SERIALIZER = 'smartthings.serializer.update_app_settings_request_serializer';
     public const string SERVICE_UPDATE_DEVICE_REQUEST_SERIALIZER = 'smartthings.serializer.update_device_request_serializer';
+    public const string SERVICE_UPDATE_SIGNATURE_TYPE_REQUEST_SERIALIZER = 'smartthings.serializer.update_signature_type_request_serializer';
     public const string SERVICE_VIRTUAL_DEVICE_API = 'smartthings.api.virtual_device_api';
 }

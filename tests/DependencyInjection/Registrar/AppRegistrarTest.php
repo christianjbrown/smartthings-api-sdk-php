@@ -19,6 +19,14 @@ final class AppRegistrarTest extends TestCase
 
         (new AppRegistrar())->register($container);
 
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_UPDATE_SIGNATURE_TYPE_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_GENERATE_APP_OAUTH_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_UPDATE_APP_OAUTH_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_UPDATE_APP_SETTINGS_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_UPDATE_APP_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CREATE_APP_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_GENERATE_APP_OAUTH_RESPONSE_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CREATE_APP_RESPONSE_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_APPS_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_APP_OAUTH_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_APP_SETTINGS_TRANSFORMER));
