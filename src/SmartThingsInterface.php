@@ -4,33 +4,7 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings;
 
-use ChristianBrown\SmartThings\Api\AppApiInterface;
-use ChristianBrown\SmartThings\Api\CapabilityApiInterface;
-use ChristianBrown\SmartThings\Api\ChannelApiInterface;
-use ChristianBrown\SmartThings\Api\DeviceApiInterface;
-use ChristianBrown\SmartThings\Api\DeviceHealthApiInterface;
-use ChristianBrown\SmartThings\Api\DeviceHistoryApiInterface;
-use ChristianBrown\SmartThings\Api\DevicePreferenceDefinitionApiInterface;
-use ChristianBrown\SmartThings\Api\DevicePreferencesApiInterface;
-use ChristianBrown\SmartThings\Api\DeviceProfileApiInterface;
-use ChristianBrown\SmartThings\Api\DeviceStatusApiInterface;
-use ChristianBrown\SmartThings\Api\DriverApiInterface;
-use ChristianBrown\SmartThings\Api\HubApiInterface;
-use ChristianBrown\SmartThings\Api\InstalledAppApiInterface;
-use ChristianBrown\SmartThings\Api\LocationApiInterface;
-use ChristianBrown\SmartThings\Api\LocationModeApiInterface;
-use ChristianBrown\SmartThings\Api\LocationRoomApiInterface;
-use ChristianBrown\SmartThings\Api\OrganizationApiInterface;
-use ChristianBrown\SmartThings\Api\PresentationApiInterface;
-use ChristianBrown\SmartThings\Api\RuleApiInterface;
-use ChristianBrown\SmartThings\Api\SceneApiInterface;
-use ChristianBrown\SmartThings\Api\ScheduleApiInterface;
-use ChristianBrown\SmartThings\Api\SchemaConnectorApiInterface;
-use ChristianBrown\SmartThings\Api\ServiceApiInterface;
-use ChristianBrown\SmartThings\Api\SubscriptionApiInterface;
-use ChristianBrown\SmartThings\Api\VirtualDeviceApiInterface;
-
-interface SmartThingsInterface
+interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutomationInterface, SmartThingsCapabilityInterface, SmartThingsDeviceInterface, SmartThingsDeviceMetadataInterface, SmartThingsEdgeInterface, SmartThingsLocationInterface, SmartThingsOrganizationInterface, SmartThingsVirtualDeviceInterface
 {
     public const string SERVICE_API_CLIENT = 'smartthings.api_client';
     public const string SERVICE_APP_API = 'smartthings.api.app_api';
@@ -139,54 +113,4 @@ interface SmartThingsInterface
     public const string SERVICE_SUBSCRIPTION_TRANSFORMER = 'smartthings.transformer.subscription_transformer';
     public const string SERVICE_SUBSCRIPTIONS_TRANSFORMER = 'smartthings.transformer.subscriptions_transformer';
     public const string SERVICE_VIRTUAL_DEVICE_API = 'smartthings.api.virtual_device_api';
-
-    public function getAppApi(): AppApiInterface;
-
-    public function getCapabilityApi(): CapabilityApiInterface;
-
-    public function getChannelApi(): ChannelApiInterface;
-
-    public function getDeviceApi(): DeviceApiInterface;
-
-    public function getDeviceHealthApi(): DeviceHealthApiInterface;
-
-    public function getDeviceHistoryApi(): DeviceHistoryApiInterface;
-
-    public function getDevicePreferenceDefinitionApi(): DevicePreferenceDefinitionApiInterface;
-
-    public function getDevicePreferencesApi(): DevicePreferencesApiInterface;
-
-    public function getDeviceProfileApi(): DeviceProfileApiInterface;
-
-    public function getDeviceStatusApi(): DeviceStatusApiInterface;
-
-    public function getDriverApi(): DriverApiInterface;
-
-    public function getHubApi(): HubApiInterface;
-
-    public function getInstalledAppApi(): InstalledAppApiInterface;
-
-    public function getLocationApi(): LocationApiInterface;
-
-    public function getLocationModeApi(): LocationModeApiInterface;
-
-    public function getLocationRoomApi(): LocationRoomApiInterface;
-
-    public function getOrganizationApi(): OrganizationApiInterface;
-
-    public function getPresentationApi(): PresentationApiInterface;
-
-    public function getRuleApi(): RuleApiInterface;
-
-    public function getSceneApi(): SceneApiInterface;
-
-    public function getScheduleApi(): ScheduleApiInterface;
-
-    public function getSchemaConnectorApi(): SchemaConnectorApiInterface;
-
-    public function getServiceApi(): ServiceApiInterface;
-
-    public function getSubscriptionApi(): SubscriptionApiInterface;
-
-    public function getVirtualDeviceApi(): VirtualDeviceApiInterface;
 }
