@@ -13,25 +13,374 @@ use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AppInterface;
+use ChristianBrown\SmartThings\Model\AppOauthDefinition;
 use ChristianBrown\SmartThings\Model\AppOauthInterface;
 use ChristianBrown\SmartThings\Model\AppSettingsInterface;
+use ChristianBrown\SmartThings\Model\AppUiSettings;
+use ChristianBrown\SmartThings\Model\CreateAppRequest;
+use ChristianBrown\SmartThings\Model\CreateAppRequestInterface;
+use ChristianBrown\SmartThings\Model\CreateAppResponse;
+use ChristianBrown\SmartThings\Model\CreateAppResponseInterface;
+use ChristianBrown\SmartThings\Model\CreateOrUpdateLambdaSmartAppRequest;
+use ChristianBrown\SmartThings\Model\CreateOrUpdateWebhookSmartAppRequest;
+use ChristianBrown\SmartThings\Model\GenerateAppOauthRequest;
+use ChristianBrown\SmartThings\Model\GenerateAppOauthRequestInterface;
+use ChristianBrown\SmartThings\Model\GenerateAppOauthResponse;
+use ChristianBrown\SmartThings\Model\GenerateAppOauthResponseInterface;
+use ChristianBrown\SmartThings\Model\IconImage;
+use ChristianBrown\SmartThings\Model\UpdateAppOauthRequest;
+use ChristianBrown\SmartThings\Model\UpdateAppOauthRequestInterface;
+use ChristianBrown\SmartThings\Model\UpdateAppRequest;
+use ChristianBrown\SmartThings\Model\UpdateAppRequestInterface;
+use ChristianBrown\SmartThings\Model\UpdateAppSettingsRequest;
+use ChristianBrown\SmartThings\Model\UpdateAppSettingsRequestInterface;
+use ChristianBrown\SmartThings\Model\UpdateSignatureTypeRequest;
+use ChristianBrown\SmartThings\Model\UpdateSignatureTypeRequestInterface;
+use ChristianBrown\SmartThings\Serializer\CreateAppRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CreateAppRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\UpdateAppOauthRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateAppOauthRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\UpdateAppRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateAppRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\UpdateAppSettingsRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateAppSettingsRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\UpdateSignatureTypeRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateSignatureTypeRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\AppSettingsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\AppsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\AppTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\CreateAppResponseTransformer;
+use ChristianBrown\SmartThings\Transformer\CreateAppResponseTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\GenerateAppOauthResponseTransformer;
+use ChristianBrown\SmartThings\Transformer\GenerateAppOauthResponseTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\Exception;
-
 use PHPUnit\Framework\TestCase;
 
 use function rawurlencode;
 use function sprintf;
 
+#[CoversClass(UpdateSignatureTypeRequestSerializer::class)]
+#[CoversClass(UpdateSignatureTypeRequest::class)]
+#[CoversClass(GenerateAppOauthResponseTransformer::class)]
+#[CoversClass(GenerateAppOauthResponse::class)]
+#[CoversClass(GenerateAppOauthRequestSerializer::class)]
+#[CoversClass(GenerateAppOauthRequest::class)]
+#[CoversClass(UpdateAppOauthRequestSerializer::class)]
+#[CoversClass(UpdateAppOauthRequest::class)]
+#[CoversClass(UpdateAppSettingsRequestSerializer::class)]
+#[CoversClass(UpdateAppSettingsRequest::class)]
+#[CoversClass(UpdateAppRequestSerializer::class)]
+#[CoversClass(UpdateAppRequest::class)]
+#[CoversClass(CreateAppResponseTransformer::class)]
+#[CoversClass(CreateAppResponse::class)]
+#[CoversClass(CreateAppRequestSerializer::class)]
+#[CoversClass(AppUiSettings::class)]
+#[CoversClass(AppOauthDefinition::class)]
+#[CoversClass(CreateOrUpdateWebhookSmartAppRequest::class)]
+#[CoversClass(CreateOrUpdateLambdaSmartAppRequest::class)]
+#[CoversClass(IconImage::class)]
+#[CoversClass(CreateAppRequest::class)]
 #[CoversClass(AppApi::class)]
 #[CoversClass(Token::class)]
 final class AppApiTest extends TestCase
 {
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateApp(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(CreateAppRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                AppApiInterface::API_URL,
+                [AppApiInterface::KEY_SIGNATURE_TYPE => 'test-signature-type', AppApiInterface::KEY_REQUIRE_CONFIRMATION => 'true', AppApiInterface::KEY_ACCOUNT_ID => 'test-account-id'],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(CreateAppRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(CreateAppResponseInterface::class);
+
+        $transformer = self::createMock(CreateAppResponseTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), $serializer, $transformer);
+        $actual = $api->createApp($request, 'test-signature-type', true, 'test-account-id');
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateAppInvalidatesListCache(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn([AppApiInterface::KEY_ITEMS => ['test-item']]);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['test-data']);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+
+        $api->getMultiple();
+        $api->createApp(self::createStub(CreateAppRequestInterface::class));
+        $api->getMultiple();
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateAppUnexpectedResponse(): void
+    {
+        $request = self::createStub(CreateAppRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn([]);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(AppApiInterface::UNEXPECTED_RESPONSE);
+        $api->createApp($request);
+    }
+
+    /**
+     * Without an injected serializer the default one is used.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateAppUsesDefaultSerializer(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['app' => ['appId' => 'test-app-id'], 'oauthClientId' => 'test-client-id']);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api->createApp(new CreateAppRequest('test-app-name', 'test-display-name', 'test-description', 'test-app-type', ['test-classifications-1', 'test-classifications-2']));
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * Without an injected transformer the default one is used.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateAppUsesDefaultTransformer(): void
+    {
+        $request = self::createStub(CreateAppRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['app' => ['appId' => 'test-app-id'], 'oauthClientId' => 'test-client-id']);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api->createApp($request);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateAppWithoutOptionalParameters(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(CreateAppRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                AppApiInterface::API_URL,
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(CreateAppRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(CreateAppResponseInterface::class);
+
+        $transformer = self::createMock(CreateAppResponseTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), $serializer, $transformer);
+        $actual = $api->createApp($request);
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteApp(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(AppApiInterface::API_URL_SPRINTF, 'test-app-name-or-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api->deleteApp('test-app-name-or-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteAppInvalidatesCaches(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+
+        $api->getOneById('test-app-name-or-id');
+        $api->deleteApp('test-app-name-or-id');
+        $api->getOneById('test-app-name-or-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGenerateAppOauth(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(GenerateAppOauthRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                sprintf(AppApiInterface::API_URL_OAUTH_GENERATE_SPRINTF, 'test-app-name-or-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(GenerateAppOauthRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(GenerateAppOauthResponseInterface::class);
+
+        $transformer = self::createMock(GenerateAppOauthResponseTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), null, null, null, null, null, $serializer, $transformer);
+        $actual = $api->generateAppOauth('test-app-name-or-id', $request);
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGenerateAppOauthUnexpectedResponse(): void
+    {
+        $request = self::createStub(GenerateAppOauthRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn([]);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(AppApiInterface::UNEXPECTED_RESPONSE);
+        $api->generateAppOauth('test-app-name-or-id', $request);
+    }
+
+    /**
+     * Without an injected serializer the default one is used.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGenerateAppOauthUsesDefaultSerializer(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['oauthClientId' => 'test-client-id']);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api->generateAppOauth('test-app-name-or-id', new GenerateAppOauthRequest());
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * Without an injected transformer the default one is used.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGenerateAppOauthUsesDefaultTransformer(): void
+    {
+        $request = self::createStub(GenerateAppOauthRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['oauthClientId' => 'test-client-id']);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api->generateAppOauth('test-app-name-or-id', $request);
+
+        $this->addToAssertionCount(1);
+    }
+
     /**
      * @throws RequestExceptionInterface
      * @throws Exception
@@ -505,5 +854,361 @@ final class AppApiTest extends TestCase
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(AppApiInterface::UNEXPECTED_RESPONSE);
         $appApi->getSettings('test-app-id', $skipCache);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testRegister(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(AppApiInterface::API_URL_REGISTER_SPRINTF, 'test-app-name-or-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api->register('test-app-name-or-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateApp(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(UpdateAppRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(AppApiInterface::API_URL_SPRINTF, 'test-app-name-or-id'),
+                [AppApiInterface::KEY_SIGNATURE_TYPE => 'test-signature-type', AppApiInterface::KEY_REQUIRE_CONFIRMATION => 'true'],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(UpdateAppRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(AppInterface::class);
+
+        $transformer = self::createMock(AppTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new AppApi($requestSender, $transformer, self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), null, null, $serializer);
+        $actual = $api->updateApp('test-app-name-or-id', $request, 'test-signature-type', true);
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateAppOauth(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(UpdateAppOauthRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(AppApiInterface::API_URL_OAUTH_SPRINTF, 'test-app-name-or-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(UpdateAppOauthRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(AppOauthInterface::class);
+
+        $transformer = self::createMock(AppOauthTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), $transformer, self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), null, null, null, null, $serializer);
+        $actual = $api->updateAppOauth('test-app-name-or-id', $request);
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateAppOauthUnexpectedResponse(): void
+    {
+        $request = self::createStub(UpdateAppOauthRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn([]);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(AppApiInterface::UNEXPECTED_RESPONSE);
+        $api->updateAppOauth('test-app-name-or-id', $request);
+    }
+
+    /**
+     * Without an injected serializer the default one is used.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateAppOauthUsesDefaultSerializer(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn(['test-data']);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api->updateAppOauth('test-app-name-or-id', new UpdateAppOauthRequest('test-client-name', ['test-scope-1', 'test-scope-2'], ['test-redirect-uris-1', 'test-redirect-uris-2']));
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateAppRefreshesCaches(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(1))->method('get')
+            ->willReturn(['test-data']);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn(['test-data']);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+
+        $api->getOneById('test-app-name-or-id');
+        $api->updateApp('test-app-name-or-id', self::createStub(UpdateAppRequestInterface::class));
+        $api->getOneById('test-app-name-or-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateAppSettings(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(UpdateAppSettingsRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(AppApiInterface::API_URL_SETTINGS_SPRINTF, 'test-app-name-or-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(UpdateAppSettingsRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(AppSettingsInterface::class);
+
+        $transformer = self::createMock(AppSettingsTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), $transformer, new Token('test-api-token'), null, null, null, $serializer);
+        $actual = $api->updateAppSettings('test-app-name-or-id', $request);
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateAppSettingsUnexpectedResponse(): void
+    {
+        $request = self::createStub(UpdateAppSettingsRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn([]);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(AppApiInterface::UNEXPECTED_RESPONSE);
+        $api->updateAppSettings('test-app-name-or-id', $request);
+    }
+
+    /**
+     * Without an injected serializer the default one is used.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateAppSettingsUsesDefaultSerializer(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn(['test-data']);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api->updateAppSettings('test-app-name-or-id', new UpdateAppSettingsRequest());
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateAppUnexpectedResponse(): void
+    {
+        $request = self::createStub(UpdateAppRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn([]);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(AppApiInterface::UNEXPECTED_RESPONSE);
+        $api->updateApp('test-app-name-or-id', $request);
+    }
+
+    /**
+     * Without an injected serializer the default one is used.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateAppUsesDefaultSerializer(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn(['test-data']);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api->updateApp('test-app-name-or-id', new UpdateAppRequest('test-display-name', 'test-description', 'test-app-type', ['test-classifications-1', 'test-classifications-2']));
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateAppWithoutOptionalParameters(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(UpdateAppRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(AppApiInterface::API_URL_SPRINTF, 'test-app-name-or-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(UpdateAppRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(AppInterface::class);
+
+        $transformer = self::createMock(AppTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new AppApi($requestSender, $transformer, self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), null, null, $serializer);
+        $actual = $api->updateApp('test-app-name-or-id', $request);
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateSignatureType(): void
+    {
+        $request = self::createStub(UpdateSignatureTypeRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(AppApiInterface::API_URL_SIGNATURE_TYPE_SPRINTF, 'test-app-name-or-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn([]);
+
+        $serializer = self::createMock(UpdateSignatureTypeRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), null, null, null, null, null, null, null, $serializer);
+        $api->updateSignatureType('test-app-name-or-id', $request);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * Without an injected serializer the default one is used.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateSignatureTypeUsesDefaultSerializer(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn([]);
+
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api->updateSignatureType('test-app-name-or-id', new UpdateSignatureTypeRequest('test-signature-type'));
+
+        $this->addToAssertionCount(1);
     }
 }
