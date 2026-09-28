@@ -31,6 +31,8 @@ final class VirtualDeviceApi implements VirtualDeviceApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *

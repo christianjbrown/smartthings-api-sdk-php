@@ -34,7 +34,9 @@ PSR/PEAR/Squiz/Generic), and **php-cs-fixer** (`@PhpCsFixer`/`@Symfony`) handles
 `bin/php-cs*` scripts are thin wrappers over it.
 Static analysis is **PHPStan at `level: max`** (`phpstan.neon.dist`, run with `composer stan` /
 `./bin/phpstan analyse`), and there is a **GitHub Actions CI workflow** (`.github/workflows/ci.yml`)
-that runs style, PHPStan, and the PHPUnit suite with coverage on every push/PR. Always run
+that runs style, PHPStan, and the PHPUnit suite with coverage on every push/PR, then enforces
+100% coverage with `bin/php-coverage-check` (from `christianjbrown/code-quality-scripts`) against
+the text coverage report — a coverage drop fails the build. Always run
 `composer fix-style` first (php-cs-fixer auto-fixes what it can), then `composer check-style` to
 surface any remaining violations that must be fixed by hand, then `composer stan` and `composer test`
 before finishing.
@@ -44,10 +46,19 @@ before finishing.
 Three layers under `src/`, mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
 `ChristianBrown\SmartThings\` → `src/`, `ChristianBrown\SmartThings\Tests\` → `tests/`.
 
-- **`SmartThings`** (`src/SmartThings.php`) — the facade/entry point. Constructed with just a
-  `string $apiToken`, it builds a Symfony `ContainerBuilder`, registers every transformer and client
-  as a service (ids on `SmartThingsInterface` as `SERVICE_*` constants), and exposes `getDeviceApi()`,
-  `getDeviceStatusApi()`, `getLocationApi()`, and `getLocationRoomApi()`.
+- **`SmartThings`** (`src/SmartThings.php`) — the facade/entry point. Constructed with a
+  `string $apiToken` and an optional `ApiHostInterface` (defaults to production), it asks
+  `DependencyInjection\ContainerFactory` to build a Symfony `ContainerBuilder` and exposes a getter
+  per API client (`getDeviceApi()`, `getDeviceStatusApi()`, `getLocationApi()`, `getLocationRoomApi()`,
+  and 21 more — see `SmartThingsInterface`). Service ids live on `SmartThingsInterface` as `SERVICE_*`
+  constants. `ContainerFactory` runs a fixed, ordered list of small registrar classes under
+  `src/DependencyInjection/Registrar/`, one per resource group (core, devices, locations, automations,
+  capabilities, apps, edge, organizations/services, i18n, and so on), each implementing
+  `ServiceRegistrarInterface::register(ContainerBuilder $container): void`. Adding a new API group
+  means adding one registrar and one line in `ContainerFactory`, not editing a single giant method.
+  `SmartThingsInterface` itself is split into nine narrower role interfaces by domain (see
+  `src/SmartThings*Interface.php`), which it extends — existing code that type-hints against
+  `SmartThingsInterface` is unaffected.
 - **`Api/`** — HTTP clients (`DeviceApi`, `DeviceStatusApi`, `LocationApi`, `LocationRoomApi`). Each is
   constructed with a `JsonApiRequestSenderInterface` (from `christianjbrown/api-client` — no
   Guzzle/PSR-18 used directly), its transformer(s), and a `string $apiToken`. They send an

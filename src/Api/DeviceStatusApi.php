@@ -43,6 +43,8 @@ final class DeviceStatusApi implements DeviceStatusApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
@@ -73,6 +75,8 @@ final class DeviceStatusApi implements DeviceStatusApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
@@ -103,6 +107,8 @@ final class DeviceStatusApi implements DeviceStatusApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
@@ -112,6 +118,8 @@ final class DeviceStatusApi implements DeviceStatusApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */

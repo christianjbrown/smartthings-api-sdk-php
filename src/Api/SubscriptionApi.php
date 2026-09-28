@@ -40,6 +40,8 @@ final class SubscriptionApi implements SubscriptionApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -72,6 +74,8 @@ final class SubscriptionApi implements SubscriptionApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */

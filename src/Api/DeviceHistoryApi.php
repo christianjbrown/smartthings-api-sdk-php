@@ -34,6 +34,8 @@ final class DeviceHistoryApi implements DeviceHistoryApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
      * Reads device event history, transparently following the paging
      * `_links.next.href` and aggregating every page's `items` until the API
      * stops returning a next link or the optional $maxPages cap is reached
