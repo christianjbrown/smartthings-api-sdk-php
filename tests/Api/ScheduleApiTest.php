@@ -12,22 +12,215 @@ use ChristianBrown\SmartThings\Api\ScheduleApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
+use ChristianBrown\SmartThings\Model\CronSchedule;
+use ChristianBrown\SmartThings\Model\OnceSchedule;
 use ChristianBrown\SmartThings\Model\ScheduleInterface;
+use ChristianBrown\SmartThings\Model\ScheduleRequest;
+use ChristianBrown\SmartThings\Model\ScheduleRequestInterface;
+use ChristianBrown\SmartThings\Serializer\ScheduleRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\ScheduleRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\SchedulesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ScheduleTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\Exception;
-
 use PHPUnit\Framework\TestCase;
 
 use function rawurlencode;
 use function sprintf;
 
+#[CoversClass(ScheduleRequestSerializer::class)]
+#[CoversClass(CronSchedule::class)]
+#[CoversClass(OnceSchedule::class)]
+#[CoversClass(ScheduleRequest::class)]
 #[CoversClass(ScheduleApi::class)]
 #[CoversClass(Token::class)]
 final class ScheduleApiTest extends TestCase
 {
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateSchedule(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(ScheduleRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                sprintf(ScheduleApiInterface::API_URL_LIST_SPRINTF, 'test-installed-app-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(ScheduleRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(ScheduleInterface::class);
+
+        $transformer = self::createMock(ScheduleTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new ScheduleApi($requestSender, $transformer, self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'), $serializer);
+        $actual = $api->createSchedule('test-installed-app-id', $request);
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateScheduleInvalidatesListCache(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn([ScheduleApiInterface::KEY_ITEMS => ['test-item']]);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['test-data']);
+
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+
+        $api->getMultiple('test-installed-app-id');
+        $api->createSchedule('test-installed-app-id', self::createStub(ScheduleRequestInterface::class));
+        $api->getMultiple('test-installed-app-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateScheduleUnexpectedResponse(): void
+    {
+        $request = self::createStub(ScheduleRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn([]);
+
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(ScheduleApiInterface::UNEXPECTED_RESPONSE);
+        $api->createSchedule('test-installed-app-id', $request);
+    }
+
+    /**
+     * Without an injected serializer the default one is used.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateScheduleUsesDefaultSerializer(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['test-data']);
+
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api->createSchedule('test-installed-app-id', new ScheduleRequest('test-name'));
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteSchedule(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(ScheduleApiInterface::API_URL_SPRINTF, 'test-installed-app-id', 'test-schedule-name'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api->deleteSchedule('test-installed-app-id', 'test-schedule-name');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteScheduleInvalidatesCaches(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+
+        $api->getOneByName('test-installed-app-id', 'test-schedule-name');
+        $api->deleteSchedule('test-installed-app-id', 'test-schedule-name');
+        $api->getOneByName('test-installed-app-id', 'test-schedule-name');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteSchedules(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(ScheduleApiInterface::API_URL_LIST_SPRINTF, 'test-installed-app-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api->deleteSchedules('test-installed-app-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteSchedulesInvalidatesCaches(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+
+        $api->getOneByName('test-installed-app-id', 'test-schedule-name');
+        $api->deleteSchedules('test-installed-app-id');
+        $api->getOneByName('test-installed-app-id', 'test-schedule-name');
+
+        $this->addToAssertionCount(1);
+    }
+
     /**
      * @throws RequestExceptionInterface
      * @throws Exception
