@@ -12,8 +12,18 @@ use ChristianBrown\SmartThings\Api\InstalledAppApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
+use ChristianBrown\SmartThings\Model\CoordinateAliasRequest;
+use ChristianBrown\SmartThings\Model\CoordinateAliasRequestInterface;
+use ChristianBrown\SmartThings\Model\CreateInstalledAppEventsRequest;
+use ChristianBrown\SmartThings\Model\CreateInstalledAppEventsRequestInterface;
 use ChristianBrown\SmartThings\Model\InstalledAppConfigInterface;
 use ChristianBrown\SmartThings\Model\InstalledAppInterface;
+use ChristianBrown\SmartThings\Model\SmartAppDashboardCardEventRequest;
+use ChristianBrown\SmartThings\Model\SmartAppEventRequest;
+use ChristianBrown\SmartThings\Serializer\CoordinateAliasRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CoordinateAliasRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\CreateInstalledAppEventsRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CreateInstalledAppEventsRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformerInterface;
@@ -21,16 +31,136 @@ use ChristianBrown\SmartThings\Transformer\InstalledAppTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\Exception;
-
 use PHPUnit\Framework\TestCase;
 
 use function rawurlencode;
 use function sprintf;
 
+#[CoversClass(CoordinateAliasRequestSerializer::class)]
+#[CoversClass(CoordinateAliasRequest::class)]
+#[CoversClass(CreateInstalledAppEventsRequestSerializer::class)]
+#[CoversClass(SmartAppDashboardCardEventRequest::class)]
+#[CoversClass(SmartAppEventRequest::class)]
+#[CoversClass(CreateInstalledAppEventsRequest::class)]
 #[CoversClass(InstalledAppApi::class)]
 #[CoversClass(Token::class)]
 final class InstalledAppApiTest extends TestCase
 {
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateEvents(): void
+    {
+        $request = self::createStub(CreateInstalledAppEventsRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                sprintf(InstalledAppApiInterface::API_URL_EVENTS_SPRINTF, 'test-installed-app-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn([]);
+
+        $serializer = self::createMock(CreateInstalledAppEventsRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), $serializer);
+        $api->createEvents('test-installed-app-id', $request);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * Without an injected serializer the default one is used.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateEventsUsesDefaultSerializer(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn([]);
+
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'));
+        $api->createEvents('test-installed-app-id', new CreateInstalledAppEventsRequest());
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteCoordinateAlias(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(InstalledAppApiInterface::API_URL_ALIAS_SPRINTF, 'test-installed-app-id', 'test-alias-name'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'));
+        $api->deleteCoordinateAlias('test-installed-app-id', 'test-alias-name');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteInstallation(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(InstalledAppApiInterface::API_URL_SPRINTF, 'test-installed-app-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'));
+        $api->deleteInstallation('test-installed-app-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteInstallationInvalidatesCaches(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'));
+
+        $api->getOneById('test-installed-app-id');
+        $api->deleteInstallation('test-installed-app-id');
+        $api->getOneById('test-installed-app-id');
+
+        $this->addToAssertionCount(1);
+    }
+
     /**
      * @throws RequestExceptionInterface
      * @throws Exception
@@ -285,6 +415,31 @@ final class InstalledAppApiTest extends TestCase
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(InstalledAppApiInterface::UNEXPECTED_RESPONSE);
         $api->getConfig('test-installed-app-id', 'test-config-id', $skipCache);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetCoordinateAliasCapability(): void
+    {
+        $data = ['test-data'];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')
+            ->with(
+                sprintf(InstalledAppApiInterface::API_URL_ALIAS_CAPABILITY_SPRINTF, 'test-installed-app-id', 'test-alias-name'),
+                [InstalledAppApiInterface::KEY_NAME => 'test-name'],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'));
+        $actual = $api->getCoordinateAliasCapability('test-installed-app-id', 'test-alias-name', 'test-name');
+
+        self::assertSame($data, $actual);
     }
 
     /**
@@ -688,5 +843,53 @@ final class InstalledAppApiTest extends TestCase
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(InstalledAppApiInterface::UNEXPECTED_RESPONSE);
         $api->getOneById('test-installed-app-id', $skipCache);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testPutCoordinateAlias(): void
+    {
+        $request = self::createStub(CoordinateAliasRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(InstalledAppApiInterface::API_URL_ALIAS_SPRINTF, 'test-installed-app-id', 'test-alias-name'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn([]);
+
+        $serializer = self::createMock(CoordinateAliasRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), null, $serializer);
+        $api->putCoordinateAlias('test-installed-app-id', 'test-alias-name', $request);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * Without an injected serializer the default one is used.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testPutCoordinateAliasUsesDefaultSerializer(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn([]);
+
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'));
+        $api->putCoordinateAlias('test-installed-app-id', 'test-alias-name', new CoordinateAliasRequest(1.5, 1.5, 7));
+
+        $this->addToAssertionCount(1);
     }
 }
