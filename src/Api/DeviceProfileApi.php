@@ -7,9 +7,15 @@ namespace ChristianBrown\SmartThings\Api;
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
+use ChristianBrown\SmartThings\Model\CreateDeviceProfileRequestInterface;
 use ChristianBrown\SmartThings\Model\DeviceProfileInterface;
 use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
 use ChristianBrown\SmartThings\Model\LocalizationInterface;
+use ChristianBrown\SmartThings\Model\UpdateDeviceProfileRequestInterface;
+use ChristianBrown\SmartThings\Serializer\CreateDeviceProfileRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CreateDeviceProfileRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\UpdateDeviceProfileRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateDeviceProfileRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceProfilesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\LocaleReferencesTransformerInterface;
@@ -25,6 +31,7 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
      * @var array<string, DeviceProfileInterface>
      */
     private array $cache = [];
+    private ?CreateDeviceProfileRequestSerializerInterface $createDeviceProfileRequestSerializer;
     private DeviceProfilesTransformerInterface $deviceProfilesTransformer;
     private DeviceProfileTransformerInterface $deviceProfileTransformer;
 
@@ -46,8 +53,9 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
      * @var array<string, LocalizationInterface>
      */
     private array $translationsCache = [];
+    private ?UpdateDeviceProfileRequestSerializerInterface $updateDeviceProfileRequestSerializer;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceProfileTransformerInterface $deviceProfileTransformer, DeviceProfilesTransformerInterface $deviceProfilesTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceProfileTransformerInterface $deviceProfileTransformer, DeviceProfilesTransformerInterface $deviceProfilesTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token, ?CreateDeviceProfileRequestSerializerInterface $createDeviceProfileRequestSerializer = null, ?UpdateDeviceProfileRequestSerializerInterface $updateDeviceProfileRequestSerializer = null)
     {
         $this->requestSender = $requestSender;
         $this->deviceProfileTransformer = $deviceProfileTransformer;
@@ -55,6 +63,45 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
         $this->localeReferencesTransformer = $localeReferencesTransformer;
         $this->localizationTransformer = $localizationTransformer;
         $this->token = $token;
+        $this->createDeviceProfileRequestSerializer = $createDeviceProfileRequestSerializer;
+        $this->updateDeviceProfileRequestSerializer = $updateDeviceProfileRequestSerializer;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function createDeviceProfile(CreateDeviceProfileRequestInterface $request): DeviceProfileInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $body = $this->resolveCreateDeviceProfileRequestSerializer()->serialize($request);
+        $data = $this->requestSender->post(self::API_URL, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $profile = $this->deviceProfileTransformer->transform($data);
+        $this->listCache = null;
+
+        return $profile;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteDeviceProfile(string $deviceProfileId): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($deviceProfileId));
+        $this->requestSender->delete($url, [], $headers);
+        unset($this->cache[$deviceProfileId]);
+        $this->listCache = null;
     }
 
     /**
@@ -181,5 +228,48 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
         $this->translationsCache[$cacheKey] = $localization;
 
         return $localization;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function updateDeviceProfile(string $deviceProfileId, UpdateDeviceProfileRequestInterface $request): DeviceProfileInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($deviceProfileId));
+        $body = $this->resolveUpdateDeviceProfileRequestSerializer()->serialize($request);
+        $data = $this->requestSender->put($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $profile = $this->deviceProfileTransformer->transform($data);
+        $this->cache[$deviceProfileId] = $profile;
+        $this->listCache = null;
+
+        return $profile;
+    }
+
+    /**
+     * Falls back to the default serializer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolveCreateDeviceProfileRequestSerializer(): CreateDeviceProfileRequestSerializerInterface
+    {
+        return $this->createDeviceProfileRequestSerializer ?? new CreateDeviceProfileRequestSerializer();
+    }
+
+    /**
+     * Falls back to the default serializer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolveUpdateDeviceProfileRequestSerializer(): UpdateDeviceProfileRequestSerializerInterface
+    {
+        return $this->updateDeviceProfileRequestSerializer ?? new UpdateDeviceProfileRequestSerializer();
     }
 }

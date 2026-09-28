@@ -20,6 +20,8 @@ final class DeviceProfileRegistrarTest extends TestCase
         (new DeviceProfileRegistrar())->register($container);
 
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PROFILES_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PROFILE_CREATE_REQUEST_SERIALIZER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PROFILE_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PROFILE_UPDATE_REQUEST_SERIALIZER));
     }
 }
