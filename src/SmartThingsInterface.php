@@ -79,11 +79,14 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_LOCALE_REFERENCES_TRANSFORMER = 'smartthings.transformer.locale_references_transformer';
     public const string SERVICE_LOCALIZATION_TRANSFORMER = 'smartthings.transformer.localization_transformer';
     public const string SERVICE_LOCATION_API = 'smartthings.api.location_api';
+    public const string SERVICE_LOCATION_CREATE_REQUEST_SERIALIZER = 'smartthings.serializer.create_location_request_serializer';
     public const string SERVICE_LOCATION_MODE_API = 'smartthings.api.location_mode_api';
+    public const string SERVICE_LOCATION_PATCH_REQUEST_SERIALIZER = 'smartthings.serializer.patch_location_request_serializer';
     public const string SERVICE_LOCATION_ROOM_API = 'smartthings.api.location_room_api';
     public const string SERVICE_LOCATION_ROOM_TRANSFORMER = 'smartthings.transformer.location_room_transformer';
     public const string SERVICE_LOCATION_ROOMS_TRANSFORMER = 'smartthings.transformer.location_rooms_transformer';
     public const string SERVICE_LOCATION_TRANSFORMER = 'smartthings.transformer.location_transformer';
+    public const string SERVICE_LOCATION_UPDATE_REQUEST_SERIALIZER = 'smartthings.serializer.update_location_request_serializer';
     public const string SERVICE_LOCATIONS_TRANSFORMER = 'smartthings.transformer.locations_transformer';
     public const string SERVICE_MODE_TRANSFORMER = 'smartthings.transformer.mode_transformer';
     public const string SERVICE_MODES_TRANSFORMER = 'smartthings.transformer.modes_transformer';

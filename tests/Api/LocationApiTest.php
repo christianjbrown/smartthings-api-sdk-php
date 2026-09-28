@@ -12,7 +12,17 @@ use ChristianBrown\SmartThings\Api\LocationApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
+use ChristianBrown\SmartThings\Model\CreateLocationRequest;
 use ChristianBrown\SmartThings\Model\LocationInterface;
+use ChristianBrown\SmartThings\Model\LocationPatchField;
+use ChristianBrown\SmartThings\Model\PatchLocationRequest;
+use ChristianBrown\SmartThings\Model\UpdateLocationRequest;
+use ChristianBrown\SmartThings\Serializer\CreateLocationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CreateLocationRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\PatchLocationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\PatchLocationRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\UpdateLocationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateLocationRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\LocationTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -24,10 +34,223 @@ use PHPUnit\Framework\TestCase;
 use function rawurlencode;
 use function sprintf;
 
+#[CoversClass(CreateLocationRequest::class)]
+#[CoversClass(CreateLocationRequestSerializer::class)]
 #[CoversClass(LocationApi::class)]
+#[CoversClass(LocationPatchField::class)]
+#[CoversClass(PatchLocationRequest::class)]
+#[CoversClass(PatchLocationRequestSerializer::class)]
 #[CoversClass(Token::class)]
+#[CoversClass(UpdateLocationRequest::class)]
+#[CoversClass(UpdateLocationRequestSerializer::class)]
 final class LocationApiTest extends TestCase
 {
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateLocation(): void
+    {
+        $data = ['test-location-data'];
+
+        $request = new CreateLocationRequest('Home', 'GBR');
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                LocationApiInterface::API_URL,
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $createLocationRequestSerializer = self::createMock(CreateLocationRequestSerializerInterface::class);
+        $createLocationRequestSerializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $locationTransformer = self::createMock(LocationTransformerInterface::class);
+        $locationTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($location);
+
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
+
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), $createLocationRequestSerializer);
+        $actual = $locationApi->createLocation($request);
+
+        self::assertSame($location, $actual);
+    }
+
+    /**
+     * createLocation() invalidates the cached location list, so a subsequent
+     * getMultiple() call hits the API again instead of returning a stale list.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateLocationInvalidatesListCache(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn([LocationApiInterface::KEY_ITEMS => ['test-item']]);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['test-location-data']);
+
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
+        $locationTransformer->method('transform')
+            ->willReturn($location);
+
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
+        $locationsTransformer->method('transform')
+            ->willReturn([$location]);
+
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
+
+        $locationApi->getMultiple();
+        $locationApi->createLocation(new CreateLocationRequest('Home', 'GBR'));
+        $locationApi->getMultiple();
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateLocationUnexpectedResponse(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn([]);
+
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
+
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(LocationApiInterface::UNEXPECTED_RESPONSE);
+        $locationApi->createLocation(new CreateLocationRequest('Home', 'GBR'));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteLocation(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(LocationApiInterface::API_URL_SPRINTF, 'test-location-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
+
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
+        $locationApi->deleteLocation('test-location-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * deleteLocation() invalidates the cached copy of this location and the cached
+     * location list, so subsequent lookups hit the API again.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteLocationInvalidatesCaches(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-location-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
+        $locationTransformer->method('transform')
+            ->willReturn($location);
+
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
+
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
+
+        $locationApi->getOneById('test-location-id');
+        $locationApi->deleteLocation('test-location-id');
+        $locationApi->getOneById('test-location-id');
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteLocationWithForce(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(LocationApiInterface::API_URL_SPRINTF, 'test-location-id'),
+                [LocationApiInterface::KEY_FORCE => 'true'],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
+
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
+        $locationApi->deleteLocation('test-location-id', true);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteLocationWithForceFalse(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(LocationApiInterface::API_URL_SPRINTF, 'test-location-id'),
+                [LocationApiInterface::KEY_FORCE => 'false'],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
+
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
+        $locationApi->deleteLocation('test-location-id', false);
+
+        $this->addToAssertionCount(1);
+    }
+
     /**
      * @throws RequestExceptionInterface
      * @throws Exception
@@ -330,5 +553,193 @@ final class LocationApiTest extends TestCase
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationApiInterface::UNEXPECTED_RESPONSE);
         $locationApi->getOneById('test-location-id', $skipCache);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testPatchLocation(): void
+    {
+        $data = ['test-location-data'];
+
+        $request = (new PatchLocationRequest())->setLatitude(new LocationPatchField(51.5));
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('patch')
+            ->with(
+                sprintf(LocationApiInterface::API_URL_SPRINTF, 'test-location-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $patchLocationRequestSerializer = self::createMock(PatchLocationRequestSerializerInterface::class);
+        $patchLocationRequestSerializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $location = self::createStub(LocationInterface::class);
+
+        $locationTransformer = self::createMock(LocationTransformerInterface::class);
+        $locationTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($location);
+
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
+
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), null, null, $patchLocationRequestSerializer);
+        $actual = $locationApi->patchLocation('test-location-id', $request);
+
+        self::assertSame($location, $actual);
+    }
+
+    /**
+     * patchLocation() refreshes the cached copy of this location and invalidates the
+     * cached location list, so a subsequent getOneById() reflects the change while
+     * getMultiple() hits the API again.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testPatchLocationRefreshesCachesAndInvalidatesList(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())
+            ->method('patch')
+            ->willReturn(['test-location-data']);
+        $requestSender->expects(self::once())->method('get')
+            ->willReturn([LocationApiInterface::KEY_ITEMS => ['test-item']]);
+
+        $locationTransformer = self::createMock(LocationTransformerInterface::class);
+        $locationTransformer->expects(self::once())
+            ->method('transform')
+            ->willReturn($location);
+
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
+        $locationsTransformer->method('transform')
+            ->willReturn([$location]);
+
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
+
+        self::assertSame($location, $locationApi->patchLocation('test-location-id', new PatchLocationRequest()));
+        self::assertSame($location, $locationApi->getOneById('test-location-id'));
+        $locationApi->getMultiple();
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testPatchLocationUnexpectedResponse(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('patch')
+            ->willReturn([]);
+
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
+
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(LocationApiInterface::UNEXPECTED_RESPONSE);
+        $locationApi->patchLocation('test-location-id', new PatchLocationRequest());
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateLocation(): void
+    {
+        $data = ['test-location-data'];
+
+        $request = new UpdateLocationRequest('Home');
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(LocationApiInterface::API_URL_SPRINTF, 'test-location-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $updateLocationRequestSerializer = self::createMock(UpdateLocationRequestSerializerInterface::class);
+        $updateLocationRequestSerializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $location = self::createStub(LocationInterface::class);
+
+        $locationTransformer = self::createMock(LocationTransformerInterface::class);
+        $locationTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($location);
+
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
+
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), null, $updateLocationRequestSerializer);
+        $actual = $locationApi->updateLocation('test-location-id', $request);
+
+        self::assertSame($location, $actual);
+    }
+
+    /**
+     * updateLocation() refreshes the cached copy of this location, so a subsequent
+     * getOneById() for the same id is served from it.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateLocationPopulatesCache(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())
+            ->method('put')
+            ->willReturn(['test-location-data']);
+
+        $locationTransformer = self::createMock(LocationTransformerInterface::class);
+        $locationTransformer->expects(self::once())
+            ->method('transform')
+            ->willReturn($location);
+
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
+
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
+
+        self::assertSame($location, $locationApi->updateLocation('test-location-id', new UpdateLocationRequest('Home')));
+        self::assertSame($location, $locationApi->getOneById('test-location-id'));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateLocationUnexpectedResponse(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn([]);
+
+        $locationTransformer = self::createStub(LocationTransformerInterface::class);
+        $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
+
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(LocationApiInterface::UNEXPECTED_RESPONSE);
+        $locationApi->updateLocation('test-location-id', new UpdateLocationRequest('Home'));
     }
 }
