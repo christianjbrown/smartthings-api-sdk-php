@@ -7,6 +7,7 @@ namespace ChristianBrown\SmartThings\Api;
 use ChristianBrown\SmartThings\Model\DevicePreferenceDefinitionInterface;
 use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
 use ChristianBrown\SmartThings\Model\LocalizationInterface;
+use ChristianBrown\SmartThings\Model\PreferenceRequestInterface;
 
 interface DevicePreferenceDefinitionApiInterface extends ApiInterface
 {
@@ -21,6 +22,18 @@ interface DevicePreferenceDefinitionApiInterface extends ApiInterface
     public const string UNEXPECTED_RESPONSE_SPRINTF = '%s not set or not an array';
 
     /**
+     * Creates a Preference. Invalidates the cached preference lists so a subsequent
+     * getMultiple() reflects the new preference.
+     */
+    public function createPreference(PreferenceRequestInterface $request): DevicePreferenceDefinitionInterface;
+
+    /**
+     * Deletes a Preference by id. Invalidates any cached copy of this preference and
+     * the cached preference lists.
+     */
+    public function deletePreferenceById(string $preferenceId): void;
+
+    /**
      * @return array<int, LocaleReferenceInterface>
      */
     public function getLocales(string $preferenceId, bool $skipCache = false): array;
@@ -33,4 +46,10 @@ interface DevicePreferenceDefinitionApiInterface extends ApiInterface
     public function getOneById(string $preferenceId, bool $skipCache = false): DevicePreferenceDefinitionInterface;
 
     public function getTranslations(string $preferenceId, string $locale, bool $skipCache = false): LocalizationInterface;
+
+    /**
+     * Updates a Preference by id. Refreshes the cached copy of this preference and
+     * invalidates the cached preference lists.
+     */
+    public function updatePreferenceById(string $preferenceId, PreferenceRequestInterface $request): DevicePreferenceDefinitionInterface;
 }

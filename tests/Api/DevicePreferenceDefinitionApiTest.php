@@ -15,6 +15,9 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DevicePreferenceDefinitionInterface;
 use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
 use ChristianBrown\SmartThings\Model\LocalizationInterface;
+use ChristianBrown\SmartThings\Model\PreferenceRequest;
+use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\LocaleReferencesTransformerInterface;
@@ -28,9 +31,151 @@ use function rawurlencode;
 use function sprintf;
 
 #[CoversClass(DevicePreferenceDefinitionApi::class)]
+#[CoversClass(PreferenceRequest::class)]
+#[CoversClass(PreferenceRequestSerializer::class)]
 #[CoversClass(Token::class)]
 final class DevicePreferenceDefinitionApiTest extends TestCase
 {
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreatePreference(): void
+    {
+        $data = ['test-preference-data'];
+
+        $request = new PreferenceRequest('tempOffset', 'Temperature Offset', 'number', ['minimum' => -10.0]);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                DevicePreferenceDefinitionApiInterface::API_URL,
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $preferenceRequestSerializer = self::createMock(PreferenceRequestSerializerInterface::class);
+        $preferenceRequestSerializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $definition = self::createStub(DevicePreferenceDefinitionInterface::class);
+
+        $devicePreferenceDefinitionTransformer = self::createMock(DevicePreferenceDefinitionTransformerInterface::class);
+        $devicePreferenceDefinitionTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($definition);
+
+        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), $preferenceRequestSerializer);
+        $actual = $api->createPreference($request);
+
+        self::assertSame($definition, $actual);
+    }
+
+    /**
+     * createPreference() invalidates the cached preference lists, so a subsequent
+     * getMultiple() call hits the API again instead of returning a stale list.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreatePreferenceInvalidatesListCache(): void
+    {
+        $definition = self::createStub(DevicePreferenceDefinitionInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn([DevicePreferenceDefinitionApiInterface::KEY_ITEMS => ['test-item']]);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['test-preference-data']);
+
+        $devicePreferenceDefinitionTransformer = self::createStub(DevicePreferenceDefinitionTransformerInterface::class);
+        $devicePreferenceDefinitionTransformer->method('transform')
+            ->willReturn($definition);
+
+        $devicePreferenceDefinitionsTransformer = self::createStub(DevicePreferenceDefinitionsTransformerInterface::class);
+        $devicePreferenceDefinitionsTransformer->method('transform')
+            ->willReturn([$definition]);
+
+        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, $devicePreferenceDefinitionsTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+
+        $api->getMultiple();
+        $api->createPreference(new PreferenceRequest('tempOffset', 'Temperature Offset', 'number', ['minimum' => -10.0]));
+        $api->getMultiple();
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreatePreferenceUnexpectedResponse(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn([]);
+
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(DevicePreferenceDefinitionApiInterface::UNEXPECTED_RESPONSE);
+        $api->createPreference(new PreferenceRequest('tempOffset', 'Temperature Offset', 'number', ['minimum' => -10.0]));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeletePreferenceById(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(DevicePreferenceDefinitionApiInterface::API_URL_SPRINTF, 'test-preference-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api->deletePreferenceById('test-preference-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * deletePreferenceById() invalidates the cached copy of this preference and the
+     * cached preference lists, so subsequent lookups hit the API again.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeletePreferenceByIdInvalidatesCaches(): void
+    {
+        $definition = self::createStub(DevicePreferenceDefinitionInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-preference-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $devicePreferenceDefinitionTransformer = self::createStub(DevicePreferenceDefinitionTransformerInterface::class);
+        $devicePreferenceDefinitionTransformer->method('transform')
+            ->willReturn($definition);
+
+        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+
+        $api->getOneById('test-preference-id');
+        $api->deletePreferenceById('test-preference-id');
+        $api->getOneById('test-preference-id');
+    }
+
     /**
      * @throws RequestExceptionInterface
      * @throws Exception
@@ -512,5 +657,89 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DevicePreferenceDefinitionApiInterface::UNEXPECTED_RESPONSE);
         $api->getTranslations('test-preference-id', 'ko', $skipCache);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdatePreferenceById(): void
+    {
+        $data = ['test-preference-data'];
+
+        $request = new PreferenceRequest('tempOffset', 'Temperature Offset', 'number', ['minimum' => -10.0]);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(DevicePreferenceDefinitionApiInterface::API_URL_SPRINTF, 'test-preference-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $preferenceRequestSerializer = self::createMock(PreferenceRequestSerializerInterface::class);
+        $preferenceRequestSerializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $definition = self::createStub(DevicePreferenceDefinitionInterface::class);
+
+        $devicePreferenceDefinitionTransformer = self::createMock(DevicePreferenceDefinitionTransformerInterface::class);
+        $devicePreferenceDefinitionTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($definition);
+
+        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), $preferenceRequestSerializer);
+        $actual = $api->updatePreferenceById('test-preference-id', $request);
+
+        self::assertSame($definition, $actual);
+    }
+
+    /**
+     * updatePreferenceById() refreshes the cached copy of this preference, so a
+     * subsequent getOneById() for the same id is served from it.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdatePreferenceByIdPopulatesCache(): void
+    {
+        $definition = self::createStub(DevicePreferenceDefinitionInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())
+            ->method('put')
+            ->willReturn(['test-preference-data']);
+
+        $devicePreferenceDefinitionTransformer = self::createMock(DevicePreferenceDefinitionTransformerInterface::class);
+        $devicePreferenceDefinitionTransformer->expects(self::once())
+            ->method('transform')
+            ->willReturn($definition);
+
+        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+
+        self::assertSame($definition, $api->updatePreferenceById('test-preference-id', new PreferenceRequest('tempOffset', 'Temperature Offset', 'number', ['minimum' => -10.0])));
+        self::assertSame($definition, $api->getOneById('test-preference-id'));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdatePreferenceByIdUnexpectedResponse(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn([]);
+
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(DevicePreferenceDefinitionApiInterface::UNEXPECTED_RESPONSE);
+        $api->updatePreferenceById('test-preference-id', new PreferenceRequest('tempOffset', 'Temperature Offset', 'number', ['minimum' => -10.0]));
     }
 }

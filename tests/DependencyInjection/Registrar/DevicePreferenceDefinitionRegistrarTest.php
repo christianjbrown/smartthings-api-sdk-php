@@ -21,5 +21,6 @@ final class DevicePreferenceDefinitionRegistrarTest extends TestCase
 
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PREFERENCE_DEFINITIONS_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PREFERENCE_DEFINITION_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_PREFERENCE_REQUEST_SERIALIZER));
     }
 }
