@@ -55,6 +55,47 @@ final class LocationRoomApi implements LocationRoomApiInterface
      *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
+     */
+    public function createRoom(LocationInterface $location, string $name): LocationRoomInterface
+    {
+        $locationId = $location->getLocationId();
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_LIST_SPRINTF, rawurlencode($locationId));
+        $body = [self::KEY_NAME => $name];
+        $data = $this->requestSender->post($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $room = $this->roomTransformer->transform($data);
+        unset($this->listCache[$locationId]);
+
+        return $room;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteRoom(LocationInterface $location, string $roomId): void
+    {
+        $locationId = $location->getLocationId();
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($locationId), rawurlencode($roomId));
+        $this->requestSender->delete($url, [], $headers);
+        unset($this->cache[$roomId], $this->listCache[$locationId]);
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
      *
      * @return array<int, DeviceInterface>
      */
@@ -147,6 +188,33 @@ final class LocationRoomApi implements LocationRoomApiInterface
     public function getOneByLocationAndId(LocationInterface $location, string $roomId, bool $skipCache = false): LocationRoomInterface
     {
         return $this->getOne($location->getLocationId(), $roomId, $skipCache);
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function updateRoom(LocationInterface $location, string $roomId, string $name): LocationRoomInterface
+    {
+        $locationId = $location->getLocationId();
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($locationId), rawurlencode($roomId));
+        $body = [self::KEY_NAME => $name];
+        $data = $this->requestSender->put($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $room = $this->roomTransformer->transform($data);
+        $this->cache[$roomId] = $room;
+        unset($this->listCache[$locationId]);
+
+        return $room;
     }
 
     /**

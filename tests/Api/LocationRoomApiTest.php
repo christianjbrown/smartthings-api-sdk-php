@@ -35,6 +35,169 @@ final class LocationRoomApiTest extends TestCase
      * @throws RequestExceptionInterface
      * @throws Exception
      */
+    public function testCreateRoom(): void
+    {
+        $data = ['test-room-data'];
+
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $room = self::createStub(LocationRoomInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                sprintf(LocationRoomApiInterface::API_URL_LIST_SPRINTF, 'test-location-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                [LocationRoomApiInterface::KEY_NAME => 'test-room-name']
+            )
+            ->willReturn($data);
+
+        $roomTransformer = self::createMock(LocationRoomTransformerInterface::class);
+        $roomTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($room);
+
+        $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
+
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $actual = $roomApi->createRoom($location, 'test-room-name');
+
+        self::assertSame($room, $actual);
+    }
+
+    /**
+     * createRoom() invalidates the cached room list for this location, so a subsequent
+     * getMultiple() call hits the API again instead of returning a stale list.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateRoomInvalidatesListCache(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $room = self::createStub(LocationRoomInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn([LocationRoomApiInterface::KEY_ITEMS => ['test-item']]);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['test-room-data']);
+
+        $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
+        $roomTransformer->method('transform')
+            ->willReturn($room);
+
+        $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
+        $roomsTransformer->method('transform')
+            ->willReturn([$room]);
+
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+
+        $roomApi->getMultiple($location);
+        $roomApi->createRoom($location, 'test-room-name');
+        $roomApi->getMultiple($location);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateRoomUnexpectedResponse(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn([]);
+
+        $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
+        $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
+
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(LocationRoomApiInterface::UNEXPECTED_RESPONSE);
+        $roomApi->createRoom($location, 'test-room-name');
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteRoom(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(LocationRoomApiInterface::API_URL_SPRINTF, 'test-location-id', 'test-room-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
+        $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
+
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi->deleteRoom($location, 'test-room-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * deleteRoom() invalidates both the cached copy of this room and the cached room
+     * list for this location, so subsequent lookups hit the API again.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteRoomInvalidatesCaches(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $room = self::createStub(LocationRoomInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-room-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
+        $roomTransformer->method('transform')
+            ->willReturn($room);
+
+        $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
+
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+
+        $roomApi->getOneByLocationAndId($location, 'test-room-id');
+        $roomApi->deleteRoom($location, 'test-room-id');
+        $roomApi->getOneByLocationAndId($location, 'test-room-id');
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
     public function testGetCachesByRoomId(): void
     {
         $data = ['test-room-data'];
@@ -674,5 +837,104 @@ final class LocationRoomApiTest extends TestCase
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($room, $roomApi->getOneByDevice($device));
         self::assertSame($room, $roomApi->getOneByDevice($device, true));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateRoom(): void
+    {
+        $data = ['test-room-data'];
+
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $room = self::createStub(LocationRoomInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(LocationRoomApiInterface::API_URL_SPRINTF, 'test-location-id', 'test-room-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                [LocationRoomApiInterface::KEY_NAME => 'test-room-name']
+            )
+            ->willReturn($data);
+
+        $roomTransformer = self::createMock(LocationRoomTransformerInterface::class);
+        $roomTransformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($room);
+
+        $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
+
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $actual = $roomApi->updateRoom($location, 'test-room-id', 'test-room-name');
+
+        self::assertSame($room, $actual);
+    }
+
+    /**
+     * updateRoom() refreshes the cached copy of this room, so a subsequent
+     * getOneByLocationAndId() for the same id is served from it.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateRoomPopulatesCache(): void
+    {
+        $data = ['test-room-data'];
+
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $room = self::createStub(LocationRoomInterface::class);
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())
+            ->method('put')
+            ->willReturn($data);
+
+        $roomTransformer = self::createMock(LocationRoomTransformerInterface::class);
+        $roomTransformer->expects(self::once())
+            ->method('transform')
+            ->with($data)
+            ->willReturn($room);
+
+        $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
+
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+
+        self::assertSame($room, $roomApi->updateRoom($location, 'test-room-id', 'test-room-name'));
+        self::assertSame($room, $roomApi->getOneByLocationAndId($location, 'test-room-id'));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateRoomUnexpectedResponse(): void
+    {
+        $location = self::createStub(LocationInterface::class);
+        $location->method('getLocationId')
+            ->willReturn('test-location-id');
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn([]);
+
+        $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
+        $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
+
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(LocationRoomApiInterface::UNEXPECTED_RESPONSE);
+        $roomApi->updateRoom($location, 'test-room-id', 'test-room-name');
     }
 }
