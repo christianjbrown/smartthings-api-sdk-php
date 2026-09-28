@@ -31,11 +31,13 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_DEVICE_COMPONENT_CAPABILITY_TRANSFORMER = 'smartthings.transformer.device_component_capability_transformer';
     public const string SERVICE_DEVICE_COMPONENT_TRANSFORMER = 'smartthings.transformer.device_component_transformer';
     public const string SERVICE_DEVICE_COMPONENTS_TRANSFORMER = 'smartthings.transformer.device_components_transformer';
+    public const string SERVICE_DEVICE_EVENT_SERIALIZER = 'smartthings.serializer.device_event_serializer';
     public const string SERVICE_DEVICE_HEALTH_API = 'smartthings.api.device_health_api';
     public const string SERVICE_DEVICE_HEALTH_TRANSFORMER = 'smartthings.transformer.device_health_transformer';
     public const string SERVICE_DEVICE_HISTORY_API = 'smartthings.api.device_history_api';
     public const string SERVICE_DEVICE_HISTORY_EVENT_TRANSFORMER = 'smartthings.transformer.device_history_event_transformer';
     public const string SERVICE_DEVICE_HISTORY_EVENTS_TRANSFORMER = 'smartthings.transformer.device_history_events_transformer';
+    public const string SERVICE_DEVICE_INSTALL_REQUEST_SERIALIZER = 'smartthings.serializer.device_install_request_serializer';
     public const string SERVICE_DEVICE_PREFERENCE_DEFINITION_API = 'smartthings.api.device_preference_definition_api';
     public const string SERVICE_DEVICE_PREFERENCE_DEFINITION_TRANSFORMER = 'smartthings.transformer.device_preference_definition_transformer';
     public const string SERVICE_DEVICE_PREFERENCE_DEFINITIONS_TRANSFORMER = 'smartthings.transformer.device_preference_definitions_transformer';
@@ -117,5 +119,6 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_SUBSCRIPTION_API = 'smartthings.api.subscription_api';
     public const string SERVICE_SUBSCRIPTION_TRANSFORMER = 'smartthings.transformer.subscription_transformer';
     public const string SERVICE_SUBSCRIPTIONS_TRANSFORMER = 'smartthings.transformer.subscriptions_transformer';
+    public const string SERVICE_UPDATE_DEVICE_REQUEST_SERIALIZER = 'smartthings.serializer.update_device_request_serializer';
     public const string SERVICE_VIRTUAL_DEVICE_API = 'smartthings.api.virtual_device_api';
 }

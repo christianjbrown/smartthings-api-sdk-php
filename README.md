@@ -6,7 +6,7 @@ A strongly-typed PHP client for the [SmartThings API](https://developer.smartthi
 
 The client currently supports:
 
-- **Listing devices** — id, name, label, location and room ids, and each component's capabilities — or reading a single device by id (`getOneById`). **Write:** executing one or more capability commands on a device (`executeCommands`), returning each command's tracking id and status.
+- **Listing devices** — id, name, label, location and room ids, and each component's capabilities — or reading a single device by id (`getOneById`). **Write:** executing one or more capability commands on a device (`executeCommands`), returning each command's tracking id and status; installing a SmartApp-managed device (`installDevice`); updating a device's label, location, or room (`updateDevice`); deleting a device (`deleteDevice`); and posting attribute-state events for a SmartApp-managed device (`createEvents`).
 - **Reading a device's status** — currently the `temperatureMeasurement`, `relativeHumidityMeasurement`, and `battery` capabilities (value, unit, and timestamp) from the device's `main` component (`getOneById`/`getOneByDevice`), a single component (`getOneByComponent`), or a single capability on a component (`getOneByCapability`).
 - **Reading a device's health** — the connection `state` (`ONLINE`/`OFFLINE`/`UNHEALTHY`) and the `lastUpdatedDate`, by id (`getOneById`) or from a device (`getOneByDevice`).
 - **Reading a device's preferences** — the device's current preference values, by id (`getOneById`) or from a device (`getOneByDevice`). Each preference carries its name, `preferenceType`, and value.
@@ -37,7 +37,7 @@ The client currently supports:
 
 | Resource | Client | Endpoint(s) | Returns |
 | --- | --- | --- | --- |
-| Devices | `getDeviceApi()` | `GET /devices`, `GET /devices/{deviceId}`, `POST /devices/{deviceId}/commands` | `DeviceInterface[]` / `DeviceInterface` / `DeviceCommandResultInterface[]` |
+| Devices | `getDeviceApi()` | `GET /devices`, `GET /devices/{deviceId}`, `POST /devices/{deviceId}/commands`, `POST /devices`, `PUT /devices/{deviceId}`, `DELETE /devices/{deviceId}`, `POST /devices/{deviceId}/events` | `DeviceInterface[]` / `DeviceInterface` / `DeviceCommandResultInterface[]` |
 | Virtual devices | `getVirtualDeviceApi()` | `GET /virtualdevices` | `DeviceInterface[]` |
 | Device status | `getDeviceStatusApi()` | `GET /devices/{deviceId}/status`, `GET /devices/{deviceId}/components/{componentId}/status`, `GET /devices/{deviceId}/components/{componentId}/capabilities/{capabilityId}/status` | `DeviceStatusInterface` |
 | Device health | `getDeviceHealthApi()` | `GET /devices/{deviceId}/health` | `DeviceHealthInterface` |
