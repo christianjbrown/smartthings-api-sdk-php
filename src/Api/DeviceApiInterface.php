@@ -25,6 +25,7 @@ interface DeviceApiInterface extends ApiInterface
      * Executes one or more capability commands on a device. This does not cache: every
      * call re-triggers the device's side effects.
      *
+     * @param string                             $deviceId The device to command
      * @param array<int, DeviceCommandInterface> $commands
      * @param null|bool                          $ordered  deprecated by the vendor spec; functionality is not
      *                                                     guaranteed, but still accepted for backward compatibility

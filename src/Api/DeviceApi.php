@@ -51,6 +51,7 @@ final class DeviceApi implements DeviceApiInterface
     }
 
     /**
+     * @param string                             $deviceId The device to command
      * @param array<int, DeviceCommandInterface> $commands
      *
      * @throws RequestExceptionInterface
