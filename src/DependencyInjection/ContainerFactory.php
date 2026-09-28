@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\DependencyInjection;
 
+use ChristianBrown\SmartThings\Api\ApiHostInterface;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ApiClientRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\AppRegistrar;
@@ -42,13 +43,13 @@ final class ContainerFactory implements ContainerFactoryInterface
      */
     private array $registrars;
 
-    public function __construct(TokenInterface $token)
+    public function __construct(TokenInterface $token, ApiHostInterface $apiHost)
     {
         // Registration order matters: a service must be registered before another
         // service wires a reference to its definition, so core comes first and the
         // API clients (which reference every transformer chain) come last.
         $this->registrars = [
-            new CoreRegistrar(),
+            new CoreRegistrar($apiHost),
             new AppRegistrar(),
             new CapabilityRegistrar(),
             new ChannelRegistrar(),

@@ -199,6 +199,27 @@ Both live in `src/Exception/`. Request-level failures (network errors, non-2xx r
 
 Under the hood, `SmartThings` wires the clients and their transformer chains through a [Symfony dependency-injection](https://symfony.com/doc/current/components/dependency_injection.html) container. If you don't want the container, you can build the same chains by hand — as shown below. The HTTP request sender comes from [`christianjbrown/api-client`](https://github.com/christianjbrown/api-client-php).
 
+### Overriding the API host
+
+Every request goes to `https://api.smartthings.com` by default. To point at a different host — a
+staging environment, a proxy, a recorded-fixture server in a test suite — pass an `ApiHostInterface`
+as the second constructor argument:
+
+```php
+use ChristianBrown\SmartThings\Api\ApiHost;
+use ChristianBrown\SmartThings\SmartThings;
+
+$smartThings = new SmartThings(
+    'your-smartthings-personal-access-token',
+    new ApiHost('https://staging.example.com')
+);
+```
+
+Omit it, or pass `null`, and requests go to production exactly as before — existing callers don't
+need to change anything. `ApiHostInterface::PRODUCTION_BASE_URL` holds the default. The interface
+constants on each `*ApiInterface` (e.g. `DeviceApiInterface::API_URL`) still point at production and
+are unaffected by an override; the override only changes the host each request is actually sent to.
+
 <details id="wiring-the-clients">
 <summary><strong>Wiring the clients</strong></summary>
 

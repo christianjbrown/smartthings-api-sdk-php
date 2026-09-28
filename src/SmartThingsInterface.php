@@ -113,6 +113,7 @@ interface SmartThingsInterface
     public const string SERVICE_ORGANIZATIONS_TRANSFORMER = 'smartthings.transformer.organizations_transformer';
     public const string SERVICE_PRESENTATION_API = 'smartthings.api.presentation_api';
     public const string SERVICE_PRESENTATION_TRANSFORMER = 'smartthings.transformer.presentation_transformer';
+    public const string SERVICE_RAW_JSON_API_REQUEST_SENDER = 'smartthings.raw_json_api_request_sender';
     public const string SERVICE_RULE_API = 'smartthings.api.rule_api';
     public const string SERVICE_RULE_TRANSFORMER = 'smartthings.transformer.rule_transformer';
     public const string SERVICE_RULES_TRANSFORMER = 'smartthings.transformer.rules_transformer';

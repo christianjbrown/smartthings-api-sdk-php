@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings;
 
+use ChristianBrown\SmartThings\Api\ApiHost;
+use ChristianBrown\SmartThings\Api\ApiHostInterface;
 use ChristianBrown\SmartThings\Api\AppApiInterface;
 use ChristianBrown\SmartThings\Api\CapabilityApiInterface;
 use ChristianBrown\SmartThings\Api\ChannelApiInterface;
@@ -41,10 +43,10 @@ final class SmartThings implements SmartThingsInterface
     private ContainerBuilder $container;
     private TokenInterface $token;
 
-    public function __construct(string $apiToken)
+    public function __construct(string $apiToken, ?ApiHostInterface $apiHost = null)
     {
         $this->token = new Token($apiToken);
-        $this->container = (new ContainerFactory($this->token))->build();
+        $this->container = (new ContainerFactory($this->token, $apiHost ?? new ApiHost()))->build();
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests;
 
+use ChristianBrown\SmartThings\Api\ApiHost;
 use ChristianBrown\SmartThings\Api\AppApi;
 use ChristianBrown\SmartThings\Api\CapabilityApi;
 use ChristianBrown\SmartThings\Api\ChannelApi;
@@ -15,6 +16,7 @@ use ChristianBrown\SmartThings\Api\DevicePreferencesApi;
 use ChristianBrown\SmartThings\Api\DeviceProfileApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\DriverApi;
+use ChristianBrown\SmartThings\Api\HostOverridingJsonApiRequestSender;
 use ChristianBrown\SmartThings\Api\HubApi;
 use ChristianBrown\SmartThings\Api\InstalledAppApi;
 use ChristianBrown\SmartThings\Api\LocationApi;
@@ -148,6 +150,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CapabilityRegistrar::class)]
 #[UsesClass(ChannelRegistrar::class)]
 #[UsesClass(CoreRegistrar::class)]
+#[UsesClass(ApiHost::class)]
+#[UsesClass(HostOverridingJsonApiRequestSender::class)]
 #[UsesClass(DeviceHealthRegistrar::class)]
 #[UsesClass(DeviceHistoryRegistrar::class)]
 #[UsesClass(DevicePreferenceDefinitionRegistrar::class)]
@@ -276,6 +280,13 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(SubscriptionTransformer::class)]
 final class SmartThingsTest extends TestCase
 {
+    public function testConstructAcceptsCustomApiHost(): void
+    {
+        $smartThings = new SmartThings('token', new ApiHost('https://staging.example.test'));
+
+        self::assertInstanceOf(DeviceApi::class, $smartThings->getDeviceApi());
+    }
+
     public function testGetAppApi(): void
     {
         $smartThings = new SmartThings('token');
