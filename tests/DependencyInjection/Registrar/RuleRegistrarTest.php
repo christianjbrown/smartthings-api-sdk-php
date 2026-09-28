@@ -21,6 +21,7 @@ final class RuleRegistrarTest extends TestCase
 
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_RULES_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_RULE_EXECUTION_RESULT_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_RULE_REQUEST_SERIALIZER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_RULE_TRANSFORMER));
     }
 }

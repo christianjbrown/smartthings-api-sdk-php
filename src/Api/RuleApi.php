@@ -10,6 +10,9 @@ use ChristianBrown\SmartThings\Exception\MissingInputException;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\RuleExecutionResultInterface;
 use ChristianBrown\SmartThings\Model\RuleInterface;
+use ChristianBrown\SmartThings\Model\RuleRequestInterface;
+use ChristianBrown\SmartThings\Serializer\RuleRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\RuleRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\RuleExecutionResultTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleExecutionResultTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\RulesTransformerInterface;
@@ -32,17 +35,86 @@ final class RuleApi implements RuleApiInterface
     private array $listCache = [];
     private JsonApiRequestSenderInterface $requestSender;
     private ?RuleExecutionResultTransformerInterface $ruleExecutionResultTransformer;
+    private ?RuleRequestSerializerInterface $ruleRequestSerializer;
     private RulesTransformerInterface $rulesTransformer;
     private RuleTransformerInterface $ruleTransformer;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, RuleTransformerInterface $ruleTransformer, RulesTransformerInterface $rulesTransformer, TokenInterface $token, ?RuleExecutionResultTransformerInterface $ruleExecutionResultTransformer = null)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, RuleTransformerInterface $ruleTransformer, RulesTransformerInterface $rulesTransformer, TokenInterface $token, ?RuleExecutionResultTransformerInterface $ruleExecutionResultTransformer = null, ?RuleRequestSerializerInterface $ruleRequestSerializer = null)
     {
         $this->requestSender = $requestSender;
         $this->ruleTransformer = $ruleTransformer;
         $this->rulesTransformer = $rulesTransformer;
         $this->token = $token;
         $this->ruleExecutionResultTransformer = $ruleExecutionResultTransformer;
+        $this->ruleRequestSerializer = $ruleRequestSerializer;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws MissingInputException
+     * @throws UnexpectedResponseException
+     */
+    public function createRule(string $locationId, RuleRequestInterface $request): RuleInterface
+    {
+        if ('' === $locationId) {
+            throw new MissingInputException(self::MISSING_LOCATION_ID);
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $query = [self::KEY_LOCATION_ID => $locationId];
+        $body = $this->resolveRuleRequestSerializer()->serialize($request);
+        $data = $this->requestSender->post(self::API_URL, $query, $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $rule = $this->ruleTransformer->transform($data);
+        unset($this->listCache[$locationId]);
+
+        return $rule;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws MissingInputException
+     */
+    public function deleteAllRules(string $locationId): void
+    {
+        if ('' === $locationId) {
+            throw new MissingInputException(self::MISSING_LOCATION_ID);
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $query = [self::KEY_LOCATION_ID => $locationId];
+        $this->requestSender->delete(self::API_URL, $query, $headers);
+        unset($this->listCache[$locationId]);
+        $this->cache = [];
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws MissingInputException
+     */
+    public function deleteRule(string $ruleId, string $locationId): void
+    {
+        if ('' === $locationId) {
+            throw new MissingInputException(self::MISSING_LOCATION_ID);
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($ruleId));
+        $query = [self::KEY_LOCATION_ID => $locationId];
+        $this->requestSender->delete($url, $query, $headers);
+        unset($this->cache[$ruleId], $this->listCache[$locationId]);
     }
 
     /**
@@ -133,11 +205,51 @@ final class RuleApi implements RuleApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws MissingInputException
+     * @throws UnexpectedResponseException
+     */
+    public function updateRule(string $ruleId, string $locationId, RuleRequestInterface $request): RuleInterface
+    {
+        if ('' === $locationId) {
+            throw new MissingInputException(self::MISSING_LOCATION_ID);
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($ruleId));
+        $query = [self::KEY_LOCATION_ID => $locationId];
+        $body = $this->resolveRuleRequestSerializer()->serialize($request);
+        $data = $this->requestSender->put($url, $query, $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $rule = $this->ruleTransformer->transform($data);
+        $this->cache[$ruleId] = $rule;
+        unset($this->listCache[$locationId]);
+
+        return $rule;
+    }
+
+    /**
      * Falls back to the default transformer when the caller (or an older, hand-wired
      * caller) did not supply one, keeping the appended constructor parameter optional.
      */
     private function resolveRuleExecutionResultTransformer(): RuleExecutionResultTransformerInterface
     {
         return $this->ruleExecutionResultTransformer ?? new RuleExecutionResultTransformer();
+    }
+
+    /**
+     * Falls back to the default serializer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolveRuleRequestSerializer(): RuleRequestSerializerInterface
+    {
+        return $this->ruleRequestSerializer ?? new RuleRequestSerializer();
     }
 }
