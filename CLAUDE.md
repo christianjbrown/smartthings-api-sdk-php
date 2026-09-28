@@ -34,7 +34,9 @@ PSR/PEAR/Squiz/Generic), and **php-cs-fixer** (`@PhpCsFixer`/`@Symfony`) handles
 `bin/php-cs*` scripts are thin wrappers over it.
 Static analysis is **PHPStan at `level: max`** (`phpstan.neon.dist`, run with `composer stan` /
 `./bin/phpstan analyse`), and there is a **GitHub Actions CI workflow** (`.github/workflows/ci.yml`)
-that runs style, PHPStan, and the PHPUnit suite with coverage on every push/PR. Always run
+that runs style, PHPStan, and the PHPUnit suite with coverage on every push/PR, then enforces
+100% coverage with `bin/php-coverage-check` (from `christianjbrown/code-quality-scripts`) against
+the text coverage report — a coverage drop fails the build. Always run
 `composer fix-style` first (php-cs-fixer auto-fixes what it can), then `composer check-style` to
 surface any remaining violations that must be fixed by hand, then `composer stan` and `composer test`
 before finishing.
