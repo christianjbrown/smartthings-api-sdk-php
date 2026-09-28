@@ -7,7 +7,14 @@ namespace ChristianBrown\SmartThings\Api;
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
+use ChristianBrown\SmartThings\Model\DeviceCommandInterface;
+use ChristianBrown\SmartThings\Model\DeviceCommandResultInterface;
 use ChristianBrown\SmartThings\Model\DeviceInterface;
+use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializerInterface;
+use ChristianBrown\SmartThings\Transformer\DeviceCommandResultsTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceCommandResultsTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\DeviceCommandResultTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformerInterface;
 
@@ -26,17 +33,48 @@ final class DeviceApi implements DeviceApiInterface
      * @var array<string, DeviceInterface>
      */
     private array $deviceCache = [];
+    private ?DeviceCommandResultsTransformerInterface $deviceCommandResultsTransformer;
+    private ?DeviceCommandSerializerInterface $deviceCommandSerializer;
     private DevicesTransformerInterface $devicesTransformer;
     private DeviceTransformerInterface $deviceTransformer;
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceTransformerInterface $deviceTransformer, DevicesTransformerInterface $devicesTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceTransformerInterface $deviceTransformer, DevicesTransformerInterface $devicesTransformer, TokenInterface $token, ?DeviceCommandSerializerInterface $deviceCommandSerializer = null, ?DeviceCommandResultsTransformerInterface $deviceCommandResultsTransformer = null)
     {
         $this->requestSender = $requestSender;
         $this->deviceTransformer = $deviceTransformer;
         $this->devicesTransformer = $devicesTransformer;
         $this->token = $token;
+        $this->deviceCommandSerializer = $deviceCommandSerializer;
+        $this->deviceCommandResultsTransformer = $deviceCommandResultsTransformer;
+    }
+
+    /**
+     * @param array<int, DeviceCommandInterface> $commands
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     *
+     * @return array<int, DeviceCommandResultInterface>
+     */
+    public function executeCommands(string $deviceId, array $commands, ?bool $ordered = null): array
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_COMMANDS_SPRINTF, rawurlencode($deviceId));
+        $body = [self::KEY_COMMANDS => $this->resolveDeviceCommandSerializer()->serialize($commands)];
+        $data = $this->requestSender->post($url, self::buildOrderedQuery($ordered), $headers, $body);
+
+        if (!isset($data[self::KEY_RESULTS])) {
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_RESULTS));
+        }
+        if (!is_array($data[self::KEY_RESULTS])) {
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_RESULTS));
+        }
+
+        return $this->resolveDeviceCommandResultsTransformer()->transform($data[self::KEY_RESULTS]);
     }
 
     /**
@@ -107,6 +145,20 @@ final class DeviceApi implements DeviceApiInterface
     /**
      * @return array<string, string>
      */
+    private static function buildOrderedQuery(?bool $ordered): array
+    {
+        // Isolated so the optional filter is its own path, not multiplied
+        // against the response-shape guards in executeCommands().
+        if (null === $ordered) {
+            return [];
+        }
+
+        return [self::KEY_ORDERED => $ordered ? 'true' : 'false'];
+    }
+
+    /**
+     * @return array<string, string>
+     */
     private static function buildQuery(?string $locationId): array
     {
         // Isolated so the optional filter is its own path, not multiplied
@@ -116,5 +168,23 @@ final class DeviceApi implements DeviceApiInterface
         }
 
         return [self::KEY_LOCATION_ID => $locationId];
+    }
+
+    /**
+     * Falls back to the default transformer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolveDeviceCommandResultsTransformer(): DeviceCommandResultsTransformerInterface
+    {
+        return $this->deviceCommandResultsTransformer ?? new DeviceCommandResultsTransformer(new DeviceCommandResultTransformer());
+    }
+
+    /**
+     * Falls back to the default serializer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolveDeviceCommandSerializer(): DeviceCommandSerializerInterface
+    {
+        return $this->deviceCommandSerializer ?? new DeviceCommandSerializer();
     }
 }

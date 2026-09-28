@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\DependencyInjection\Registrar;
 
 use ChristianBrown\SmartThings\DependencyInjection\ServiceRegistrarInterface;
+use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializer;
 use ChristianBrown\SmartThings\SmartThingsInterface;
+use ChristianBrown\SmartThings\Transformer\DeviceCommandResultsTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceCommandResultTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentsTransformer;
@@ -18,6 +21,14 @@ final class DeviceRegistrar implements ServiceRegistrarInterface
 {
     public function register(ContainerBuilder $container): void
     {
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_COMMAND_SERIALIZER, DeviceCommandSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_COMMAND_RESULT_TRANSFORMER, DeviceCommandResultTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_COMMAND_RESULTS_TRANSFORMER, DeviceCommandResultsTransformer::class)
+            ->setArguments(
+                [
+                    $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_COMMAND_RESULT_TRANSFORMER),
+                ]
+            );
         $container->register(SmartThingsInterface::SERVICE_DEVICE_COMPONENT_CAPABILITY_TRANSFORMER, DeviceComponentCapabilityTransformer::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_COMPONENT_CAPABILITIES_TRANSFORMER, DeviceComponentCapabilitiesTransformer::class)
             ->setArguments(

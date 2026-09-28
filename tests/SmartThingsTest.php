@@ -59,6 +59,7 @@ use ChristianBrown\SmartThings\DependencyInjection\Registrar\ScheduleRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SchemaConnectorRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ServiceApiRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SubscriptionRegistrar;
+use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializer;
 use ChristianBrown\SmartThings\SmartThings;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
 use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
@@ -73,6 +74,8 @@ use ChristianBrown\SmartThings\Transformer\ChannelDriversTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelDriverTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelsTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceCommandResultsTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceCommandResultTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentsTransformer;
@@ -212,6 +215,9 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ChannelDriverTransformer::class)]
 #[UsesClass(ChannelsTransformer::class)]
 #[UsesClass(ChannelTransformer::class)]
+#[UsesClass(DeviceCommandResultsTransformer::class)]
+#[UsesClass(DeviceCommandResultTransformer::class)]
+#[UsesClass(DeviceCommandSerializer::class)]
 #[UsesClass(DeviceComponentCapabilitiesTransformer::class)]
 #[UsesClass(DeviceComponentCapabilityTransformer::class)]
 #[UsesClass(DeviceComponentsTransformer::class)]
