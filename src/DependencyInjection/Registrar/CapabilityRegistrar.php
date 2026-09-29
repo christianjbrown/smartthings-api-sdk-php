@@ -24,7 +24,12 @@ final class CapabilityRegistrar implements ServiceRegistrarInterface
         $container->register(SmartThingsInterface::SERVICE_CAPABILITY_LOCALIZATION_REQUEST_SERIALIZER, CapabilityLocalizationRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_UPDATE_CAPABILITY_REQUEST_SERIALIZER, UpdateCapabilityRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_CREATE_CAPABILITY_REQUEST_SERIALIZER, CreateCapabilityRequestSerializer::class);
-        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_TRANSFORMER, CapabilityTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_TRANSFORMER, CapabilityTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_DETAILS_TRANSFORMER),
+                ]
+            );
         $container->register(SmartThingsInterface::SERVICE_CAPABILITIES_TRANSFORMER, CapabilitiesTransformer::class)
             ->setArguments(
                 [

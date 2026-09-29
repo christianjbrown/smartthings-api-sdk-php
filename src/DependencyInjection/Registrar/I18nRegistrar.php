@@ -10,6 +10,7 @@ use ChristianBrown\SmartThings\Transformer\LocaleReferencesTransformer;
 use ChristianBrown\SmartThings\Transformer\LocaleReferenceTransformer;
 use ChristianBrown\SmartThings\Transformer\LocalizationTransformer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 final class I18nRegistrar implements ServiceRegistrarInterface
 {
@@ -22,6 +23,11 @@ final class I18nRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_LOCALE_REFERENCE_TRANSFORMER),
                 ]
             );
-        $container->register(SmartThingsInterface::SERVICE_LOCALIZATION_TRANSFORMER, LocalizationTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_LOCALIZATION_TRANSFORMER, LocalizationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_LOCALIZATION_DETAILS_TRANSFORMER),
+                ]
+            );
     }
 }

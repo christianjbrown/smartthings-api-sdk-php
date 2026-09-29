@@ -8,6 +8,10 @@ use ChristianBrown\SmartThings\Model\CapabilityInterface;
 
 interface CapabilityTransformerInterface
 {
+    public const array DETAIL_KEYS = [self::KEY_ATTRIBUTES, self::KEY_COMMANDS];
+    public const string KEY_ATTRIBUTES = 'attributes';
+    public const string KEY_COMMANDS = 'commands';
+    public const string KEY_EPHEMERAL = 'ephemeral';
     public const string KEY_ID = 'id';
     public const string KEY_NAME = 'name';
     public const string KEY_STATUS = 'status';

@@ -74,6 +74,7 @@ use ChristianBrown\SmartThings\Serializer\ExcludedConditionItemIdSerializer;
 use ChristianBrown\SmartThings\Serializer\ExcludedDeviceActionConfigEntrySerializer;
 use ChristianBrown\SmartThings\Serializer\ExcludedDeviceConditionConfigEntrySerializer;
 use ChristianBrown\SmartThings\Serializer\GroupVisibleConditionsSerializer;
+use ChristianBrown\SmartThings\Serializer\IndoorMapSerializer;
 use ChristianBrown\SmartThings\Serializer\ListForArgumentSerializer;
 use ChristianBrown\SmartThings\Serializer\ListForAutomationActionSerializer;
 use ChristianBrown\SmartThings\Serializer\ListForAutomationConditionSerializer;
@@ -135,6 +136,8 @@ use ChristianBrown\SmartThings\Serializer\ToggleSwitchForDashboardSerializer;
 use ChristianBrown\SmartThings\Serializer\ToggleSwitchForDashboardStateSerializer;
 use ChristianBrown\SmartThings\Serializer\ToggleSwitchSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateCapabilityPresentationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateDeviceComponentSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateDeviceRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\VisibleConditionBaseSerializer;
 use ChristianBrown\SmartThings\Serializer\VisibleConditionForColorItemReferToSerializer;
 use ChristianBrown\SmartThings\Serializer\VisibleConditionForColorItemSerializer;
@@ -149,7 +152,12 @@ use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformer;
 use ChristianBrown\SmartThings\Transformer\AppDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppUiSettingsTransformer;
+use ChristianBrown\SmartThings\Transformer\AttributeDataSchemaTransformer;
+use ChristianBrown\SmartThings\Transformer\AttributePropertiesTransformer;
+use ChristianBrown\SmartThings\Transformer\AttributeSchemaTransformer;
 use ChristianBrown\SmartThings\Transformer\AttributeStateTransformer;
+use ChristianBrown\SmartThings\Transformer\AttributeUnitSchemaTransformer;
+use ChristianBrown\SmartThings\Transformer\AttributeValueSchemaTransformer;
 use ChristianBrown\SmartThings\Transformer\AttributeValueTransformer;
 use ChristianBrown\SmartThings\Transformer\AutomationForCapabilityActionsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\AutomationForCapabilityConditionsItemTransformer;
@@ -178,14 +186,23 @@ use ChristianBrown\SmartThings\Transformer\BasicPlusTvVolumeCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\BasicPlusTvVolumeTransformer;
 use ChristianBrown\SmartThings\Transformer\BleD2DDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\ButtonForTvTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityArgumentI18nTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityArgumentLocalizationTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityAttributeLabelTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityAttributeLocalizationTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityAttributeTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityCommandLocalizationTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationValueTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitySubscriptionDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityValueForDashboardStateTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityValueForPanelTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityValueTransformer;
 use ChristianBrown\SmartThings\Transformer\ClustersTransformer;
+use ChristianBrown\SmartThings\Transformer\CommandArgumentTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandClassesTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandMappingsTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandMappingTransformer;
@@ -241,6 +258,7 @@ use ChristianBrown\SmartThings\Transformer\EdgeDriverSupportedEndpointAppsAppsIt
 use ChristianBrown\SmartThings\Transformer\EdgeDriverSupportedEndpointAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\EmptyForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\EmptyWithAvailableSizeTransformer;
+use ChristianBrown\SmartThings\Transformer\EnumCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\EnumSliderForAutomationConditionSupportedOperatorsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\EnumSliderForAutomationConditionTransformer;
 use ChristianBrown\SmartThings\Transformer\ExcludedActionItemIdExcludeItemTransformer;
@@ -284,6 +302,7 @@ use ChristianBrown\SmartThings\Transformer\ListForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeStateTransformer;
 use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeTransformer;
+use ChristianBrown\SmartThings\Transformer\LocalizationDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationParentTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomDetailsTransformer;
@@ -318,6 +337,7 @@ use ChristianBrown\SmartThings\Transformer\PlayStopCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayStopStateTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayStopTransformer;
 use ChristianBrown\SmartThings\Transformer\PoCodesTransformer;
+use ChristianBrown\SmartThings\Transformer\PreferenceOptionLocalizationTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationSettingsForDevicePresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationSettingsTemperatureConversionsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationSettingsTransformer;
@@ -4113,6 +4133,83 @@ final class ShapeRegistrar implements ServiceRegistrarInterface
                     new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFOS_ITEM_TRANSFORMER),
                     new Reference(SmartThingsInterface::SERVICE_LANGUAGE_ITEM_TRANSFORMER),
                     new Reference(SmartThingsInterface::SERVICE_PRESENTATION_SETTINGS_FOR_DEVICE_PRESENTATION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_ATTRIBUTE_VALUE_SCHEMA_TRANSFORMER, AttributeValueSchemaTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_ATTRIBUTE_UNIT_SCHEMA_TRANSFORMER, AttributeUnitSchemaTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_ATTRIBUTE_DATA_SCHEMA_TRANSFORMER, AttributeDataSchemaTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_ATTRIBUTE_PROPERTIES_TRANSFORMER, AttributePropertiesTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ATTRIBUTE_VALUE_SCHEMA_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_ATTRIBUTE_UNIT_SCHEMA_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_ATTRIBUTE_DATA_SCHEMA_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_ATTRIBUTE_SCHEMA_TRANSFORMER, AttributeSchemaTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ATTRIBUTE_PROPERTIES_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_ENUM_COMMAND_TRANSFORMER, EnumCommandTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_ATTRIBUTE_TRANSFORMER, CapabilityAttributeTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ATTRIBUTE_SCHEMA_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_ENUM_COMMAND_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_COMMAND_ARGUMENT_TRANSFORMER, CommandArgumentTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_COMMAND_TRANSFORMER, CapabilityCommandTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_COMMAND_ARGUMENT_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_DETAILS_TRANSFORMER, CapabilityDetailsTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_ATTRIBUTE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_COMMAND_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PREFERENCE_OPTION_LOCALIZATION_TRANSFORMER, PreferenceOptionLocalizationTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_ATTRIBUTE_LABEL_TRANSFORMER, CapabilityAttributeLabelTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_ATTRIBUTE_LOCALIZATION_TRANSFORMER, CapabilityAttributeLocalizationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_ATTRIBUTE_LABEL_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_ARGUMENT_I18N_TRANSFORMER, CapabilityArgumentI18nTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_ARGUMENT_LOCALIZATION_TRANSFORMER, CapabilityArgumentLocalizationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_ARGUMENT_I18N_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_COMMAND_LOCALIZATION_TRANSFORMER, CapabilityCommandLocalizationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_ARGUMENT_LOCALIZATION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_LOCALIZATION_DETAILS_TRANSFORMER, LocalizationDetailsTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PREFERENCE_OPTION_LOCALIZATION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_ATTRIBUTE_LOCALIZATION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_COMMAND_LOCALIZATION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_UPDATE_DEVICE_COMPONENT_SERIALIZER, UpdateDeviceComponentSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_INDOOR_MAP_SERIALIZER, IndoorMapSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_UPDATE_DEVICE_REQUEST_SERIALIZER, UpdateDeviceRequestSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_UPDATE_DEVICE_COMPONENT_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_INDOOR_MAP_SERIALIZER),
                 ]
             );
     }
