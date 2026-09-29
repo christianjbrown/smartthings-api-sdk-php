@@ -7,7 +7,7 @@ namespace ChristianBrown\SmartThings\Model;
 final class CreateDeviceProfileRequest implements CreateDeviceProfileRequestInterface
 {
     /**
-     * @var array<int, mixed[]>
+     * @var array<int, DeviceProfileComponentRequestInterface|mixed[]>
      */
     private array $components;
 
@@ -23,13 +23,13 @@ final class CreateDeviceProfileRequest implements CreateDeviceProfileRequestInte
     private string $name;
 
     /**
-     * @var null|array<int, mixed[]>
+     * @var null|array<int, mixed[]|PreferenceRequestInterface>
      */
     private ?array $preferences = null;
     private ?string $presentationId = null;
 
     /**
-     * @phpstan-param array<int, mixed[]> $components
+     * @phpstan-param array<int, DeviceProfileComponentRequestInterface|mixed[]> $components
      */
     public function __construct(string $name, array $components)
     {
@@ -38,7 +38,7 @@ final class CreateDeviceProfileRequest implements CreateDeviceProfileRequestInte
     }
 
     /**
-     * @return array<int, mixed[]>
+     * @return array<int, DeviceProfileComponentRequestInterface|mixed[]>
      */
     public function getComponents(): array
     {
@@ -67,7 +67,7 @@ final class CreateDeviceProfileRequest implements CreateDeviceProfileRequestInte
     }
 
     /**
-     * @return null|array<int, mixed[]>
+     * @return null|array<int, mixed[]|PreferenceRequestInterface>
      */
     public function getPreferences(): ?array
     {
@@ -100,7 +100,7 @@ final class CreateDeviceProfileRequest implements CreateDeviceProfileRequestInte
     }
 
     /**
-     * @param null|array<int, mixed[]> $value
+     * @param null|array<int, mixed[]|PreferenceRequestInterface> $value
      */
     public function setPreferences(?array $value): CreateDeviceProfileRequestInterface
     {

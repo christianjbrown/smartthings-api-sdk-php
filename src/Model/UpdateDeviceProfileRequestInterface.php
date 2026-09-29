@@ -11,7 +11,7 @@ namespace ChristianBrown\SmartThings\Model;
 interface UpdateDeviceProfileRequestInterface
 {
     /**
-     * @return null|array<int, mixed[]>
+     * @return null|array<int, DeviceProfileComponentRequestInterface|mixed[]>
      */
     public function getComponents(): ?array;
 
@@ -21,14 +21,14 @@ interface UpdateDeviceProfileRequestInterface
     public function getMetadata(): ?array;
 
     /**
-     * @return null|array<int, mixed[]>
+     * @return null|array<int, mixed[]|PreferenceRequestInterface>
      */
     public function getPreferences(): ?array;
 
     public function getPresentationId(): ?string;
 
     /**
-     * @param null|array<int, mixed[]> $value
+     * @param null|array<int, DeviceProfileComponentRequestInterface|mixed[]> $value
      */
     public function setComponents(?array $value): self;
 
@@ -38,7 +38,7 @@ interface UpdateDeviceProfileRequestInterface
     public function setMetadata(?array $value): self;
 
     /**
-     * @param null|array<int, mixed[]> $value
+     * @param null|array<int, mixed[]|PreferenceRequestInterface> $value
      */
     public function setPreferences(?array $value): self;
 

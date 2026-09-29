@@ -107,5 +107,22 @@ final class ShapeRegistrarTest extends TestCase
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_INDOOR_MAP_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_RELATIONSHIP_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_DETAILS_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CAPABILITY_CONFIGURATION_VALUE_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CAPABILITY_CONFIGURATION_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_RESTRICTION_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CAPABILITY_REFERENCE_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_CATEGORY_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PROFILE_COMPONENT_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_PREFERENCE_DEFINITION_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_RESTRICTION_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PREFERENCE_DEFINITION_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CAPABILITY_CONFIGURATION_VALUE_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CAPABILITY_CONFIGURATION_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_RESTRICTION_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_ATTRIBUTE_STATE_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_CAPABILITY_REFERENCE_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_CATEGORY_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PROFILE_COMPONENT_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PROFILE_DETAILS_TRANSFORMER));
     }
 }

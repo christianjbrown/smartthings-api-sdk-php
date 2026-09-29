@@ -5,12 +5,22 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\DependencyInjection\Registrar;
 
 use ChristianBrown\SmartThings\DependencyInjection\ServiceRegistrarInterface;
+use ChristianBrown\SmartThings\Serializer\CapabilityConfigurationSerializer;
+use ChristianBrown\SmartThings\Serializer\CapabilityConfigurationValueSerializer;
+use ChristianBrown\SmartThings\Serializer\CapabilityReferenceRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceCategorySerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceProfileComponentRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\PreferenceDefinitionSerializer;
+use ChristianBrown\SmartThings\Serializer\RestrictionSerializer;
 use ChristianBrown\SmartThings\SmartThingsInterface;
 use ChristianBrown\SmartThings\Transformer\AppDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppUiSettingsTransformer;
+use ChristianBrown\SmartThings\Transformer\AttributeStateTransformer;
 use ChristianBrown\SmartThings\Transformer\AttributeValueTransformer;
 use ChristianBrown\SmartThings\Transformer\BleD2DDeviceDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationValueTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitySubscriptionDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\ClustersTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandClassesTransformer;
@@ -18,12 +28,18 @@ use ChristianBrown\SmartThings\Transformer\CommandMappingsTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandMappingTransformer;
 use ChristianBrown\SmartThings\Transformer\ConvertedTtsTransformer;
 use ChristianBrown\SmartThings\Transformer\CronScheduleTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceCapabilityReferenceTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceCategoryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHealthDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceIntegrationProfileKeyTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceLifecycleDetailTransformer;
+use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceProfileComponentTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceProfileDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileReferenceTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceRelationshipTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceRestrictionTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceResultsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceSubscriptionDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\DriverDetailsTransformer;
@@ -68,6 +84,7 @@ use ChristianBrown\SmartThings\Transformer\OwnerTransformer;
 use ChristianBrown\SmartThings\Transformer\PageLinksTransformer;
 use ChristianBrown\SmartThings\Transformer\PageLinkTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayedTextTransformer;
+use ChristianBrown\SmartThings\Transformer\RestrictionTransformer;
 use ChristianBrown\SmartThings\Transformer\RoomIndoorMapTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneLifecycleDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\ScheduleDetailsTransformer;
@@ -399,6 +416,67 @@ final class ShapeRegistrar implements ServiceRegistrarInterface
                     new Reference(SmartThingsInterface::SERVICE_MQTT_DEVICE_DETAILS_TRANSFORMER),
                     new Reference(SmartThingsInterface::SERVICE_INDOOR_MAP_TRANSFORMER),
                     new Reference(SmartThingsInterface::SERVICE_DEVICE_RELATIONSHIP_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_CONFIGURATION_VALUE_SERIALIZER, CapabilityConfigurationValueSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_CONFIGURATION_SERIALIZER, CapabilityConfigurationSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_CONFIGURATION_VALUE_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_RESTRICTION_SERIALIZER, RestrictionSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_REFERENCE_REQUEST_SERIALIZER, CapabilityReferenceRequestSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_CONFIGURATION_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_RESTRICTION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CATEGORY_SERIALIZER, DeviceCategorySerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_PROFILE_COMPONENT_REQUEST_SERIALIZER, DeviceProfileComponentRequestSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_REFERENCE_REQUEST_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CATEGORY_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_RESTRICTION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PREFERENCE_DEFINITION_SERIALIZER, PreferenceDefinitionSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_RESTRICTION_TRANSFORMER, DeviceRestrictionTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_PREFERENCE_DEFINITION_TRANSFORMER, DevicePreferenceDefinitionTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_CONFIGURATION_VALUE_TRANSFORMER, CapabilityConfigurationValueTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_CONFIGURATION_TRANSFORMER, CapabilityConfigurationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_CONFIGURATION_VALUE_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_RESTRICTION_TRANSFORMER, RestrictionTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_ATTRIBUTE_STATE_TRANSFORMER, AttributeStateTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CAPABILITY_REFERENCE_TRANSFORMER, DeviceCapabilityReferenceTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_CONFIGURATION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_RESTRICTION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_ATTRIBUTE_STATE_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CATEGORY_TRANSFORMER, DeviceCategoryTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_PROFILE_COMPONENT_TRANSFORMER, DeviceProfileComponentTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CAPABILITY_REFERENCE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CATEGORY_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_RESTRICTION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_PROFILE_DETAILS_TRANSFORMER, DeviceProfileDetailsTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_RESTRICTION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_PREFERENCE_DEFINITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_PROFILE_COMPONENT_TRANSFORMER),
                 ]
             );
     }

@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Tests\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceProfile;
+use ChristianBrown\SmartThings\Transformer\DeviceProfileDetailsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -25,7 +26,7 @@ final class DeviceProfileTransformerTest extends TestCase
             DeviceProfileTransformerInterface::KEY_STATUS => 'PUBLISHED',
         ];
 
-        $transformer = new DeviceProfileTransformer();
+        $transformer = new DeviceProfileTransformer(self::createStub(DeviceProfileDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -43,7 +44,7 @@ final class DeviceProfileTransformerTest extends TestCase
     #[DataProvider('provideTransformOptionalFieldCombinationsCases')]
     public function testTransformOptionalFieldCombinations(array $data, ?string $expectedName, ?string $expectedStatus): void
     {
-        $transformer = new DeviceProfileTransformer();
+        $transformer = new DeviceProfileTransformer(self::createStub(DeviceProfileDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -90,7 +91,7 @@ final class DeviceProfileTransformerTest extends TestCase
     #[TestWith([[DeviceProfileTransformerInterface::KEY_ID => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new DeviceProfileTransformer();
+        $transformer = new DeviceProfileTransformer(self::createStub(DeviceProfileDetailsTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DeviceProfileTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceProfileTransformerInterface::KEY_ID));

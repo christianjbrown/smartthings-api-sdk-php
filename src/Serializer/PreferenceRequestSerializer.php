@@ -10,6 +10,13 @@ use function array_filter;
 
 final class PreferenceRequestSerializer implements PreferenceRequestSerializerInterface
 {
+    private PreferenceDefinitionSerializerInterface $preferenceDefinitionSerializer;
+
+    public function __construct(PreferenceDefinitionSerializerInterface $preferenceDefinitionSerializer)
+    {
+        $this->preferenceDefinitionSerializer = $preferenceDefinitionSerializer;
+    }
+
     /**
      * @return mixed[]
      */
@@ -23,10 +30,25 @@ final class PreferenceRequestSerializer implements PreferenceRequestSerializerIn
             self::KEY_EXPLICIT => $request->getExplicit(),
             self::KEY_REQUIRED => $request->getRequired(),
             self::KEY_PREFERENCE_TYPE => $request->getPreferenceType(),
-            self::KEY_DEFINITION => $request->getDefinition(),
+            self::KEY_DEFINITION => $this->serializeDefinition($request),
         ];
 
         // Omit null optionals rather than sending them as explicit nulls.
         return array_filter($serialized, static fn (mixed $value): bool => null !== $value);
+    }
+
+    /**
+     * The typed definition wins when set; otherwise the raw array is passed through.
+     *
+     * @return mixed[]
+     */
+    private function serializeDefinition(PreferenceRequestInterface $request): array
+    {
+        $definition = $request->getDefinitionModel();
+        if (null === $definition) {
+            return $request->getDefinition();
+        }
+
+        return $this->preferenceDefinitionSerializer->serialize($definition);
     }
 }

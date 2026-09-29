@@ -11,6 +11,7 @@ use ChristianBrown\SmartThings\SmartThingsInterface;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionsTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionTransformer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 final class DevicePreferenceDefinitionRegistrar implements ServiceRegistrarInterface
 {
@@ -18,7 +19,12 @@ final class DevicePreferenceDefinitionRegistrar implements ServiceRegistrarInter
     {
         $container->register(SmartThingsInterface::SERVICE_PREFERENCE_LOCALIZATION_REQUEST_SERIALIZER, PreferenceLocalizationRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_PREFERENCE_DEFINITION_TRANSFORMER, DevicePreferenceDefinitionTransformer::class);
-        $container->register(SmartThingsInterface::SERVICE_PREFERENCE_REQUEST_SERIALIZER, PreferenceRequestSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_PREFERENCE_REQUEST_SERIALIZER, PreferenceRequestSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PREFERENCE_DEFINITION_SERIALIZER),
+                ]
+            );
         $container->register(SmartThingsInterface::SERVICE_DEVICE_PREFERENCE_DEFINITIONS_TRANSFORMER, DevicePreferenceDefinitionsTransformer::class)
             ->setArguments(
                 [
