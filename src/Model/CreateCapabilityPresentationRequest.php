@@ -6,51 +6,35 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class CreateCapabilityPresentationRequest implements CreateCapabilityPresentationRequestInterface
 {
-    /**
-     * @var null|mixed[]
-     */
-    private ?array $automation = null;
+    private ?AutomationForCapabilityInterface $automation = null;
+    private ?DashboardForCapabilityInterface $dashboard = null;
 
     /**
-     * @var null|mixed[]
-     */
-    private ?array $dashboard = null;
-
-    /**
-     * @var null|mixed[]
+     * @var null|array<int, CreateCapabilityPresentationRequestDetailViewItemInterface>
      */
     private ?array $detailView = null;
     private string $id;
+    private ?PresentationSettingsInterface $presentationSettings = null;
+    private int $version;
 
-    /**
-     * @var null|mixed[]
-     */
-    private ?array $presentationSettings = null;
-    private ?int $version = null;
-
-    public function __construct(string $id)
+    public function __construct(string $id, int $version)
     {
         $this->id = $id;
+        $this->version = $version;
     }
 
-    /**
-     * @return null|mixed[]
-     */
-    public function getAutomation(): ?array
+    public function getAutomation(): ?AutomationForCapabilityInterface
     {
         return $this->automation;
     }
 
-    /**
-     * @return null|mixed[]
-     */
-    public function getDashboard(): ?array
+    public function getDashboard(): ?DashboardForCapabilityInterface
     {
         return $this->dashboard;
     }
 
     /**
-     * @return null|mixed[]
+     * @return null|array<int, CreateCapabilityPresentationRequestDetailViewItemInterface>
      */
     public function getDetailView(): ?array
     {
@@ -62,33 +46,24 @@ final class CreateCapabilityPresentationRequest implements CreateCapabilityPrese
         return $this->id;
     }
 
-    /**
-     * @return null|mixed[]
-     */
-    public function getPresentationSettings(): ?array
+    public function getPresentationSettings(): ?PresentationSettingsInterface
     {
         return $this->presentationSettings;
     }
 
-    public function getVersion(): ?int
+    public function getVersion(): int
     {
         return $this->version;
     }
 
-    /**
-     * @param null|mixed[] $value
-     */
-    public function setAutomation(?array $value): CreateCapabilityPresentationRequestInterface
+    public function setAutomation(?AutomationForCapabilityInterface $value): CreateCapabilityPresentationRequestInterface
     {
         $this->automation = $value;
 
         return $this;
     }
 
-    /**
-     * @param null|mixed[] $value
-     */
-    public function setDashboard(?array $value): CreateCapabilityPresentationRequestInterface
+    public function setDashboard(?DashboardForCapabilityInterface $value): CreateCapabilityPresentationRequestInterface
     {
         $this->dashboard = $value;
 
@@ -96,7 +71,7 @@ final class CreateCapabilityPresentationRequest implements CreateCapabilityPrese
     }
 
     /**
-     * @param null|mixed[] $value
+     * @param null|array<int, CreateCapabilityPresentationRequestDetailViewItemInterface> $value
      */
     public function setDetailView(?array $value): CreateCapabilityPresentationRequestInterface
     {
@@ -105,19 +80,9 @@ final class CreateCapabilityPresentationRequest implements CreateCapabilityPrese
         return $this;
     }
 
-    /**
-     * @param null|mixed[] $value
-     */
-    public function setPresentationSettings(?array $value): CreateCapabilityPresentationRequestInterface
+    public function setPresentationSettings(?PresentationSettingsInterface $value): CreateCapabilityPresentationRequestInterface
     {
         $this->presentationSettings = $value;
-
-        return $this;
-    }
-
-    public function setVersion(?int $value): CreateCapabilityPresentationRequestInterface
-    {
-        $this->version = $value;
 
         return $this;
     }

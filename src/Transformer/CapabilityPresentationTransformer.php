@@ -6,14 +6,24 @@ namespace ChristianBrown\SmartThings\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilityPresentation;
+use ChristianBrown\SmartThings\Model\CapabilityPresentationDetailsInterface;
 use ChristianBrown\SmartThings\Model\CapabilityPresentationInterface;
 
+use function array_flip;
+use function array_intersect_key;
 use function is_int;
 use function is_string;
 use function sprintf;
 
 final class CapabilityPresentationTransformer implements CapabilityPresentationTransformerInterface
 {
+    private CapabilityPresentationDetailsTransformerInterface $capabilityPresentationDetailsTransformer;
+
+    public function __construct(CapabilityPresentationDetailsTransformerInterface $capabilityPresentationDetailsTransformer)
+    {
+        $this->capabilityPresentationDetailsTransformer = $capabilityPresentationDetailsTransformer;
+    }
+
     /**
      * @param mixed[] $data
      */
@@ -29,7 +39,24 @@ final class CapabilityPresentationTransformer implements CapabilityPresentationT
 
         self::applyVersion($presentation, $data);
 
+        $this->applyDetails($presentation, $data);
+
         return $presentation;
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private function applyDetails(CapabilityPresentation $model, array $data): void
+    {
+        if ([] === array_intersect_key($data, array_flip(self::DETAIL_KEYS))) {
+            return;
+        }
+        $details = $this->capabilityPresentationDetailsTransformer->transform($data);
+        self::copyDashboard($model, $details);
+        self::copyDetailView($model, $details);
+        self::copyAutomation($model, $details);
+        self::copyPresentationSettings($model, $details);
     }
 
     /**
@@ -44,5 +71,25 @@ final class CapabilityPresentationTransformer implements CapabilityPresentationT
             return;
         }
         $presentation->setVersion($data[self::KEY_VERSION]);
+    }
+
+    private static function copyAutomation(CapabilityPresentation $model, CapabilityPresentationDetailsInterface $details): void
+    {
+        $model->setAutomation($details->getAutomation());
+    }
+
+    private static function copyDashboard(CapabilityPresentation $model, CapabilityPresentationDetailsInterface $details): void
+    {
+        $model->setDashboard($details->getDashboard());
+    }
+
+    private static function copyDetailView(CapabilityPresentation $model, CapabilityPresentationDetailsInterface $details): void
+    {
+        $model->setDetailView($details->getDetailView() ?? []);
+    }
+
+    private static function copyPresentationSettings(CapabilityPresentation $model, CapabilityPresentationDetailsInterface $details): void
+    {
+        $model->setPresentationSettings($details->getPresentationSettings());
     }
 }
