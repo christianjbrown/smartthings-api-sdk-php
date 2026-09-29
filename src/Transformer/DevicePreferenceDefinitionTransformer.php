@@ -33,6 +33,8 @@ final class DevicePreferenceDefinitionTransformer implements DevicePreferenceDef
         self::applyRequired($definition, $data);
         self::applyTitle($definition, $data);
 
+        self::applyExplicit($definition, $data);
+
         return $definition;
     }
 
@@ -48,6 +50,20 @@ final class DevicePreferenceDefinitionTransformer implements DevicePreferenceDef
             return;
         }
         $definition->setDescription($data[self::KEY_DESCRIPTION]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyExplicit(DevicePreferenceDefinition $model, array $data): void
+    {
+        if (!isset($data[self::KEY_EXPLICIT])) {
+            return;
+        }
+        if (!is_bool($data[self::KEY_EXPLICIT])) {
+            return;
+        }
+        $model->setExplicit($data[self::KEY_EXPLICIT]);
     }
 
     /**

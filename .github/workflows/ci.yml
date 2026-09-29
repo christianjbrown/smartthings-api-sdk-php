@@ -28,7 +28,7 @@ jobs:
         run: ./bin/php-cs ./src ./tests
 
       - name: Static analysis
-        run: ./bin/phpstan analyse --no-progress
+        run: ./bin/phpstan analyse --no-progress --memory-limit=512M
 
       - name: Run tests with coverage
         run: XDEBUG_MODE=coverage php -d memory_limit=-1 ./bin/phpunit --coverage-text=.phpunit.cache/coverage.txt

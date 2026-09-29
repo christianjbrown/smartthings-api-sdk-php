@@ -31,7 +31,24 @@ final class ChannelTransformer implements ChannelTransformerInterface
         self::applyTermsOfServiceUrl($channel, $data);
         self::applyType($channel, $data);
 
+        self::applyCreatedDate($channel, $data);
+        self::applyLastModifiedDate($channel, $data);
+
         return $channel;
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyCreatedDate(Channel $model, array $data): void
+    {
+        if (empty($data[self::KEY_CREATED_DATE])) {
+            return;
+        }
+        if (!is_string($data[self::KEY_CREATED_DATE])) {
+            return;
+        }
+        $model->setCreatedDate($data[self::KEY_CREATED_DATE]);
     }
 
     /**
@@ -46,6 +63,20 @@ final class ChannelTransformer implements ChannelTransformerInterface
             return;
         }
         $channel->setDescription($data[self::KEY_DESCRIPTION]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyLastModifiedDate(Channel $model, array $data): void
+    {
+        if (empty($data[self::KEY_LAST_MODIFIED_DATE])) {
+            return;
+        }
+        if (!is_string($data[self::KEY_LAST_MODIFIED_DATE])) {
+            return;
+        }
+        $model->setLastModifiedDate($data[self::KEY_LAST_MODIFIED_DATE]);
     }
 
     /**

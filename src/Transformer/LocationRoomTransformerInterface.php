@@ -8,6 +8,12 @@ use ChristianBrown\SmartThings\Model\LocationRoomInterface;
 
 interface LocationRoomTransformerInterface
 {
+    public const array DETAIL_KEYS = [self::KEY_INDOOR_MAP];
+    public const string KEY_ALLOWED = 'allowed';
+    public const string KEY_BACKGROUND_IMAGE = 'backgroundImage';
+    public const string KEY_CREATED = 'created';
+    public const string KEY_INDOOR_MAP = 'indoorMap';
+    public const string KEY_LAST_MODIFIED = 'lastModified';
     public const string KEY_LOCATION_ID = 'locationId';
     public const string KEY_NAME = 'name';
     public const string KEY_ROOM_ID = 'roomId';

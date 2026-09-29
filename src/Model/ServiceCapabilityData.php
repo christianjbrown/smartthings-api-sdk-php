@@ -17,10 +17,20 @@ final class ServiceCapabilityData implements ServiceCapabilityDataInterface
     private array $airQualityForecast = [];
 
     /**
+     * @var array<int, ServiceCapabilityDataAlertItemInterface>
+     */
+    private array $alert = [];
+
+    /**
      * @var array<string, ServiceMeasurementInterface>
      */
     private array $forecast = [];
     private string $locationId;
+
+    /**
+     * @var array<int, string>
+     */
+    private array $name = [];
 
     /**
      * @var array<string, ServiceMeasurementInterface>
@@ -49,6 +59,14 @@ final class ServiceCapabilityData implements ServiceCapabilityDataInterface
     }
 
     /**
+     * @return array<int, ServiceCapabilityDataAlertItemInterface>
+     */
+    public function getAlert(): array
+    {
+        return $this->alert;
+    }
+
+    /**
      * @return array<string, ServiceMeasurementInterface>
      */
     public function getForecast(): array
@@ -59,6 +77,14 @@ final class ServiceCapabilityData implements ServiceCapabilityDataInterface
     public function getLocationId(): string
     {
         return $this->locationId;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getName(): array
+    {
+        return $this->name;
     }
 
     /**
@@ -90,6 +116,16 @@ final class ServiceCapabilityData implements ServiceCapabilityDataInterface
     }
 
     /**
+     * @param array<int, ServiceCapabilityDataAlertItemInterface> $value
+     */
+    public function setAlert(array $value): ServiceCapabilityDataInterface
+    {
+        $this->alert = $value;
+
+        return $this;
+    }
+
+    /**
      * @param array<string, ServiceMeasurementInterface> $value
      */
     public function setForecast(array $value): ServiceCapabilityDataInterface
@@ -102,6 +138,16 @@ final class ServiceCapabilityData implements ServiceCapabilityDataInterface
     public function setLocationId(string $value): ServiceCapabilityDataInterface
     {
         $this->locationId = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param array<int, string> $value
+     */
+    public function setName(array $value): ServiceCapabilityDataInterface
+    {
+        $this->name = $value;
 
         return $this;
     }

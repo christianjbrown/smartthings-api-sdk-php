@@ -8,10 +8,14 @@ use ChristianBrown\SmartThings\Model\DriverInterface;
 
 interface DriverTransformerInterface
 {
+    public const array DETAIL_KEYS = [self::KEY_DEVICE_INTEGRATION_PROFILES, self::KEY_PERMISSIONS, self::KEY_FINGERPRINTS];
     public const string KEY_DESCRIPTION = 'description';
+    public const string KEY_DEVICE_INTEGRATION_PROFILES = 'deviceIntegrationProfiles';
     public const string KEY_DRIVER_ID = 'driverId';
+    public const string KEY_FINGERPRINTS = 'fingerprints';
     public const string KEY_NAME = 'name';
     public const string KEY_PACKAGE_KEY = 'packageKey';
+    public const string KEY_PERMISSIONS = 'permissions';
     public const string KEY_VERSION = 'version';
     public const string UNEXPECTED_STRING_SPRINTF = '%s not set or not a string';
 

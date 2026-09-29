@@ -13,6 +13,7 @@ use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppTransformer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 final class InstalledAppRegistrar implements ServiceRegistrarInterface
 {
@@ -20,7 +21,12 @@ final class InstalledAppRegistrar implements ServiceRegistrarInterface
     {
         $container->register(SmartThingsInterface::SERVICE_COORDINATE_ALIAS_REQUEST_SERIALIZER, CoordinateAliasRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_CREATE_INSTALLED_APP_EVENTS_REQUEST_SERIALIZER, CreateInstalledAppEventsRequestSerializer::class);
-        $container->register(SmartThingsInterface::SERVICE_INSTALLED_APP_TRANSFORMER, InstalledAppTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_INSTALLED_APP_TRANSFORMER, InstalledAppTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_INSTALLED_APP_DETAILS_TRANSFORMER),
+                ]
+            );
         $container->register(SmartThingsInterface::SERVICE_INSTALLED_APPS_TRANSFORMER, InstalledAppsTransformer::class)
             ->setArguments(
                 [

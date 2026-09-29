@@ -8,9 +8,12 @@ use ChristianBrown\SmartThings\Model\InstalledAppConfigInterface;
 
 interface InstalledAppConfigTransformerInterface
 {
+    public const string KEY_CONFIG = 'config';
     public const string KEY_CONFIGURATION_ID = 'configurationId';
     public const string KEY_CONFIGURATION_STATUS = 'configurationStatus';
+    public const string KEY_CREATED_DATE = 'createdDate';
     public const string KEY_INSTALLED_APP_ID = 'installedAppId';
+    public const string KEY_LAST_UPDATED_DATE = 'lastUpdatedDate';
     public const string UNEXPECTED_STRING_SPRINTF = '%s not set or not a string';
 
     /**

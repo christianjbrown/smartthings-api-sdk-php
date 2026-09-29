@@ -8,7 +8,11 @@ interface ChannelInterface
 {
     public function getChannelId(): string;
 
+    public function getCreatedDate(): ?string;
+
     public function getDescription(): ?string;
+
+    public function getLastModifiedDate(): ?string;
 
     public function getName(): ?string;
 
@@ -18,7 +22,11 @@ interface ChannelInterface
 
     public function setChannelId(string $value): self;
 
+    public function setCreatedDate(?string $value): self;
+
     public function setDescription(?string $value): self;
+
+    public function setLastModifiedDate(?string $value): self;
 
     public function setName(?string $value): self;
 

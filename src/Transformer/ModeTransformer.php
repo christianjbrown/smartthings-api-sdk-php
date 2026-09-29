@@ -8,6 +8,9 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Mode;
 use ChristianBrown\SmartThings\Model\ModeInterface;
 
+use function array_filter;
+use function array_values;
+use function is_array;
 use function is_string;
 use function sprintf;
 
@@ -29,7 +32,23 @@ final class ModeTransformer implements ModeTransformerInterface
         self::applyLabel($mode, $data);
         self::applyName($mode, $data);
 
+        self::applyAllowed($mode, $data);
+
         return $mode;
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyAllowed(Mode $model, array $data): void
+    {
+        if (!isset($data[self::KEY_ALLOWED])) {
+            return;
+        }
+        if (!is_array($data[self::KEY_ALLOWED])) {
+            return;
+        }
+        $model->setAllowed(array_values(array_filter($data[self::KEY_ALLOWED], is_string(...))));
     }
 
     /**

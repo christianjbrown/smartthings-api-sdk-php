@@ -17,6 +17,7 @@ use ChristianBrown\SmartThings\Transformer\SchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaPageTransformer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 final class SchemaConnectorRegistrar implements ServiceRegistrarInterface
 {
@@ -26,14 +27,24 @@ final class SchemaConnectorRegistrar implements ServiceRegistrarInterface
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_OAUTH_CREDENTIALS_REQUEST_SERIALIZER, SchemaOauthCredentialsRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_UPDATE_REQUEST_SERIALIZER, SchemaAppUpdateRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_CREATE_REQUEST_SERIALIZER, SchemaAppCreateRequestSerializer::class);
-        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_TRANSFORMER, SchemaAppTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_TRANSFORMER, SchemaAppTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_SCHEMA_APP_DETAILS_TRANSFORMER),
+                ]
+            );
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_APPS_TRANSFORMER, SchemaAppsTransformer::class)
             ->setArguments(
                 [
                     $container->getDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_TRANSFORMER),
                 ]
             );
-        $container->register(SmartThingsInterface::SERVICE_INSTALLED_SCHEMA_APP_TRANSFORMER, InstalledSchemaAppTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_INSTALLED_SCHEMA_APP_TRANSFORMER, InstalledSchemaAppTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_INSTALLED_SCHEMA_APP_DETAILS_TRANSFORMER),
+                ]
+            );
         $container->register(SmartThingsInterface::SERVICE_INSTALLED_SCHEMA_APPS_TRANSFORMER, InstalledSchemaAppsTransformer::class)
             ->setArguments(
                 [

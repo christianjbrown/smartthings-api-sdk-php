@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Tests\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Location;
+use ChristianBrown\SmartThings\Transformer\LocationDetailsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\LocationTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -24,7 +25,7 @@ final class LocationTransformerTest extends TestCase
             LocationTransformerInterface::KEY_NAME => 'test-name',
         ];
 
-        $transformer = new LocationTransformer();
+        $transformer = new LocationTransformer(self::createStub(LocationDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -41,7 +42,7 @@ final class LocationTransformerTest extends TestCase
     #[DataProvider('provideTransformOptionalFieldCombinationsCases')]
     public function testTransformOptionalFieldCombinations(array $data, ?string $expectedName): void
     {
-        $transformer = new LocationTransformer();
+        $transformer = new LocationTransformer(self::createStub(LocationDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -77,7 +78,7 @@ final class LocationTransformerTest extends TestCase
     #[TestWith([[LocationTransformerInterface::KEY_LOCATION_ID => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new LocationTransformer();
+        $transformer = new LocationTransformer(self::createStub(LocationDetailsTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(LocationTransformerInterface::UNEXPECTED_STRING_SPRINTF, LocationTransformerInterface::KEY_LOCATION_ID));

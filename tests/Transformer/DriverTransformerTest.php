@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Tests\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Driver;
+use ChristianBrown\SmartThings\Transformer\DriverDetailsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DriverTransformer;
 use ChristianBrown\SmartThings\Transformer\DriverTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -29,7 +30,7 @@ final class DriverTransformerTest extends TestCase
             DriverTransformerInterface::KEY_VERSION => '2024-01-01',
         ];
 
-        $transformer = new DriverTransformer();
+        $transformer = new DriverTransformer(self::createStub(DriverDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -48,7 +49,7 @@ final class DriverTransformerTest extends TestCase
     #[DataProvider('provideTransformOptionalFieldsCases')]
     public function testTransformOptionalFields(array $data, ?string $expectedDescription, ?string $expectedName, ?string $expectedPackageKey, ?string $expectedVersion): void
     {
-        $transformer = new DriverTransformer();
+        $transformer = new DriverTransformer(self::createStub(DriverDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -85,7 +86,7 @@ final class DriverTransformerTest extends TestCase
     #[TestWith([[DriverTransformerInterface::KEY_DRIVER_ID => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new DriverTransformer();
+        $transformer = new DriverTransformer(self::createStub(DriverDetailsTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DriverTransformerInterface::UNEXPECTED_STRING_SPRINTF, DriverTransformerInterface::KEY_DRIVER_ID));

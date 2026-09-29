@@ -14,12 +14,18 @@ use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationTransformer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 final class LocationRegistrar implements ServiceRegistrarInterface
 {
     public function register(ContainerBuilder $container): void
     {
-        $container->register(SmartThingsInterface::SERVICE_LOCATION_TRANSFORMER, LocationTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_LOCATION_TRANSFORMER, LocationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_LOCATION_DETAILS_TRANSFORMER),
+                ]
+            );
         $container->register(SmartThingsInterface::SERVICE_LOCATION_CREATE_REQUEST_SERIALIZER, CreateLocationRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_LOCATION_UPDATE_REQUEST_SERIALIZER, UpdateLocationRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_LOCATION_PATCH_REQUEST_SERIALIZER, PatchLocationRequestSerializer::class);
@@ -30,7 +36,12 @@ final class LocationRegistrar implements ServiceRegistrarInterface
                 ]
             );
 
-        $container->register(SmartThingsInterface::SERVICE_LOCATION_ROOM_TRANSFORMER, LocationRoomTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_LOCATION_ROOM_TRANSFORMER, LocationRoomTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_LOCATION_ROOM_DETAILS_TRANSFORMER),
+                ]
+            );
         $container->register(SmartThingsInterface::SERVICE_LOCATION_ROOMS_TRANSFORMER, LocationRoomsTransformer::class)
             ->setArguments(
                 [

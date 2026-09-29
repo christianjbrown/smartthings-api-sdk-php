@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Tests\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Subscription;
+use ChristianBrown\SmartThings\Transformer\SubscriptionDetailsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -25,7 +26,7 @@ final class SubscriptionTransformerTest extends TestCase
             SubscriptionTransformerInterface::KEY_SOURCE_TYPE => 'DEVICE',
         ];
 
-        $transformer = new SubscriptionTransformer();
+        $transformer = new SubscriptionTransformer(self::createStub(SubscriptionDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -43,7 +44,7 @@ final class SubscriptionTransformerTest extends TestCase
     #[DataProvider('provideTransformOptionalFieldCombinationsCases')]
     public function testTransformOptionalFieldCombinations(array $data, ?string $expectedInstalledAppId, ?string $expectedSourceType): void
     {
-        $transformer = new SubscriptionTransformer();
+        $transformer = new SubscriptionTransformer(self::createStub(SubscriptionDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -90,7 +91,7 @@ final class SubscriptionTransformerTest extends TestCase
     #[TestWith([[SubscriptionTransformerInterface::KEY_ID => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new SubscriptionTransformer();
+        $transformer = new SubscriptionTransformer(self::createStub(SubscriptionDetailsTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(SubscriptionTransformerInterface::UNEXPECTED_STRING_SPRINTF, SubscriptionTransformerInterface::KEY_ID));

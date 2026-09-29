@@ -6,19 +6,26 @@ namespace ChristianBrown\SmartThings\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ServiceCapabilityData;
+use ChristianBrown\SmartThings\Model\ServiceCapabilityDataDetailsInterface;
 use ChristianBrown\SmartThings\Model\ServiceCapabilityDataInterface;
 
+use function array_filter;
+use function array_flip;
+use function array_intersect_key;
+use function array_values;
 use function is_array;
 use function is_string;
 use function sprintf;
 
 final class ServiceCapabilityDataTransformer implements ServiceCapabilityDataTransformerInterface
 {
+    private ServiceCapabilityDataDetailsTransformerInterface $serviceCapabilityDataDetailsTransformer;
     private ServiceMeasurementsTransformerInterface $serviceMeasurementsTransformer;
 
-    public function __construct(ServiceMeasurementsTransformerInterface $serviceMeasurementsTransformer)
+    public function __construct(ServiceMeasurementsTransformerInterface $serviceMeasurementsTransformer, ServiceCapabilityDataDetailsTransformerInterface $serviceCapabilityDataDetailsTransformer)
     {
         $this->serviceMeasurementsTransformer = $serviceMeasurementsTransformer;
+        $this->serviceCapabilityDataDetailsTransformer = $serviceCapabilityDataDetailsTransformer;
     }
 
     /**
@@ -38,6 +45,10 @@ final class ServiceCapabilityDataTransformer implements ServiceCapabilityDataTra
         $this->applyAirQualityForecast($capabilityData, $data);
         $this->applyForecast($capabilityData, $data);
         $this->applyWeather($capabilityData, $data);
+
+        self::applyName($capabilityData, $data);
+
+        $this->applyDetails($capabilityData, $data);
 
         return $capabilityData;
     }
@@ -73,6 +84,18 @@ final class ServiceCapabilityDataTransformer implements ServiceCapabilityDataTra
     /**
      * @phpstan-param mixed[] $data
      */
+    private function applyDetails(ServiceCapabilityData $model, array $data): void
+    {
+        if ([] === array_intersect_key($data, array_flip(self::DETAIL_KEYS))) {
+            return;
+        }
+        $details = $this->serviceCapabilityDataDetailsTransformer->transform($data);
+        self::copyAlert($model, $details);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
     private function applyForecast(ServiceCapabilityData $capabilityData, array $data): void
     {
         if (empty($data[self::KEY_FORECAST])) {
@@ -87,6 +110,20 @@ final class ServiceCapabilityDataTransformer implements ServiceCapabilityDataTra
     /**
      * @phpstan-param mixed[] $data
      */
+    private static function applyName(ServiceCapabilityData $model, array $data): void
+    {
+        if (!isset($data[self::KEY_NAME])) {
+            return;
+        }
+        if (!is_array($data[self::KEY_NAME])) {
+            return;
+        }
+        $model->setName(array_values(array_filter($data[self::KEY_NAME], is_string(...))));
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
     private function applyWeather(ServiceCapabilityData $capabilityData, array $data): void
     {
         if (empty($data[self::KEY_WEATHER])) {
@@ -96,5 +133,10 @@ final class ServiceCapabilityDataTransformer implements ServiceCapabilityDataTra
             return;
         }
         $capabilityData->setWeather($this->serviceMeasurementsTransformer->transform($data[self::KEY_WEATHER]));
+    }
+
+    private static function copyAlert(ServiceCapabilityData $model, ServiceCapabilityDataDetailsInterface $details): void
+    {
+        $model->setAlert($details->getAlert() ?? []);
     }
 }

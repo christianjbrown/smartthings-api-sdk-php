@@ -7,6 +7,7 @@ namespace ChristianBrown\SmartThings\Model;
 final class DevicePreferenceDefinition implements DevicePreferenceDefinitionInterface
 {
     private ?string $description = null;
+    private ?bool $explicit = null;
     private ?string $name = null;
     private string $preferenceId;
     private ?string $preferenceType = null;
@@ -21,6 +22,11 @@ final class DevicePreferenceDefinition implements DevicePreferenceDefinitionInte
     public function getDescription(): ?string
     {
         return $this->description;
+    }
+
+    public function getExplicit(): ?bool
+    {
+        return $this->explicit;
     }
 
     public function getName(): ?string
@@ -51,6 +57,13 @@ final class DevicePreferenceDefinition implements DevicePreferenceDefinitionInte
     public function setDescription(?string $value): DevicePreferenceDefinitionInterface
     {
         $this->description = $value;
+
+        return $this;
+    }
+
+    public function setExplicit(?bool $value): DevicePreferenceDefinitionInterface
+    {
+        $this->explicit = $value;
 
         return $this;
     }

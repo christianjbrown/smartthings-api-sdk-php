@@ -17,11 +17,21 @@ interface ServiceCapabilityDataInterface
     public function getAirQualityForecast(): array;
 
     /**
+     * @return array<int, ServiceCapabilityDataAlertItemInterface>
+     */
+    public function getAlert(): array;
+
+    /**
      * @return array<string, ServiceMeasurementInterface>
      */
     public function getForecast(): array;
 
     public function getLocationId(): string;
+
+    /**
+     * @return array<int, string>
+     */
+    public function getName(): array;
 
     /**
      * @return array<string, ServiceMeasurementInterface>
@@ -39,11 +49,21 @@ interface ServiceCapabilityDataInterface
     public function setAirQualityForecast(array $value): self;
 
     /**
+     * @param array<int, ServiceCapabilityDataAlertItemInterface> $value
+     */
+    public function setAlert(array $value): self;
+
+    /**
      * @param array<string, ServiceMeasurementInterface> $value
      */
     public function setForecast(array $value): self;
 
     public function setLocationId(string $value): self;
+
+    /**
+     * @param array<int, string> $value
+     */
+    public function setName(array $value): self;
 
     /**
      * @param array<string, ServiceMeasurementInterface> $value

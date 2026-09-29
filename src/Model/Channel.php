@@ -7,7 +7,9 @@ namespace ChristianBrown\SmartThings\Model;
 final class Channel implements ChannelInterface
 {
     private string $channelId;
+    private ?string $createdDate = null;
     private ?string $description = null;
+    private ?string $lastModifiedDate = null;
     private ?string $name = null;
     private ?string $termsOfServiceUrl = null;
     private ?string $type = null;
@@ -22,9 +24,19 @@ final class Channel implements ChannelInterface
         return $this->channelId;
     }
 
+    public function getCreatedDate(): ?string
+    {
+        return $this->createdDate;
+    }
+
     public function getDescription(): ?string
     {
         return $this->description;
+    }
+
+    public function getLastModifiedDate(): ?string
+    {
+        return $this->lastModifiedDate;
     }
 
     public function getName(): ?string
@@ -49,9 +61,23 @@ final class Channel implements ChannelInterface
         return $this;
     }
 
+    public function setCreatedDate(?string $value): ChannelInterface
+    {
+        $this->createdDate = $value;
+
+        return $this;
+    }
+
     public function setDescription(?string $value): ChannelInterface
     {
         $this->description = $value;
+
+        return $this;
+    }
+
+    public function setLastModifiedDate(?string $value): ChannelInterface
+    {
+        $this->lastModifiedDate = $value;
 
         return $this;
     }

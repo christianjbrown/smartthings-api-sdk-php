@@ -6,13 +6,23 @@ namespace ChristianBrown\SmartThings\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Driver;
+use ChristianBrown\SmartThings\Model\DriverDetailsInterface;
 use ChristianBrown\SmartThings\Model\DriverInterface;
 
+use function array_flip;
+use function array_intersect_key;
 use function is_string;
 use function sprintf;
 
 final class DriverTransformer implements DriverTransformerInterface
 {
+    private DriverDetailsTransformerInterface $driverDetailsTransformer;
+
+    public function __construct(DriverDetailsTransformerInterface $driverDetailsTransformer)
+    {
+        $this->driverDetailsTransformer = $driverDetailsTransformer;
+    }
+
     /**
      * @param mixed[] $data
      */
@@ -31,6 +41,8 @@ final class DriverTransformer implements DriverTransformerInterface
         self::applyPackageKey($driver, $data);
         self::applyVersion($driver, $data);
 
+        $this->applyDetails($driver, $data);
+
         return $driver;
     }
 
@@ -46,6 +58,20 @@ final class DriverTransformer implements DriverTransformerInterface
             return;
         }
         $driver->setDescription($data[self::KEY_DESCRIPTION]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private function applyDetails(Driver $model, array $data): void
+    {
+        if ([] === array_intersect_key($data, array_flip(self::DETAIL_KEYS))) {
+            return;
+        }
+        $details = $this->driverDetailsTransformer->transform($data);
+        self::copyDeviceIntegrationProfiles($model, $details);
+        self::copyPermissions($model, $details);
+        self::copyFingerprints($model, $details);
     }
 
     /**
@@ -88,5 +114,20 @@ final class DriverTransformer implements DriverTransformerInterface
             return;
         }
         $driver->setVersion($data[self::KEY_VERSION]);
+    }
+
+    private static function copyDeviceIntegrationProfiles(Driver $model, DriverDetailsInterface $details): void
+    {
+        $model->setDeviceIntegrationProfiles($details->getDeviceIntegrationProfiles() ?? []);
+    }
+
+    private static function copyFingerprints(Driver $model, DriverDetailsInterface $details): void
+    {
+        $model->setFingerprints($details->getFingerprints() ?? []);
+    }
+
+    private static function copyPermissions(Driver $model, DriverDetailsInterface $details): void
+    {
+        $model->setPermissions($details->getPermissions() ?? []);
     }
 }

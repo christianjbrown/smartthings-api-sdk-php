@@ -9,6 +9,7 @@ use ChristianBrown\SmartThings\Model\DevicePreferenceDefinitionInterface;
 interface DevicePreferenceDefinitionTransformerInterface
 {
     public const string KEY_DESCRIPTION = 'description';
+    public const string KEY_EXPLICIT = 'explicit';
     public const string KEY_NAME = 'name';
     public const string KEY_PREFERENCE_ID = 'preferenceId';
     public const string KEY_PREFERENCE_TYPE = 'preferenceType';

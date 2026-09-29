@@ -92,36 +92,46 @@ use ChristianBrown\SmartThings\Serializer\UpdateCapabilityPresentationRequestSer
 use ChristianBrown\SmartThings\Serializer\UpdateCapabilityRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateSignatureTypeRequestSerializer;
 use ChristianBrown\SmartThings\SmartThings;
+use ChristianBrown\SmartThings\Transformer\AppDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
 use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppTransformer;
+use ChristianBrown\SmartThings\Transformer\AppUiSettingsTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespaceTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilitySubscriptionDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelDriversTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelDriverTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelsTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelTransformer;
+use ChristianBrown\SmartThings\Transformer\ClustersTransformer;
+use ChristianBrown\SmartThings\Transformer\CommandClassesTransformer;
 use ChristianBrown\SmartThings\Transformer\ConvertedTtsTransformer;
 use ChristianBrown\SmartThings\Transformer\CreateAppResponseTransformer;
+use ChristianBrown\SmartThings\Transformer\CronScheduleTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCommandResultsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCommandResultTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceHealthDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHealthTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHistoryEventsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHistoryEventTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceIntegrationProfileKeyTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceLifecycleDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionsTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicePreferencesTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfilesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceResultsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryBatteryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasurementHumidityTransformer;
@@ -130,43 +140,64 @@ use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTem
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceSubscriptionDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
+use ChristianBrown\SmartThings\Transformer\DriverDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\DriverFingerprintTransformer;
+use ChristianBrown\SmartThings\Transformer\DriverPermissionTransformer;
 use ChristianBrown\SmartThings\Transformer\DriversTransformer;
 use ChristianBrown\SmartThings\Transformer\DriverTransformer;
 use ChristianBrown\SmartThings\Transformer\GenerateAppOauthResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\HubCharacteristicsTransformer;
 use ChristianBrown\SmartThings\Transformer\HubEnrolledChannelsTransformer;
 use ChristianBrown\SmartThings\Transformer\HubEnrolledChannelTransformer;
+use ChristianBrown\SmartThings\Transformer\HubHealthDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\HubInstalledDriversTransformer;
 use ChristianBrown\SmartThings\Transformer\HubInstalledDriverTransformer;
 use ChristianBrown\SmartThings\Transformer\HubTransformer;
+use ChristianBrown\SmartThings\Transformer\IconImageTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppIconImageTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledAppUiTransformer;
+use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppTransformer;
+use ChristianBrown\SmartThings\Transformer\LambdaSmartAppTransformer;
 use ChristianBrown\SmartThings\Transformer\LocaleReferencesTransformer;
 use ChristianBrown\SmartThings\Transformer\LocaleReferenceTransformer;
 use ChristianBrown\SmartThings\Transformer\LocalizationTransformer;
+use ChristianBrown\SmartThings\Transformer\LocationDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\LocationParentTransformer;
+use ChristianBrown\SmartThings\Transformer\LocationRoomDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationTransformer;
 use ChristianBrown\SmartThings\Transformer\ModesTransformer;
+use ChristianBrown\SmartThings\Transformer\ModeSubscriptionDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\ModeTransformer;
+use ChristianBrown\SmartThings\Transformer\NoticeTransformer;
 use ChristianBrown\SmartThings\Transformer\OrganizationsTransformer;
 use ChristianBrown\SmartThings\Transformer\OrganizationTransformer;
+use ChristianBrown\SmartThings\Transformer\OwnerTransformer;
 use ChristianBrown\SmartThings\Transformer\PageLinksTransformer;
 use ChristianBrown\SmartThings\Transformer\PageLinkTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayedTextTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationTransformer;
+use ChristianBrown\SmartThings\Transformer\RoomIndoorMapTransformer;
 use ChristianBrown\SmartThings\Transformer\RulesTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleTransformer;
+use ChristianBrown\SmartThings\Transformer\SceneLifecycleDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
+use ChristianBrown\SmartThings\Transformer\ScheduleDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\SchedulesTransformer;
 use ChristianBrown\SmartThings\Transformer\ScheduleTransformer;
+use ChristianBrown\SmartThings\Transformer\SchemaAppDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppInviteAcceptanceTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppInvitePageTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppInviteReceiptTransformer;
@@ -176,6 +207,11 @@ use ChristianBrown\SmartThings\Transformer\SchemaAppReceiptTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaPageTransformer;
+use ChristianBrown\SmartThings\Transformer\SecurityArmStateDetailTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataAlertItemLastUpdateTimeTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataAlertItemSeverityTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataAlertItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityNamesTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoSubscriptionsTransformer;
@@ -184,10 +220,17 @@ use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceMeasurementsTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceMeasurementTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceSubscriptionReceiptTransformer;
+use ChristianBrown\SmartThings\Transformer\SubscriptionDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
 use ChristianBrown\SmartThings\Transformer\TtsInfoTransformer;
 use ChristianBrown\SmartThings\Transformer\TtsVoiceTransformer;
+use ChristianBrown\SmartThings\Transformer\ViperAppLinksTransformer;
+use ChristianBrown\SmartThings\Transformer\WebhookSmartAppTransformer;
+use ChristianBrown\SmartThings\Transformer\ZigbeeGenericFingerprintTransformer;
+use ChristianBrown\SmartThings\Transformer\ZigbeeManufacturerFingerprintTransformer;
+use ChristianBrown\SmartThings\Transformer\ZWaveGenericFingerprintTransformer;
+use ChristianBrown\SmartThings\Transformer\ZWaveManufacturerFingerprintTransformer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -376,6 +419,49 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(SchemaAppInviteRequestSerializer::class)]
 #[UsesClass(DriverPackageUploader::class)]
 #[UsesClass(RuleRequestSerializer::class)]
+#[UsesClass(LocationParentTransformer::class)]
+#[UsesClass(LocationDetailsTransformer::class)]
+#[UsesClass(RoomIndoorMapTransformer::class)]
+#[UsesClass(LocationRoomDetailsTransformer::class)]
+#[UsesClass(CronScheduleTransformer::class)]
+#[UsesClass(ScheduleDetailsTransformer::class)]
+#[UsesClass(ServiceCapabilityDataAlertItemLastUpdateTimeTransformer::class)]
+#[UsesClass(ServiceCapabilityDataAlertItemSeverityTransformer::class)]
+#[UsesClass(ServiceCapabilityDataAlertItemTransformer::class)]
+#[UsesClass(ServiceCapabilityDataDetailsTransformer::class)]
+#[UsesClass(DeviceIntegrationProfileKeyTransformer::class)]
+#[UsesClass(DriverPermissionTransformer::class)]
+#[UsesClass(ClustersTransformer::class)]
+#[UsesClass(ZigbeeGenericFingerprintTransformer::class)]
+#[UsesClass(ZigbeeManufacturerFingerprintTransformer::class)]
+#[UsesClass(ZWaveManufacturerFingerprintTransformer::class)]
+#[UsesClass(CommandClassesTransformer::class)]
+#[UsesClass(ZWaveGenericFingerprintTransformer::class)]
+#[UsesClass(DriverFingerprintTransformer::class)]
+#[UsesClass(DriverDetailsTransformer::class)]
+#[UsesClass(ViperAppLinksTransformer::class)]
+#[UsesClass(SchemaAppDetailsTransformer::class)]
+#[UsesClass(DeviceResultsTransformer::class)]
+#[UsesClass(InstalledSchemaAppDetailsTransformer::class)]
+#[UsesClass(DeviceSubscriptionDetailTransformer::class)]
+#[UsesClass(CapabilitySubscriptionDetailTransformer::class)]
+#[UsesClass(ModeSubscriptionDetailTransformer::class)]
+#[UsesClass(DeviceLifecycleDetailTransformer::class)]
+#[UsesClass(DeviceHealthDetailTransformer::class)]
+#[UsesClass(SecurityArmStateDetailTransformer::class)]
+#[UsesClass(HubHealthDetailTransformer::class)]
+#[UsesClass(SceneLifecycleDetailTransformer::class)]
+#[UsesClass(SubscriptionDetailsTransformer::class)]
+#[UsesClass(OwnerTransformer::class)]
+#[UsesClass(NoticeTransformer::class)]
+#[UsesClass(InstalledAppUiTransformer::class)]
+#[UsesClass(InstalledAppIconImageTransformer::class)]
+#[UsesClass(InstalledAppDetailsTransformer::class)]
+#[UsesClass(IconImageTransformer::class)]
+#[UsesClass(LambdaSmartAppTransformer::class)]
+#[UsesClass(WebhookSmartAppTransformer::class)]
+#[UsesClass(AppUiSettingsTransformer::class)]
+#[UsesClass(AppDetailsTransformer::class)]
 final class SmartThingsTest extends TestCase
 {
     public function testConstructAcceptsCustomApiHost(): void

@@ -10,7 +10,13 @@ final class HubInstalledDriver implements HubInstalledDriverInterface
     private ?string $description = null;
     private ?string $developer = null;
     private string $driverId;
+    private ?bool $isWWST = null;
     private ?string $name = null;
+
+    /**
+     * @var mixed[]
+     */
+    private array $permissions = [];
     private ?string $vendorSupportInformation = null;
     private ?string $version = null;
 
@@ -39,9 +45,22 @@ final class HubInstalledDriver implements HubInstalledDriverInterface
         return $this->driverId;
     }
 
+    public function getIsWWST(): ?bool
+    {
+        return $this->isWWST;
+    }
+
     public function getName(): ?string
     {
         return $this->name;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getPermissions(): array
+    {
+        return $this->permissions;
     }
 
     public function getVendorSupportInformation(): ?string
@@ -82,9 +101,26 @@ final class HubInstalledDriver implements HubInstalledDriverInterface
         return $this;
     }
 
+    public function setIsWWST(?bool $value): HubInstalledDriverInterface
+    {
+        $this->isWWST = $value;
+
+        return $this;
+    }
+
     public function setName(?string $value): HubInstalledDriverInterface
     {
         $this->name = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param mixed[] $value
+     */
+    public function setPermissions(array $value): HubInstalledDriverInterface
+    {
+        $this->permissions = $value;
 
         return $this;
     }

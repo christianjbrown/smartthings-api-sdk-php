@@ -9,7 +9,9 @@ use ChristianBrown\SmartThings\Model\ChannelInterface;
 interface ChannelTransformerInterface
 {
     public const string KEY_CHANNEL_ID = 'channelId';
+    public const string KEY_CREATED_DATE = 'createdDate';
     public const string KEY_DESCRIPTION = 'description';
+    public const string KEY_LAST_MODIFIED_DATE = 'lastModifiedDate';
     public const string KEY_NAME = 'name';
     public const string KEY_TERMS_OF_SERVICE_URL = 'termsOfServiceUrl';
     public const string KEY_TYPE = 'type';
