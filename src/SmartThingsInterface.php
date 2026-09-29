@@ -14,6 +14,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_APPS_TRANSFORMER = 'smartthings.transformer.apps_transformer';
     public const string SERVICE_CAPABILITIES_TRANSFORMER = 'smartthings.transformer.capabilities_transformer';
     public const string SERVICE_CAPABILITY_API = 'smartthings.api.capability_api';
+    public const string SERVICE_CAPABILITY_LOCALIZATION_REQUEST_SERIALIZER = 'smartthings.serializer.capability_localization_request_serializer';
     public const string SERVICE_CAPABILITY_NAMESPACE_TRANSFORMER = 'smartthings.transformer.capability_namespace_transformer';
     public const string SERVICE_CAPABILITY_NAMESPACES_TRANSFORMER = 'smartthings.transformer.capability_namespaces_transformer';
     public const string SERVICE_CAPABILITY_PRESENTATION_TRANSFORMER = 'smartthings.transformer.capability_presentation_transformer';
@@ -26,6 +27,8 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_COORDINATE_ALIAS_REQUEST_SERIALIZER = 'smartthings.serializer.coordinate_alias_request_serializer';
     public const string SERVICE_CREATE_APP_REQUEST_SERIALIZER = 'smartthings.serializer.create_app_request_serializer';
     public const string SERVICE_CREATE_APP_RESPONSE_TRANSFORMER = 'smartthings.transformer.create_app_response_transformer';
+    public const string SERVICE_CREATE_CAPABILITY_PRESENTATION_REQUEST_SERIALIZER = 'smartthings.serializer.create_capability_presentation_request_serializer';
+    public const string SERVICE_CREATE_CAPABILITY_REQUEST_SERIALIZER = 'smartthings.serializer.create_capability_request_serializer';
     public const string SERVICE_CREATE_INSTALLED_APP_EVENTS_REQUEST_SERIALIZER = 'smartthings.serializer.create_installed_app_events_request_serializer';
     public const string SERVICE_DEVICE_API = 'smartthings.api.device_api';
     public const string SERVICE_DEVICE_COMMAND_RESULT_TRANSFORMER = 'smartthings.transformer.device_command_result_transformer';
@@ -101,6 +104,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_ORGANIZATION_API = 'smartthings.api.organization_api';
     public const string SERVICE_ORGANIZATION_TRANSFORMER = 'smartthings.transformer.organization_transformer';
     public const string SERVICE_ORGANIZATIONS_TRANSFORMER = 'smartthings.transformer.organizations_transformer';
+    public const string SERVICE_PREFERENCE_LOCALIZATION_REQUEST_SERIALIZER = 'smartthings.serializer.preference_localization_request_serializer';
     public const string SERVICE_PREFERENCE_REQUEST_SERIALIZER = 'smartthings.serializer.preference_request_serializer';
     public const string SERVICE_PRESENTATION_API = 'smartthings.api.presentation_api';
     public const string SERVICE_PRESENTATION_TRANSFORMER = 'smartthings.transformer.presentation_transformer';
@@ -137,6 +141,8 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_UPDATE_APP_OAUTH_REQUEST_SERIALIZER = 'smartthings.serializer.update_app_oauth_request_serializer';
     public const string SERVICE_UPDATE_APP_REQUEST_SERIALIZER = 'smartthings.serializer.update_app_request_serializer';
     public const string SERVICE_UPDATE_APP_SETTINGS_REQUEST_SERIALIZER = 'smartthings.serializer.update_app_settings_request_serializer';
+    public const string SERVICE_UPDATE_CAPABILITY_PRESENTATION_REQUEST_SERIALIZER = 'smartthings.serializer.update_capability_presentation_request_serializer';
+    public const string SERVICE_UPDATE_CAPABILITY_REQUEST_SERIALIZER = 'smartthings.serializer.update_capability_request_serializer';
     public const string SERVICE_UPDATE_DEVICE_REQUEST_SERIALIZER = 'smartthings.serializer.update_device_request_serializer';
     public const string SERVICE_UPDATE_SIGNATURE_TYPE_REQUEST_SERIALIZER = 'smartthings.serializer.update_signature_type_request_serializer';
     public const string SERVICE_VIRTUAL_DEVICE_API = 'smartthings.api.virtual_device_api';

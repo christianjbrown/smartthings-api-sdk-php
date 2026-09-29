@@ -10,7 +10,10 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DevicePreferenceDefinitionInterface;
 use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
 use ChristianBrown\SmartThings\Model\LocalizationInterface;
+use ChristianBrown\SmartThings\Model\PreferenceLocalizationRequestInterface;
 use ChristianBrown\SmartThings\Model\PreferenceRequestInterface;
+use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializerInterface;
 use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionsTransformerInterface;
@@ -42,6 +45,7 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
      */
     private array $localesCache = [];
     private LocalizationTransformerInterface $localizationTransformer;
+    private ?PreferenceLocalizationRequestSerializerInterface $preferenceLocalizationRequestSerializer;
     private ?PreferenceRequestSerializerInterface $preferenceRequestSerializer;
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
@@ -51,7 +55,7 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
      */
     private array $translationsCache = [];
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DevicePreferenceDefinitionTransformerInterface $devicePreferenceDefinitionTransformer, DevicePreferenceDefinitionsTransformerInterface $devicePreferenceDefinitionsTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token, ?PreferenceRequestSerializerInterface $preferenceRequestSerializer = null)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, DevicePreferenceDefinitionTransformerInterface $devicePreferenceDefinitionTransformer, DevicePreferenceDefinitionsTransformerInterface $devicePreferenceDefinitionsTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token, ?PreferenceRequestSerializerInterface $preferenceRequestSerializer = null, ?PreferenceLocalizationRequestSerializerInterface $preferenceLocalizationRequestSerializer = null)
     {
         $this->requestSender = $requestSender;
         $this->devicePreferenceDefinitionTransformer = $devicePreferenceDefinitionTransformer;
@@ -60,6 +64,7 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
         $this->localizationTransformer = $localizationTransformer;
         $this->token = $token;
         $this->preferenceRequestSerializer = $preferenceRequestSerializer;
+        $this->preferenceLocalizationRequestSerializer = $preferenceLocalizationRequestSerializer;
     }
 
     /**
@@ -83,6 +88,30 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
         $this->listCache = [];
 
         return $definition;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function createPreferenceLocalization(string $preferenceId, PreferenceLocalizationRequestInterface $request): LocalizationInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_PREFERENCE_LOCALIZATIONS_SPRINTF, rawurlencode($preferenceId));
+        $body = $this->resolvePreferenceLocalizationRequestSerializer()->serialize($request);
+        $data = $this->requestSender->post($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->localizationTransformer->transform($data);
+        unset($this->localesCache[$preferenceId]);
+
+        return $result;
     }
 
     /**
@@ -254,6 +283,31 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
     }
 
     /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function updatePreferenceLocalization(string $preferenceId, string $locale, PreferenceLocalizationRequestInterface $request): LocalizationInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_PREFERENCE_LOCALIZATION_SPRINTF, rawurlencode($preferenceId), rawurlencode($locale));
+        $body = $this->resolvePreferenceLocalizationRequestSerializer()->serialize($request);
+        $data = $this->requestSender->put($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->localizationTransformer->transform($data);
+        $this->translationsCache = [];
+        unset($this->localesCache[$preferenceId]);
+
+        return $result;
+    }
+
+    /**
      * @return array<string, string>
      */
     private static function buildQuery(?string $namespace): array
@@ -265,6 +319,15 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
         }
 
         return [self::KEY_NAMESPACE => $namespace];
+    }
+
+    /**
+     * Falls back to the default serializer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolvePreferenceLocalizationRequestSerializer(): PreferenceLocalizationRequestSerializerInterface
+    {
+        return $this->preferenceLocalizationRequestSerializer ?? new PreferenceLocalizationRequestSerializer();
     }
 
     /**

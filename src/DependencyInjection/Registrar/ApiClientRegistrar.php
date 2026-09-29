@@ -75,6 +75,11 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_LOCALE_REFERENCES_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_LOCALIZATION_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_CREATE_CAPABILITY_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_UPDATE_CAPABILITY_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_CAPABILITY_LOCALIZATION_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_CREATE_CAPABILITY_PRESENTATION_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_UPDATE_CAPABILITY_PRESENTATION_REQUEST_SERIALIZER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_CHANNEL_API, ChannelApi::class)
@@ -128,6 +133,7 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_LOCALIZATION_TRANSFORMER),
                     $this->token,
                     $container->getDefinition(SmartThingsInterface::SERVICE_PREFERENCE_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_PREFERENCE_LOCALIZATION_REQUEST_SERIALIZER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_DEVICE_PREFERENCES_API, DevicePreferencesApi::class)
