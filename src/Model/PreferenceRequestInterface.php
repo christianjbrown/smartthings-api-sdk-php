@@ -21,6 +21,8 @@ interface PreferenceRequestInterface
      */
     public function getDefinition(): array;
 
+    public function getDefinitionModel(): ?PreferenceDefinitionInterface;
+
     public function getDescription(): ?string;
 
     public function getExplicit(): ?bool;
@@ -34,6 +36,8 @@ interface PreferenceRequestInterface
     public function getRequired(): ?bool;
 
     public function getTitle(): string;
+
+    public function setDefinitionModel(?PreferenceDefinitionInterface $value): self;
 
     public function setDescription(?string $value): self;
 

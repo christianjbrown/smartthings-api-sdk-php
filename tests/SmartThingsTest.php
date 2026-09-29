@@ -64,20 +64,29 @@ use ChristianBrown\SmartThings\DependencyInjection\Registrar\ServiceApiRegistrar
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SubscriptionRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\TreeRegistrar;
+use ChristianBrown\SmartThings\Serializer\CapabilityConfigurationSerializer;
+use ChristianBrown\SmartThings\Serializer\CapabilityConfigurationValueSerializer;
 use ChristianBrown\SmartThings\Serializer\CapabilityLocalizationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CapabilityReferenceRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\ChannelCreateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\ChannelUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateAppRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateCapabilityPresentationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateCapabilityRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CreateDeviceProfileRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceCategorySerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceProfileComponentRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\DriverChannelCreateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\DriverChannelUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\HubDeviceUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\HubDriverInstallRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PlayTextRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\PreferenceDefinitionSerializer;
 use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\RestrictionSerializer;
 use ChristianBrown\SmartThings\Serializer\RuleRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SchemaAppCreateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SchemaAppInviteRequestSerializer;
@@ -90,6 +99,7 @@ use ChristianBrown\SmartThings\Serializer\UpdateAppRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppSettingsRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateCapabilityPresentationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateCapabilityRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateDeviceProfileRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateSignatureTypeRequestSerializer;
 use ChristianBrown\SmartThings\SmartThings;
 use ChristianBrown\SmartThings\Transformer\AppDetailsTransformer;
@@ -99,9 +109,12 @@ use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppTransformer;
 use ChristianBrown\SmartThings\Transformer\AppUiSettingsTransformer;
+use ChristianBrown\SmartThings\Transformer\AttributeStateTransformer;
 use ChristianBrown\SmartThings\Transformer\AttributeValueTransformer;
 use ChristianBrown\SmartThings\Transformer\BleD2DDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationValueTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespaceTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformer;
@@ -118,6 +131,8 @@ use ChristianBrown\SmartThings\Transformer\CommandMappingTransformer;
 use ChristianBrown\SmartThings\Transformer\ConvertedTtsTransformer;
 use ChristianBrown\SmartThings\Transformer\CreateAppResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\CronScheduleTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceCapabilityReferenceTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceCategoryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCommandResultsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCommandResultTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
@@ -135,10 +150,13 @@ use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionsTransforme
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicePreferencesTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceProfileComponentTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceProfileDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileReferenceTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfilesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceRelationshipTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceRestrictionTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceResultsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryBatteryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryTransformer;
@@ -219,6 +237,7 @@ use ChristianBrown\SmartThings\Transformer\PageLinksTransformer;
 use ChristianBrown\SmartThings\Transformer\PageLinkTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayedTextTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationTransformer;
+use ChristianBrown\SmartThings\Transformer\RestrictionTransformer;
 use ChristianBrown\SmartThings\Transformer\RoomIndoorMapTransformer;
 use ChristianBrown\SmartThings\Transformer\RulesTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleTransformer;
@@ -532,6 +551,25 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(IndoorMapTransformer::class)]
 #[UsesClass(DeviceRelationshipTransformer::class)]
 #[UsesClass(DeviceDetailsTransformer::class)]
+#[UsesClass(CapabilityConfigurationValueSerializer::class)]
+#[UsesClass(CapabilityConfigurationSerializer::class)]
+#[UsesClass(RestrictionSerializer::class)]
+#[UsesClass(CapabilityReferenceRequestSerializer::class)]
+#[UsesClass(DeviceCategorySerializer::class)]
+#[UsesClass(DeviceProfileComponentRequestSerializer::class)]
+#[UsesClass(PreferenceDefinitionSerializer::class)]
+#[UsesClass(DeviceRestrictionTransformer::class)]
+#[UsesClass(CapabilityConfigurationValueTransformer::class)]
+#[UsesClass(CapabilityConfigurationTransformer::class)]
+#[UsesClass(RestrictionTransformer::class)]
+#[UsesClass(AttributeStateTransformer::class)]
+#[UsesClass(DeviceCapabilityReferenceTransformer::class)]
+#[UsesClass(DeviceCategoryTransformer::class)]
+#[UsesClass(DeviceProfileComponentTransformer::class)]
+#[UsesClass(DeviceProfileDetailsTransformer::class)]
+#[UsesClass(CreateDeviceProfileRequestSerializer::class)]
+#[UsesClass(UpdateDeviceProfileRequestSerializer::class)]
+#[UsesClass(PreferenceRequestSerializer::class)]
 final class SmartThingsTest extends TestCase
 {
     public function testConstructAcceptsCustomApiHost(): void

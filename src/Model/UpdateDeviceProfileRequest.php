@@ -7,7 +7,7 @@ namespace ChristianBrown\SmartThings\Model;
 final class UpdateDeviceProfileRequest implements UpdateDeviceProfileRequestInterface
 {
     /**
-     * @var null|array<int, mixed[]>
+     * @var null|array<int, DeviceProfileComponentRequestInterface|mixed[]>
      */
     private ?array $components = null;
 
@@ -17,13 +17,13 @@ final class UpdateDeviceProfileRequest implements UpdateDeviceProfileRequestInte
     private ?array $metadata = null;
 
     /**
-     * @var null|array<int, mixed[]>
+     * @var null|array<int, mixed[]|PreferenceRequestInterface>
      */
     private ?array $preferences = null;
     private ?string $presentationId = null;
 
     /**
-     * @return null|array<int, mixed[]>
+     * @return null|array<int, DeviceProfileComponentRequestInterface|mixed[]>
      */
     public function getComponents(): ?array
     {
@@ -39,7 +39,7 @@ final class UpdateDeviceProfileRequest implements UpdateDeviceProfileRequestInte
     }
 
     /**
-     * @return null|array<int, mixed[]>
+     * @return null|array<int, mixed[]|PreferenceRequestInterface>
      */
     public function getPreferences(): ?array
     {
@@ -52,7 +52,7 @@ final class UpdateDeviceProfileRequest implements UpdateDeviceProfileRequestInte
     }
 
     /**
-     * @param null|array<int, mixed[]> $value
+     * @param null|array<int, DeviceProfileComponentRequestInterface|mixed[]> $value
      */
     public function setComponents(?array $value): UpdateDeviceProfileRequestInterface
     {
@@ -72,7 +72,7 @@ final class UpdateDeviceProfileRequest implements UpdateDeviceProfileRequestInte
     }
 
     /**
-     * @param null|array<int, mixed[]> $value
+     * @param null|array<int, mixed[]|PreferenceRequestInterface> $value
      */
     public function setPreferences(?array $value): UpdateDeviceProfileRequestInterface
     {

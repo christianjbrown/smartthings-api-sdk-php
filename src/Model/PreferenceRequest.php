@@ -10,6 +10,7 @@ final class PreferenceRequest implements PreferenceRequestInterface
      * @var mixed[]
      */
     private array $definition;
+    private ?PreferenceDefinitionInterface $definitionModel = null;
     private ?string $description = null;
     private ?bool $explicit = null;
     private string $name;
@@ -35,6 +36,11 @@ final class PreferenceRequest implements PreferenceRequestInterface
     public function getDefinition(): array
     {
         return $this->definition;
+    }
+
+    public function getDefinitionModel(): ?PreferenceDefinitionInterface
+    {
+        return $this->definitionModel;
     }
 
     public function getDescription(): ?string
@@ -70,6 +76,13 @@ final class PreferenceRequest implements PreferenceRequestInterface
     public function getTitle(): string
     {
         return $this->title;
+    }
+
+    public function setDefinitionModel(?PreferenceDefinitionInterface $value): PreferenceRequestInterface
+    {
+        $this->definitionModel = $value;
+
+        return $this;
     }
 
     public function setDescription(?string $value): PreferenceRequestInterface

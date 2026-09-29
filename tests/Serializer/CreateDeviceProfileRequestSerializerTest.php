@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Tests\Serializer;
 
 use ChristianBrown\SmartThings\Model\CreateDeviceProfileRequest;
+use ChristianBrown\SmartThings\Model\DeviceProfileComponentRequestInterface;
+use ChristianBrown\SmartThings\Model\PreferenceRequestInterface;
 use ChristianBrown\SmartThings\Serializer\CreateDeviceProfileRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateDeviceProfileRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\DeviceProfileComponentRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -19,7 +23,7 @@ final class CreateDeviceProfileRequestSerializerTest extends TestCase
         $components = [['id' => 'main', 'capabilities' => [['id' => 'switch']], 'categories' => [['name' => 'Switch']]]];
         $request = new CreateDeviceProfileRequest('thermostat1.model1', $components);
 
-        $serializer = new CreateDeviceProfileRequestSerializer();
+        $serializer = new CreateDeviceProfileRequestSerializer(self::createStub(DeviceProfileComponentRequestSerializerInterface::class), self::createStub(PreferenceRequestSerializerInterface::class));
 
         $actual = $serializer->serialize($request);
 
@@ -30,6 +34,33 @@ final class CreateDeviceProfileRequestSerializerTest extends TestCase
             ],
             $actual
         );
+    }
+
+    public function testSerializeTypedComponentsAndPreferences(): void
+    {
+        $component = self::createStub(DeviceProfileComponentRequestInterface::class);
+        $preference = self::createStub(PreferenceRequestInterface::class);
+
+        $componentSerializer = self::createMock(DeviceProfileComponentRequestSerializerInterface::class);
+        $componentSerializer->expects(self::once())->method('serialize')
+            ->with($component)
+            ->willReturn(['test-serialized-component']);
+        $preferenceSerializer = self::createMock(PreferenceRequestSerializerInterface::class);
+        $preferenceSerializer->expects(self::once())->method('serialize')
+            ->with($preference)
+            ->willReturn(['test-serialized-preference']);
+
+        $rawComponent = ['id' => 'raw'];
+        $rawPreference = ['preferenceId' => 'raw'];
+        $request = (new CreateDeviceProfileRequest('thermostat1.model1', [$component, $rawComponent]))
+            ->setPreferences([$preference, $rawPreference]);
+
+        $serializer = new CreateDeviceProfileRequestSerializer($componentSerializer, $preferenceSerializer);
+
+        $actual = $serializer->serialize($request);
+
+        self::assertSame([['test-serialized-component'], $rawComponent], $actual[CreateDeviceProfileRequestSerializerInterface::KEY_COMPONENTS]);
+        self::assertSame([['test-serialized-preference'], $rawPreference], $actual[CreateDeviceProfileRequestSerializerInterface::KEY_PREFERENCES]);
     }
 
     public function testSerializeWithAllFieldsSet(): void
@@ -45,7 +76,7 @@ final class CreateDeviceProfileRequestSerializerTest extends TestCase
             ->setDeviceConfig($deviceConfig)
             ->setPresentationId('perfectlife6617.custom-thermostat');
 
-        $serializer = new CreateDeviceProfileRequestSerializer();
+        $serializer = new CreateDeviceProfileRequestSerializer(self::createStub(DeviceProfileComponentRequestSerializerInterface::class), self::createStub(PreferenceRequestSerializerInterface::class));
 
         $actual = $serializer->serialize($request);
 
