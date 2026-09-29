@@ -10,19 +10,70 @@ use ChristianBrown\SmartThings\Serializer\AlternativeItemSerializer;
 use ChristianBrown\SmartThings\Serializer\AutomationForCapabilityActionsItemSerializer;
 use ChristianBrown\SmartThings\Serializer\AutomationForCapabilityConditionsItemSerializer;
 use ChristianBrown\SmartThings\Serializer\AutomationForCapabilitySerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusCameraImageSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusCameraOverlayIconsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusCameraSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusItemActionsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusItemProgressBarsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusItemSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusLightColorControlColorSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusLightColorControlSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusLightSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusProgressBarsBarItemSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusProgressBarsStateItemSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusStateBoardColorsSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusStateBoardItemSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusTvChannelSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusTvDirectionalPadCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusTvDirectionalPadSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusTvSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusTvVolumeCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusTvVolumeSerializer;
+use ChristianBrown\SmartThings\Serializer\ButtonForTvSerializer;
 use ChristianBrown\SmartThings\Serializer\CapabilityConfigurationSerializer;
 use ChristianBrown\SmartThings\Serializer\CapabilityConfigurationValueSerializer;
 use ChristianBrown\SmartThings\Serializer\CapabilityReferenceRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CapabilityValueForDashboardStateSerializer;
+use ChristianBrown\SmartThings\Serializer\CapabilityValueForPanelSerializer;
+use ChristianBrown\SmartThings\Serializer\CapabilityValueSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateCapabilityPresentationRequestDetailViewItemSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateCapabilityPresentationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\DashboardForCapabilitySerializer;
+use ChristianBrown\SmartThings\Serializer\DescriptionItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DescriptionsInAutomationSerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceCategorySerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigEntryForDashboardActionInlineSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigEntryForDashboardActionSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigEntryForDashboardStateFormatInfoItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigEntryForDashboardStateFormatInfoItemTimeSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigEntryForDashboardStateSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigEntryForDetailViewSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationAutomationSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationDashboardSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationDpInfoItemArgumentsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationDpInfoItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationDpInfosItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationIconsItemBadgeItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationIconsItemProductKeysItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationIconsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationRequestAutomationSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationSerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceProfileComponentRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\DynamicListForAutomationActionSerializer;
 use ChristianBrown\SmartThings\Serializer\DynamicListForAutomationConditionSerializer;
 use ChristianBrown\SmartThings\Serializer\EmptyWithAvailableSizeSerializer;
 use ChristianBrown\SmartThings\Serializer\EnumSliderForAutomationConditionSerializer;
 use ChristianBrown\SmartThings\Serializer\EnumSliderForAutomationConditionSupportedOperatorsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\ExcludedActionItemIdExcludeItemSerializer;
+use ChristianBrown\SmartThings\Serializer\ExcludedActionItemIdSerializer;
+use ChristianBrown\SmartThings\Serializer\ExcludedConditionItemIdExcludeItemAttributesItemSerializer;
+use ChristianBrown\SmartThings\Serializer\ExcludedConditionItemIdExcludeItemSerializer;
+use ChristianBrown\SmartThings\Serializer\ExcludedConditionItemIdSerializer;
+use ChristianBrown\SmartThings\Serializer\ExcludedDeviceActionConfigEntrySerializer;
+use ChristianBrown\SmartThings\Serializer\ExcludedDeviceConditionConfigEntrySerializer;
+use ChristianBrown\SmartThings\Serializer\GroupVisibleConditionsSerializer;
 use ChristianBrown\SmartThings\Serializer\ListForArgumentSerializer;
 use ChristianBrown\SmartThings\Serializer\ListForAutomationActionSerializer;
 use ChristianBrown\SmartThings\Serializer\ListForAutomationConditionSerializer;
@@ -36,7 +87,10 @@ use ChristianBrown\SmartThings\Serializer\NumberFieldForArgumentSerializer;
 use ChristianBrown\SmartThings\Serializer\NumberFieldForAutomationActionSerializer;
 use ChristianBrown\SmartThings\Serializer\NumberFieldForAutomationConditionSerializer;
 use ChristianBrown\SmartThings\Serializer\NumberFieldSerializer;
+use ChristianBrown\SmartThings\Serializer\PanelForDeviceConfigItemsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\PanelForDeviceConfigSerializer;
 use ChristianBrown\SmartThings\Serializer\PanelItemForCapabilitySerializer;
+use ChristianBrown\SmartThings\Serializer\PatchItemSerializer;
 use ChristianBrown\SmartThings\Serializer\PlayPauseCommandSerializer;
 use ChristianBrown\SmartThings\Serializer\PlayPauseSerializer;
 use ChristianBrown\SmartThings\Serializer\PlayPauseStateSerializer;
@@ -52,6 +106,7 @@ use ChristianBrown\SmartThings\Serializer\RestrictionSerializer;
 use ChristianBrown\SmartThings\Serializer\SliderForArgumentSerializer;
 use ChristianBrown\SmartThings\Serializer\SliderForAutomationActionSerializer;
 use ChristianBrown\SmartThings\Serializer\SliderForAutomationConditionSerializer;
+use ChristianBrown\SmartThings\Serializer\SliderForLightSerializer;
 use ChristianBrown\SmartThings\Serializer\SliderTypeSerializer;
 use ChristianBrown\SmartThings\Serializer\SliderWithAvailableSizeSerializer;
 use ChristianBrown\SmartThings\Serializer\StandbyPowerSwitchForDashboardSerializer;
@@ -81,8 +136,15 @@ use ChristianBrown\SmartThings\Serializer\ToggleSwitchForDashboardStateSerialize
 use ChristianBrown\SmartThings\Serializer\ToggleSwitchSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateCapabilityPresentationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\VisibleConditionBaseSerializer;
+use ChristianBrown\SmartThings\Serializer\VisibleConditionForColorItemReferToSerializer;
+use ChristianBrown\SmartThings\Serializer\VisibleConditionForColorItemSerializer;
+use ChristianBrown\SmartThings\Serializer\VisibleConditionForDashboardStateSerializer;
+use ChristianBrown\SmartThings\Serializer\VisibleConditionForDetailViewSerializer;
+use ChristianBrown\SmartThings\Serializer\VisibleConditionSerializer;
 use ChristianBrown\SmartThings\SmartThingsInterface;
 use ChristianBrown\SmartThings\Transformer\ActionItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ActionListItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ActionsArrayItemTransformer;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformer;
 use ChristianBrown\SmartThings\Transformer\AppDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppDeviceDetailsTransformer;
@@ -92,26 +154,75 @@ use ChristianBrown\SmartThings\Transformer\AttributeValueTransformer;
 use ChristianBrown\SmartThings\Transformer\AutomationForCapabilityActionsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\AutomationForCapabilityConditionsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\AutomationForCapabilityTransformer;
+use ChristianBrown\SmartThings\Transformer\AutomationListItemTransformer;
+use ChristianBrown\SmartThings\Transformer\AutomationTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusCameraImageTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusCameraOverlayIconsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusCameraTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusItemActionsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusItemForPresentationTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusItemProgressBarsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusItemTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusLightColorControlColorTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusLightColorControlTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusLightTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusProgressBarsBarItemTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusProgressBarsStateItemTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusStateBoardColorsTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusStateBoardItemTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusTvChannelTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusTvDirectionalPadCommandTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusTvDirectionalPadTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusTvTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusTvVolumeCommandTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusTvVolumeTransformer;
 use ChristianBrown\SmartThings\Transformer\BleD2DDeviceDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\ButtonForTvTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationValueTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitySubscriptionDetailTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityValueForDashboardStateTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityValueForPanelTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityValueTransformer;
 use ChristianBrown\SmartThings\Transformer\ClustersTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandClassesTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandMappingsTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandMappingTransformer;
 use ChristianBrown\SmartThings\Transformer\ConvertedTtsTransformer;
 use ChristianBrown\SmartThings\Transformer\CreateCapabilityPresentationRequestDetailViewItemTransformer;
+use ChristianBrown\SmartThings\Transformer\CreateDeviceConfigRequestTransformer;
 use ChristianBrown\SmartThings\Transformer\CronScheduleTransformer;
 use ChristianBrown\SmartThings\Transformer\DashboardForCapabilityTransformer;
+use ChristianBrown\SmartThings\Transformer\DashboardTransformer;
+use ChristianBrown\SmartThings\Transformer\DescriptionItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DescriptionsInAutomationTransformer;
+use ChristianBrown\SmartThings\Transformer\DetailViewListItemTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCapabilityReferenceTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCategoryTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardActionInlineTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardActionTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardStateFormatInfoItemTimeTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardStateFormatInfoItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardStateTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDetailViewTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationAutomationTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationDashboardTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationDpInfoItemArgumentsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationDpInfoItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationDpInfosItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationIconsItemBadgeItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationIconsItemProductKeysItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationIconsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationRequestAutomationTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHealthDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceIntegrationProfileKeyTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceLifecycleDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionTransformer;
+use ChristianBrown\SmartThings\Transformer\DevicePresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileComponentTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileReferenceTransformer;
@@ -128,12 +239,23 @@ use ChristianBrown\SmartThings\Transformer\DynamicListForAutomationConditionTran
 use ChristianBrown\SmartThings\Transformer\EdgeChildDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\EdgeDriverSupportedEndpointAppsAppsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\EdgeDriverSupportedEndpointAppsTransformer;
+use ChristianBrown\SmartThings\Transformer\EmptyForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\EmptyWithAvailableSizeTransformer;
 use ChristianBrown\SmartThings\Transformer\EnumSliderForAutomationConditionSupportedOperatorsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\EnumSliderForAutomationConditionTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedActionItemIdExcludeItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedActionItemIdTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedActionItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedConditionItemIdExcludeItemAttributesItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedConditionItemIdExcludeItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedConditionItemIdTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedConditionItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedDeviceActionConfigEntryTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedDeviceConditionConfigEntryTransformer;
 use ChristianBrown\SmartThings\Transformer\GroupDeviceDetailsDevicesItemComponentsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\GroupDeviceDetailsDevicesItemTransformer;
 use ChristianBrown\SmartThings\Transformer\GroupDeviceDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\GroupVisibleConditionsTransformer;
 use ChristianBrown\SmartThings\Transformer\HubDeviceDetailsHubDataHub2hubSupportMatrixCapabilitiesItemTransformer;
 use ChristianBrown\SmartThings\Transformer\HubDeviceDetailsHubDataHub2hubSupportMatrixTransformer;
 use ChristianBrown\SmartThings\Transformer\HubDeviceDetailsHubDataTransformer;
@@ -151,10 +273,14 @@ use ChristianBrown\SmartThings\Transformer\IrDeviceDetailsFunctionCodesTransform
 use ChristianBrown\SmartThings\Transformer\IrDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\LambdaSmartAppTransformer;
 use ChristianBrown\SmartThings\Transformer\LanDeviceDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\LanguageItemTransformer;
 use ChristianBrown\SmartThings\Transformer\ListForArgumentTransformer;
 use ChristianBrown\SmartThings\Transformer\ListForAutomationActionTransformer;
 use ChristianBrown\SmartThings\Transformer\ListForAutomationConditionTransformer;
 use ChristianBrown\SmartThings\Transformer\ListForDetailViewTransformer;
+use ChristianBrown\SmartThings\Transformer\ListForPanelItemCommandTransformer;
+use ChristianBrown\SmartThings\Transformer\ListForPanelItemStateTransformer;
+use ChristianBrown\SmartThings\Transformer\ListForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeStateTransformer;
 use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeTransformer;
@@ -178,7 +304,12 @@ use ChristianBrown\SmartThings\Transformer\OcfDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\OwnerTransformer;
 use ChristianBrown\SmartThings\Transformer\PageLinksTransformer;
 use ChristianBrown\SmartThings\Transformer\PageLinkTransformer;
+use ChristianBrown\SmartThings\Transformer\PanelForDeviceConfigItemsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\PanelForDeviceConfigTransformer;
+use ChristianBrown\SmartThings\Transformer\PanelForDevicePresentationItemsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\PanelForDevicePresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\PanelItemForCapabilityTransformer;
+use ChristianBrown\SmartThings\Transformer\PatchItemTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayedTextTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayPauseCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayPauseStateTransformer;
@@ -186,8 +317,11 @@ use ChristianBrown\SmartThings\Transformer\PlayPauseTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayStopCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayStopStateTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayStopTransformer;
+use ChristianBrown\SmartThings\Transformer\PoCodesTransformer;
+use ChristianBrown\SmartThings\Transformer\PresentationSettingsForDevicePresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationSettingsTemperatureConversionsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationSettingsTransformer;
+use ChristianBrown\SmartThings\Transformer\PushButtonForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\PushButtonTransformer;
 use ChristianBrown\SmartThings\Transformer\PushButtonWithAvailableSizeTransformer;
 use ChristianBrown\SmartThings\Transformer\RestrictionTransformer;
@@ -208,15 +342,22 @@ use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataDetailsTransform
 use ChristianBrown\SmartThings\Transformer\SliderForArgumentTransformer;
 use ChristianBrown\SmartThings\Transformer\SliderForAutomationActionTransformer;
 use ChristianBrown\SmartThings\Transformer\SliderForAutomationConditionTransformer;
+use ChristianBrown\SmartThings\Transformer\SliderForLightTransformer;
+use ChristianBrown\SmartThings\Transformer\SliderForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\SliderTypeTransformer;
 use ChristianBrown\SmartThings\Transformer\SliderWithAvailableSizeTransformer;
 use ChristianBrown\SmartThings\Transformer\StandbyPowerSwitchForDashboardStateTransformer;
 use ChristianBrown\SmartThings\Transformer\StandbyPowerSwitchForDashboardTransformer;
 use ChristianBrown\SmartThings\Transformer\StandbyPowerSwitchTransformer;
+use ChristianBrown\SmartThings\Transformer\StateForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\StateItemTransformer;
 use ChristianBrown\SmartThings\Transformer\StatelessPowerToggleForDashboardTransformer;
+use ChristianBrown\SmartThings\Transformer\StatesArrayItemTransformer;
 use ChristianBrown\SmartThings\Transformer\StateTransformer;
 use ChristianBrown\SmartThings\Transformer\StateWithAvailableSizeTransformer;
+use ChristianBrown\SmartThings\Transformer\StepperForPanelItemCommandTransformer;
+use ChristianBrown\SmartThings\Transformer\StepperForPanelItemStateTransformer;
+use ChristianBrown\SmartThings\Transformer\StepperForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\StepperTransformer;
 use ChristianBrown\SmartThings\Transformer\StepperWithAvailableSizeCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\StepperWithAvailableSizeStateTransformer;
@@ -226,6 +367,7 @@ use ChristianBrown\SmartThings\Transformer\SupportedValuesForDynamicListTransfor
 use ChristianBrown\SmartThings\Transformer\SupportedValuesForDynamicListValueMapTransformer;
 use ChristianBrown\SmartThings\Transformer\SwitchControlTransformer;
 use ChristianBrown\SmartThings\Transformer\SwitchForDashboardTransformer;
+use ChristianBrown\SmartThings\Transformer\TemperatureConversionsItemForDevicePresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\TextButtonButtonsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\TextButtonTransformer;
 use ChristianBrown\SmartThings\Transformer\TextFieldForArgumentTransformer;
@@ -242,6 +384,11 @@ use ChristianBrown\SmartThings\Transformer\ViperAppLinksTransformer;
 use ChristianBrown\SmartThings\Transformer\ViperDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\VirtualDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\VisibleConditionBaseTransformer;
+use ChristianBrown\SmartThings\Transformer\VisibleConditionForColorItemReferToTransformer;
+use ChristianBrown\SmartThings\Transformer\VisibleConditionForColorItemTransformer;
+use ChristianBrown\SmartThings\Transformer\VisibleConditionForDashboardStateTransformer;
+use ChristianBrown\SmartThings\Transformer\VisibleConditionForDetailViewTransformer;
+use ChristianBrown\SmartThings\Transformer\VisibleConditionTransformer;
 use ChristianBrown\SmartThings\Transformer\WebhookSmartAppTransformer;
 use ChristianBrown\SmartThings\Transformer\ZigbeeDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\ZigbeeGenericFingerprintTransformer;
@@ -1715,6 +1862,2257 @@ final class ShapeRegistrar implements ServiceRegistrarInterface
                     new Reference(SmartThingsInterface::SERVICE_CREATE_CAPABILITY_PRESENTATION_REQUEST_DETAIL_VIEW_ITEM_TRANSFORMER),
                     new Reference(SmartThingsInterface::SERVICE_AUTOMATION_FOR_CAPABILITY_TRANSFORMER),
                     new Reference(SmartThingsInterface::SERVICE_PRESENTATION_SETTINGS_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_ARGUMENTS_ITEM_SERIALIZER, DeviceConfigurationDpInfoItemArgumentsItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_ARGUMENTS_ITEM_TRANSFORMER, DeviceConfigurationDpInfoItemArgumentsItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_SERIALIZER, DeviceConfigurationDpInfoItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_ARGUMENTS_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_TRANSFORMER, DeviceConfigurationDpInfoItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_ARGUMENTS_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFOS_ITEM_SERIALIZER, DeviceConfigurationDpInfosItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFOS_ITEM_TRANSFORMER, DeviceConfigurationDpInfosItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER, VisibleConditionSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER, VisibleConditionTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_SERIALIZER, DeviceConfigurationIconsItemBadgeItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_TRANSFORMER, DeviceConfigurationIconsItemBadgeItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_SERIALIZER, DeviceConfigurationIconsItemProductKeysItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_TRANSFORMER, DeviceConfigurationIconsItemProductKeysItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_SERIALIZER, DeviceConfigurationIconsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_TRANSFORMER, DeviceConfigurationIconsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_DASHBOARD_STATE_SERIALIZER, CapabilityValueForDashboardStateSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_DASHBOARD_STATE_TRANSFORMER, CapabilityValueForDashboardStateTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_SERIALIZER, DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_TRANSFORMER, DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_SERIALIZER, DeviceConfigEntryForDashboardStateFormatInfoItemTimeSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_TRANSFORMER, DeviceConfigEntryForDashboardStateFormatInfoItemTimeTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_SERIALIZER, DeviceConfigEntryForDashboardStateFormatInfoItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TRANSFORMER, DeviceConfigEntryForDashboardStateFormatInfoItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_SERIALIZER, VisibleConditionForDashboardStateSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_TRANSFORMER, VisibleConditionForDashboardStateTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_SERIALIZER, DeviceConfigEntryForDashboardStateSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_DASHBOARD_STATE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_TRANSFORMER, DeviceConfigEntryForDashboardStateTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_DASHBOARD_STATE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_INLINE_SERIALIZER, DeviceConfigEntryForDashboardActionInlineSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PUSH_BUTTON_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_TOGGLE_SWITCH_FOR_DASHBOARD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_SWITCH_FOR_DASHBOARD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_STANDBY_POWER_SWITCH_FOR_DASHBOARD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_STATELESS_POWER_TOGGLE_FOR_DASHBOARD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_PAUSE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_STOP_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_INLINE_TRANSFORMER, DeviceConfigEntryForDashboardActionInlineTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PUSH_BUTTON_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_TOGGLE_SWITCH_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_SWITCH_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_STANDBY_POWER_SWITCH_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_STATELESS_POWER_TOGGLE_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_PAUSE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_STOP_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_SERIALIZER, DeviceConfigEntryForDashboardActionSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_INLINE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_TRANSFORMER, DeviceConfigEntryForDashboardActionTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_INLINE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_SERIALIZER, BasicPlusCameraImageSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_TRANSFORMER, BasicPlusCameraImageTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_SERIALIZER, BasicPlusCameraOverlayIconsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_TRANSFORMER, BasicPlusCameraOverlayIconsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_SERIALIZER, BasicPlusCameraSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_TRANSFORMER, BasicPlusCameraTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_SERIALIZER, BasicPlusTvVolumeCommandSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_TRANSFORMER, BasicPlusTvVolumeCommandTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_SERIALIZER, BasicPlusTvVolumeSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_TRANSFORMER, BasicPlusTvVolumeTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_SERIALIZER, ButtonForTvSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_TRANSFORMER, ButtonForTvTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_SERIALIZER, BasicPlusTvChannelSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_TRANSFORMER, BasicPlusTvChannelTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_SERIALIZER, BasicPlusTvDirectionalPadCommandSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_TRANSFORMER, BasicPlusTvDirectionalPadCommandTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_SERIALIZER, BasicPlusTvDirectionalPadSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_TRANSFORMER, BasicPlusTvDirectionalPadTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_SERIALIZER, BasicPlusTvSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_TRANSFORMER, BasicPlusTvTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_SERIALIZER, SliderForLightSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_TRANSFORMER, SliderForLightTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_SERIALIZER, BasicPlusLightColorControlColorSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_TRANSFORMER, BasicPlusLightColorControlColorTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_SERIALIZER, BasicPlusLightColorControlSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_TRANSFORMER, BasicPlusLightColorControlTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_SERIALIZER, BasicPlusLightSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_TRANSFORMER, BasicPlusLightTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_SERIALIZER, BasicPlusItemActionsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_TRANSFORMER, BasicPlusItemActionsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_SERIALIZER, VisibleConditionForColorItemReferToSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_TRANSFORMER, VisibleConditionForColorItemReferToTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_SERIALIZER, VisibleConditionForColorItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_TRANSFORMER, VisibleConditionForColorItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_SERIALIZER, BasicPlusStateBoardColorsSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_TRANSFORMER, BasicPlusStateBoardColorsTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_SERIALIZER, BasicPlusStateBoardItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_TRANSFORMER, BasicPlusStateBoardItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_SERIALIZER, BasicPlusProgressBarsStateItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_TRANSFORMER, BasicPlusProgressBarsStateItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_SERIALIZER, BasicPlusProgressBarsBarItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_TRANSFORMER, BasicPlusProgressBarsBarItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_SERIALIZER, BasicPlusItemProgressBarsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_TRANSFORMER, BasicPlusItemProgressBarsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_PANEL_SERIALIZER, CapabilityValueForPanelSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_PANEL_TRANSFORMER, CapabilityValueForPanelTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_ITEMS_ITEM_SERIALIZER, PanelForDeviceConfigItemsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_PANEL_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_ITEMS_ITEM_TRANSFORMER, PanelForDeviceConfigItemsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_PANEL_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_SERIALIZER, PanelForDeviceConfigSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_ITEMS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_TRANSFORMER, PanelForDeviceConfigTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_ITEMS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_SERIALIZER, BasicPlusItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_TRANSFORMER, BasicPlusItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_SERIALIZER, GroupVisibleConditionsSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_TRANSFORMER, GroupVisibleConditionsTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DASHBOARD_SERIALIZER, DeviceConfigurationDashboardSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DASHBOARD_TRANSFORMER, DeviceConfigurationDashboardTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_SERIALIZER, CapabilityValueSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_TRANSFORMER, CapabilityValueTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PATCH_ITEM_SERIALIZER, PatchItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_PATCH_ITEM_TRANSFORMER, PatchItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_SERIALIZER, VisibleConditionForDetailViewSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_TRANSFORMER, VisibleConditionForDetailViewTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DETAIL_VIEW_SERIALIZER, DeviceConfigEntryForDetailViewSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DETAIL_VIEW_TRANSFORMER, DeviceConfigEntryForDetailViewTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_SERIALIZER, ExcludedConditionItemIdExcludeItemAttributesItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_TRANSFORMER, ExcludedConditionItemIdExcludeItemAttributesItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_SERIALIZER, ExcludedConditionItemIdExcludeItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER, ExcludedConditionItemIdExcludeItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_SERIALIZER, ExcludedConditionItemIdSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_TRANSFORMER, ExcludedConditionItemIdTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_CONDITION_CONFIG_ENTRY_SERIALIZER, ExcludedDeviceConditionConfigEntrySerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_CONDITION_CONFIG_ENTRY_TRANSFORMER, ExcludedDeviceConditionConfigEntryTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_SERIALIZER, ExcludedActionItemIdExcludeItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER, ExcludedActionItemIdExcludeItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_SERIALIZER, ExcludedActionItemIdSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_TRANSFORMER, ExcludedActionItemIdTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_ACTION_CONFIG_ENTRY_SERIALIZER, ExcludedDeviceActionConfigEntrySerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_ACTION_CONFIG_ENTRY_TRANSFORMER, ExcludedDeviceActionConfigEntryTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DESCRIPTION_ITEM_SERIALIZER, DescriptionItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DESCRIPTION_ITEM_TRANSFORMER, DescriptionItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DESCRIPTIONS_IN_AUTOMATION_SERIALIZER, DescriptionsInAutomationSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DESCRIPTION_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DESCRIPTIONS_IN_AUTOMATION_TRANSFORMER, DescriptionsInAutomationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DESCRIPTION_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_AUTOMATION_SERIALIZER, DeviceConfigurationAutomationSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_CONDITION_CONFIG_ENTRY_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_ACTION_CONFIG_ENTRY_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DESCRIPTIONS_IN_AUTOMATION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_AUTOMATION_TRANSFORMER, DeviceConfigurationAutomationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_CONDITION_CONFIG_ENTRY_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_ACTION_CONFIG_ENTRY_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DESCRIPTIONS_IN_AUTOMATION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_SERIALIZER, DeviceConfigurationSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFOS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DASHBOARD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DETAIL_VIEW_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_AUTOMATION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_TRANSFORMER, DeviceConfigurationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFOS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DETAIL_VIEW_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_AUTOMATION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER, VisibleConditionSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER, VisibleConditionTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_SERIALIZER, DeviceConfigurationIconsItemBadgeItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_TRANSFORMER, DeviceConfigurationIconsItemBadgeItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_SERIALIZER, DeviceConfigurationIconsItemProductKeysItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_TRANSFORMER, DeviceConfigurationIconsItemProductKeysItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_SERIALIZER, DeviceConfigurationIconsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_TRANSFORMER, DeviceConfigurationIconsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_DASHBOARD_STATE_SERIALIZER, CapabilityValueForDashboardStateSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_DASHBOARD_STATE_TRANSFORMER, CapabilityValueForDashboardStateTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_SERIALIZER, DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_TRANSFORMER, DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_SERIALIZER, DeviceConfigEntryForDashboardStateFormatInfoItemTimeSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_TRANSFORMER, DeviceConfigEntryForDashboardStateFormatInfoItemTimeTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_SERIALIZER, DeviceConfigEntryForDashboardStateFormatInfoItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TRANSFORMER, DeviceConfigEntryForDashboardStateFormatInfoItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_SERIALIZER, VisibleConditionForDashboardStateSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_TRANSFORMER, VisibleConditionForDashboardStateTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_SERIALIZER, DeviceConfigEntryForDashboardStateSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_DASHBOARD_STATE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_TRANSFORMER, DeviceConfigEntryForDashboardStateTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_DASHBOARD_STATE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_INLINE_SERIALIZER, DeviceConfigEntryForDashboardActionInlineSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PUSH_BUTTON_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_TOGGLE_SWITCH_FOR_DASHBOARD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_SWITCH_FOR_DASHBOARD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_STANDBY_POWER_SWITCH_FOR_DASHBOARD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_STATELESS_POWER_TOGGLE_FOR_DASHBOARD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_PAUSE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_STOP_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_INLINE_TRANSFORMER, DeviceConfigEntryForDashboardActionInlineTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PUSH_BUTTON_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_TOGGLE_SWITCH_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_SWITCH_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_STANDBY_POWER_SWITCH_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_STATELESS_POWER_TOGGLE_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_PAUSE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_STOP_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_SERIALIZER, DeviceConfigEntryForDashboardActionSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_INLINE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_TRANSFORMER, DeviceConfigEntryForDashboardActionTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_INLINE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_SERIALIZER, BasicPlusCameraImageSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_TRANSFORMER, BasicPlusCameraImageTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_SERIALIZER, BasicPlusCameraOverlayIconsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_TRANSFORMER, BasicPlusCameraOverlayIconsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_SERIALIZER, BasicPlusCameraSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_TRANSFORMER, BasicPlusCameraTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_SERIALIZER, BasicPlusTvVolumeCommandSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_TRANSFORMER, BasicPlusTvVolumeCommandTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_SERIALIZER, BasicPlusTvVolumeSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_TRANSFORMER, BasicPlusTvVolumeTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_SERIALIZER, ButtonForTvSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_TRANSFORMER, ButtonForTvTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_SERIALIZER, BasicPlusTvChannelSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_TRANSFORMER, BasicPlusTvChannelTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_SERIALIZER, BasicPlusTvDirectionalPadCommandSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_TRANSFORMER, BasicPlusTvDirectionalPadCommandTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_SERIALIZER, BasicPlusTvDirectionalPadSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_TRANSFORMER, BasicPlusTvDirectionalPadTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_SERIALIZER, BasicPlusTvSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_TRANSFORMER, BasicPlusTvTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_SERIALIZER, SliderForLightSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_TRANSFORMER, SliderForLightTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_SERIALIZER, BasicPlusLightColorControlColorSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_TRANSFORMER, BasicPlusLightColorControlColorTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_SERIALIZER, BasicPlusLightColorControlSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_TRANSFORMER, BasicPlusLightColorControlTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_SERIALIZER, BasicPlusLightSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_TRANSFORMER, BasicPlusLightTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_SERIALIZER, BasicPlusItemActionsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_TRANSFORMER, BasicPlusItemActionsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_SERIALIZER, VisibleConditionForColorItemReferToSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_TRANSFORMER, VisibleConditionForColorItemReferToTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_SERIALIZER, VisibleConditionForColorItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_TRANSFORMER, VisibleConditionForColorItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_SERIALIZER, BasicPlusStateBoardColorsSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_TRANSFORMER, BasicPlusStateBoardColorsTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_SERIALIZER, BasicPlusStateBoardItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_TRANSFORMER, BasicPlusStateBoardItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_SERIALIZER, BasicPlusProgressBarsStateItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_TRANSFORMER, BasicPlusProgressBarsStateItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_SERIALIZER, BasicPlusProgressBarsBarItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_TRANSFORMER, BasicPlusProgressBarsBarItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_SERIALIZER, BasicPlusItemProgressBarsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_TRANSFORMER, BasicPlusItemProgressBarsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_PANEL_SERIALIZER, CapabilityValueForPanelSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_PANEL_TRANSFORMER, CapabilityValueForPanelTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_ITEMS_ITEM_SERIALIZER, PanelForDeviceConfigItemsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_PANEL_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_ITEMS_ITEM_TRANSFORMER, PanelForDeviceConfigItemsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_PANEL_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_SERIALIZER, PanelForDeviceConfigSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_ITEMS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_TRANSFORMER, PanelForDeviceConfigTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_ITEMS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_SERIALIZER, BasicPlusItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_TRANSFORMER, BasicPlusItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_SERIALIZER, GroupVisibleConditionsSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_TRANSFORMER, GroupVisibleConditionsTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DASHBOARD_SERIALIZER, DeviceConfigurationDashboardSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DASHBOARD_TRANSFORMER, DeviceConfigurationDashboardTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_SERIALIZER, CapabilityValueSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_TRANSFORMER, CapabilityValueTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PATCH_ITEM_SERIALIZER, PatchItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_PATCH_ITEM_TRANSFORMER, PatchItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_SERIALIZER, VisibleConditionForDetailViewSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_TRANSFORMER, VisibleConditionForDetailViewTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DETAIL_VIEW_SERIALIZER, DeviceConfigEntryForDetailViewSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DETAIL_VIEW_TRANSFORMER, DeviceConfigEntryForDetailViewTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_SERIALIZER, ExcludedConditionItemIdExcludeItemAttributesItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_TRANSFORMER, ExcludedConditionItemIdExcludeItemAttributesItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_SERIALIZER, ExcludedConditionItemIdExcludeItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER, ExcludedConditionItemIdExcludeItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_SERIALIZER, ExcludedConditionItemIdSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_TRANSFORMER, ExcludedConditionItemIdTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_CONDITION_CONFIG_ENTRY_SERIALIZER, ExcludedDeviceConditionConfigEntrySerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_CONDITION_CONFIG_ENTRY_TRANSFORMER, ExcludedDeviceConditionConfigEntryTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_SERIALIZER, ExcludedActionItemIdExcludeItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER, ExcludedActionItemIdExcludeItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_SERIALIZER, ExcludedActionItemIdSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_TRANSFORMER, ExcludedActionItemIdTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_ACTION_CONFIG_ENTRY_SERIALIZER, ExcludedDeviceActionConfigEntrySerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_ACTION_CONFIG_ENTRY_TRANSFORMER, ExcludedDeviceActionConfigEntryTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_REQUEST_AUTOMATION_SERIALIZER, DeviceConfigurationRequestAutomationSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_CONDITION_CONFIG_ENTRY_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_ACTION_CONFIG_ENTRY_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_REQUEST_AUTOMATION_TRANSFORMER, DeviceConfigurationRequestAutomationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_CONDITION_CONFIG_ENTRY_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_ACTION_CONFIG_ENTRY_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_REQUEST_SERIALIZER, DeviceConfigurationRequestSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DASHBOARD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DETAIL_VIEW_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_REQUEST_AUTOMATION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER, VisibleConditionSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER, VisibleConditionTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_SERIALIZER, DeviceConfigurationIconsItemBadgeItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_TRANSFORMER, DeviceConfigurationIconsItemBadgeItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_SERIALIZER, DeviceConfigurationIconsItemProductKeysItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_TRANSFORMER, DeviceConfigurationIconsItemProductKeysItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_SERIALIZER, DeviceConfigurationIconsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_TRANSFORMER, DeviceConfigurationIconsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_DASHBOARD_STATE_SERIALIZER, CapabilityValueForDashboardStateSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_DASHBOARD_STATE_TRANSFORMER, CapabilityValueForDashboardStateTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_SERIALIZER, DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_TRANSFORMER, DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_SERIALIZER, DeviceConfigEntryForDashboardStateFormatInfoItemTimeSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_TRANSFORMER, DeviceConfigEntryForDashboardStateFormatInfoItemTimeTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_SERIALIZER, DeviceConfigEntryForDashboardStateFormatInfoItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TRANSFORMER, DeviceConfigEntryForDashboardStateFormatInfoItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_SERIALIZER, VisibleConditionForDashboardStateSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_TRANSFORMER, VisibleConditionForDashboardStateTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_SERIALIZER, DeviceConfigEntryForDashboardStateSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_DASHBOARD_STATE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_TRANSFORMER, DeviceConfigEntryForDashboardStateTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_DASHBOARD_STATE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_INLINE_SERIALIZER, DeviceConfigEntryForDashboardActionInlineSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PUSH_BUTTON_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_TOGGLE_SWITCH_FOR_DASHBOARD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_SWITCH_FOR_DASHBOARD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_STANDBY_POWER_SWITCH_FOR_DASHBOARD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_STATELESS_POWER_TOGGLE_FOR_DASHBOARD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_PAUSE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_STOP_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_INLINE_TRANSFORMER, DeviceConfigEntryForDashboardActionInlineTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PUSH_BUTTON_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_TOGGLE_SWITCH_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_SWITCH_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_STANDBY_POWER_SWITCH_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_STATELESS_POWER_TOGGLE_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_PAUSE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_STOP_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_SERIALIZER, DeviceConfigEntryForDashboardActionSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_INLINE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_TRANSFORMER, DeviceConfigEntryForDashboardActionTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_INLINE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_SERIALIZER, BasicPlusCameraImageSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_TRANSFORMER, BasicPlusCameraImageTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_SERIALIZER, BasicPlusCameraOverlayIconsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_TRANSFORMER, BasicPlusCameraOverlayIconsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_SERIALIZER, BasicPlusCameraSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_TRANSFORMER, BasicPlusCameraTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_SERIALIZER, BasicPlusTvVolumeCommandSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_TRANSFORMER, BasicPlusTvVolumeCommandTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_SERIALIZER, BasicPlusTvVolumeSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_TRANSFORMER, BasicPlusTvVolumeTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_SERIALIZER, ButtonForTvSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_TRANSFORMER, ButtonForTvTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_SERIALIZER, BasicPlusTvChannelSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_TRANSFORMER, BasicPlusTvChannelTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_SERIALIZER, BasicPlusTvDirectionalPadCommandSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_TRANSFORMER, BasicPlusTvDirectionalPadCommandTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_SERIALIZER, BasicPlusTvDirectionalPadSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_TRANSFORMER, BasicPlusTvDirectionalPadTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_SERIALIZER, BasicPlusTvSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_TRANSFORMER, BasicPlusTvTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_SERIALIZER, SliderForLightSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_TRANSFORMER, SliderForLightTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_SERIALIZER, BasicPlusLightColorControlColorSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_TRANSFORMER, BasicPlusLightColorControlColorTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_SERIALIZER, BasicPlusLightColorControlSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_TRANSFORMER, BasicPlusLightColorControlTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_SERIALIZER, BasicPlusLightSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_TRANSFORMER, BasicPlusLightTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_SERIALIZER, BasicPlusItemActionsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_TRANSFORMER, BasicPlusItemActionsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_SERIALIZER, VisibleConditionForColorItemReferToSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_TRANSFORMER, VisibleConditionForColorItemReferToTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_SERIALIZER, VisibleConditionForColorItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_TRANSFORMER, VisibleConditionForColorItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_SERIALIZER, BasicPlusStateBoardColorsSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_TRANSFORMER, BasicPlusStateBoardColorsTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_SERIALIZER, BasicPlusStateBoardItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_TRANSFORMER, BasicPlusStateBoardItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_SERIALIZER, BasicPlusProgressBarsStateItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_TRANSFORMER, BasicPlusProgressBarsStateItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_SERIALIZER, BasicPlusProgressBarsBarItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_TRANSFORMER, BasicPlusProgressBarsBarItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_SERIALIZER, BasicPlusItemProgressBarsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_TRANSFORMER, BasicPlusItemProgressBarsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_PANEL_SERIALIZER, CapabilityValueForPanelSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_PANEL_TRANSFORMER, CapabilityValueForPanelTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_ITEMS_ITEM_SERIALIZER, PanelForDeviceConfigItemsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_PANEL_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_ITEMS_ITEM_TRANSFORMER, PanelForDeviceConfigItemsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_FOR_PANEL_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_SERIALIZER, PanelForDeviceConfigSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_ITEMS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_TRANSFORMER, PanelForDeviceConfigTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_ITEMS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_SERIALIZER, BasicPlusItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_TRANSFORMER, BasicPlusItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_CONFIG_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_SERIALIZER, GroupVisibleConditionsSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_TRANSFORMER, GroupVisibleConditionsTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DASHBOARD_SERIALIZER, DeviceConfigurationDashboardSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DASHBOARD_TRANSFORMER, DeviceConfigurationDashboardTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_ACTION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_SERIALIZER, CapabilityValueSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_TRANSFORMER, CapabilityValueTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PATCH_ITEM_SERIALIZER, PatchItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_PATCH_ITEM_TRANSFORMER, PatchItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_SERIALIZER, VisibleConditionForDetailViewSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_TRANSFORMER, VisibleConditionForDetailViewTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DETAIL_VIEW_SERIALIZER, DeviceConfigEntryForDetailViewSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DETAIL_VIEW_TRANSFORMER, DeviceConfigEntryForDetailViewTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_SERIALIZER, ExcludedConditionItemIdExcludeItemAttributesItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_TRANSFORMER, ExcludedConditionItemIdExcludeItemAttributesItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_SERIALIZER, ExcludedConditionItemIdExcludeItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER, ExcludedConditionItemIdExcludeItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_SERIALIZER, ExcludedConditionItemIdSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_TRANSFORMER, ExcludedConditionItemIdTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_CONDITION_CONFIG_ENTRY_SERIALIZER, ExcludedDeviceConditionConfigEntrySerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_CONDITION_CONFIG_ENTRY_TRANSFORMER, ExcludedDeviceConditionConfigEntryTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_SERIALIZER, ExcludedActionItemIdExcludeItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER, ExcludedActionItemIdExcludeItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_SERIALIZER, ExcludedActionItemIdSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_TRANSFORMER, ExcludedActionItemIdTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_ACTION_CONFIG_ENTRY_SERIALIZER, ExcludedDeviceActionConfigEntrySerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_ACTION_CONFIG_ENTRY_TRANSFORMER, ExcludedDeviceActionConfigEntryTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_VALUE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PATCH_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_REQUEST_AUTOMATION_SERIALIZER, DeviceConfigurationRequestAutomationSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_CONDITION_CONFIG_ENTRY_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_ACTION_CONFIG_ENTRY_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_REQUEST_AUTOMATION_TRANSFORMER, DeviceConfigurationRequestAutomationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_CONDITION_CONFIG_ENTRY_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_DEVICE_ACTION_CONFIG_ENTRY_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_CREATE_DEVICE_CONFIG_REQUEST_TRANSFORMER, CreateDeviceConfigRequestTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DETAIL_VIEW_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_REQUEST_AUTOMATION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER, VisibleConditionSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER, VisibleConditionTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_SERIALIZER, DeviceConfigurationIconsItemBadgeItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_TRANSFORMER, DeviceConfigurationIconsItemBadgeItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_SERIALIZER, DeviceConfigurationIconsItemProductKeysItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_TRANSFORMER, DeviceConfigurationIconsItemProductKeysItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_SERIALIZER, DeviceConfigurationIconsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_TRANSFORMER, DeviceConfigurationIconsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_BADGE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_PRODUCT_KEYS_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_SERIALIZER, VisibleConditionForDashboardStateSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_TRANSFORMER, VisibleConditionForDashboardStateTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_SERIALIZER, DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_TRANSFORMER, DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_SERIALIZER, DeviceConfigEntryForDashboardStateFormatInfoItemTimeSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_TRANSFORMER, DeviceConfigEntryForDashboardStateFormatInfoItemTimeTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_SERIALIZER, DeviceConfigEntryForDashboardStateFormatInfoItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TRANSFORMER, DeviceConfigEntryForDashboardStateFormatInfoItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_REMAINING_TIME_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TIME_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_STATES_ARRAY_ITEM_TRANSFORMER, StatesArrayItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DASHBOARD_STATE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_ACTIONS_ARRAY_ITEM_TRANSFORMER, ActionsArrayItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PUSH_BUTTON_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_TOGGLE_SWITCH_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_SWITCH_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_STANDBY_POWER_SWITCH_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_STATELESS_POWER_TOGGLE_FOR_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_PAUSE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_STOP_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_SERIALIZER, BasicPlusCameraImageSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_TRANSFORMER, BasicPlusCameraImageTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_SERIALIZER, BasicPlusCameraOverlayIconsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_TRANSFORMER, BasicPlusCameraOverlayIconsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_SERIALIZER, BasicPlusCameraSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_TRANSFORMER, BasicPlusCameraTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_IMAGE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_OVERLAY_ICONS_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_SERIALIZER, BasicPlusTvVolumeCommandSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_TRANSFORMER, BasicPlusTvVolumeCommandTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_SERIALIZER, BasicPlusTvVolumeSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_TRANSFORMER, BasicPlusTvVolumeTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_SERIALIZER, ButtonForTvSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_TRANSFORMER, ButtonForTvTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_SERIALIZER, BasicPlusTvChannelSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_TRANSFORMER, BasicPlusTvChannelTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_SERIALIZER, BasicPlusTvDirectionalPadCommandSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_TRANSFORMER, BasicPlusTvDirectionalPadCommandTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_SERIALIZER, BasicPlusTvDirectionalPadSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_TRANSFORMER, BasicPlusTvDirectionalPadTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_COMMAND_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_SERIALIZER, BasicPlusTvSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_TRANSFORMER, BasicPlusTvTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_VOLUME_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BUTTON_FOR_TV_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_CHANNEL_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_DIRECTIONAL_PAD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_SERIALIZER, SliderForLightSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_TRANSFORMER, SliderForLightTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_SERIALIZER, BasicPlusLightColorControlColorSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_TRANSFORMER, BasicPlusLightColorControlColorTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_SERIALIZER, BasicPlusLightColorControlSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_TRANSFORMER, BasicPlusLightColorControlTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_COLOR_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_SERIALIZER, BasicPlusLightSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_TRANSFORMER, BasicPlusLightTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_SLIDER_FOR_LIGHT_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_COLOR_CONTROL_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_SERIALIZER, BasicPlusItemActionsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_TRANSFORMER, BasicPlusItemActionsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_SERIALIZER, VisibleConditionForColorItemReferToSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_TRANSFORMER, VisibleConditionForColorItemReferToTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_SERIALIZER, VisibleConditionForColorItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_TRANSFORMER, VisibleConditionForColorItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_REFER_TO_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_SERIALIZER, BasicPlusStateBoardColorsSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_TRANSFORMER, BasicPlusStateBoardColorsTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_COLOR_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_SERIALIZER, BasicPlusStateBoardItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_TRANSFORMER, BasicPlusStateBoardItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_COLORS_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_SERIALIZER, BasicPlusProgressBarsStateItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_TRANSFORMER, BasicPlusProgressBarsStateItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIG_ENTRY_FOR_DASHBOARD_STATE_FORMAT_INFO_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_SERIALIZER, BasicPlusProgressBarsBarItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_TRANSFORMER, BasicPlusProgressBarsBarItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_SERIALIZER, BasicPlusItemProgressBarsItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_SERIALIZER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_TRANSFORMER, BasicPlusItemProgressBarsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_STATE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_PROGRESS_BARS_BAR_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_STEPPER_FOR_PANEL_ITEM_COMMAND_TRANSFORMER, StepperForPanelItemCommandTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_STEPPER_FOR_PANEL_ITEM_STATE_TRANSFORMER, StepperForPanelItemStateTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_STEPPER_FOR_PANEL_ITEM_TRANSFORMER, StepperForPanelItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_STEPPER_FOR_PANEL_ITEM_COMMAND_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_STEPPER_FOR_PANEL_ITEM_STATE_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_LIST_FOR_PANEL_ITEM_COMMAND_TRANSFORMER, ListForPanelItemCommandTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_LIST_FOR_PANEL_ITEM_STATE_TRANSFORMER, ListForPanelItemStateTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_LIST_FOR_PANEL_ITEM_TRANSFORMER, ListForPanelItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_LIST_FOR_PANEL_ITEM_COMMAND_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_LIST_FOR_PANEL_ITEM_STATE_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PUSH_BUTTON_FOR_PANEL_ITEM_TRANSFORMER, PushButtonForPanelItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_STATE_FOR_PANEL_ITEM_TRANSFORMER, StateForPanelItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_SLIDER_FOR_PANEL_ITEM_TRANSFORMER, SliderForPanelItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_ALTERNATIVE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EMPTY_FOR_PANEL_ITEM_TRANSFORMER, EmptyForPanelItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_PRESENTATION_ITEMS_ITEM_TRANSFORMER, PanelForDevicePresentationItemsItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_STEPPER_FOR_PANEL_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_LIST_FOR_PANEL_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PUSH_BUTTON_FOR_PANEL_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_STATE_FOR_PANEL_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_SLIDER_FOR_PANEL_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_EMPTY_FOR_PANEL_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_PRESENTATION_TRANSFORMER, PanelForDevicePresentationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_PRESENTATION_ITEMS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_FOR_PRESENTATION_TRANSFORMER, BasicPlusItemForPresentationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_CAMERA_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_TV_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_LIGHT_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_ACTIONS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_STATE_BOARD_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_PROGRESS_BARS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PANEL_FOR_DEVICE_PRESENTATION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_SERIALIZER, GroupVisibleConditionsSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_TRANSFORMER, GroupVisibleConditionsTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DASHBOARD_TRANSFORMER, DashboardTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_STATES_ARRAY_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_ACTIONS_ARRAY_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_BASIC_PLUS_ITEM_FOR_PRESENTATION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_GROUP_VISIBLE_CONDITIONS_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_SERIALIZER, VisibleConditionForDetailViewSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_TRANSFORMER, VisibleConditionForDetailViewTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_DETAIL_VIEW_LIST_ITEM_TRANSFORMER, DetailViewListItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_TOGGLE_SWITCH_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_STANDBY_POWER_SWITCH_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_SWITCH_CONTROL_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_SLIDER_TYPE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PUSH_BUTTON_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_TEXT_BUTTON_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_PAUSE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PLAY_STOP_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_LIST_FOR_DETAIL_VIEW_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_TEXT_FIELD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_NUMBER_FIELD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_STEPPER_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_STATE_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_MULTI_ARG_COMMAND_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_FOR_DETAIL_VIEW_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_ARGUMENTS_ITEM_SERIALIZER, DeviceConfigurationDpInfoItemArgumentsItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_ARGUMENTS_ITEM_TRANSFORMER, DeviceConfigurationDpInfoItemArgumentsItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_SERIALIZER, ExcludedConditionItemIdExcludeItemAttributesItemSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_TRANSFORMER, ExcludedConditionItemIdExcludeItemAttributesItemTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_SERIALIZER, ExcludedConditionItemIdExcludeItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER, ExcludedConditionItemIdExcludeItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_TRANSFORMER, ExcludedConditionItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_AUTOMATION_LIST_ITEM_TRANSFORMER, AutomationListItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_SLIDER_FOR_AUTOMATION_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_LIST_FOR_AUTOMATION_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DYNAMIC_LIST_FOR_AUTOMATION_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_NUMBER_FIELD_FOR_AUTOMATION_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_TEXT_FIELD_FOR_AUTOMATION_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_ENUM_SLIDER_FOR_AUTOMATION_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_SERIALIZER, ExcludedActionItemIdExcludeItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER, ExcludedActionItemIdExcludeItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_CONDITION_ITEM_ID_EXCLUDE_ITEM_ATTRIBUTES_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_TRANSFORMER, ExcludedActionItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_ID_EXCLUDE_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_ACTION_LIST_ITEM_TRANSFORMER, ActionListItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_SLIDER_FOR_AUTOMATION_ACTION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_LIST_FOR_AUTOMATION_ACTION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DYNAMIC_LIST_FOR_AUTOMATION_ACTION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_TEXT_FIELD_FOR_AUTOMATION_ACTION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_NUMBER_FIELD_FOR_AUTOMATION_ACTION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_MULTI_ARG_COMMAND_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_EXCLUDED_ACTION_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DESCRIPTION_ITEM_SERIALIZER, DescriptionItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DESCRIPTION_ITEM_TRANSFORMER, DescriptionItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_VISIBLE_CONDITION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DESCRIPTIONS_IN_AUTOMATION_SERIALIZER, DescriptionsInAutomationSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DESCRIPTION_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DESCRIPTIONS_IN_AUTOMATION_TRANSFORMER, DescriptionsInAutomationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DESCRIPTION_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_AUTOMATION_TRANSFORMER, AutomationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_AUTOMATION_LIST_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_ACTION_LIST_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DESCRIPTIONS_IN_AUTOMATION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_SERIALIZER, DeviceConfigurationDpInfoItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_ARGUMENTS_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_TRANSFORMER, DeviceConfigurationDpInfoItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_ARGUMENTS_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFOS_ITEM_SERIALIZER, DeviceConfigurationDpInfosItemSerializer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFOS_ITEM_TRANSFORMER, DeviceConfigurationDpInfosItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PO_CODES_TRANSFORMER, PoCodesTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_LANGUAGE_ITEM_TRANSFORMER, LanguageItemTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_PO_CODES_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_TEMPERATURE_CONVERSIONS_ITEM_FOR_DEVICE_PRESENTATION_TRANSFORMER, TemperatureConversionsItemForDevicePresentationTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_PRESENTATION_SETTINGS_FOR_DEVICE_PRESENTATION_TRANSFORMER, PresentationSettingsForDevicePresentationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_TEMPERATURE_CONVERSIONS_ITEM_FOR_DEVICE_PRESENTATION_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_PRESENTATION_TRANSFORMER, DevicePresentationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_ICONS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DASHBOARD_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DETAIL_VIEW_LIST_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_AUTOMATION_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFO_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_DP_INFOS_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_LANGUAGE_ITEM_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_PRESENTATION_SETTINGS_FOR_DEVICE_PRESENTATION_TRANSFORMER),
                 ]
             );
     }
