@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\DependencyInjection\Registrar;
 
 use ChristianBrown\SmartThings\DependencyInjection\ServiceRegistrarInterface;
+use ChristianBrown\SmartThings\Serializer\ChannelCreateRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\ChannelUpdateRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\DriverChannelCreateRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\DriverChannelUpdateRequestSerializer;
 use ChristianBrown\SmartThings\SmartThingsInterface;
 use ChristianBrown\SmartThings\Transformer\ChannelDriversTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelDriverTransformer;
@@ -16,6 +20,10 @@ final class ChannelRegistrar implements ServiceRegistrarInterface
 {
     public function register(ContainerBuilder $container): void
     {
+        $container->register(SmartThingsInterface::SERVICE_DRIVER_CHANNEL_UPDATE_REQUEST_SERIALIZER, DriverChannelUpdateRequestSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_DRIVER_CHANNEL_CREATE_REQUEST_SERIALIZER, DriverChannelCreateRequestSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_CHANNEL_UPDATE_REQUEST_SERIALIZER, ChannelUpdateRequestSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_CHANNEL_CREATE_REQUEST_SERIALIZER, ChannelCreateRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_CHANNEL_TRANSFORMER, ChannelTransformer::class);
         $container->register(SmartThingsInterface::SERVICE_CHANNELS_TRANSFORMER, ChannelsTransformer::class)
             ->setArguments(

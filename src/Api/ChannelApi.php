@@ -7,10 +7,19 @@ namespace ChristianBrown\SmartThings\Api;
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
+use ChristianBrown\SmartThings\Model\ChannelCreateRequestInterface;
 use ChristianBrown\SmartThings\Model\ChannelDriverInterface;
 use ChristianBrown\SmartThings\Model\ChannelInterface;
+use ChristianBrown\SmartThings\Model\ChannelUpdateRequestInterface;
+use ChristianBrown\SmartThings\Model\DriverChannelCreateRequestInterface;
+use ChristianBrown\SmartThings\Model\DriverChannelUpdateRequestInterface;
 use ChristianBrown\SmartThings\Model\DriverInterface;
+use ChristianBrown\SmartThings\Serializer\ChannelCreateRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\ChannelUpdateRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\DriverChannelCreateRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\DriverChannelUpdateRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\ChannelDriversTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\ChannelDriverTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ChannelsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ChannelTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DriverTransformerInterface;
@@ -26,9 +35,19 @@ final class ChannelApi implements ChannelApiInterface
      * @var array<string, ChannelInterface>
      */
     private array $cache = [];
+    private ChannelCreateRequestSerializerInterface $channelCreateRequestSerializer;
     private ChannelDriversTransformerInterface $channelDriversTransformer;
+    private ChannelDriverTransformerInterface $channelDriverTransformer;
     private ChannelsTransformerInterface $channelsTransformer;
     private ChannelTransformerInterface $channelTransformer;
+    private ChannelUpdateRequestSerializerInterface $channelUpdateRequestSerializer;
+
+    /**
+     * @var array<string, ChannelDriverInterface>
+     */
+    private array $driverChannelCache = [];
+    private DriverChannelCreateRequestSerializerInterface $driverChannelCreateRequestSerializer;
+    private DriverChannelUpdateRequestSerializerInterface $driverChannelUpdateRequestSerializer;
 
     /**
      * @var array<string, array<int, ChannelDriverInterface>>
@@ -48,7 +67,7 @@ final class ChannelApi implements ChannelApiInterface
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, ChannelTransformerInterface $channelTransformer, ChannelsTransformerInterface $channelsTransformer, ChannelDriversTransformerInterface $channelDriversTransformer, DriverTransformerInterface $driverTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, ChannelTransformerInterface $channelTransformer, ChannelsTransformerInterface $channelsTransformer, ChannelDriversTransformerInterface $channelDriversTransformer, DriverTransformerInterface $driverTransformer, TokenInterface $token, ChannelCreateRequestSerializerInterface $channelCreateRequestSerializer, ChannelUpdateRequestSerializerInterface $channelUpdateRequestSerializer, ChannelDriverTransformerInterface $channelDriverTransformer, DriverChannelCreateRequestSerializerInterface $driverChannelCreateRequestSerializer, DriverChannelUpdateRequestSerializerInterface $driverChannelUpdateRequestSerializer)
     {
         $this->requestSender = $requestSender;
         $this->channelTransformer = $channelTransformer;
@@ -56,6 +75,117 @@ final class ChannelApi implements ChannelApiInterface
         $this->channelDriversTransformer = $channelDriversTransformer;
         $this->driverTransformer = $driverTransformer;
         $this->token = $token;
+        $this->channelCreateRequestSerializer = $channelCreateRequestSerializer;
+        $this->channelUpdateRequestSerializer = $channelUpdateRequestSerializer;
+        $this->channelDriverTransformer = $channelDriverTransformer;
+        $this->driverChannelCreateRequestSerializer = $driverChannelCreateRequestSerializer;
+        $this->driverChannelUpdateRequestSerializer = $driverChannelUpdateRequestSerializer;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function createChannel(ChannelCreateRequestInterface $request): ChannelInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $body = $this->channelCreateRequestSerializer->serialize($request);
+        $data = $this->requestSender->post(self::API_URL, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->channelTransformer->transform($data);
+        $this->listCache = [];
+
+        return $result;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function createDriverChannel(string $channelId, DriverChannelCreateRequestInterface $request): ChannelDriverInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_DRIVERS_SPRINTF, rawurlencode($channelId));
+        $body = $this->driverChannelCreateRequestSerializer->serialize($request);
+        $data = $this->requestSender->post($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->channelDriverTransformer->transform($data);
+        unset($this->driversCache[$channelId]);
+
+        return $result;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteChannel(string $channelId): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($channelId));
+        $this->requestSender->delete($url, [], $headers);
+        unset($this->cache[$channelId], $this->driversCache[$channelId]);
+        $this->listCache = [];
+        $this->metaCache = [];
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteDriverChannel(string $channelId, string $driverId): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_DRIVER_SPRINTF, rawurlencode($channelId), rawurlencode($driverId));
+        $this->requestSender->delete($url, [], $headers);
+        unset($this->driversCache[$channelId], $this->driverChannelCache[sprintf(self::CACHE_KEY_SPRINTF, $channelId, $driverId)]);
+        $this->metaCache = [];
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function getDriverChannel(string $channelId, string $driverId, bool $skipCache = false): ChannelDriverInterface
+    {
+        $cacheKey = sprintf(self::CACHE_KEY_SPRINTF, $channelId, $driverId);
+        if (!$skipCache) {
+            if (isset($this->driverChannelCache[$cacheKey])) {
+                return $this->driverChannelCache[$cacheKey];
+            }
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_DRIVER_SPRINTF, rawurlencode($channelId), rawurlencode($driverId));
+        $data = $this->requestSender->get($url, [], $headers);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->channelDriverTransformer->transform($data);
+        $this->driverChannelCache[$cacheKey] = $result;
+
+        return $result;
     }
 
     /**
@@ -165,6 +295,56 @@ final class ChannelApi implements ChannelApiInterface
         $this->cache[$channelId] = $channel;
 
         return $channel;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function updateChannel(string $channelId, ChannelUpdateRequestInterface $request): ChannelInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($channelId));
+        $body = $this->channelUpdateRequestSerializer->serialize($request);
+        $data = $this->requestSender->put($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->channelTransformer->transform($data);
+        $this->cache[$channelId] = $result;
+        $this->listCache = [];
+
+        return $result;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function updateDriverChannelVersion(string $channelId, string $driverId, DriverChannelUpdateRequestInterface $request): ChannelDriverInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_DRIVER_SPRINTF, rawurlencode($channelId), rawurlencode($driverId));
+        $body = $this->driverChannelUpdateRequestSerializer->serialize($request);
+        $data = $this->requestSender->put($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->channelDriverTransformer->transform($data);
+        unset($this->driversCache[$channelId]);
+        $this->driverChannelCache[sprintf(self::CACHE_KEY_SPRINTF, $channelId, $driverId)] = $result;
+
+        return $result;
     }
 
     /**

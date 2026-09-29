@@ -19,6 +19,10 @@ final class ChannelRegistrarTest extends TestCase
 
         (new ChannelRegistrar())->register($container);
 
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DRIVER_CHANNEL_UPDATE_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DRIVER_CHANNEL_CREATE_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CHANNEL_UPDATE_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CHANNEL_CREATE_REQUEST_SERIALIZER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CHANNELS_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CHANNEL_DRIVERS_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CHANNEL_DRIVER_TRANSFORMER));

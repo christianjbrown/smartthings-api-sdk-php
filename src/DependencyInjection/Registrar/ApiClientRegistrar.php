@@ -91,6 +91,11 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_CHANNEL_DRIVERS_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_DRIVER_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_CHANNEL_CREATE_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_CHANNEL_UPDATE_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_CHANNEL_DRIVER_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_DRIVER_CHANNEL_CREATE_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_DRIVER_CHANNEL_UPDATE_REQUEST_SERIALIZER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_DEVICE_API, DeviceApi::class)
@@ -184,6 +189,8 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_HUB_INSTALLED_DRIVERS_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_HUB_ENROLLED_CHANNELS_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_HUB_DRIVER_INSTALL_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_HUB_DEVICE_UPDATE_REQUEST_SERIALIZER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_INSTALLED_APP_API, InstalledAppApi::class)
