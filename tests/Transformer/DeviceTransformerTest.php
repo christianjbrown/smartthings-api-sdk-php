@@ -8,6 +8,7 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Device;
 use ChristianBrown\SmartThings\Model\DeviceComponentInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentsTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\DeviceDetailsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -41,7 +42,7 @@ final class DeviceTransformerTest extends TestCase
             ->with($componentsData)
             ->willReturn($components);
 
-        $transformer = new DeviceTransformer($componentsTransformer);
+        $transformer = new DeviceTransformer($componentsTransformer, self::createStub(DeviceDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -78,7 +79,7 @@ final class DeviceTransformerTest extends TestCase
                 ->method('transform');
         }
 
-        $transformer = new DeviceTransformer($componentsTransformer);
+        $transformer = new DeviceTransformer($componentsTransformer, self::createStub(DeviceDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -158,7 +159,7 @@ final class DeviceTransformerTest extends TestCase
     public function testTransformUnexpectedData(array $data): void
     {
         $componentsTransformer = self::createStub(DeviceComponentsTransformerInterface::class);
-        $transformer = new DeviceTransformer($componentsTransformer);
+        $transformer = new DeviceTransformer($componentsTransformer, self::createStub(DeviceDetailsTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DeviceTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceTransformerInterface::KEY_DEVICE_ID));
