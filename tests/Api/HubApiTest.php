@@ -12,9 +12,13 @@ use ChristianBrown\SmartThings\Api\HubApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
+use ChristianBrown\SmartThings\Model\HubDeviceUpdateRequestInterface;
+use ChristianBrown\SmartThings\Model\HubDriverInstallRequestInterface;
 use ChristianBrown\SmartThings\Model\HubEnrolledChannelInterface;
 use ChristianBrown\SmartThings\Model\HubInstalledDriverInterface;
 use ChristianBrown\SmartThings\Model\HubInterface;
+use ChristianBrown\SmartThings\Serializer\HubDeviceUpdateRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\HubDriverInstallRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\HubCharacteristicsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\HubEnrolledChannelsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\HubInstalledDriversTransformerInterface;
@@ -32,6 +36,29 @@ use function sprintf;
 #[CoversClass(Token::class)]
 final class HubApiTest extends TestCase
 {
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteHubByEui(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(HubApiInterface::API_URL_EUI_SPRINTF, 'test-hub-eui'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new HubApi($requestSender, self::createStub(HubTransformerInterface::class), self::createStub(HubCharacteristicsTransformerInterface::class), self::createStub(HubInstalledDriverTransformerInterface::class), self::createStub(HubInstalledDriversTransformerInterface::class), self::createStub(HubEnrolledChannelsTransformerInterface::class), new Token('test-api-token'), self::createStub(HubDriverInstallRequestSerializerInterface::class), self::createStub(HubDeviceUpdateRequestSerializerInterface::class));
+        $api->deleteHubByEui('test-hub-eui');
+
+        $this->addToAssertionCount(1);
+    }
+
     /**
      * @throws RequestExceptionInterface
      * @throws Exception
@@ -499,6 +526,119 @@ final class HubApiTest extends TestCase
     }
 
     /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testInstallDrivers(): void
+    {
+        $request = self::createStub(HubDriverInstallRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(HubApiInterface::API_URL_DRIVER_SPRINTF, 'test-hub-device-id', 'test-driver-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn([]);
+
+        $serializer = self::createMock(HubDriverInstallRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $api = new HubApi($requestSender, self::createStub(HubTransformerInterface::class), self::createStub(HubCharacteristicsTransformerInterface::class), self::createStub(HubInstalledDriverTransformerInterface::class), self::createStub(HubInstalledDriversTransformerInterface::class), self::createStub(HubEnrolledChannelsTransformerInterface::class), new Token('test-api-token'), $serializer, self::createStub(HubDeviceUpdateRequestSerializerInterface::class));
+        $api->installDrivers('test-hub-device-id', 'test-driver-id', $request);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUninstallDriver(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(HubApiInterface::API_URL_DRIVER_SPRINTF, 'test-hub-device-id', 'test-driver-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new HubApi($requestSender, self::createStub(HubTransformerInterface::class), self::createStub(HubCharacteristicsTransformerInterface::class), self::createStub(HubInstalledDriverTransformerInterface::class), self::createStub(HubInstalledDriversTransformerInterface::class), self::createStub(HubEnrolledChannelsTransformerInterface::class), new Token('test-api-token'), self::createStub(HubDriverInstallRequestSerializerInterface::class), self::createStub(HubDeviceUpdateRequestSerializerInterface::class));
+        $api->uninstallDriver('test-hub-device-id', 'test-driver-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateHubDevice(): void
+    {
+        $request = self::createStub(HubDeviceUpdateRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('patch')
+            ->with(
+                sprintf(HubApiInterface::API_URL_CHILD_DEVICE_SPRINTF, 'test-hub-device-id', 'test-device-id'),
+                [HubApiInterface::KEY_FORCE_UPDATE => 'true'],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn([]);
+
+        $serializer = self::createMock(HubDeviceUpdateRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $api = new HubApi($requestSender, self::createStub(HubTransformerInterface::class), self::createStub(HubCharacteristicsTransformerInterface::class), self::createStub(HubInstalledDriverTransformerInterface::class), self::createStub(HubInstalledDriversTransformerInterface::class), self::createStub(HubEnrolledChannelsTransformerInterface::class), new Token('test-api-token'), self::createStub(HubDriverInstallRequestSerializerInterface::class), $serializer);
+        $api->updateHubDevice('test-hub-device-id', 'test-device-id', $request, true);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateHubDeviceWithoutOptionalParameters(): void
+    {
+        $request = self::createStub(HubDeviceUpdateRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('patch')
+            ->with(
+                sprintf(HubApiInterface::API_URL_CHILD_DEVICE_SPRINTF, 'test-hub-device-id', 'test-device-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn([]);
+
+        $serializer = self::createMock(HubDeviceUpdateRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $api = new HubApi($requestSender, self::createStub(HubTransformerInterface::class), self::createStub(HubCharacteristicsTransformerInterface::class), self::createStub(HubInstalledDriverTransformerInterface::class), self::createStub(HubInstalledDriversTransformerInterface::class), self::createStub(HubEnrolledChannelsTransformerInterface::class), new Token('test-api-token'), self::createStub(HubDriverInstallRequestSerializerInterface::class), $serializer);
+        $api->updateHubDevice('test-hub-device-id', 'test-device-id', $request);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
      * @return array<string, string>
      */
     private static function authHeaders(): array
@@ -519,14 +659,6 @@ final class HubApiTest extends TestCase
         ?HubInstalledDriversTransformerInterface $driversTransformer = null,
         ?HubEnrolledChannelsTransformerInterface $channelsTransformer = null,
     ): HubApi {
-        return new HubApi(
-            $requestSender,
-            $hubTransformer ?? self::createStub(HubTransformerInterface::class),
-            $characteristicsTransformer ?? self::createStub(HubCharacteristicsTransformerInterface::class),
-            $driverTransformer ?? self::createStub(HubInstalledDriverTransformerInterface::class),
-            $driversTransformer ?? self::createStub(HubInstalledDriversTransformerInterface::class),
-            $channelsTransformer ?? self::createStub(HubEnrolledChannelsTransformerInterface::class),
-            new Token('test-api-token'),
-        );
+        return new HubApi($requestSender, $hubTransformer ?? self::createStub(HubTransformerInterface::class), $characteristicsTransformer ?? self::createStub(HubCharacteristicsTransformerInterface::class), $driverTransformer ?? self::createStub(HubInstalledDriverTransformerInterface::class), $driversTransformer ?? self::createStub(HubInstalledDriversTransformerInterface::class), $channelsTransformer ?? self::createStub(HubEnrolledChannelsTransformerInterface::class), new Token('test-api-token'), self::createStub(HubDriverInstallRequestSerializerInterface::class), self::createStub(HubDeviceUpdateRequestSerializerInterface::class));
     }
 }
