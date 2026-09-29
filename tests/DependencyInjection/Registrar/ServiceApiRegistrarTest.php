@@ -19,6 +19,8 @@ final class ServiceApiRegistrarTest extends TestCase
 
         (new ServiceApiRegistrar())->register($container);
 
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SERVICE_SUBSCRIPTION_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SERVICE_SUBSCRIPTION_RECEIPT_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SERVICE_CAPABILITY_DATA_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SERVICE_CAPABILITY_NAMES_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SERVICE_LOCATION_INFO_SUBSCRIPTIONS_TRANSFORMER));
