@@ -13,17 +13,11 @@ use ChristianBrown\SmartThings\Model\DeviceEventInterface;
 use ChristianBrown\SmartThings\Model\DeviceInstallRequestInterface;
 use ChristianBrown\SmartThings\Model\DeviceInterface;
 use ChristianBrown\SmartThings\Model\UpdateDeviceRequestInterface;
-use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\DeviceEventSerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceEventSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\DeviceInstallRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceInstallRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\UpdateDeviceRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateDeviceRequestSerializerInterface;
-use ChristianBrown\SmartThings\Transformer\DeviceCommandResultsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCommandResultsTransformerInterface;
-use ChristianBrown\SmartThings\Transformer\DeviceCommandResultTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformerInterface;
 
@@ -42,17 +36,17 @@ final class DeviceApi implements DeviceApiInterface
      * @var array<string, DeviceInterface>
      */
     private array $deviceCache = [];
-    private ?DeviceCommandResultsTransformerInterface $deviceCommandResultsTransformer;
-    private ?DeviceCommandSerializerInterface $deviceCommandSerializer;
-    private ?DeviceEventSerializerInterface $deviceEventSerializer;
-    private ?DeviceInstallRequestSerializerInterface $deviceInstallRequestSerializer;
+    private DeviceCommandResultsTransformerInterface $deviceCommandResultsTransformer;
+    private DeviceCommandSerializerInterface $deviceCommandSerializer;
+    private DeviceEventSerializerInterface $deviceEventSerializer;
+    private DeviceInstallRequestSerializerInterface $deviceInstallRequestSerializer;
     private DevicesTransformerInterface $devicesTransformer;
     private DeviceTransformerInterface $deviceTransformer;
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
-    private ?UpdateDeviceRequestSerializerInterface $updateDeviceRequestSerializer;
+    private UpdateDeviceRequestSerializerInterface $updateDeviceRequestSerializer;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceTransformerInterface $deviceTransformer, DevicesTransformerInterface $devicesTransformer, TokenInterface $token, ?DeviceCommandSerializerInterface $deviceCommandSerializer = null, ?DeviceCommandResultsTransformerInterface $deviceCommandResultsTransformer = null, ?DeviceInstallRequestSerializerInterface $deviceInstallRequestSerializer = null, ?UpdateDeviceRequestSerializerInterface $updateDeviceRequestSerializer = null, ?DeviceEventSerializerInterface $deviceEventSerializer = null)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceTransformerInterface $deviceTransformer, DevicesTransformerInterface $devicesTransformer, TokenInterface $token, DeviceCommandSerializerInterface $deviceCommandSerializer, DeviceCommandResultsTransformerInterface $deviceCommandResultsTransformer, DeviceInstallRequestSerializerInterface $deviceInstallRequestSerializer, UpdateDeviceRequestSerializerInterface $updateDeviceRequestSerializer, DeviceEventSerializerInterface $deviceEventSerializer)
     {
         $this->requestSender = $requestSender;
         $this->deviceTransformer = $deviceTransformer;
@@ -77,7 +71,7 @@ final class DeviceApi implements DeviceApiInterface
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_EVENTS_SPRINTF, rawurlencode($deviceId));
-        $body = [self::KEY_DEVICE_EVENTS => $this->resolveDeviceEventSerializer()->serialize($events)];
+        $body = [self::KEY_DEVICE_EVENTS => $this->deviceEventSerializer->serialize($events)];
         $this->requestSender->post($url, [], $headers, $body);
     }
 
@@ -109,7 +103,7 @@ final class DeviceApi implements DeviceApiInterface
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_COMMANDS_SPRINTF, rawurlencode($deviceId));
-        $body = [self::KEY_COMMANDS => $this->resolveDeviceCommandSerializer()->serialize($commands)];
+        $body = [self::KEY_COMMANDS => $this->deviceCommandSerializer->serialize($commands)];
         $data = $this->requestSender->post($url, self::buildOrderedQuery($ordered), $headers, $body);
 
         if (!isset($data[self::KEY_RESULTS])) {
@@ -119,7 +113,7 @@ final class DeviceApi implements DeviceApiInterface
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_RESULTS));
         }
 
-        return $this->resolveDeviceCommandResultsTransformer()->transform($data[self::KEY_RESULTS]);
+        return $this->deviceCommandResultsTransformer->transform($data[self::KEY_RESULTS]);
     }
 
     /**
@@ -198,7 +192,7 @@ final class DeviceApi implements DeviceApiInterface
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $body = $this->resolveDeviceInstallRequestSerializer()->serialize($request);
+        $body = $this->deviceInstallRequestSerializer->serialize($request);
         $data = $this->requestSender->post(self::API_URL, [], $headers, $body);
 
         if (empty($data)) {
@@ -222,7 +216,7 @@ final class DeviceApi implements DeviceApiInterface
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($deviceId));
-        $body = $this->resolveUpdateDeviceRequestSerializer()->serialize($request);
+        $body = $this->updateDeviceRequestSerializer->serialize($request);
         $data = $this->requestSender->put($url, [], $headers, $body);
 
         if (empty($data)) {
@@ -260,50 +254,5 @@ final class DeviceApi implements DeviceApiInterface
         }
 
         return [self::KEY_LOCATION_ID => $locationId];
-    }
-
-    /**
-     * Falls back to the default transformer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveDeviceCommandResultsTransformer(): DeviceCommandResultsTransformerInterface
-    {
-        return $this->deviceCommandResultsTransformer ?? new DeviceCommandResultsTransformer(new DeviceCommandResultTransformer());
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveDeviceCommandSerializer(): DeviceCommandSerializerInterface
-    {
-        return $this->deviceCommandSerializer ?? new DeviceCommandSerializer();
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveDeviceEventSerializer(): DeviceEventSerializerInterface
-    {
-        return $this->deviceEventSerializer ?? new DeviceEventSerializer();
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveDeviceInstallRequestSerializer(): DeviceInstallRequestSerializerInterface
-    {
-        return $this->deviceInstallRequestSerializer ?? new DeviceInstallRequestSerializer();
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveUpdateDeviceRequestSerializer(): UpdateDeviceRequestSerializerInterface
-    {
-        return $this->updateDeviceRequestSerializer ?? new UpdateDeviceRequestSerializer();
     }
 }

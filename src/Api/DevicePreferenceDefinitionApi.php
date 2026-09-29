@@ -12,9 +12,7 @@ use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
 use ChristianBrown\SmartThings\Model\LocalizationInterface;
 use ChristianBrown\SmartThings\Model\PreferenceLocalizationRequestInterface;
 use ChristianBrown\SmartThings\Model\PreferenceRequestInterface;
-use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionTransformerInterface;
@@ -45,8 +43,8 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
      */
     private array $localesCache = [];
     private LocalizationTransformerInterface $localizationTransformer;
-    private ?PreferenceLocalizationRequestSerializerInterface $preferenceLocalizationRequestSerializer;
-    private ?PreferenceRequestSerializerInterface $preferenceRequestSerializer;
+    private PreferenceLocalizationRequestSerializerInterface $preferenceLocalizationRequestSerializer;
+    private PreferenceRequestSerializerInterface $preferenceRequestSerializer;
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
@@ -55,7 +53,7 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
      */
     private array $translationsCache = [];
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DevicePreferenceDefinitionTransformerInterface $devicePreferenceDefinitionTransformer, DevicePreferenceDefinitionsTransformerInterface $devicePreferenceDefinitionsTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token, ?PreferenceRequestSerializerInterface $preferenceRequestSerializer = null, ?PreferenceLocalizationRequestSerializerInterface $preferenceLocalizationRequestSerializer = null)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, DevicePreferenceDefinitionTransformerInterface $devicePreferenceDefinitionTransformer, DevicePreferenceDefinitionsTransformerInterface $devicePreferenceDefinitionsTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token, PreferenceRequestSerializerInterface $preferenceRequestSerializer, PreferenceLocalizationRequestSerializerInterface $preferenceLocalizationRequestSerializer)
     {
         $this->requestSender = $requestSender;
         $this->devicePreferenceDefinitionTransformer = $devicePreferenceDefinitionTransformer;
@@ -78,7 +76,7 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $body = $this->resolvePreferenceRequestSerializer()->serialize($request);
+        $body = $this->preferenceRequestSerializer->serialize($request);
         $data = $this->requestSender->post(self::API_URL, [], $headers, $body);
 
         if (empty($data)) {
@@ -102,7 +100,7 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_PREFERENCE_LOCALIZATIONS_SPRINTF, rawurlencode($preferenceId));
-        $body = $this->resolvePreferenceLocalizationRequestSerializer()->serialize($request);
+        $body = $this->preferenceLocalizationRequestSerializer->serialize($request);
         $data = $this->requestSender->post($url, [], $headers, $body);
 
         if (empty($data)) {
@@ -269,7 +267,7 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($preferenceId));
-        $body = $this->resolvePreferenceRequestSerializer()->serialize($request);
+        $body = $this->preferenceRequestSerializer->serialize($request);
         $data = $this->requestSender->put($url, [], $headers, $body);
 
         if (empty($data)) {
@@ -294,7 +292,7 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_PREFERENCE_LOCALIZATION_SPRINTF, rawurlencode($preferenceId), rawurlencode($locale));
-        $body = $this->resolvePreferenceLocalizationRequestSerializer()->serialize($request);
+        $body = $this->preferenceLocalizationRequestSerializer->serialize($request);
         $data = $this->requestSender->put($url, [], $headers, $body);
 
         if (empty($data)) {
@@ -319,23 +317,5 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
         }
 
         return [self::KEY_NAMESPACE => $namespace];
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolvePreferenceLocalizationRequestSerializer(): PreferenceLocalizationRequestSerializerInterface
-    {
-        return $this->preferenceLocalizationRequestSerializer ?? new PreferenceLocalizationRequestSerializer();
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolvePreferenceRequestSerializer(): PreferenceRequestSerializerInterface
-    {
-        return $this->preferenceRequestSerializer ?? new PreferenceRequestSerializer();
     }
 }

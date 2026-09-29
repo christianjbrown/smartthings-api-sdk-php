@@ -13,48 +13,27 @@ use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AppInterface;
-use ChristianBrown\SmartThings\Model\AppOauthDefinition;
 use ChristianBrown\SmartThings\Model\AppOauthInterface;
 use ChristianBrown\SmartThings\Model\AppSettingsInterface;
-use ChristianBrown\SmartThings\Model\AppUiSettings;
-use ChristianBrown\SmartThings\Model\CreateAppRequest;
 use ChristianBrown\SmartThings\Model\CreateAppRequestInterface;
-use ChristianBrown\SmartThings\Model\CreateAppResponse;
 use ChristianBrown\SmartThings\Model\CreateAppResponseInterface;
-use ChristianBrown\SmartThings\Model\CreateOrUpdateLambdaSmartAppRequest;
-use ChristianBrown\SmartThings\Model\CreateOrUpdateWebhookSmartAppRequest;
-use ChristianBrown\SmartThings\Model\GenerateAppOauthRequest;
 use ChristianBrown\SmartThings\Model\GenerateAppOauthRequestInterface;
-use ChristianBrown\SmartThings\Model\GenerateAppOauthResponse;
 use ChristianBrown\SmartThings\Model\GenerateAppOauthResponseInterface;
-use ChristianBrown\SmartThings\Model\IconImage;
-use ChristianBrown\SmartThings\Model\UpdateAppOauthRequest;
 use ChristianBrown\SmartThings\Model\UpdateAppOauthRequestInterface;
-use ChristianBrown\SmartThings\Model\UpdateAppRequest;
 use ChristianBrown\SmartThings\Model\UpdateAppRequestInterface;
-use ChristianBrown\SmartThings\Model\UpdateAppSettingsRequest;
 use ChristianBrown\SmartThings\Model\UpdateAppSettingsRequestInterface;
-use ChristianBrown\SmartThings\Model\UpdateSignatureTypeRequest;
 use ChristianBrown\SmartThings\Model\UpdateSignatureTypeRequestInterface;
-use ChristianBrown\SmartThings\Serializer\CreateAppRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateAppRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\UpdateAppOauthRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppOauthRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\UpdateAppRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\UpdateAppSettingsRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppSettingsRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\UpdateSignatureTypeRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateSignatureTypeRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\AppSettingsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\AppsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\AppTransformerInterface;
-use ChristianBrown\SmartThings\Transformer\CreateAppResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\CreateAppResponseTransformerInterface;
-use ChristianBrown\SmartThings\Transformer\GenerateAppOauthResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\GenerateAppOauthResponseTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -64,27 +43,6 @@ use PHPUnit\Framework\TestCase;
 use function rawurlencode;
 use function sprintf;
 
-#[CoversClass(UpdateSignatureTypeRequestSerializer::class)]
-#[CoversClass(UpdateSignatureTypeRequest::class)]
-#[CoversClass(GenerateAppOauthResponseTransformer::class)]
-#[CoversClass(GenerateAppOauthResponse::class)]
-#[CoversClass(GenerateAppOauthRequestSerializer::class)]
-#[CoversClass(GenerateAppOauthRequest::class)]
-#[CoversClass(UpdateAppOauthRequestSerializer::class)]
-#[CoversClass(UpdateAppOauthRequest::class)]
-#[CoversClass(UpdateAppSettingsRequestSerializer::class)]
-#[CoversClass(UpdateAppSettingsRequest::class)]
-#[CoversClass(UpdateAppRequestSerializer::class)]
-#[CoversClass(UpdateAppRequest::class)]
-#[CoversClass(CreateAppResponseTransformer::class)]
-#[CoversClass(CreateAppResponse::class)]
-#[CoversClass(CreateAppRequestSerializer::class)]
-#[CoversClass(AppUiSettings::class)]
-#[CoversClass(AppOauthDefinition::class)]
-#[CoversClass(CreateOrUpdateWebhookSmartAppRequest::class)]
-#[CoversClass(CreateOrUpdateLambdaSmartAppRequest::class)]
-#[CoversClass(IconImage::class)]
-#[CoversClass(CreateAppRequest::class)]
 #[CoversClass(AppApi::class)]
 #[CoversClass(Token::class)]
 final class AppApiTest extends TestCase
@@ -122,7 +80,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($model);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), $serializer, $transformer);
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), $serializer, $transformer, self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
         $actual = $api->createApp($request, 'test-signature-type', true, 'test-account-id');
 
         self::assertSame($model, $actual);
@@ -140,7 +98,7 @@ final class AppApiTest extends TestCase
         $requestSender->expects(self::once())->method('post')
             ->willReturn(['test-data']);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         $api->getMultiple();
         $api->createApp(self::createStub(CreateAppRequestInterface::class));
@@ -160,48 +118,11 @@ final class AppApiTest extends TestCase
         $requestSender->expects(self::once())->method('post')
             ->willReturn([]);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(AppApiInterface::UNEXPECTED_RESPONSE);
         $api->createApp($request);
-    }
-
-    /**
-     * Without an injected serializer the default one is used.
-     *
-     * @throws RequestExceptionInterface
-     * @throws Exception
-     */
-    public function testCreateAppUsesDefaultSerializer(): void
-    {
-        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->expects(self::once())->method('post')
-            ->willReturn(['app' => ['appId' => 'test-app-id'], 'oauthClientId' => 'test-client-id']);
-
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
-        $api->createApp(new CreateAppRequest('test-app-name', 'test-display-name', 'test-description', 'test-app-type', ['test-classifications-1', 'test-classifications-2']));
-
-        $this->addToAssertionCount(1);
-    }
-
-    /**
-     * Without an injected transformer the default one is used.
-     *
-     * @throws RequestExceptionInterface
-     * @throws Exception
-     */
-    public function testCreateAppUsesDefaultTransformer(): void
-    {
-        $request = self::createStub(CreateAppRequestInterface::class);
-        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->expects(self::once())->method('post')
-            ->willReturn(['app' => ['appId' => 'test-app-id'], 'oauthClientId' => 'test-client-id']);
-
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
-        $api->createApp($request);
-
-        $this->addToAssertionCount(1);
     }
 
     /**
@@ -237,7 +158,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($model);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), $serializer, $transformer);
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), $serializer, $transformer, self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
         $actual = $api->createApp($request);
 
         self::assertSame($model, $actual);
@@ -260,7 +181,7 @@ final class AppApiTest extends TestCase
             )
             ->willReturn([]);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
         $api->deleteApp('test-app-name-or-id');
 
         $this->addToAssertionCount(1);
@@ -278,7 +199,7 @@ final class AppApiTest extends TestCase
         $requestSender->expects(self::once())->method('delete')
             ->willReturn([]);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         $api->getOneById('test-app-name-or-id');
         $api->deleteApp('test-app-name-or-id');
@@ -320,7 +241,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($model);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), null, null, null, null, null, $serializer, $transformer);
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), $serializer, $transformer, self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
         $actual = $api->generateAppOauth('test-app-name-or-id', $request);
 
         self::assertSame($model, $actual);
@@ -337,48 +258,11 @@ final class AppApiTest extends TestCase
         $requestSender->expects(self::once())->method('post')
             ->willReturn([]);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(AppApiInterface::UNEXPECTED_RESPONSE);
         $api->generateAppOauth('test-app-name-or-id', $request);
-    }
-
-    /**
-     * Without an injected serializer the default one is used.
-     *
-     * @throws RequestExceptionInterface
-     * @throws Exception
-     */
-    public function testGenerateAppOauthUsesDefaultSerializer(): void
-    {
-        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->expects(self::once())->method('post')
-            ->willReturn(['oauthClientId' => 'test-client-id']);
-
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
-        $api->generateAppOauth('test-app-name-or-id', new GenerateAppOauthRequest());
-
-        $this->addToAssertionCount(1);
-    }
-
-    /**
-     * Without an injected transformer the default one is used.
-     *
-     * @throws RequestExceptionInterface
-     * @throws Exception
-     */
-    public function testGenerateAppOauthUsesDefaultTransformer(): void
-    {
-        $request = self::createStub(GenerateAppOauthRequestInterface::class);
-        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->expects(self::once())->method('post')
-            ->willReturn(['oauthClientId' => 'test-client-id']);
-
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
-        $api->generateAppOauth('test-app-name-or-id', $request);
-
-        $this->addToAssertionCount(1);
     }
 
     /**
@@ -409,7 +293,7 @@ final class AppApiTest extends TestCase
             ->with($data[AppApiInterface::KEY_ITEMS])
             ->willReturn($apps);
 
-        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), $appsTransformer, self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), $appsTransformer, self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
         $actual = $appApi->getMultiple();
 
         self::assertSame($apps, $actual);
@@ -438,7 +322,7 @@ final class AppApiTest extends TestCase
             ->with($data[AppApiInterface::KEY_ITEMS])
             ->willReturn($apps);
 
-        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), $appsTransformer, self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), $appsTransformer, self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         // Second call is served from the cache without hitting the API.
         self::assertSame($apps, $appApi->getMultiple());
@@ -467,7 +351,7 @@ final class AppApiTest extends TestCase
             ->with($data[AppApiInterface::KEY_ITEMS])
             ->willReturn($apps);
 
-        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), $appsTransformer, self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), $appsTransformer, self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($apps, $appApi->getMultiple());
@@ -497,7 +381,7 @@ final class AppApiTest extends TestCase
             )
             ->willReturn($data);
 
-        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(AppApiInterface::UNEXPECTED_RESPONSE_SPRINTF, AppApiInterface::KEY_ITEMS));
@@ -530,7 +414,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($oauth);
 
-        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), $appOauthTransformer, self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), $appOauthTransformer, self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
         $actual = $appApi->getOauth('test-app-id');
 
         self::assertSame($oauth, $actual);
@@ -557,7 +441,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($oauth);
 
-        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), $appOauthTransformer, self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), $appOauthTransformer, self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         // Second call for the same app is served from the cache without hitting the API.
         self::assertSame($oauth, $appApi->getOauth('test-app-id'));
@@ -584,7 +468,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($oauth);
 
-        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), $appOauthTransformer, self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), $appOauthTransformer, self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($oauth, $appApi->getOauth('test-app-id'));
@@ -603,7 +487,7 @@ final class AppApiTest extends TestCase
         $requestSender->expects(self::once())->method('get')
             ->willReturn([]);
 
-        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(AppApiInterface::UNEXPECTED_RESPONSE);
@@ -636,7 +520,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($app);
 
-        $appApi = new AppApi($requestSender, $appTransformer, self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, $appTransformer, self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
         $actual = $appApi->getOneById('test-app-id');
 
         self::assertSame($app, $actual);
@@ -663,7 +547,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($app);
 
-        $appApi = new AppApi($requestSender, $appTransformer, self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, $appTransformer, self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         // Second call for the same app is served from the cache without hitting the API.
         self::assertSame($app, $appApi->getOneById('test-app-id'));
@@ -698,7 +582,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($app);
 
-        $appApi = new AppApi($requestSender, $appTransformer, self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, $appTransformer, self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
         $actual = $appApi->getOneById($appNameOrId);
 
         self::assertSame($app, $actual);
@@ -724,7 +608,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($app);
 
-        $appApi = new AppApi($requestSender, $appTransformer, self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, $appTransformer, self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($app, $appApi->getOneById('test-app-id'));
@@ -743,7 +627,7 @@ final class AppApiTest extends TestCase
         $requestSender->expects(self::once())->method('get')
             ->willReturn([]);
 
-        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(AppApiInterface::UNEXPECTED_RESPONSE);
@@ -776,7 +660,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($settings);
 
-        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), $appSettingsTransformer, new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), $appSettingsTransformer, new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
         $actual = $appApi->getSettings('test-app-id');
 
         self::assertSame($settings, $actual);
@@ -803,7 +687,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($settings);
 
-        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), $appSettingsTransformer, new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), $appSettingsTransformer, new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         // Second call for the same app is served from the cache without hitting the API.
         self::assertSame($settings, $appApi->getSettings('test-app-id'));
@@ -830,7 +714,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($settings);
 
-        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), $appSettingsTransformer, new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), $appSettingsTransformer, new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($settings, $appApi->getSettings('test-app-id'));
@@ -849,7 +733,7 @@ final class AppApiTest extends TestCase
         $requestSender->expects(self::once())->method('get')
             ->willReturn([]);
 
-        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $appApi = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(AppApiInterface::UNEXPECTED_RESPONSE);
@@ -873,7 +757,7 @@ final class AppApiTest extends TestCase
             )
             ->willReturn([]);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
         $api->register('test-app-name-or-id');
 
         $this->addToAssertionCount(1);
@@ -912,7 +796,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($model);
 
-        $api = new AppApi($requestSender, $transformer, self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), null, null, $serializer);
+        $api = new AppApi($requestSender, $transformer, self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), $serializer, self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
         $actual = $api->updateApp('test-app-name-or-id', $request, 'test-signature-type', true);
 
         self::assertSame($model, $actual);
@@ -951,7 +835,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($model);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), $transformer, self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), null, null, null, null, $serializer);
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), $transformer, self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), $serializer, self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
         $actual = $api->updateAppOauth('test-app-name-or-id', $request);
 
         self::assertSame($model, $actual);
@@ -968,29 +852,11 @@ final class AppApiTest extends TestCase
         $requestSender->expects(self::once())->method('put')
             ->willReturn([]);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(AppApiInterface::UNEXPECTED_RESPONSE);
         $api->updateAppOauth('test-app-name-or-id', $request);
-    }
-
-    /**
-     * Without an injected serializer the default one is used.
-     *
-     * @throws RequestExceptionInterface
-     * @throws Exception
-     */
-    public function testUpdateAppOauthUsesDefaultSerializer(): void
-    {
-        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->expects(self::once())->method('put')
-            ->willReturn(['test-data']);
-
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
-        $api->updateAppOauth('test-app-name-or-id', new UpdateAppOauthRequest('test-client-name', ['test-scope-1', 'test-scope-2'], ['test-redirect-uris-1', 'test-redirect-uris-2']));
-
-        $this->addToAssertionCount(1);
     }
 
     /**
@@ -1005,7 +871,7 @@ final class AppApiTest extends TestCase
         $requestSender->expects(self::once())->method('put')
             ->willReturn(['test-data']);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         $api->getOneById('test-app-name-or-id');
         $api->updateApp('test-app-name-or-id', self::createStub(UpdateAppRequestInterface::class));
@@ -1047,7 +913,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($model);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), $transformer, new Token('test-api-token'), null, null, null, $serializer);
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), $transformer, new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), $serializer, self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
         $actual = $api->updateAppSettings('test-app-name-or-id', $request);
 
         self::assertSame($model, $actual);
@@ -1064,29 +930,11 @@ final class AppApiTest extends TestCase
         $requestSender->expects(self::once())->method('put')
             ->willReturn([]);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(AppApiInterface::UNEXPECTED_RESPONSE);
         $api->updateAppSettings('test-app-name-or-id', $request);
-    }
-
-    /**
-     * Without an injected serializer the default one is used.
-     *
-     * @throws RequestExceptionInterface
-     * @throws Exception
-     */
-    public function testUpdateAppSettingsUsesDefaultSerializer(): void
-    {
-        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->expects(self::once())->method('put')
-            ->willReturn(['test-data']);
-
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
-        $api->updateAppSettings('test-app-name-or-id', new UpdateAppSettingsRequest());
-
-        $this->addToAssertionCount(1);
     }
 
     /**
@@ -1100,29 +948,11 @@ final class AppApiTest extends TestCase
         $requestSender->expects(self::once())->method('put')
             ->willReturn([]);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(AppApiInterface::UNEXPECTED_RESPONSE);
         $api->updateApp('test-app-name-or-id', $request);
-    }
-
-    /**
-     * Without an injected serializer the default one is used.
-     *
-     * @throws RequestExceptionInterface
-     * @throws Exception
-     */
-    public function testUpdateAppUsesDefaultSerializer(): void
-    {
-        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->expects(self::once())->method('put')
-            ->willReturn(['test-data']);
-
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
-        $api->updateApp('test-app-name-or-id', new UpdateAppRequest('test-display-name', 'test-description', 'test-app-type', ['test-classifications-1', 'test-classifications-2']));
-
-        $this->addToAssertionCount(1);
     }
 
     /**
@@ -1158,7 +988,7 @@ final class AppApiTest extends TestCase
             ->with($data)
             ->willReturn($model);
 
-        $api = new AppApi($requestSender, $transformer, self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), null, null, $serializer);
+        $api = new AppApi($requestSender, $transformer, self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), $serializer, self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), self::createStub(UpdateSignatureTypeRequestSerializerInterface::class));
         $actual = $api->updateApp('test-app-name-or-id', $request);
 
         self::assertSame($model, $actual);
@@ -1188,26 +1018,8 @@ final class AppApiTest extends TestCase
             ->with($request)
             ->willReturn(['test-serialized-request']);
 
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), null, null, null, null, null, null, null, $serializer);
+        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateAppRequestSerializerInterface::class), self::createStub(CreateAppResponseTransformerInterface::class), self::createStub(UpdateAppRequestSerializerInterface::class), self::createStub(UpdateAppSettingsRequestSerializerInterface::class), self::createStub(UpdateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthRequestSerializerInterface::class), self::createStub(GenerateAppOauthResponseTransformerInterface::class), $serializer);
         $api->updateSignatureType('test-app-name-or-id', $request);
-
-        $this->addToAssertionCount(1);
-    }
-
-    /**
-     * Without an injected serializer the default one is used.
-     *
-     * @throws RequestExceptionInterface
-     * @throws Exception
-     */
-    public function testUpdateSignatureTypeUsesDefaultSerializer(): void
-    {
-        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->expects(self::once())->method('put')
-            ->willReturn([]);
-
-        $api = new AppApi($requestSender, self::createStub(AppTransformerInterface::class), self::createStub(AppsTransformerInterface::class), self::createStub(AppOauthTransformerInterface::class), self::createStub(AppSettingsTransformerInterface::class), new Token('test-api-token'));
-        $api->updateSignatureType('test-app-name-or-id', new UpdateSignatureTypeRequest('test-signature-type'));
 
         $this->addToAssertionCount(1);
     }

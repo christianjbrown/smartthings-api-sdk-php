@@ -28,7 +28,6 @@ use ChristianBrown\SmartThings\Transformer\LocalizationTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\Exception;
-
 use PHPUnit\Framework\TestCase;
 
 use function rawurlencode;
@@ -79,7 +78,7 @@ final class DeviceProfileApiTest extends TestCase
         $localeReferencesTransformer = self::createStub(LocaleReferencesTransformerInterface::class);
         $devicesProfilesTransformer = self::createStub(DeviceProfilesTransformerInterface::class);
 
-        $api = new DeviceProfileApi($requestSender, $deviceProfileTransformer, $devicesProfilesTransformer, $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), $createDeviceProfileRequestSerializer);
+        $api = new DeviceProfileApi($requestSender, $deviceProfileTransformer, $devicesProfilesTransformer, $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), $createDeviceProfileRequestSerializer, self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
         $actual = $api->createDeviceProfile($request);
 
         self::assertSame($profile, $actual);
@@ -110,7 +109,7 @@ final class DeviceProfileApiTest extends TestCase
         $devicesProfilesTransformer->method('transform')
             ->willReturn([$profile]);
 
-        $api = new DeviceProfileApi($requestSender, $deviceProfileTransformer, $devicesProfilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DeviceProfileApi($requestSender, $deviceProfileTransformer, $devicesProfilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         $api->getMultiple();
         $api->createDeviceProfile(new CreateDeviceProfileRequest('thermostat1.model1', [['id' => 'main']]));
@@ -127,7 +126,7 @@ final class DeviceProfileApiTest extends TestCase
         $requestSender->expects(self::once())->method('post')
             ->willReturn([]);
 
-        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DeviceProfileApiInterface::UNEXPECTED_RESPONSE);
@@ -151,7 +150,7 @@ final class DeviceProfileApiTest extends TestCase
             )
             ->willReturn([]);
 
-        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
         $api->deleteDeviceProfile('test-profile-id');
 
         $this->addToAssertionCount(1);
@@ -178,7 +177,7 @@ final class DeviceProfileApiTest extends TestCase
         $deviceProfileTransformer->method('transform')
             ->willReturn($profile);
 
-        $api = new DeviceProfileApi($requestSender, $deviceProfileTransformer, self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DeviceProfileApi($requestSender, $deviceProfileTransformer, self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         $api->getOneById('test-profile-id');
         $api->deleteDeviceProfile('test-profile-id');
@@ -213,7 +212,7 @@ final class DeviceProfileApiTest extends TestCase
             ->with($data[DeviceProfileApiInterface::KEY_ITEMS])
             ->willReturn($locales);
 
-        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         self::assertSame($locales, $api->getLocales('test-device-profile-id'));
     }
@@ -232,7 +231,7 @@ final class DeviceProfileApiTest extends TestCase
         $localeReferencesTransformer = self::createMock(LocaleReferencesTransformerInterface::class);
         $localeReferencesTransformer->expects(self::once())->method('transform')->willReturn($locales);
 
-        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         // Second call for the same id is served from the cache without hitting the API.
         self::assertSame($locales, $api->getLocales('test-device-profile-id'));
@@ -253,7 +252,7 @@ final class DeviceProfileApiTest extends TestCase
         $localeReferencesTransformer = self::createMock(LocaleReferencesTransformerInterface::class);
         $localeReferencesTransformer->expects(self::exactly(2))->method('transform')->willReturn($locales);
 
-        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($locales, $api->getLocales('test-device-profile-id'));
@@ -275,7 +274,7 @@ final class DeviceProfileApiTest extends TestCase
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::once())->method('get')->willReturn($data);
 
-        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DeviceProfileApiInterface::UNEXPECTED_RESPONSE_SPRINTF, DeviceProfileApiInterface::KEY_ITEMS));
@@ -312,7 +311,7 @@ final class DeviceProfileApiTest extends TestCase
             ->with($data[DeviceProfileApiInterface::KEY_ITEMS])
             ->willReturn($profiles);
 
-        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
         $actual = $profileApi->getMultiple();
 
         self::assertSame($profiles, $actual);
@@ -343,7 +342,7 @@ final class DeviceProfileApiTest extends TestCase
             ->with($data[DeviceProfileApiInterface::KEY_ITEMS])
             ->willReturn($profiles);
 
-        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         // Second call is served from the cache without hitting the API.
         self::assertSame($profiles, $profileApi->getMultiple());
@@ -374,7 +373,7 @@ final class DeviceProfileApiTest extends TestCase
             ->with($data[DeviceProfileApiInterface::KEY_ITEMS])
             ->willReturn($profiles);
 
-        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($profiles, $profileApi->getMultiple());
@@ -407,7 +406,7 @@ final class DeviceProfileApiTest extends TestCase
         $profileTransformer = self::createStub(DeviceProfileTransformerInterface::class);
         $profilesTransformer = self::createStub(DeviceProfilesTransformerInterface::class);
 
-        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DeviceProfileApiInterface::UNEXPECTED_RESPONSE_SPRINTF, DeviceProfileApiInterface::KEY_ITEMS));
@@ -442,7 +441,7 @@ final class DeviceProfileApiTest extends TestCase
 
         $profilesTransformer = self::createStub(DeviceProfilesTransformerInterface::class);
 
-        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
         $actual = $profileApi->getOneById('test-profile-id');
 
         self::assertSame($profile, $actual);
@@ -478,7 +477,7 @@ final class DeviceProfileApiTest extends TestCase
 
         $profilesTransformer = self::createStub(DeviceProfilesTransformerInterface::class);
 
-        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         // Second call for the same id is served from the cache without hitting the API.
         self::assertSame($profile, $profileApi->getOneById('test-profile-id'));
@@ -515,7 +514,7 @@ final class DeviceProfileApiTest extends TestCase
 
         $profilesTransformer = self::createStub(DeviceProfilesTransformerInterface::class);
 
-        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
         $actual = $profileApi->getOneById($deviceProfileId);
 
         self::assertSame($profile, $actual);
@@ -550,7 +549,7 @@ final class DeviceProfileApiTest extends TestCase
 
         $profilesTransformer = self::createStub(DeviceProfilesTransformerInterface::class);
 
-        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($profile, $profileApi->getOneById('test-profile-id'));
@@ -579,7 +578,7 @@ final class DeviceProfileApiTest extends TestCase
         $profileTransformer = self::createStub(DeviceProfileTransformerInterface::class);
         $profilesTransformer = self::createStub(DeviceProfilesTransformerInterface::class);
 
-        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $profileApi = new DeviceProfileApi($requestSender, $profileTransformer, $profilesTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DeviceProfileApiInterface::UNEXPECTED_RESPONSE);
@@ -610,7 +609,7 @@ final class DeviceProfileApiTest extends TestCase
         $localizationTransformer = self::createMock(LocalizationTransformerInterface::class);
         $localizationTransformer->expects(self::once())->method('transform')->with($data)->willReturn($localization);
 
-        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'));
+        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         self::assertSame($localization, $api->getTranslations('test-device-profile-id', 'ko'));
     }
@@ -629,7 +628,7 @@ final class DeviceProfileApiTest extends TestCase
         $localizationTransformer = self::createMock(LocalizationTransformerInterface::class);
         $localizationTransformer->expects(self::once())->method('transform')->willReturn($localization);
 
-        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'));
+        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         // Second call for the same id and tag is served from the cache without hitting the API.
         self::assertSame($localization, $api->getTranslations('test-device-profile-id', 'ko'));
@@ -650,7 +649,7 @@ final class DeviceProfileApiTest extends TestCase
         $localizationTransformer = self::createMock(LocalizationTransformerInterface::class);
         $localizationTransformer->expects(self::exactly(2))->method('transform')->willReturn($localization);
 
-        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'));
+        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($localization, $api->getTranslations('test-device-profile-id', 'ko'));
@@ -668,7 +667,7 @@ final class DeviceProfileApiTest extends TestCase
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::once())->method('get')->willReturn([]);
 
-        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DeviceProfileApiInterface::UNEXPECTED_RESPONSE);
@@ -709,7 +708,7 @@ final class DeviceProfileApiTest extends TestCase
             ->with($data)
             ->willReturn($profile);
 
-        $api = new DeviceProfileApi($requestSender, $deviceProfileTransformer, self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), null, $updateDeviceProfileRequestSerializer);
+        $api = new DeviceProfileApi($requestSender, $deviceProfileTransformer, self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), $updateDeviceProfileRequestSerializer);
         $actual = $api->updateDeviceProfile('test-profile-id', $request);
 
         self::assertSame($profile, $actual);
@@ -736,7 +735,7 @@ final class DeviceProfileApiTest extends TestCase
             ->method('transform')
             ->willReturn($profile);
 
-        $api = new DeviceProfileApi($requestSender, $deviceProfileTransformer, self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DeviceProfileApi($requestSender, $deviceProfileTransformer, self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         self::assertSame($profile, $api->updateDeviceProfile('test-profile-id', new UpdateDeviceProfileRequest()));
         self::assertSame($profile, $api->getOneById('test-profile-id'));
@@ -752,7 +751,7 @@ final class DeviceProfileApiTest extends TestCase
         $requestSender->expects(self::once())->method('put')
             ->willReturn([]);
 
-        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DeviceProfileApi($requestSender, self::createStub(DeviceProfileTransformerInterface::class), self::createStub(DeviceProfilesTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateDeviceProfileRequestSerializerInterface::class), self::createStub(UpdateDeviceProfileRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DeviceProfileApiInterface::UNEXPECTED_RESPONSE);

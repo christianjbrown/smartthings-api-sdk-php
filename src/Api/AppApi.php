@@ -18,25 +18,17 @@ use ChristianBrown\SmartThings\Model\UpdateAppOauthRequestInterface;
 use ChristianBrown\SmartThings\Model\UpdateAppRequestInterface;
 use ChristianBrown\SmartThings\Model\UpdateAppSettingsRequestInterface;
 use ChristianBrown\SmartThings\Model\UpdateSignatureTypeRequestInterface;
-use ChristianBrown\SmartThings\Serializer\CreateAppRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateAppRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\UpdateAppOauthRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppOauthRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\UpdateAppRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\UpdateAppSettingsRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppSettingsRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\UpdateSignatureTypeRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateSignatureTypeRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\AppSettingsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\AppsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\AppTransformerInterface;
-use ChristianBrown\SmartThings\Transformer\CreateAppResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\CreateAppResponseTransformerInterface;
-use ChristianBrown\SmartThings\Transformer\GenerateAppOauthResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\GenerateAppOauthResponseTransformerInterface;
 
 use function array_filter;
@@ -56,10 +48,10 @@ final class AppApi implements AppApiInterface
      * @var array<string, AppInterface>
      */
     private array $cache = [];
-    private ?CreateAppRequestSerializerInterface $createAppRequestSerializer;
-    private ?CreateAppResponseTransformerInterface $createAppResponseTransformer;
-    private ?GenerateAppOauthRequestSerializerInterface $generateAppOauthRequestSerializer;
-    private ?GenerateAppOauthResponseTransformerInterface $generateAppOauthResponseTransformer;
+    private CreateAppRequestSerializerInterface $createAppRequestSerializer;
+    private CreateAppResponseTransformerInterface $createAppResponseTransformer;
+    private GenerateAppOauthRequestSerializerInterface $generateAppOauthRequestSerializer;
+    private GenerateAppOauthResponseTransformerInterface $generateAppOauthResponseTransformer;
 
     /**
      * @var ?array<int, AppInterface>
@@ -77,12 +69,12 @@ final class AppApi implements AppApiInterface
      */
     private array $settingsCache = [];
     private TokenInterface $token;
-    private ?UpdateAppOauthRequestSerializerInterface $updateAppOauthRequestSerializer;
-    private ?UpdateAppRequestSerializerInterface $updateAppRequestSerializer;
-    private ?UpdateAppSettingsRequestSerializerInterface $updateAppSettingsRequestSerializer;
-    private ?UpdateSignatureTypeRequestSerializerInterface $updateSignatureTypeRequestSerializer;
+    private UpdateAppOauthRequestSerializerInterface $updateAppOauthRequestSerializer;
+    private UpdateAppRequestSerializerInterface $updateAppRequestSerializer;
+    private UpdateAppSettingsRequestSerializerInterface $updateAppSettingsRequestSerializer;
+    private UpdateSignatureTypeRequestSerializerInterface $updateSignatureTypeRequestSerializer;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, AppTransformerInterface $appTransformer, AppsTransformerInterface $appsTransformer, AppOauthTransformerInterface $appOauthTransformer, AppSettingsTransformerInterface $appSettingsTransformer, TokenInterface $token, ?CreateAppRequestSerializerInterface $createAppRequestSerializer = null, ?CreateAppResponseTransformerInterface $createAppResponseTransformer = null, ?UpdateAppRequestSerializerInterface $updateAppRequestSerializer = null, ?UpdateAppSettingsRequestSerializerInterface $updateAppSettingsRequestSerializer = null, ?UpdateAppOauthRequestSerializerInterface $updateAppOauthRequestSerializer = null, ?GenerateAppOauthRequestSerializerInterface $generateAppOauthRequestSerializer = null, ?GenerateAppOauthResponseTransformerInterface $generateAppOauthResponseTransformer = null, ?UpdateSignatureTypeRequestSerializerInterface $updateSignatureTypeRequestSerializer = null)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, AppTransformerInterface $appTransformer, AppsTransformerInterface $appsTransformer, AppOauthTransformerInterface $appOauthTransformer, AppSettingsTransformerInterface $appSettingsTransformer, TokenInterface $token, CreateAppRequestSerializerInterface $createAppRequestSerializer, CreateAppResponseTransformerInterface $createAppResponseTransformer, UpdateAppRequestSerializerInterface $updateAppRequestSerializer, UpdateAppSettingsRequestSerializerInterface $updateAppSettingsRequestSerializer, UpdateAppOauthRequestSerializerInterface $updateAppOauthRequestSerializer, GenerateAppOauthRequestSerializerInterface $generateAppOauthRequestSerializer, GenerateAppOauthResponseTransformerInterface $generateAppOauthResponseTransformer, UpdateSignatureTypeRequestSerializerInterface $updateSignatureTypeRequestSerializer)
     {
         $this->requestSender = $requestSender;
         $this->appTransformer = $appTransformer;
@@ -112,13 +104,13 @@ final class AppApi implements AppApiInterface
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $query = array_filter([self::KEY_SIGNATURE_TYPE => $signatureType, self::KEY_REQUIRE_CONFIRMATION => self::formatBool($requireConfirmation), self::KEY_ACCOUNT_ID => $accountId], static fn (?string $value): bool => null !== $value);
-        $body = $this->resolveCreateAppRequestSerializer()->serialize($request);
+        $body = $this->createAppRequestSerializer->serialize($request);
         $data = $this->requestSender->post(self::API_URL, $query, $headers, $body);
 
         if (empty($data)) {
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
-        $result = $this->resolveCreateAppResponseTransformer()->transform($data);
+        $result = $this->createAppResponseTransformer->transform($data);
         $this->listCache = null;
 
         return $result;
@@ -150,13 +142,13 @@ final class AppApi implements AppApiInterface
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_OAUTH_GENERATE_SPRINTF, rawurlencode($appNameOrId));
-        $body = $this->resolveGenerateAppOauthRequestSerializer()->serialize($request);
+        $body = $this->generateAppOauthRequestSerializer->serialize($request);
         $data = $this->requestSender->post($url, [], $headers, $body);
 
         if (empty($data)) {
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
-        $result = $this->resolveGenerateAppOauthResponseTransformer()->transform($data);
+        $result = $this->generateAppOauthResponseTransformer->transform($data);
         unset($this->oauthCache[$appNameOrId]);
 
         return $result;
@@ -287,7 +279,7 @@ final class AppApi implements AppApiInterface
         ];
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($appNameOrId));
         $query = array_filter([self::KEY_SIGNATURE_TYPE => $signatureType, self::KEY_REQUIRE_CONFIRMATION => self::formatBool($requireConfirmation)], static fn (?string $value): bool => null !== $value);
-        $body = $this->resolveUpdateAppRequestSerializer()->serialize($request);
+        $body = $this->updateAppRequestSerializer->serialize($request);
         $data = $this->requestSender->put($url, $query, $headers, $body);
 
         if (empty($data)) {
@@ -312,7 +304,7 @@ final class AppApi implements AppApiInterface
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_OAUTH_SPRINTF, rawurlencode($appNameOrId));
-        $body = $this->resolveUpdateAppOauthRequestSerializer()->serialize($request);
+        $body = $this->updateAppOauthRequestSerializer->serialize($request);
         $data = $this->requestSender->put($url, [], $headers, $body);
 
         if (empty($data)) {
@@ -336,7 +328,7 @@ final class AppApi implements AppApiInterface
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_SETTINGS_SPRINTF, rawurlencode($appNameOrId));
-        $body = $this->resolveUpdateAppSettingsRequestSerializer()->serialize($request);
+        $body = $this->updateAppSettingsRequestSerializer->serialize($request);
         $data = $this->requestSender->put($url, [], $headers, $body);
 
         if (empty($data)) {
@@ -357,7 +349,7 @@ final class AppApi implements AppApiInterface
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_SIGNATURE_TYPE_SPRINTF, rawurlencode($appNameOrId));
-        $body = $this->resolveUpdateSignatureTypeRequestSerializer()->serialize($request);
+        $body = $this->updateSignatureTypeRequestSerializer->serialize($request);
         $this->requestSender->put($url, [], $headers, $body);
         unset($this->cache[$appNameOrId]);
     }
@@ -385,69 +377,5 @@ final class AppApi implements AppApiInterface
     private static function formatBool(?bool $value): ?string
     {
         return null === $value ? null : var_export($value, true);
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveCreateAppRequestSerializer(): CreateAppRequestSerializerInterface
-    {
-        return $this->createAppRequestSerializer ?? new CreateAppRequestSerializer();
-    }
-
-    private function resolveCreateAppResponseTransformer(): CreateAppResponseTransformerInterface
-    {
-        return $this->createAppResponseTransformer ?? new CreateAppResponseTransformer($this->appTransformer);
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveGenerateAppOauthRequestSerializer(): GenerateAppOauthRequestSerializerInterface
-    {
-        return $this->generateAppOauthRequestSerializer ?? new GenerateAppOauthRequestSerializer();
-    }
-
-    private function resolveGenerateAppOauthResponseTransformer(): GenerateAppOauthResponseTransformerInterface
-    {
-        return $this->generateAppOauthResponseTransformer ?? new GenerateAppOauthResponseTransformer($this->appOauthTransformer);
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveUpdateAppOauthRequestSerializer(): UpdateAppOauthRequestSerializerInterface
-    {
-        return $this->updateAppOauthRequestSerializer ?? new UpdateAppOauthRequestSerializer();
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveUpdateAppRequestSerializer(): UpdateAppRequestSerializerInterface
-    {
-        return $this->updateAppRequestSerializer ?? new UpdateAppRequestSerializer();
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveUpdateAppSettingsRequestSerializer(): UpdateAppSettingsRequestSerializerInterface
-    {
-        return $this->updateAppSettingsRequestSerializer ?? new UpdateAppSettingsRequestSerializer();
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveUpdateSignatureTypeRequestSerializer(): UpdateSignatureTypeRequestSerializerInterface
-    {
-        return $this->updateSignatureTypeRequestSerializer ?? new UpdateSignatureTypeRequestSerializer();
     }
 }
