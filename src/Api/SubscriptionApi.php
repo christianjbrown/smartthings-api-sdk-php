@@ -9,7 +9,6 @@ use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\SubscriptionInterface;
 use ChristianBrown\SmartThings\Model\SubscriptionRequestInterface;
-use ChristianBrown\SmartThings\Serializer\SubscriptionRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SubscriptionRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\SubscriptionTransformerInterface;
@@ -31,12 +30,12 @@ final class SubscriptionApi implements SubscriptionApiInterface
      */
     private array $listCache = [];
     private JsonApiRequestSenderInterface $requestSender;
-    private ?SubscriptionRequestSerializerInterface $subscriptionRequestSerializer;
+    private SubscriptionRequestSerializerInterface $subscriptionRequestSerializer;
     private SubscriptionsTransformerInterface $subscriptionsTransformer;
     private SubscriptionTransformerInterface $subscriptionTransformer;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, SubscriptionTransformerInterface $subscriptionTransformer, SubscriptionsTransformerInterface $subscriptionsTransformer, TokenInterface $token, ?SubscriptionRequestSerializerInterface $subscriptionRequestSerializer = null)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, SubscriptionTransformerInterface $subscriptionTransformer, SubscriptionsTransformerInterface $subscriptionsTransformer, TokenInterface $token, SubscriptionRequestSerializerInterface $subscriptionRequestSerializer)
     {
         $this->requestSender = $requestSender;
         $this->subscriptionTransformer = $subscriptionTransformer;
@@ -149,7 +148,7 @@ final class SubscriptionApi implements SubscriptionApiInterface
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_LIST_SPRINTF, rawurlencode($installedAppId));
-        $body = $this->resolveSubscriptionRequestSerializer()->serialize($request);
+        $body = $this->subscriptionRequestSerializer->serialize($request);
         $data = $this->requestSender->post($url, [], $headers, $body);
 
         if (empty($data)) {
@@ -159,14 +158,5 @@ final class SubscriptionApi implements SubscriptionApiInterface
         unset($this->listCache[$installedAppId]);
 
         return $result;
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveSubscriptionRequestSerializer(): SubscriptionRequestSerializerInterface
-    {
-        return $this->subscriptionRequestSerializer ?? new SubscriptionRequestSerializer();
     }
 }

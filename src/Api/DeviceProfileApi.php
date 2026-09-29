@@ -12,9 +12,7 @@ use ChristianBrown\SmartThings\Model\DeviceProfileInterface;
 use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
 use ChristianBrown\SmartThings\Model\LocalizationInterface;
 use ChristianBrown\SmartThings\Model\UpdateDeviceProfileRequestInterface;
-use ChristianBrown\SmartThings\Serializer\CreateDeviceProfileRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateDeviceProfileRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\UpdateDeviceProfileRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateDeviceProfileRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceProfilesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileTransformerInterface;
@@ -31,7 +29,7 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
      * @var array<string, DeviceProfileInterface>
      */
     private array $cache = [];
-    private ?CreateDeviceProfileRequestSerializerInterface $createDeviceProfileRequestSerializer;
+    private CreateDeviceProfileRequestSerializerInterface $createDeviceProfileRequestSerializer;
     private DeviceProfilesTransformerInterface $deviceProfilesTransformer;
     private DeviceProfileTransformerInterface $deviceProfileTransformer;
 
@@ -53,9 +51,9 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
      * @var array<string, LocalizationInterface>
      */
     private array $translationsCache = [];
-    private ?UpdateDeviceProfileRequestSerializerInterface $updateDeviceProfileRequestSerializer;
+    private UpdateDeviceProfileRequestSerializerInterface $updateDeviceProfileRequestSerializer;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceProfileTransformerInterface $deviceProfileTransformer, DeviceProfilesTransformerInterface $deviceProfilesTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token, ?CreateDeviceProfileRequestSerializerInterface $createDeviceProfileRequestSerializer = null, ?UpdateDeviceProfileRequestSerializerInterface $updateDeviceProfileRequestSerializer = null)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceProfileTransformerInterface $deviceProfileTransformer, DeviceProfilesTransformerInterface $deviceProfilesTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token, CreateDeviceProfileRequestSerializerInterface $createDeviceProfileRequestSerializer, UpdateDeviceProfileRequestSerializerInterface $updateDeviceProfileRequestSerializer)
     {
         $this->requestSender = $requestSender;
         $this->deviceProfileTransformer = $deviceProfileTransformer;
@@ -78,7 +76,7 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $body = $this->resolveCreateDeviceProfileRequestSerializer()->serialize($request);
+        $body = $this->createDeviceProfileRequestSerializer->serialize($request);
         $data = $this->requestSender->post(self::API_URL, [], $headers, $body);
 
         if (empty($data)) {
@@ -242,7 +240,7 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($deviceProfileId));
-        $body = $this->resolveUpdateDeviceProfileRequestSerializer()->serialize($request);
+        $body = $this->updateDeviceProfileRequestSerializer->serialize($request);
         $data = $this->requestSender->put($url, [], $headers, $body);
 
         if (empty($data)) {
@@ -253,23 +251,5 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
         $this->listCache = null;
 
         return $profile;
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveCreateDeviceProfileRequestSerializer(): CreateDeviceProfileRequestSerializerInterface
-    {
-        return $this->createDeviceProfileRequestSerializer ?? new CreateDeviceProfileRequestSerializer();
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveUpdateDeviceProfileRequestSerializer(): UpdateDeviceProfileRequestSerializerInterface
-    {
-        return $this->updateDeviceProfileRequestSerializer ?? new UpdateDeviceProfileRequestSerializer();
     }
 }

@@ -22,7 +22,6 @@ use ChristianBrown\SmartThings\Transformer\SceneTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\Exception;
-
 use PHPUnit\Framework\TestCase;
 
 use function rawurlencode;
@@ -73,7 +72,7 @@ final class SceneApiTest extends TestCase
      * @throws RequestExceptionInterface
      * @throws Exception
      */
-    public function testExecuteEncodesIdAndDefaultsTransformer(): void
+    public function testExecuteEncodesIdWithRealTransformer(): void
     {
         $data = ['status' => 'success'];
 
@@ -91,9 +90,8 @@ final class SceneApiTest extends TestCase
         $sceneTransformer = self::createStub(SceneTransformerInterface::class);
         $scenesTransformer = self::createStub(ScenesTransformerInterface::class);
 
-        // No SceneExecutionResultTransformerInterface supplied: the appended constructor
-        // parameter stays optional and the API falls back to the default transformer.
-        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'));
+        // The real execution result transformer, so the parsed result is checked.
+        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'), new SceneExecutionResultTransformer());
         $actual = $sceneApi->execute('a/b c');
 
         self::assertSame('success', $actual->getStatus());
@@ -129,7 +127,7 @@ final class SceneApiTest extends TestCase
             ->with($data[SceneApiInterface::KEY_ITEMS])
             ->willReturn($scenes);
 
-        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'));
+        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'), self::createStub(SceneExecutionResultTransformerInterface::class));
         $actual = $sceneApi->getMultiple();
 
         self::assertSame($scenes, $actual);
@@ -160,7 +158,7 @@ final class SceneApiTest extends TestCase
             ->with($data[SceneApiInterface::KEY_ITEMS])
             ->willReturn($scenes);
 
-        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'));
+        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'), self::createStub(SceneExecutionResultTransformerInterface::class));
 
         // Second call with the same filter is served from the cache without hitting the API.
         self::assertSame($scenes, $sceneApi->getMultiple());
@@ -192,7 +190,7 @@ final class SceneApiTest extends TestCase
             ->with($data[SceneApiInterface::KEY_ITEMS])
             ->willReturn($scenes);
 
-        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'));
+        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'), self::createStub(SceneExecutionResultTransformerInterface::class));
 
         self::assertSame($scenes, $sceneApi->getMultiple());
         self::assertSame($scenes, $sceneApi->getMultiple('test-location-id'));
@@ -228,7 +226,7 @@ final class SceneApiTest extends TestCase
             ->with($data[SceneApiInterface::KEY_ITEMS])
             ->willReturn($scenes);
 
-        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'));
+        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'), self::createStub(SceneExecutionResultTransformerInterface::class));
         $actual = $sceneApi->getMultiple('test-location-id');
 
         self::assertSame($scenes, $actual);
@@ -258,7 +256,7 @@ final class SceneApiTest extends TestCase
             ->with($data[SceneApiInterface::KEY_ITEMS])
             ->willReturn($scenes);
 
-        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'));
+        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'), self::createStub(SceneExecutionResultTransformerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($scenes, $sceneApi->getMultiple());
@@ -291,7 +289,7 @@ final class SceneApiTest extends TestCase
         $sceneTransformer = self::createStub(SceneTransformerInterface::class);
         $scenesTransformer = self::createStub(ScenesTransformerInterface::class);
 
-        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'));
+        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'), self::createStub(SceneExecutionResultTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(SceneApiInterface::UNEXPECTED_RESPONSE_SPRINTF, SceneApiInterface::KEY_ITEMS));
@@ -326,7 +324,7 @@ final class SceneApiTest extends TestCase
 
         $scenesTransformer = self::createStub(ScenesTransformerInterface::class);
 
-        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'));
+        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'), self::createStub(SceneExecutionResultTransformerInterface::class));
         $actual = $sceneApi->getOneById('test-scene-id');
 
         self::assertSame($scene, $actual);
@@ -362,7 +360,7 @@ final class SceneApiTest extends TestCase
 
         $scenesTransformer = self::createStub(ScenesTransformerInterface::class);
 
-        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'));
+        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'), self::createStub(SceneExecutionResultTransformerInterface::class));
 
         // Second call for the same sceneId is served from the cache without hitting the API.
         self::assertSame($scene, $sceneApi->getOneById('test-scene-id'));
@@ -399,7 +397,7 @@ final class SceneApiTest extends TestCase
 
         $scenesTransformer = self::createStub(ScenesTransformerInterface::class);
 
-        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'));
+        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'), self::createStub(SceneExecutionResultTransformerInterface::class));
         $actual = $sceneApi->getOneById($sceneId);
 
         self::assertSame($scene, $actual);
@@ -434,7 +432,7 @@ final class SceneApiTest extends TestCase
 
         $scenesTransformer = self::createStub(ScenesTransformerInterface::class);
 
-        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'));
+        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'), self::createStub(SceneExecutionResultTransformerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($scene, $sceneApi->getOneById('test-scene-id'));
@@ -463,7 +461,7 @@ final class SceneApiTest extends TestCase
         $sceneTransformer = self::createStub(SceneTransformerInterface::class);
         $scenesTransformer = self::createStub(ScenesTransformerInterface::class);
 
-        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'));
+        $sceneApi = new SceneApi($requestSender, $sceneTransformer, $scenesTransformer, new Token('test-api-token'), self::createStub(SceneExecutionResultTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(SceneApiInterface::UNEXPECTED_RESPONSE);

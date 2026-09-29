@@ -9,7 +9,6 @@ use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ScheduleInterface;
 use ChristianBrown\SmartThings\Model\ScheduleRequestInterface;
-use ChristianBrown\SmartThings\Serializer\ScheduleRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\ScheduleRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\SchedulesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ScheduleTransformerInterface;
@@ -30,12 +29,12 @@ final class ScheduleApi implements ScheduleApiInterface
      */
     private array $listCache = [];
     private JsonApiRequestSenderInterface $requestSender;
-    private ?ScheduleRequestSerializerInterface $scheduleRequestSerializer;
+    private ScheduleRequestSerializerInterface $scheduleRequestSerializer;
     private SchedulesTransformerInterface $schedulesTransformer;
     private ScheduleTransformerInterface $scheduleTransformer;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, ScheduleTransformerInterface $scheduleTransformer, SchedulesTransformerInterface $schedulesTransformer, TokenInterface $token, ?ScheduleRequestSerializerInterface $scheduleRequestSerializer = null)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, ScheduleTransformerInterface $scheduleTransformer, SchedulesTransformerInterface $schedulesTransformer, TokenInterface $token, ScheduleRequestSerializerInterface $scheduleRequestSerializer)
     {
         $this->requestSender = $requestSender;
         $this->scheduleTransformer = $scheduleTransformer;
@@ -56,7 +55,7 @@ final class ScheduleApi implements ScheduleApiInterface
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_LIST_SPRINTF, rawurlencode($installedAppId));
-        $body = $this->resolveScheduleRequestSerializer()->serialize($request);
+        $body = $this->scheduleRequestSerializer->serialize($request);
         $data = $this->requestSender->post($url, [], $headers, $body);
 
         if (empty($data)) {
@@ -157,14 +156,5 @@ final class ScheduleApi implements ScheduleApiInterface
         $this->cache[$cacheKey] = $schedule;
 
         return $schedule;
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveScheduleRequestSerializer(): ScheduleRequestSerializerInterface
-    {
-        return $this->scheduleRequestSerializer ?? new ScheduleRequestSerializer();
     }
 }

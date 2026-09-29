@@ -250,262 +250,42 @@ are unaffected by an override; the override only changes the host each request i
 <details id="wiring-the-clients">
 <summary><strong>Wiring the clients</strong></summary>
 
+The `SmartThings` facade builds and wires every client, and that is the supported way to use the
+library. If you construct a client yourself, every collaborator is a required constructor
+argument: the JSON request sender, the client's transformers, a `Token`, and, for the operations
+that write, the request serializers and response transformers. The registrars under
+`src/DependencyInjection/Registrar/` show the exact wiring of each client. For example, the scenes
+client:
+
 ```php
 use ChristianBrown\ApiClient\ApiClient;
-use ChristianBrown\SmartThings\Api\AppApi;
-use ChristianBrown\SmartThings\Api\CapabilityApi;
-use ChristianBrown\SmartThings\Api\DeviceApi;
-use ChristianBrown\SmartThings\Api\DeviceHealthApi;
-use ChristianBrown\SmartThings\Api\DeviceHistoryApi;
-use ChristianBrown\SmartThings\Api\DeviceProfileApi;
-use ChristianBrown\SmartThings\Api\DeviceStatusApi;
-use ChristianBrown\SmartThings\Api\InstalledAppApi;
-use ChristianBrown\SmartThings\Api\LocationApi;
-use ChristianBrown\SmartThings\Api\LocationModeApi;
-use ChristianBrown\SmartThings\Api\LocationRoomApi;
-use ChristianBrown\SmartThings\Api\PresentationApi;
-use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
-use ChristianBrown\SmartThings\Api\ScheduleApi;
-use ChristianBrown\SmartThings\Api\SubscriptionApi;
-use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
-use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
-use ChristianBrown\SmartThings\Transformer\AppsTransformer;
-use ChristianBrown\SmartThings\Transformer\AppTransformer;
-use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
-use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
-use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceComponentsTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceComponentTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceStatusTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTemperatureTransformer;
-use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformer;
-use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformer;
-use ChristianBrown\SmartThings\Transformer\InstalledAppsTransformer;
-use ChristianBrown\SmartThings\Transformer\InstalledAppTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasurementTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasurementHumidityTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryBatteryTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceHealthTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceHistoryEventsTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceHistoryEventTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceProfilesTransformer;
-use ChristianBrown\SmartThings\Transformer\DeviceProfileTransformer;
-use ChristianBrown\SmartThings\Transformer\LocationsTransformer;
-use ChristianBrown\SmartThings\Transformer\LocationTransformer;
-use ChristianBrown\SmartThings\Transformer\LocationRoomsTransformer;
-use ChristianBrown\SmartThings\Transformer\LocationRoomTransformer;
-use ChristianBrown\SmartThings\Transformer\ModesTransformer;
-use ChristianBrown\SmartThings\Transformer\ModeTransformer;
-use ChristianBrown\SmartThings\Transformer\PresentationTransformer;
-use ChristianBrown\SmartThings\Transformer\RulesTransformer;
-use ChristianBrown\SmartThings\Transformer\RuleTransformer;
+use ChristianBrown\SmartThings\Api\Token;
+use ChristianBrown\SmartThings\Transformer\SceneExecutionResultTransformer;
 use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
-use ChristianBrown\SmartThings\Transformer\SchedulesTransformer;
-use ChristianBrown\SmartThings\Transformer\ScheduleTransformer;
-use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformer;
-use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
 
-$apiToken = 'your-smartthings-personal-access-token';
-
-// Shared JSON request sender (wires Guzzle for you).
-$requestSender = (new ApiClient())->getJsonApiRequestSender();
-
-// Apps client. The list endpoint wraps the single app transformer in an
-// AppsTransformer; the oauth and settings endpoints get their own transformers.
-$appTransformer = new AppTransformer();
-
-$appApi = new AppApi(
-    $requestSender,
-    $appTransformer,
-    new AppsTransformer($appTransformer),
-    new AppOauthTransformer(),
-    new AppSettingsTransformer(),
-    $apiToken
-);
-
-// Capabilities client. The single capability transformer is shared: the list
-// endpoints wrap it in a CapabilitiesTransformer, and getOneByIdAndVersion() uses
-// it directly.
-$capabilityTransformer = new CapabilityTransformer();
-
-$capabilityApi = new CapabilityApi(
-    $requestSender,
-    $capabilityTransformer,
-    new CapabilitiesTransformer($capabilityTransformer),
-    $apiToken
-);
-
-// Devices client. The single device transformer is shared: the list endpoint wraps
-// it in a DevicesTransformer, and getOneById() uses it directly.
-$deviceTransformer = new DeviceTransformer(
-    new DeviceComponentsTransformer(
-        new DeviceComponentTransformer(
-            new DeviceComponentCapabilitiesTransformer(
-                new DeviceComponentCapabilityTransformer()
-            )
-        )
-    )
-);
-
-$deviceApi = new DeviceApi(
-    $requestSender,
-    $deviceTransformer,
-    new DevicesTransformer($deviceTransformer),
-    $apiToken
-);
-
-// Device status client.
-$deviceStatusApi = new DeviceStatusApi(
-    $requestSender,
-    new DeviceStatusTransformer(
-        new DeviceStatusTemperatureMeasurementTransformer(
-            new DeviceStatusTemperatureMeasurementTemperatureTransformer()
-        ),
-        new DeviceStatusRelativeHumidityMeasurementTransformer(
-            new DeviceStatusRelativeHumidityMeasurementHumidityTransformer()
-        ),
-        new DeviceStatusBatteryTransformer(
-            new DeviceStatusBatteryBatteryTransformer()
-        )
-    ),
-    $apiToken
-);
-
-// Device health client.
-$deviceHealthApi = new DeviceHealthApi(
-    $requestSender,
-    new DeviceHealthTransformer(),
-    $apiToken
-);
-
-// Device history client. It transparently follows the API's `_links.next` paging
-// chain, so the single events transformer receives every page's aggregated items.
-$deviceHistoryEventTransformer = new DeviceHistoryEventTransformer();
-
-$deviceHistoryApi = new DeviceHistoryApi(
-    $requestSender,
-    new DeviceHistoryEventsTransformer($deviceHistoryEventTransformer),
-    $apiToken
-);
-
-// Device profiles client. The single profile transformer is shared: the list
-// endpoint wraps it in a DeviceProfilesTransformer, and getOneById() uses it directly.
-$deviceProfileTransformer = new DeviceProfileTransformer();
-
-$deviceProfileApi = new DeviceProfileApi(
-    $requestSender,
-    $deviceProfileTransformer,
-    new DeviceProfilesTransformer($deviceProfileTransformer),
-    $apiToken
-);
-
-// Installed apps client. The list endpoint wraps the single transformer in an
-// InstalledAppsTransformer; the config endpoints have their own single/collection pair.
-$installedAppTransformer = new InstalledAppTransformer();
-$installedAppConfigTransformer = new InstalledAppConfigTransformer();
-
-$installedAppApi = new InstalledAppApi(
-    $requestSender,
-    $installedAppTransformer,
-    new InstalledAppsTransformer($installedAppTransformer),
-    $installedAppConfigTransformer,
-    new InstalledAppConfigsTransformer($installedAppConfigTransformer),
-    $apiToken
-);
-
-// Locations client.
-$locationApi = new LocationApi(
-    $requestSender,
-    new LocationTransformer(),
-    new LocationsTransformer(
-        new LocationTransformer()
-    ),
-    $apiToken
-);
-
-// Location modes client. The single mode transformer is shared: the list endpoint
-// wraps it in a ModesTransformer, and the single/current reads use it directly.
-$modeTransformer = new ModeTransformer();
-
-$locationModeApi = new LocationModeApi(
-    $requestSender,
-    $modeTransformer,
-    new ModesTransformer($modeTransformer),
-    $apiToken
-);
-
-// Location rooms client. The single room transformer is shared: the list endpoint
-// wraps it in a LocationRoomsTransformer, and the single-room reads use it directly.
-$locationRoomTransformer = new LocationRoomTransformer();
-
-$locationRoomApi = new LocationRoomApi(
-    $requestSender,
-    $locationRoomTransformer,
-    new LocationRoomsTransformer($locationRoomTransformer),
-    $apiToken
-);
-
-// Scenes client. The single scene transformer is shared: the list endpoint wraps
-// it in a ScenesTransformer, and getOneById() uses it directly.
 $sceneTransformer = new SceneTransformer();
 
 $sceneApi = new SceneApi(
-    $requestSender,
+    (new ApiClient())->getJsonApiRequestSender(),
     $sceneTransformer,
     new ScenesTransformer($sceneTransformer),
-    $apiToken
-);
-
-// Rules client. The single rule transformer is shared: the list endpoint wraps
-// it in a RulesTransformer, and getOneById() uses it directly. Both reads require
-// a location id.
-$ruleTransformer = new RuleTransformer();
-
-$ruleApi = new RuleApi(
-    $requestSender,
-    $ruleTransformer,
-    new RulesTransformer($ruleTransformer),
-    $apiToken
-);
-
-// Subscriptions client. The single subscription transformer is shared: the list
-// endpoint wraps it in a SubscriptionsTransformer, and getOneById() uses it directly.
-$subscriptionTransformer = new SubscriptionTransformer();
-
-$subscriptionApi = new SubscriptionApi(
-    $requestSender,
-    $subscriptionTransformer,
-    new SubscriptionsTransformer($subscriptionTransformer),
-    $apiToken
-);
-
-// Schedules client. The single schedule transformer is shared: the list endpoint
-// wraps it in a SchedulesTransformer, and getOneByName() uses it directly.
-$scheduleTransformer = new ScheduleTransformer();
-
-$scheduleApi = new ScheduleApi(
-    $requestSender,
-    $scheduleTransformer,
-    new SchedulesTransformer($scheduleTransformer),
-    $apiToken
-);
-
-// Presentation client. A single transformer serves all three read methods.
-$presentationApi = new PresentationApi(
-    $requestSender,
-    new PresentationTransformer(),
-    $apiToken
+    new Token($apiToken),
+    new SceneExecutionResultTransformer()
 );
 ```
 
 </details>
+
+## :arrow_up: Upgrading to 2.0
+
+Version 2.0 removes the built-in fallbacks: a client no longer builds a default serializer or
+transformer for a collaborator you leave out. Every collaborator of an `*Api` class, and of the
+transformers and serializers that take collaborators, is now a required constructor argument
+typed on its interface. Code that uses the `SmartThings` facade (`new SmartThings($token)` and the
+`get*Api()` getters) is unaffected, because the facade's registrars wire everything. Code that
+constructs `*Api` classes by hand has to pass the collaborators; the registrars list them.
 
 ## :page_facing_up: License
 

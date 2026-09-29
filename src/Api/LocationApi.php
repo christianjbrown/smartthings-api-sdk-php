@@ -11,11 +11,8 @@ use ChristianBrown\SmartThings\Model\CreateLocationRequestInterface;
 use ChristianBrown\SmartThings\Model\LocationInterface;
 use ChristianBrown\SmartThings\Model\PatchLocationRequestInterface;
 use ChristianBrown\SmartThings\Model\UpdateLocationRequestInterface;
-use ChristianBrown\SmartThings\Serializer\CreateLocationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateLocationRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\PatchLocationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PatchLocationRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\UpdateLocationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateLocationRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\LocationsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\LocationTransformerInterface;
@@ -30,7 +27,7 @@ final class LocationApi implements LocationApiInterface
      * @var array<string, LocationInterface>
      */
     private array $cache = [];
-    private ?CreateLocationRequestSerializerInterface $createLocationRequestSerializer;
+    private CreateLocationRequestSerializerInterface $createLocationRequestSerializer;
 
     /**
      * @var ?array<int, LocationInterface>
@@ -38,12 +35,12 @@ final class LocationApi implements LocationApiInterface
     private ?array $listCache = null;
     private LocationsTransformerInterface $locationsTransformer;
     private LocationTransformerInterface $locationTransformer;
-    private ?PatchLocationRequestSerializerInterface $patchLocationRequestSerializer;
+    private PatchLocationRequestSerializerInterface $patchLocationRequestSerializer;
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
-    private ?UpdateLocationRequestSerializerInterface $updateLocationRequestSerializer;
+    private UpdateLocationRequestSerializerInterface $updateLocationRequestSerializer;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, LocationTransformerInterface $locationTransformer, LocationsTransformerInterface $locationsTransformer, TokenInterface $token, ?CreateLocationRequestSerializerInterface $createLocationRequestSerializer = null, ?UpdateLocationRequestSerializerInterface $updateLocationRequestSerializer = null, ?PatchLocationRequestSerializerInterface $patchLocationRequestSerializer = null)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, LocationTransformerInterface $locationTransformer, LocationsTransformerInterface $locationsTransformer, TokenInterface $token, CreateLocationRequestSerializerInterface $createLocationRequestSerializer, UpdateLocationRequestSerializerInterface $updateLocationRequestSerializer, PatchLocationRequestSerializerInterface $patchLocationRequestSerializer)
     {
         $this->requestSender = $requestSender;
         $this->locationTransformer = $locationTransformer;
@@ -65,7 +62,7 @@ final class LocationApi implements LocationApiInterface
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $body = $this->resolveCreateLocationRequestSerializer()->serialize($request);
+        $body = $this->createLocationRequestSerializer->serialize($request);
         $data = $this->requestSender->post(self::API_URL, [], $headers, $body);
 
         if (empty($data)) {
@@ -166,7 +163,7 @@ final class LocationApi implements LocationApiInterface
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($locationId));
-        $body = $this->resolvePatchLocationRequestSerializer()->serialize($request);
+        $body = $this->patchLocationRequestSerializer->serialize($request);
         $data = $this->requestSender->patch($url, [], $headers, $body);
 
         if (empty($data)) {
@@ -191,7 +188,7 @@ final class LocationApi implements LocationApiInterface
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($locationId));
-        $body = $this->resolveUpdateLocationRequestSerializer()->serialize($request);
+        $body = $this->updateLocationRequestSerializer->serialize($request);
         $data = $this->requestSender->put($url, [], $headers, $body);
 
         if (empty($data)) {
@@ -216,32 +213,5 @@ final class LocationApi implements LocationApiInterface
         }
 
         return [self::KEY_FORCE => $force ? 'true' : 'false'];
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveCreateLocationRequestSerializer(): CreateLocationRequestSerializerInterface
-    {
-        return $this->createLocationRequestSerializer ?? new CreateLocationRequestSerializer();
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolvePatchLocationRequestSerializer(): PatchLocationRequestSerializerInterface
-    {
-        return $this->patchLocationRequestSerializer ?? new PatchLocationRequestSerializer();
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveUpdateLocationRequestSerializer(): UpdateLocationRequestSerializerInterface
-    {
-        return $this->updateLocationRequestSerializer ?? new UpdateLocationRequestSerializer();
     }
 }

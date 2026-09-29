@@ -11,9 +11,7 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\RuleExecutionResultInterface;
 use ChristianBrown\SmartThings\Model\RuleInterface;
 use ChristianBrown\SmartThings\Model\RuleRequestInterface;
-use ChristianBrown\SmartThings\Serializer\RuleRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\RuleRequestSerializerInterface;
-use ChristianBrown\SmartThings\Transformer\RuleExecutionResultTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleExecutionResultTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\RulesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\RuleTransformerInterface;
@@ -34,13 +32,13 @@ final class RuleApi implements RuleApiInterface
      */
     private array $listCache = [];
     private JsonApiRequestSenderInterface $requestSender;
-    private ?RuleExecutionResultTransformerInterface $ruleExecutionResultTransformer;
-    private ?RuleRequestSerializerInterface $ruleRequestSerializer;
+    private RuleExecutionResultTransformerInterface $ruleExecutionResultTransformer;
+    private RuleRequestSerializerInterface $ruleRequestSerializer;
     private RulesTransformerInterface $rulesTransformer;
     private RuleTransformerInterface $ruleTransformer;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, RuleTransformerInterface $ruleTransformer, RulesTransformerInterface $rulesTransformer, TokenInterface $token, ?RuleExecutionResultTransformerInterface $ruleExecutionResultTransformer = null, ?RuleRequestSerializerInterface $ruleRequestSerializer = null)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, RuleTransformerInterface $ruleTransformer, RulesTransformerInterface $rulesTransformer, TokenInterface $token, RuleExecutionResultTransformerInterface $ruleExecutionResultTransformer, RuleRequestSerializerInterface $ruleRequestSerializer)
     {
         $this->requestSender = $requestSender;
         $this->ruleTransformer = $ruleTransformer;
@@ -67,7 +65,7 @@ final class RuleApi implements RuleApiInterface
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $query = [self::KEY_LOCATION_ID => $locationId];
-        $body = $this->resolveRuleRequestSerializer()->serialize($request);
+        $body = $this->ruleRequestSerializer->serialize($request);
         $data = $this->requestSender->post(self::API_URL, $query, $headers, $body);
 
         if (empty($data)) {
@@ -129,7 +127,7 @@ final class RuleApi implements RuleApiInterface
         $url = sprintf(self::API_URL_EXECUTE_SPRINTF, rawurlencode($ruleId));
         $data = $this->requestSender->post($url, [], $headers);
 
-        return $this->resolveRuleExecutionResultTransformer()->transform($data);
+        return $this->ruleExecutionResultTransformer->transform($data);
     }
 
     /**
@@ -222,7 +220,7 @@ final class RuleApi implements RuleApiInterface
         ];
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($ruleId));
         $query = [self::KEY_LOCATION_ID => $locationId];
-        $body = $this->resolveRuleRequestSerializer()->serialize($request);
+        $body = $this->ruleRequestSerializer->serialize($request);
         $data = $this->requestSender->put($url, $query, $headers, $body);
 
         if (empty($data)) {
@@ -233,23 +231,5 @@ final class RuleApi implements RuleApiInterface
         unset($this->listCache[$locationId]);
 
         return $rule;
-    }
-
-    /**
-     * Falls back to the default transformer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveRuleExecutionResultTransformer(): RuleExecutionResultTransformerInterface
-    {
-        return $this->ruleExecutionResultTransformer ?? new RuleExecutionResultTransformer();
-    }
-
-    /**
-     * Falls back to the default serializer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveRuleRequestSerializer(): RuleRequestSerializerInterface
-    {
-        return $this->ruleRequestSerializer ?? new RuleRequestSerializer();
     }
 }

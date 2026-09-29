@@ -15,13 +15,9 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DevicePreferenceDefinitionInterface;
 use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
 use ChristianBrown\SmartThings\Model\LocalizationInterface;
-use ChristianBrown\SmartThings\Model\PreferenceLocalizationRequest;
 use ChristianBrown\SmartThings\Model\PreferenceLocalizationRequestInterface;
-use ChristianBrown\SmartThings\Model\PreferenceOptionLocalization;
 use ChristianBrown\SmartThings\Model\PreferenceRequest;
-use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializerInterface;
-use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionTransformerInterface;
@@ -35,12 +31,8 @@ use PHPUnit\Framework\TestCase;
 use function rawurlencode;
 use function sprintf;
 
-#[CoversClass(PreferenceLocalizationRequestSerializer::class)]
-#[CoversClass(PreferenceOptionLocalization::class)]
-#[CoversClass(PreferenceLocalizationRequest::class)]
 #[CoversClass(DevicePreferenceDefinitionApi::class)]
 #[CoversClass(PreferenceRequest::class)]
-#[CoversClass(PreferenceRequestSerializer::class)]
 #[CoversClass(Token::class)]
 final class DevicePreferenceDefinitionApiTest extends TestCase
 {
@@ -78,7 +70,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             ->with($data)
             ->willReturn($definition);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), $preferenceRequestSerializer);
+        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), $preferenceRequestSerializer, self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
         $actual = $api->createPreference($request);
 
         self::assertSame($definition, $actual);
@@ -109,7 +101,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $devicePreferenceDefinitionsTransformer->method('transform')
             ->willReturn([$definition]);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, $devicePreferenceDefinitionsTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, $devicePreferenceDefinitionsTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         $api->getMultiple();
         $api->createPreference(new PreferenceRequest('tempOffset', 'Temperature Offset', 'number', ['minimum' => -10.0]));
@@ -149,7 +141,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             ->with($data)
             ->willReturn($model);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $transformer, new Token('test-api-token'), null, $serializer);
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $transformer, new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), $serializer);
         $actual = $api->createPreferenceLocalization('test-preference-id', $request);
 
         self::assertSame($model, $actual);
@@ -166,29 +158,11 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $requestSender->expects(self::once())->method('post')
             ->willReturn([]);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DevicePreferenceDefinitionApiInterface::UNEXPECTED_RESPONSE);
         $api->createPreferenceLocalization('test-preference-id', $request);
-    }
-
-    /**
-     * Without an injected serializer the default one is used.
-     *
-     * @throws RequestExceptionInterface
-     * @throws Exception
-     */
-    public function testCreatePreferenceLocalizationUsesDefaultSerializer(): void
-    {
-        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->expects(self::once())->method('post')
-            ->willReturn(['test-data']);
-
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
-        $api->createPreferenceLocalization('test-preference-id', new PreferenceLocalizationRequest('test-tag', 'test-label'));
-
-        $this->addToAssertionCount(1);
     }
 
     /**
@@ -201,7 +175,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $requestSender->expects(self::once())->method('post')
             ->willReturn([]);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DevicePreferenceDefinitionApiInterface::UNEXPECTED_RESPONSE);
@@ -225,7 +199,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             )
             ->willReturn([]);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
         $api->deletePreferenceById('test-preference-id');
 
         $this->addToAssertionCount(1);
@@ -252,7 +226,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $devicePreferenceDefinitionTransformer->method('transform')
             ->willReturn($definition);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         $api->getOneById('test-preference-id');
         $api->deletePreferenceById('test-preference-id');
@@ -287,7 +261,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             ->with($data[DevicePreferenceDefinitionApiInterface::KEY_ITEMS])
             ->willReturn($locales);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         self::assertSame($locales, $api->getLocales('test-preference-id'));
     }
@@ -306,7 +280,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $localeReferencesTransformer = self::createMock(LocaleReferencesTransformerInterface::class);
         $localeReferencesTransformer->expects(self::once())->method('transform')->willReturn($locales);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         // Second call for the same id is served from the cache without hitting the API.
         self::assertSame($locales, $api->getLocales('test-preference-id'));
@@ -327,7 +301,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $localeReferencesTransformer = self::createMock(LocaleReferencesTransformerInterface::class);
         $localeReferencesTransformer->expects(self::exactly(2))->method('transform')->willReturn($locales);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), $localeReferencesTransformer, self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($locales, $api->getLocales('test-preference-id'));
@@ -349,7 +323,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::once())->method('get')->willReturn($data);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DevicePreferenceDefinitionApiInterface::UNEXPECTED_RESPONSE_SPRINTF, DevicePreferenceDefinitionApiInterface::KEY_ITEMS));
@@ -384,7 +358,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             ->with($data[DevicePreferenceDefinitionApiInterface::KEY_ITEMS])
             ->willReturn($definitions);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), $definitionsTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), $definitionsTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
         $actual = $api->getMultiple();
 
         self::assertSame($definitions, $actual);
@@ -413,7 +387,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             ->with($data[DevicePreferenceDefinitionApiInterface::KEY_ITEMS])
             ->willReturn($definitions);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), $definitionsTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), $definitionsTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         // Second call with the same filter is served from the cache without hitting the API.
         self::assertSame($definitions, $api->getMultiple());
@@ -448,7 +422,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             ->with($data[DevicePreferenceDefinitionApiInterface::KEY_ITEMS])
             ->willReturn($definitions);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), $definitionsTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), $definitionsTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
         $actual = $api->getMultiple('test-namespace');
 
         self::assertSame($definitions, $actual);
@@ -476,7 +450,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             ->with($data[DevicePreferenceDefinitionApiInterface::KEY_ITEMS])
             ->willReturn($definitions);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), $definitionsTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), $definitionsTransformer, self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($definitions, $api->getMultiple());
@@ -506,7 +480,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             )
             ->willReturn($data);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DevicePreferenceDefinitionApiInterface::UNEXPECTED_RESPONSE_SPRINTF, DevicePreferenceDefinitionApiInterface::KEY_ITEMS));
@@ -539,7 +513,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             ->with($data)
             ->willReturn($definition);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, $definitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, $definitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
         $actual = $api->getOneById('test-preference-id');
 
         self::assertSame($definition, $actual);
@@ -566,7 +540,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             ->with($data)
             ->willReturn($definition);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, $definitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, $definitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         // Second call for the same id is served from the cache without hitting the API.
         self::assertSame($definition, $api->getOneById('test-preference-id'));
@@ -601,7 +575,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             ->with($data)
             ->willReturn($definition);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, $definitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, $definitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
         $actual = $api->getOneById($preferenceId);
 
         self::assertSame($definition, $actual);
@@ -627,7 +601,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             ->with($data)
             ->willReturn($definition);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, $definitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, $definitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($definition, $api->getOneById('test-preference-id'));
@@ -646,7 +620,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $requestSender->expects(self::once())->method('get')
             ->willReturn([]);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DevicePreferenceDefinitionApiInterface::UNEXPECTED_RESPONSE);
@@ -677,7 +651,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $localizationTransformer = self::createMock(LocalizationTransformerInterface::class);
         $localizationTransformer->expects(self::once())->method('transform')->with($data)->willReturn($localization);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         self::assertSame($localization, $api->getTranslations('test-preference-id', 'ko'));
     }
@@ -696,7 +670,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $localizationTransformer = self::createMock(LocalizationTransformerInterface::class);
         $localizationTransformer->expects(self::once())->method('transform')->willReturn($localization);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         // Second call for the same id and locale is served from the cache without hitting the API.
         self::assertSame($localization, $api->getTranslations('test-preference-id', 'ko'));
@@ -717,7 +691,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $localizationTransformer = self::createMock(LocalizationTransformerInterface::class);
         $localizationTransformer->expects(self::exactly(2))->method('transform')->willReturn($localization);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $localizationTransformer, new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($localization, $api->getTranslations('test-preference-id', 'ko'));
@@ -735,7 +709,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::once())->method('get')->willReturn([]);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DevicePreferenceDefinitionApiInterface::UNEXPECTED_RESPONSE);
@@ -776,7 +750,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             ->with($data)
             ->willReturn($definition);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), $preferenceRequestSerializer);
+        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), $preferenceRequestSerializer, self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
         $actual = $api->updatePreferenceById('test-preference-id', $request);
 
         self::assertSame($definition, $actual);
@@ -803,7 +777,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             ->method('transform')
             ->willReturn($definition);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, $devicePreferenceDefinitionTransformer, self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         self::assertSame($definition, $api->updatePreferenceById('test-preference-id', new PreferenceRequest('tempOffset', 'Temperature Offset', 'number', ['minimum' => -10.0])));
         self::assertSame($definition, $api->getOneById('test-preference-id'));
@@ -819,7 +793,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $requestSender->expects(self::once())->method('put')
             ->willReturn([]);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DevicePreferenceDefinitionApiInterface::UNEXPECTED_RESPONSE);
@@ -859,7 +833,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
             ->with($data)
             ->willReturn($model);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $transformer, new Token('test-api-token'), null, $serializer);
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $transformer, new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), $serializer);
         $actual = $api->updatePreferenceLocalization('test-preference-id', 'test-locale', $request);
 
         self::assertSame($model, $actual);
@@ -876,7 +850,7 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $requestSender->expects(self::once())->method('put')
             ->willReturn([]);
 
-        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'), self::createStub(PreferenceRequestSerializerInterface::class), self::createStub(PreferenceLocalizationRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DevicePreferenceDefinitionApiInterface::UNEXPECTED_RESPONSE);

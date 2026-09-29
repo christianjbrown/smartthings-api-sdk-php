@@ -12,12 +12,8 @@ use ChristianBrown\SmartThings\Api\ScheduleApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
-use ChristianBrown\SmartThings\Model\CronSchedule;
-use ChristianBrown\SmartThings\Model\OnceSchedule;
 use ChristianBrown\SmartThings\Model\ScheduleInterface;
-use ChristianBrown\SmartThings\Model\ScheduleRequest;
 use ChristianBrown\SmartThings\Model\ScheduleRequestInterface;
-use ChristianBrown\SmartThings\Serializer\ScheduleRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\ScheduleRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\SchedulesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ScheduleTransformerInterface;
@@ -29,10 +25,6 @@ use PHPUnit\Framework\TestCase;
 use function rawurlencode;
 use function sprintf;
 
-#[CoversClass(ScheduleRequestSerializer::class)]
-#[CoversClass(CronSchedule::class)]
-#[CoversClass(OnceSchedule::class)]
-#[CoversClass(ScheduleRequest::class)]
 #[CoversClass(ScheduleApi::class)]
 #[CoversClass(Token::class)]
 final class ScheduleApiTest extends TestCase
@@ -88,7 +80,7 @@ final class ScheduleApiTest extends TestCase
         $requestSender->expects(self::once())->method('post')
             ->willReturn(['test-data']);
 
-        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
 
         $api->getMultiple('test-installed-app-id');
         $api->createSchedule('test-installed-app-id', self::createStub(ScheduleRequestInterface::class));
@@ -108,29 +100,11 @@ final class ScheduleApiTest extends TestCase
         $requestSender->expects(self::once())->method('post')
             ->willReturn([]);
 
-        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(ScheduleApiInterface::UNEXPECTED_RESPONSE);
         $api->createSchedule('test-installed-app-id', $request);
-    }
-
-    /**
-     * Without an injected serializer the default one is used.
-     *
-     * @throws RequestExceptionInterface
-     * @throws Exception
-     */
-    public function testCreateScheduleUsesDefaultSerializer(): void
-    {
-        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
-        $requestSender->expects(self::once())->method('post')
-            ->willReturn(['test-data']);
-
-        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
-        $api->createSchedule('test-installed-app-id', new ScheduleRequest('test-name'));
-
-        $this->addToAssertionCount(1);
     }
 
     /**
@@ -150,7 +124,7 @@ final class ScheduleApiTest extends TestCase
             )
             ->willReturn([]);
 
-        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
         $api->deleteSchedule('test-installed-app-id', 'test-schedule-name');
 
         $this->addToAssertionCount(1);
@@ -168,7 +142,7 @@ final class ScheduleApiTest extends TestCase
         $requestSender->expects(self::once())->method('delete')
             ->willReturn([]);
 
-        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
 
         $api->getOneByName('test-installed-app-id', 'test-schedule-name');
         $api->deleteSchedule('test-installed-app-id', 'test-schedule-name');
@@ -194,7 +168,7 @@ final class ScheduleApiTest extends TestCase
             )
             ->willReturn([]);
 
-        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
         $api->deleteSchedules('test-installed-app-id');
 
         $this->addToAssertionCount(1);
@@ -212,7 +186,7 @@ final class ScheduleApiTest extends TestCase
         $requestSender->expects(self::once())->method('delete')
             ->willReturn([]);
 
-        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
 
         $api->getOneByName('test-installed-app-id', 'test-schedule-name');
         $api->deleteSchedules('test-installed-app-id');
@@ -249,7 +223,7 @@ final class ScheduleApiTest extends TestCase
             ->with($data[ScheduleApiInterface::KEY_ITEMS])
             ->willReturn($schedules);
 
-        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), $schedulesTransformer, new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), $schedulesTransformer, new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
         $actual = $api->getMultiple('test-installed-app-id');
 
         self::assertSame($schedules, $actual);
@@ -278,7 +252,7 @@ final class ScheduleApiTest extends TestCase
             ->with($data[ScheduleApiInterface::KEY_ITEMS])
             ->willReturn($schedules);
 
-        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), $schedulesTransformer, new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), $schedulesTransformer, new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
 
         // Second call for the same installed app is served from the cache without hitting the API.
         self::assertSame($schedules, $api->getMultiple('test-installed-app-id'));
@@ -313,7 +287,7 @@ final class ScheduleApiTest extends TestCase
             ->with($data[ScheduleApiInterface::KEY_ITEMS])
             ->willReturn($schedules);
 
-        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), $schedulesTransformer, new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), $schedulesTransformer, new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
         $actual = $api->getMultiple('a/b c');
 
         self::assertSame($schedules, $actual);
@@ -341,7 +315,7 @@ final class ScheduleApiTest extends TestCase
             ->with($data[ScheduleApiInterface::KEY_ITEMS])
             ->willReturn($schedules);
 
-        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), $schedulesTransformer, new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), $schedulesTransformer, new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($schedules, $api->getMultiple('test-installed-app-id'));
@@ -364,7 +338,7 @@ final class ScheduleApiTest extends TestCase
         $requestSender->expects(self::once())->method('get')
             ->willReturn($data);
 
-        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(ScheduleApiInterface::UNEXPECTED_RESPONSE_SPRINTF, ScheduleApiInterface::KEY_ITEMS));
@@ -397,7 +371,7 @@ final class ScheduleApiTest extends TestCase
             ->with($data)
             ->willReturn($schedule);
 
-        $api = new ScheduleApi($requestSender, $scheduleTransformer, self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, $scheduleTransformer, self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
         $actual = $api->getOneByName('test-installed-app-id', 'test-schedule-name');
 
         self::assertSame($schedule, $actual);
@@ -424,7 +398,7 @@ final class ScheduleApiTest extends TestCase
             ->with($data)
             ->willReturn($schedule);
 
-        $api = new ScheduleApi($requestSender, $scheduleTransformer, self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, $scheduleTransformer, self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
 
         // Second call for the same ids is served from the cache without hitting the API.
         self::assertSame($schedule, $api->getOneByName('test-installed-app-id', 'test-schedule-name'));
@@ -459,7 +433,7 @@ final class ScheduleApiTest extends TestCase
             ->with($data)
             ->willReturn($schedule);
 
-        $api = new ScheduleApi($requestSender, $scheduleTransformer, self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, $scheduleTransformer, self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
         $actual = $api->getOneByName($installedAppId, $scheduleName);
 
         self::assertSame($schedule, $actual);
@@ -485,7 +459,7 @@ final class ScheduleApiTest extends TestCase
             ->with($data)
             ->willReturn($schedule);
 
-        $api = new ScheduleApi($requestSender, $scheduleTransformer, self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, $scheduleTransformer, self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($schedule, $api->getOneByName('test-installed-app-id', 'test-schedule-name'));
@@ -504,7 +478,7 @@ final class ScheduleApiTest extends TestCase
         $requestSender->expects(self::once())->method('get')
             ->willReturn([]);
 
-        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'));
+        $api = new ScheduleApi($requestSender, self::createStub(ScheduleTransformerInterface::class), self::createStub(SchedulesTransformerInterface::class), new Token('test-api-token'), self::createStub(ScheduleRequestSerializerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(ScheduleApiInterface::UNEXPECTED_RESPONSE);

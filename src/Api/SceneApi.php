@@ -9,7 +9,6 @@ use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\SceneExecutionResultInterface;
 use ChristianBrown\SmartThings\Model\SceneInterface;
-use ChristianBrown\SmartThings\Transformer\SceneExecutionResultTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneExecutionResultTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ScenesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\SceneTransformerInterface;
@@ -30,12 +29,12 @@ final class SceneApi implements SceneApiInterface
      */
     private array $listCache = [];
     private JsonApiRequestSenderInterface $requestSender;
-    private ?SceneExecutionResultTransformerInterface $sceneExecutionResultTransformer;
+    private SceneExecutionResultTransformerInterface $sceneExecutionResultTransformer;
     private ScenesTransformerInterface $scenesTransformer;
     private SceneTransformerInterface $sceneTransformer;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, SceneTransformerInterface $sceneTransformer, ScenesTransformerInterface $scenesTransformer, TokenInterface $token, ?SceneExecutionResultTransformerInterface $sceneExecutionResultTransformer = null)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, SceneTransformerInterface $sceneTransformer, ScenesTransformerInterface $scenesTransformer, TokenInterface $token, SceneExecutionResultTransformerInterface $sceneExecutionResultTransformer)
     {
         $this->requestSender = $requestSender;
         $this->sceneTransformer = $sceneTransformer;
@@ -56,7 +55,7 @@ final class SceneApi implements SceneApiInterface
         $url = sprintf(self::API_URL_EXECUTE_SPRINTF, rawurlencode($sceneId));
         $data = $this->requestSender->post($url, [], $headers);
 
-        return $this->resolveSceneExecutionResultTransformer()->transform($data);
+        return $this->sceneExecutionResultTransformer->transform($data);
     }
 
     /**
@@ -136,14 +135,5 @@ final class SceneApi implements SceneApiInterface
         }
 
         return [self::KEY_LOCATION_ID => $locationId];
-    }
-
-    /**
-     * Falls back to the default transformer when the caller (or an older, hand-wired
-     * caller) did not supply one, keeping the appended constructor parameter optional.
-     */
-    private function resolveSceneExecutionResultTransformer(): SceneExecutionResultTransformerInterface
-    {
-        return $this->sceneExecutionResultTransformer ?? new SceneExecutionResultTransformer();
     }
 }
