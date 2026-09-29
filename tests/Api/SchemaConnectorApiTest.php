@@ -13,10 +13,18 @@ use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\InstalledSchemaAppInterface;
+use ChristianBrown\SmartThings\Model\SchemaAppCreateRequestInterface;
 use ChristianBrown\SmartThings\Model\SchemaAppInterface;
+use ChristianBrown\SmartThings\Model\SchemaAppReceiptInterface;
+use ChristianBrown\SmartThings\Model\SchemaAppUpdateRequestInterface;
+use ChristianBrown\SmartThings\Model\SchemaOauthCredentialsRequestInterface;
 use ChristianBrown\SmartThings\Model\SchemaPageInterface;
+use ChristianBrown\SmartThings\Serializer\SchemaAppCreateRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\SchemaAppUpdateRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\SchemaOauthCredentialsRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\SchemaAppReceiptTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\SchemaAppsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\SchemaAppTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\SchemaPageTransformerInterface;
@@ -32,6 +40,550 @@ use function sprintf;
 #[CoversClass(Token::class)]
 final class SchemaConnectorApiTest extends TestCase
 {
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateApp(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(SchemaAppCreateRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                SchemaConnectorApiInterface::API_URL_APPS,
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_ORGANIZATION => 'test-organization-id',
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(SchemaAppCreateRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(SchemaAppReceiptInterface::class);
+
+        $transformer = self::createMock(SchemaAppReceiptTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), $serializer, $transformer, self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+        $actual = $api->createApp($request, 'test-organization-id');
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateAppInvalidatesListCache(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn([SchemaConnectorApiInterface::KEY_ENDPOINT_APPS => ['test-item']]);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['endpointAppId' => 'test-endpoint-app-id']);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+
+        $api->getMultiple();
+        $api->createApp(self::createStub(SchemaAppCreateRequestInterface::class));
+        $api->getMultiple();
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateAppUnexpectedResponse(): void
+    {
+        $request = self::createStub(SchemaAppCreateRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn([]);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(SchemaConnectorApiInterface::UNEXPECTED_RESPONSE);
+        $api->createApp($request);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateAppWithoutOptionalParameters(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(SchemaAppCreateRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                SchemaConnectorApiInterface::API_URL_APPS,
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(SchemaAppCreateRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(SchemaAppReceiptInterface::class);
+
+        $transformer = self::createMock(SchemaAppReceiptTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), $serializer, $transformer, self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+        $actual = $api->createApp($request);
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteApp(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(SchemaConnectorApiInterface::API_URL_APP_SPRINTF, 'test-endpoint-app-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_ORGANIZATION => 'test-organization-id',
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+        $api->deleteApp('test-endpoint-app-id', 'test-organization-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteAppInvalidatesCaches(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+
+        $api->getOneById('test-endpoint-app-id');
+        $api->deleteApp('test-endpoint-app-id');
+        $api->getOneById('test-endpoint-app-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteAppWithoutOptionalParameters(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(SchemaConnectorApiInterface::API_URL_APP_SPRINTF, 'test-endpoint-app-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+        $api->deleteApp('test-endpoint-app-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteInstalled(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(SchemaConnectorApiInterface::API_URL_INSTALLED_APP_SPRINTF, 'test-isa-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+        $api->deleteInstalled('test-isa-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteInstalledInvalidatesCaches(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+
+        $api->getInstalledById('test-isa-id');
+        $api->deleteInstalled('test-isa-id');
+        $api->getInstalledById('test-isa-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGenerateStOauthCredentials(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(SchemaOauthCredentialsRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                SchemaConnectorApiInterface::API_URL_OAUTH_CREDENTIALS,
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_ORGANIZATION => 'test-organization-id',
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(SchemaOauthCredentialsRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(SchemaAppReceiptInterface::class);
+
+        $transformer = self::createMock(SchemaAppReceiptTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), $transformer, self::createStub(SchemaAppUpdateRequestSerializerInterface::class), $serializer);
+        $actual = $api->generateStOauthCredentials($request, 'test-organization-id');
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGenerateStOauthCredentialsUnexpectedResponse(): void
+    {
+        $request = self::createStub(SchemaOauthCredentialsRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn([]);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(SchemaConnectorApiInterface::UNEXPECTED_RESPONSE);
+        $api->generateStOauthCredentials($request);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGenerateStOauthCredentialsWithoutOptionalParameters(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(SchemaOauthCredentialsRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                SchemaConnectorApiInterface::API_URL_OAUTH_CREDENTIALS,
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(SchemaOauthCredentialsRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(SchemaAppReceiptInterface::class);
+
+        $transformer = self::createMock(SchemaAppReceiptTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), $transformer, self::createStub(SchemaAppUpdateRequestSerializerInterface::class), $serializer);
+        $actual = $api->generateStOauthCredentials($request);
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetByOrganization(): void
+    {
+        $data = [SchemaConnectorApiInterface::KEY_ENDPOINT_APPS => ['test-item']];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')
+            ->with(
+                SchemaConnectorApiInterface::API_URL_ORGANIZATION_APPS,
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_ORGANIZATION_ID => 'test-organization-id',
+                ]
+            )
+            ->willReturn($data);
+
+        $models = [self::createStub(SchemaAppInterface::class)];
+
+        $transformer = self::createMock(SchemaAppsTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data[SchemaConnectorApiInterface::KEY_ENDPOINT_APPS])
+            ->willReturn($models);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), $transformer, self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+        $actual = $api->getByOrganization('test-organization-id');
+
+        self::assertSame($models, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetByOrganizationCaches(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')->willReturn([SchemaConnectorApiInterface::KEY_ENDPOINT_APPS => ['test-item']]);
+
+        $transformer = self::createMock(SchemaAppsTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')->willReturn([self::createStub(SchemaAppInterface::class)]);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), $transformer, self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+
+        // Second call for the same key is served from the cache without hitting the API.
+        $api->getByOrganization();
+        $api->getByOrganization();
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetByOrganizationSkipsCache(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')->willReturn([SchemaConnectorApiInterface::KEY_ENDPOINT_APPS => ['test-item']]);
+
+        $transformer = self::createMock(SchemaAppsTransformerInterface::class);
+        $transformer->expects(self::exactly(2))->method('transform')->willReturn([self::createStub(SchemaAppInterface::class)]);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), $transformer, self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+
+        // First call populates the cache; the second bypasses it and hits the API again.
+        $api->getByOrganization();
+        $api->getByOrganization(skipCache: true);
+    }
+
+    /**
+     * @param mixed[] $data
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    #[TestWith([['test-key-missing'], false])]
+    #[TestWith([[SchemaConnectorApiInterface::KEY_ENDPOINT_APPS => 'test-not-array'], false])]
+    #[TestWith([['test-key-missing'], true])]
+    #[TestWith([[SchemaConnectorApiInterface::KEY_ENDPOINT_APPS => 'test-not-array'], true])]
+    public function testGetByOrganizationUnexpectedResponse(array $data, bool $skipCache): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')->willReturn($data);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(sprintf(SchemaConnectorApiInterface::UNEXPECTED_RESPONSE_SPRINTF, SchemaConnectorApiInterface::KEY_ENDPOINT_APPS));
+        $api->getByOrganization(skipCache: $skipCache);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetByOrganizationWithoutOptionalParameters(): void
+    {
+        $data = [SchemaConnectorApiInterface::KEY_ENDPOINT_APPS => ['test-item']];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')
+            ->with(
+                SchemaConnectorApiInterface::API_URL_ORGANIZATION_APPS,
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $models = [self::createStub(SchemaAppInterface::class)];
+
+        $transformer = self::createMock(SchemaAppsTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data[SchemaConnectorApiInterface::KEY_ENDPOINT_APPS])
+            ->willReturn($models);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), $transformer, self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+        $actual = $api->getByOrganization();
+
+        self::assertSame($models, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetByUserId(): void
+    {
+        $data = [SchemaConnectorApiInterface::KEY_ENDPOINT_APPS => ['test-item']];
+
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')
+            ->with(
+                sprintf(SchemaConnectorApiInterface::API_URL_USER_APPS_SPRINTF, 'test-user-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn($data);
+
+        $models = [self::createStub(SchemaAppInterface::class)];
+
+        $transformer = self::createMock(SchemaAppsTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data[SchemaConnectorApiInterface::KEY_ENDPOINT_APPS])
+            ->willReturn($models);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), $transformer, self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+        $actual = $api->getByUserId('test-user-id');
+
+        self::assertSame($models, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetByUserIdCaches(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')->willReturn([SchemaConnectorApiInterface::KEY_ENDPOINT_APPS => ['test-item']]);
+
+        $transformer = self::createMock(SchemaAppsTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')->willReturn([self::createStub(SchemaAppInterface::class)]);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), $transformer, self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+
+        // Second call for the same key is served from the cache without hitting the API.
+        $api->getByUserId('test-user-id');
+        $api->getByUserId('test-user-id');
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetByUserIdSkipsCache(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')->willReturn([SchemaConnectorApiInterface::KEY_ENDPOINT_APPS => ['test-item']]);
+
+        $transformer = self::createMock(SchemaAppsTransformerInterface::class);
+        $transformer->expects(self::exactly(2))->method('transform')->willReturn([self::createStub(SchemaAppInterface::class)]);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), $transformer, self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+
+        // First call populates the cache; the second bypasses it and hits the API again.
+        $api->getByUserId('test-user-id');
+        $api->getByUserId('test-user-id', skipCache: true);
+    }
+
+    /**
+     * @param mixed[] $data
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    #[TestWith([['test-key-missing'], false])]
+    #[TestWith([[SchemaConnectorApiInterface::KEY_ENDPOINT_APPS => 'test-not-array'], false])]
+    #[TestWith([['test-key-missing'], true])]
+    #[TestWith([[SchemaConnectorApiInterface::KEY_ENDPOINT_APPS => 'test-not-array'], true])]
+    public function testGetByUserIdUnexpectedResponse(array $data, bool $skipCache): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')->willReturn($data);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(sprintf(SchemaConnectorApiInterface::UNEXPECTED_RESPONSE_SPRINTF, SchemaConnectorApiInterface::KEY_ENDPOINT_APPS));
+        $api->getByUserId('test-user-id', skipCache: $skipCache);
+    }
+
     /**
      * @throws RequestExceptionInterface
      * @throws Exception
@@ -541,6 +1093,67 @@ final class SchemaConnectorApiTest extends TestCase
     }
 
     /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateApp(): void
+    {
+        $request = self::createStub(SchemaAppUpdateRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(SchemaConnectorApiInterface::API_URL_APP_SPRINTF, 'test-endpoint-app-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                    ApiInterface::HEADER_KEY_ORGANIZATION => 'test-organization-id',
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn([]);
+
+        $serializer = self::createMock(SchemaAppUpdateRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), $serializer, self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+        $api->updateApp('test-endpoint-app-id', $request, 'test-organization-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateAppWithoutOptionalParameters(): void
+    {
+        $request = self::createStub(SchemaAppUpdateRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(SchemaConnectorApiInterface::API_URL_APP_SPRINTF, 'test-endpoint-app-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn([]);
+
+        $serializer = self::createMock(SchemaAppUpdateRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $api = new SchemaConnectorApi($requestSender, self::createStub(SchemaAppTransformerInterface::class), self::createStub(SchemaAppsTransformerInterface::class), self::createStub(InstalledSchemaAppTransformerInterface::class), self::createStub(InstalledSchemaAppsTransformerInterface::class), self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), $serializer, self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
+        $api->updateApp('test-endpoint-app-id', $request);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
      * @return array<string, string>
      */
     private static function authHeaders(): array
@@ -561,14 +1174,6 @@ final class SchemaConnectorApiTest extends TestCase
         ?InstalledSchemaAppsTransformerInterface $installedsTransformer = null,
         ?SchemaPageTransformerInterface $pageTransformer = null,
     ): SchemaConnectorApi {
-        return new SchemaConnectorApi(
-            $requestSender,
-            $appTransformer ?? self::createStub(SchemaAppTransformerInterface::class),
-            $appsTransformer ?? self::createStub(SchemaAppsTransformerInterface::class),
-            $installedTransformer ?? self::createStub(InstalledSchemaAppTransformerInterface::class),
-            $installedsTransformer ?? self::createStub(InstalledSchemaAppsTransformerInterface::class),
-            $pageTransformer ?? self::createStub(SchemaPageTransformerInterface::class),
-            new Token('test-api-token'),
-        );
+        return new SchemaConnectorApi($requestSender, $appTransformer ?? self::createStub(SchemaAppTransformerInterface::class), $appsTransformer ?? self::createStub(SchemaAppsTransformerInterface::class), $installedTransformer ?? self::createStub(InstalledSchemaAppTransformerInterface::class), $installedsTransformer ?? self::createStub(InstalledSchemaAppsTransformerInterface::class), $pageTransformer ?? self::createStub(SchemaPageTransformerInterface::class), new Token('test-api-token'), self::createStub(SchemaAppCreateRequestSerializerInterface::class), self::createStub(SchemaAppReceiptTransformerInterface::class), self::createStub(SchemaAppUpdateRequestSerializerInterface::class), self::createStub(SchemaOauthCredentialsRequestSerializerInterface::class));
     }
 }
