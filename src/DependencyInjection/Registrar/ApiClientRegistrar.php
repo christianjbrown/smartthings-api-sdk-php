@@ -255,6 +255,10 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_JSON_API_REQUEST_SENDER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_PRESENTATION_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_CONFIGURATION_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_PRESENTATION_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_CREATE_DEVICE_CONFIG_REQUEST_TRANSFORMER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_RULE_API, RuleApi::class)

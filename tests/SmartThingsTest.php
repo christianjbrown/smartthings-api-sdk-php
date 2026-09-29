@@ -69,10 +69,33 @@ use ChristianBrown\SmartThings\Serializer\AlternativeItemSerializer;
 use ChristianBrown\SmartThings\Serializer\AutomationForCapabilityActionsItemSerializer;
 use ChristianBrown\SmartThings\Serializer\AutomationForCapabilityConditionsItemSerializer;
 use ChristianBrown\SmartThings\Serializer\AutomationForCapabilitySerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusCameraImageSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusCameraOverlayIconsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusCameraSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusItemActionsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusItemProgressBarsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusItemSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusLightColorControlColorSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusLightColorControlSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusLightSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusProgressBarsBarItemSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusProgressBarsStateItemSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusStateBoardColorsSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusStateBoardItemSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusTvChannelSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusTvDirectionalPadCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusTvDirectionalPadSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusTvSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusTvVolumeCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\BasicPlusTvVolumeSerializer;
+use ChristianBrown\SmartThings\Serializer\ButtonForTvSerializer;
 use ChristianBrown\SmartThings\Serializer\CapabilityConfigurationSerializer;
 use ChristianBrown\SmartThings\Serializer\CapabilityConfigurationValueSerializer;
 use ChristianBrown\SmartThings\Serializer\CapabilityLocalizationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CapabilityReferenceRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CapabilityValueForDashboardStateSerializer;
+use ChristianBrown\SmartThings\Serializer\CapabilityValueForPanelSerializer;
+use ChristianBrown\SmartThings\Serializer\CapabilityValueSerializer;
 use ChristianBrown\SmartThings\Serializer\ChannelCreateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\ChannelUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateAppRequestSerializer;
@@ -81,8 +104,28 @@ use ChristianBrown\SmartThings\Serializer\CreateCapabilityPresentationRequestSer
 use ChristianBrown\SmartThings\Serializer\CreateCapabilityRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateDeviceProfileRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\DashboardForCapabilitySerializer;
+use ChristianBrown\SmartThings\Serializer\DescriptionItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DescriptionsInAutomationSerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceCategorySerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigEntryForDashboardActionInlineSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigEntryForDashboardActionSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigEntryForDashboardStateFormatInfoItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigEntryForDashboardStateFormatInfoItemTimeSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigEntryForDashboardStateSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigEntryForDetailViewSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationAutomationSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationDashboardSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationDpInfoItemArgumentsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationDpInfoItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationDpInfosItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationIconsItemBadgeItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationIconsItemProductKeysItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationIconsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationRequestAutomationSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\DeviceConfigurationSerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceProfileComponentRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\DriverChannelCreateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\DriverChannelUpdateRequestSerializer;
@@ -91,7 +134,15 @@ use ChristianBrown\SmartThings\Serializer\DynamicListForAutomationConditionSeria
 use ChristianBrown\SmartThings\Serializer\EmptyWithAvailableSizeSerializer;
 use ChristianBrown\SmartThings\Serializer\EnumSliderForAutomationConditionSerializer;
 use ChristianBrown\SmartThings\Serializer\EnumSliderForAutomationConditionSupportedOperatorsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\ExcludedActionItemIdExcludeItemSerializer;
+use ChristianBrown\SmartThings\Serializer\ExcludedActionItemIdSerializer;
+use ChristianBrown\SmartThings\Serializer\ExcludedConditionItemIdExcludeItemAttributesItemSerializer;
+use ChristianBrown\SmartThings\Serializer\ExcludedConditionItemIdExcludeItemSerializer;
+use ChristianBrown\SmartThings\Serializer\ExcludedConditionItemIdSerializer;
+use ChristianBrown\SmartThings\Serializer\ExcludedDeviceActionConfigEntrySerializer;
+use ChristianBrown\SmartThings\Serializer\ExcludedDeviceConditionConfigEntrySerializer;
 use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\GroupVisibleConditionsSerializer;
 use ChristianBrown\SmartThings\Serializer\HubDeviceUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\HubDriverInstallRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\ListForArgumentSerializer;
@@ -107,7 +158,10 @@ use ChristianBrown\SmartThings\Serializer\NumberFieldForArgumentSerializer;
 use ChristianBrown\SmartThings\Serializer\NumberFieldForAutomationActionSerializer;
 use ChristianBrown\SmartThings\Serializer\NumberFieldForAutomationConditionSerializer;
 use ChristianBrown\SmartThings\Serializer\NumberFieldSerializer;
+use ChristianBrown\SmartThings\Serializer\PanelForDeviceConfigItemsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\PanelForDeviceConfigSerializer;
 use ChristianBrown\SmartThings\Serializer\PanelItemForCapabilitySerializer;
+use ChristianBrown\SmartThings\Serializer\PatchItemSerializer;
 use ChristianBrown\SmartThings\Serializer\PlayPauseCommandSerializer;
 use ChristianBrown\SmartThings\Serializer\PlayPauseSerializer;
 use ChristianBrown\SmartThings\Serializer\PlayPauseStateSerializer;
@@ -132,6 +186,7 @@ use ChristianBrown\SmartThings\Serializer\ServiceSubscriptionRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SliderForArgumentSerializer;
 use ChristianBrown\SmartThings\Serializer\SliderForAutomationActionSerializer;
 use ChristianBrown\SmartThings\Serializer\SliderForAutomationConditionSerializer;
+use ChristianBrown\SmartThings\Serializer\SliderForLightSerializer;
 use ChristianBrown\SmartThings\Serializer\SliderTypeSerializer;
 use ChristianBrown\SmartThings\Serializer\SliderWithAvailableSizeSerializer;
 use ChristianBrown\SmartThings\Serializer\StandbyPowerSwitchForDashboardSerializer;
@@ -168,8 +223,15 @@ use ChristianBrown\SmartThings\Serializer\UpdateCapabilityRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateDeviceProfileRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateSignatureTypeRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\VisibleConditionBaseSerializer;
+use ChristianBrown\SmartThings\Serializer\VisibleConditionForColorItemReferToSerializer;
+use ChristianBrown\SmartThings\Serializer\VisibleConditionForColorItemSerializer;
+use ChristianBrown\SmartThings\Serializer\VisibleConditionForDashboardStateSerializer;
+use ChristianBrown\SmartThings\Serializer\VisibleConditionForDetailViewSerializer;
+use ChristianBrown\SmartThings\Serializer\VisibleConditionSerializer;
 use ChristianBrown\SmartThings\SmartThings;
 use ChristianBrown\SmartThings\Transformer\ActionItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ActionListItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ActionsArrayItemTransformer;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformer;
 use ChristianBrown\SmartThings\Transformer\AppDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppDeviceDetailsTransformer;
@@ -183,7 +245,30 @@ use ChristianBrown\SmartThings\Transformer\AttributeValueTransformer;
 use ChristianBrown\SmartThings\Transformer\AutomationForCapabilityActionsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\AutomationForCapabilityConditionsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\AutomationForCapabilityTransformer;
+use ChristianBrown\SmartThings\Transformer\AutomationListItemTransformer;
+use ChristianBrown\SmartThings\Transformer\AutomationTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusCameraImageTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusCameraOverlayIconsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusCameraTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusItemActionsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusItemForPresentationTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusItemProgressBarsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusItemTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusLightColorControlColorTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusLightColorControlTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusLightTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusProgressBarsBarItemTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusProgressBarsStateItemTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusStateBoardColorsTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusStateBoardItemTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusTvChannelTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusTvDirectionalPadCommandTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusTvDirectionalPadTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusTvTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusTvVolumeCommandTransformer;
+use ChristianBrown\SmartThings\Transformer\BasicPlusTvVolumeTransformer;
 use ChristianBrown\SmartThings\Transformer\BleD2DDeviceDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\ButtonForTvTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationValueTransformer;
@@ -193,6 +278,9 @@ use ChristianBrown\SmartThings\Transformer\CapabilityPresentationDetailsTransfor
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitySubscriptionDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityValueForDashboardStateTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityValueForPanelTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityValueTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelDriversTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelDriverTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelsTransformer;
@@ -204,8 +292,13 @@ use ChristianBrown\SmartThings\Transformer\CommandMappingTransformer;
 use ChristianBrown\SmartThings\Transformer\ConvertedTtsTransformer;
 use ChristianBrown\SmartThings\Transformer\CreateAppResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\CreateCapabilityPresentationRequestDetailViewItemTransformer;
+use ChristianBrown\SmartThings\Transformer\CreateDeviceConfigRequestTransformer;
 use ChristianBrown\SmartThings\Transformer\CronScheduleTransformer;
 use ChristianBrown\SmartThings\Transformer\DashboardForCapabilityTransformer;
+use ChristianBrown\SmartThings\Transformer\DashboardTransformer;
+use ChristianBrown\SmartThings\Transformer\DescriptionItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DescriptionsInAutomationTransformer;
+use ChristianBrown\SmartThings\Transformer\DetailViewListItemTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCapabilityReferenceTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCategoryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCommandResultsTransformer;
@@ -214,6 +307,23 @@ use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilitiesTransforme
 use ChristianBrown\SmartThings\Transformer\DeviceComponentCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceComponentTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardActionInlineTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardActionTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardStateFormatInfoItemTimeTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardStateFormatInfoItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardStateTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDetailViewTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationAutomationTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationDashboardTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationDpInfoItemArgumentsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationDpInfoItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationDpInfosItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationIconsItemBadgeItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationIconsItemProductKeysItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationIconsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationRequestAutomationTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigurationTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHealthDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceHealthTransformer;
@@ -225,6 +335,7 @@ use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionsTransforme
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicePreferencesTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceTransformer;
+use ChristianBrown\SmartThings\Transformer\DevicePresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileComponentTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceProfileReferenceTransformer;
@@ -254,13 +365,24 @@ use ChristianBrown\SmartThings\Transformer\DynamicListForAutomationConditionTran
 use ChristianBrown\SmartThings\Transformer\EdgeChildDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\EdgeDriverSupportedEndpointAppsAppsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\EdgeDriverSupportedEndpointAppsTransformer;
+use ChristianBrown\SmartThings\Transformer\EmptyForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\EmptyWithAvailableSizeTransformer;
 use ChristianBrown\SmartThings\Transformer\EnumSliderForAutomationConditionSupportedOperatorsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\EnumSliderForAutomationConditionTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedActionItemIdExcludeItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedActionItemIdTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedActionItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedConditionItemIdExcludeItemAttributesItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedConditionItemIdExcludeItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedConditionItemIdTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedConditionItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedDeviceActionConfigEntryTransformer;
+use ChristianBrown\SmartThings\Transformer\ExcludedDeviceConditionConfigEntryTransformer;
 use ChristianBrown\SmartThings\Transformer\GenerateAppOauthResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\GroupDeviceDetailsDevicesItemComponentsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\GroupDeviceDetailsDevicesItemTransformer;
 use ChristianBrown\SmartThings\Transformer\GroupDeviceDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\GroupVisibleConditionsTransformer;
 use ChristianBrown\SmartThings\Transformer\HubCharacteristicsTransformer;
 use ChristianBrown\SmartThings\Transformer\HubDeviceDetailsHubDataHub2hubSupportMatrixCapabilitiesItemTransformer;
 use ChristianBrown\SmartThings\Transformer\HubDeviceDetailsHubDataHub2hubSupportMatrixTransformer;
@@ -290,10 +412,14 @@ use ChristianBrown\SmartThings\Transformer\IrDeviceDetailsFunctionCodesTransform
 use ChristianBrown\SmartThings\Transformer\IrDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\LambdaSmartAppTransformer;
 use ChristianBrown\SmartThings\Transformer\LanDeviceDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\LanguageItemTransformer;
 use ChristianBrown\SmartThings\Transformer\ListForArgumentTransformer;
 use ChristianBrown\SmartThings\Transformer\ListForAutomationActionTransformer;
 use ChristianBrown\SmartThings\Transformer\ListForAutomationConditionTransformer;
 use ChristianBrown\SmartThings\Transformer\ListForDetailViewTransformer;
+use ChristianBrown\SmartThings\Transformer\ListForPanelItemCommandTransformer;
+use ChristianBrown\SmartThings\Transformer\ListForPanelItemStateTransformer;
+use ChristianBrown\SmartThings\Transformer\ListForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeStateTransformer;
 use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeTransformer;
@@ -328,7 +454,12 @@ use ChristianBrown\SmartThings\Transformer\OrganizationTransformer;
 use ChristianBrown\SmartThings\Transformer\OwnerTransformer;
 use ChristianBrown\SmartThings\Transformer\PageLinksTransformer;
 use ChristianBrown\SmartThings\Transformer\PageLinkTransformer;
+use ChristianBrown\SmartThings\Transformer\PanelForDeviceConfigItemsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\PanelForDeviceConfigTransformer;
+use ChristianBrown\SmartThings\Transformer\PanelForDevicePresentationItemsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\PanelForDevicePresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\PanelItemForCapabilityTransformer;
+use ChristianBrown\SmartThings\Transformer\PatchItemTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayedTextTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayPauseCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayPauseStateTransformer;
@@ -336,9 +467,12 @@ use ChristianBrown\SmartThings\Transformer\PlayPauseTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayStopCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayStopStateTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayStopTransformer;
+use ChristianBrown\SmartThings\Transformer\PoCodesTransformer;
+use ChristianBrown\SmartThings\Transformer\PresentationSettingsForDevicePresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationSettingsTemperatureConversionsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationSettingsTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationTransformer;
+use ChristianBrown\SmartThings\Transformer\PushButtonForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\PushButtonTransformer;
 use ChristianBrown\SmartThings\Transformer\PushButtonWithAvailableSizeTransformer;
 use ChristianBrown\SmartThings\Transformer\RestrictionTransformer;
@@ -377,15 +511,22 @@ use ChristianBrown\SmartThings\Transformer\ServiceSubscriptionReceiptTransformer
 use ChristianBrown\SmartThings\Transformer\SliderForArgumentTransformer;
 use ChristianBrown\SmartThings\Transformer\SliderForAutomationActionTransformer;
 use ChristianBrown\SmartThings\Transformer\SliderForAutomationConditionTransformer;
+use ChristianBrown\SmartThings\Transformer\SliderForLightTransformer;
+use ChristianBrown\SmartThings\Transformer\SliderForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\SliderTypeTransformer;
 use ChristianBrown\SmartThings\Transformer\SliderWithAvailableSizeTransformer;
 use ChristianBrown\SmartThings\Transformer\StandbyPowerSwitchForDashboardStateTransformer;
 use ChristianBrown\SmartThings\Transformer\StandbyPowerSwitchForDashboardTransformer;
 use ChristianBrown\SmartThings\Transformer\StandbyPowerSwitchTransformer;
+use ChristianBrown\SmartThings\Transformer\StateForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\StateItemTransformer;
 use ChristianBrown\SmartThings\Transformer\StatelessPowerToggleForDashboardTransformer;
+use ChristianBrown\SmartThings\Transformer\StatesArrayItemTransformer;
 use ChristianBrown\SmartThings\Transformer\StateTransformer;
 use ChristianBrown\SmartThings\Transformer\StateWithAvailableSizeTransformer;
+use ChristianBrown\SmartThings\Transformer\StepperForPanelItemCommandTransformer;
+use ChristianBrown\SmartThings\Transformer\StepperForPanelItemStateTransformer;
+use ChristianBrown\SmartThings\Transformer\StepperForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\StepperTransformer;
 use ChristianBrown\SmartThings\Transformer\StepperWithAvailableSizeCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\StepperWithAvailableSizeStateTransformer;
@@ -397,6 +538,7 @@ use ChristianBrown\SmartThings\Transformer\SupportedValuesForDynamicListTransfor
 use ChristianBrown\SmartThings\Transformer\SupportedValuesForDynamicListValueMapTransformer;
 use ChristianBrown\SmartThings\Transformer\SwitchControlTransformer;
 use ChristianBrown\SmartThings\Transformer\SwitchForDashboardTransformer;
+use ChristianBrown\SmartThings\Transformer\TemperatureConversionsItemForDevicePresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\TextButtonButtonsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\TextButtonTransformer;
 use ChristianBrown\SmartThings\Transformer\TextFieldForArgumentTransformer;
@@ -413,6 +555,11 @@ use ChristianBrown\SmartThings\Transformer\ViperAppLinksTransformer;
 use ChristianBrown\SmartThings\Transformer\ViperDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\VirtualDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\VisibleConditionBaseTransformer;
+use ChristianBrown\SmartThings\Transformer\VisibleConditionForColorItemReferToTransformer;
+use ChristianBrown\SmartThings\Transformer\VisibleConditionForColorItemTransformer;
+use ChristianBrown\SmartThings\Transformer\VisibleConditionForDashboardStateTransformer;
+use ChristianBrown\SmartThings\Transformer\VisibleConditionForDetailViewTransformer;
+use ChristianBrown\SmartThings\Transformer\VisibleConditionTransformer;
 use ChristianBrown\SmartThings\Transformer\WebhookSmartAppTransformer;
 use ChristianBrown\SmartThings\Transformer\ZigbeeDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\ZigbeeGenericFingerprintTransformer;
@@ -840,6 +987,153 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(PresentationSettingsTemperatureConversionsItemTransformer::class)]
 #[UsesClass(PresentationSettingsTransformer::class)]
 #[UsesClass(CapabilityPresentationDetailsTransformer::class)]
+#[UsesClass(DeviceConfigurationDpInfoItemArgumentsItemSerializer::class)]
+#[UsesClass(DeviceConfigurationDpInfoItemArgumentsItemTransformer::class)]
+#[UsesClass(DeviceConfigurationDpInfoItemSerializer::class)]
+#[UsesClass(DeviceConfigurationDpInfoItemTransformer::class)]
+#[UsesClass(DeviceConfigurationDpInfosItemSerializer::class)]
+#[UsesClass(DeviceConfigurationDpInfosItemTransformer::class)]
+#[UsesClass(VisibleConditionSerializer::class)]
+#[UsesClass(VisibleConditionTransformer::class)]
+#[UsesClass(DeviceConfigurationIconsItemBadgeItemSerializer::class)]
+#[UsesClass(DeviceConfigurationIconsItemBadgeItemTransformer::class)]
+#[UsesClass(DeviceConfigurationIconsItemProductKeysItemSerializer::class)]
+#[UsesClass(DeviceConfigurationIconsItemProductKeysItemTransformer::class)]
+#[UsesClass(DeviceConfigurationIconsItemSerializer::class)]
+#[UsesClass(DeviceConfigurationIconsItemTransformer::class)]
+#[UsesClass(CapabilityValueForDashboardStateSerializer::class)]
+#[UsesClass(CapabilityValueForDashboardStateTransformer::class)]
+#[UsesClass(DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeSerializer::class)]
+#[UsesClass(DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeTransformer::class)]
+#[UsesClass(DeviceConfigEntryForDashboardStateFormatInfoItemTimeSerializer::class)]
+#[UsesClass(DeviceConfigEntryForDashboardStateFormatInfoItemTimeTransformer::class)]
+#[UsesClass(DeviceConfigEntryForDashboardStateFormatInfoItemSerializer::class)]
+#[UsesClass(DeviceConfigEntryForDashboardStateFormatInfoItemTransformer::class)]
+#[UsesClass(VisibleConditionForDashboardStateSerializer::class)]
+#[UsesClass(VisibleConditionForDashboardStateTransformer::class)]
+#[UsesClass(DeviceConfigEntryForDashboardStateSerializer::class)]
+#[UsesClass(DeviceConfigEntryForDashboardStateTransformer::class)]
+#[UsesClass(DeviceConfigEntryForDashboardActionInlineSerializer::class)]
+#[UsesClass(DeviceConfigEntryForDashboardActionInlineTransformer::class)]
+#[UsesClass(DeviceConfigEntryForDashboardActionSerializer::class)]
+#[UsesClass(DeviceConfigEntryForDashboardActionTransformer::class)]
+#[UsesClass(BasicPlusCameraImageSerializer::class)]
+#[UsesClass(BasicPlusCameraImageTransformer::class)]
+#[UsesClass(BasicPlusCameraOverlayIconsItemSerializer::class)]
+#[UsesClass(BasicPlusCameraOverlayIconsItemTransformer::class)]
+#[UsesClass(BasicPlusCameraSerializer::class)]
+#[UsesClass(BasicPlusCameraTransformer::class)]
+#[UsesClass(BasicPlusTvVolumeCommandSerializer::class)]
+#[UsesClass(BasicPlusTvVolumeCommandTransformer::class)]
+#[UsesClass(BasicPlusTvVolumeSerializer::class)]
+#[UsesClass(BasicPlusTvVolumeTransformer::class)]
+#[UsesClass(ButtonForTvSerializer::class)]
+#[UsesClass(ButtonForTvTransformer::class)]
+#[UsesClass(BasicPlusTvChannelSerializer::class)]
+#[UsesClass(BasicPlusTvChannelTransformer::class)]
+#[UsesClass(BasicPlusTvDirectionalPadCommandSerializer::class)]
+#[UsesClass(BasicPlusTvDirectionalPadCommandTransformer::class)]
+#[UsesClass(BasicPlusTvDirectionalPadSerializer::class)]
+#[UsesClass(BasicPlusTvDirectionalPadTransformer::class)]
+#[UsesClass(BasicPlusTvSerializer::class)]
+#[UsesClass(BasicPlusTvTransformer::class)]
+#[UsesClass(SliderForLightSerializer::class)]
+#[UsesClass(SliderForLightTransformer::class)]
+#[UsesClass(BasicPlusLightColorControlColorSerializer::class)]
+#[UsesClass(BasicPlusLightColorControlColorTransformer::class)]
+#[UsesClass(BasicPlusLightColorControlSerializer::class)]
+#[UsesClass(BasicPlusLightColorControlTransformer::class)]
+#[UsesClass(BasicPlusLightSerializer::class)]
+#[UsesClass(BasicPlusLightTransformer::class)]
+#[UsesClass(BasicPlusItemActionsItemSerializer::class)]
+#[UsesClass(BasicPlusItemActionsItemTransformer::class)]
+#[UsesClass(VisibleConditionForColorItemReferToSerializer::class)]
+#[UsesClass(VisibleConditionForColorItemReferToTransformer::class)]
+#[UsesClass(VisibleConditionForColorItemSerializer::class)]
+#[UsesClass(VisibleConditionForColorItemTransformer::class)]
+#[UsesClass(BasicPlusStateBoardColorsSerializer::class)]
+#[UsesClass(BasicPlusStateBoardColorsTransformer::class)]
+#[UsesClass(BasicPlusStateBoardItemSerializer::class)]
+#[UsesClass(BasicPlusStateBoardItemTransformer::class)]
+#[UsesClass(BasicPlusProgressBarsStateItemSerializer::class)]
+#[UsesClass(BasicPlusProgressBarsStateItemTransformer::class)]
+#[UsesClass(BasicPlusProgressBarsBarItemSerializer::class)]
+#[UsesClass(BasicPlusProgressBarsBarItemTransformer::class)]
+#[UsesClass(BasicPlusItemProgressBarsItemSerializer::class)]
+#[UsesClass(BasicPlusItemProgressBarsItemTransformer::class)]
+#[UsesClass(CapabilityValueForPanelSerializer::class)]
+#[UsesClass(CapabilityValueForPanelTransformer::class)]
+#[UsesClass(PanelForDeviceConfigItemsItemSerializer::class)]
+#[UsesClass(PanelForDeviceConfigItemsItemTransformer::class)]
+#[UsesClass(PanelForDeviceConfigSerializer::class)]
+#[UsesClass(PanelForDeviceConfigTransformer::class)]
+#[UsesClass(BasicPlusItemSerializer::class)]
+#[UsesClass(BasicPlusItemTransformer::class)]
+#[UsesClass(GroupVisibleConditionsSerializer::class)]
+#[UsesClass(GroupVisibleConditionsTransformer::class)]
+#[UsesClass(DeviceConfigurationDashboardSerializer::class)]
+#[UsesClass(DeviceConfigurationDashboardTransformer::class)]
+#[UsesClass(CapabilityValueSerializer::class)]
+#[UsesClass(CapabilityValueTransformer::class)]
+#[UsesClass(PatchItemSerializer::class)]
+#[UsesClass(PatchItemTransformer::class)]
+#[UsesClass(VisibleConditionForDetailViewSerializer::class)]
+#[UsesClass(VisibleConditionForDetailViewTransformer::class)]
+#[UsesClass(DeviceConfigEntryForDetailViewSerializer::class)]
+#[UsesClass(DeviceConfigEntryForDetailViewTransformer::class)]
+#[UsesClass(ExcludedConditionItemIdExcludeItemAttributesItemSerializer::class)]
+#[UsesClass(ExcludedConditionItemIdExcludeItemAttributesItemTransformer::class)]
+#[UsesClass(ExcludedConditionItemIdExcludeItemSerializer::class)]
+#[UsesClass(ExcludedConditionItemIdExcludeItemTransformer::class)]
+#[UsesClass(ExcludedConditionItemIdSerializer::class)]
+#[UsesClass(ExcludedConditionItemIdTransformer::class)]
+#[UsesClass(ExcludedDeviceConditionConfigEntrySerializer::class)]
+#[UsesClass(ExcludedDeviceConditionConfigEntryTransformer::class)]
+#[UsesClass(ExcludedActionItemIdExcludeItemSerializer::class)]
+#[UsesClass(ExcludedActionItemIdExcludeItemTransformer::class)]
+#[UsesClass(ExcludedActionItemIdSerializer::class)]
+#[UsesClass(ExcludedActionItemIdTransformer::class)]
+#[UsesClass(ExcludedDeviceActionConfigEntrySerializer::class)]
+#[UsesClass(ExcludedDeviceActionConfigEntryTransformer::class)]
+#[UsesClass(DescriptionItemSerializer::class)]
+#[UsesClass(DescriptionItemTransformer::class)]
+#[UsesClass(DescriptionsInAutomationSerializer::class)]
+#[UsesClass(DescriptionsInAutomationTransformer::class)]
+#[UsesClass(DeviceConfigurationAutomationSerializer::class)]
+#[UsesClass(DeviceConfigurationAutomationTransformer::class)]
+#[UsesClass(DeviceConfigurationSerializer::class)]
+#[UsesClass(DeviceConfigurationTransformer::class)]
+#[UsesClass(DeviceConfigurationRequestAutomationSerializer::class)]
+#[UsesClass(DeviceConfigurationRequestAutomationTransformer::class)]
+#[UsesClass(DeviceConfigurationRequestSerializer::class)]
+#[UsesClass(CreateDeviceConfigRequestTransformer::class)]
+#[UsesClass(StatesArrayItemTransformer::class)]
+#[UsesClass(ActionsArrayItemTransformer::class)]
+#[UsesClass(StepperForPanelItemCommandTransformer::class)]
+#[UsesClass(StepperForPanelItemStateTransformer::class)]
+#[UsesClass(StepperForPanelItemTransformer::class)]
+#[UsesClass(ListForPanelItemCommandTransformer::class)]
+#[UsesClass(ListForPanelItemStateTransformer::class)]
+#[UsesClass(ListForPanelItemTransformer::class)]
+#[UsesClass(PushButtonForPanelItemTransformer::class)]
+#[UsesClass(StateForPanelItemTransformer::class)]
+#[UsesClass(SliderForPanelItemTransformer::class)]
+#[UsesClass(EmptyForPanelItemTransformer::class)]
+#[UsesClass(PanelForDevicePresentationItemsItemTransformer::class)]
+#[UsesClass(PanelForDevicePresentationTransformer::class)]
+#[UsesClass(BasicPlusItemForPresentationTransformer::class)]
+#[UsesClass(DashboardTransformer::class)]
+#[UsesClass(DetailViewListItemTransformer::class)]
+#[UsesClass(ExcludedConditionItemTransformer::class)]
+#[UsesClass(AutomationListItemTransformer::class)]
+#[UsesClass(ExcludedActionItemTransformer::class)]
+#[UsesClass(ActionListItemTransformer::class)]
+#[UsesClass(AutomationTransformer::class)]
+#[UsesClass(PoCodesTransformer::class)]
+#[UsesClass(LanguageItemTransformer::class)]
+#[UsesClass(TemperatureConversionsItemForDevicePresentationTransformer::class)]
+#[UsesClass(PresentationSettingsForDevicePresentationTransformer::class)]
+#[UsesClass(DevicePresentationTransformer::class)]
 final class SmartThingsTest extends TestCase
 {
     public function testConstructAcceptsCustomApiHost(): void

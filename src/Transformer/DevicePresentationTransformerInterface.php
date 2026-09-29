@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ChristianBrown\SmartThings\Transformer;
+
+use ChristianBrown\SmartThings\Model\DevicePresentationInterface;
+
+interface DevicePresentationTransformerInterface
+{
+    public const string KEY_AUTOMATION = 'automation';
+    public const string KEY_DASHBOARD = 'dashboard';
+    public const string KEY_DESCRIPTION = 'description';
+    public const string KEY_DETAIL_VIEW = 'detailView';
+    public const string KEY_DP_INFO = 'dpInfo';
+    public const string KEY_DP_INFOS = 'dpInfos';
+    public const string KEY_ICON_URL = 'iconUrl';
+    public const string KEY_ICONS = 'icons';
+    public const string KEY_LANGUAGE = 'language';
+    public const string KEY_MANUFACTURER_NAME = 'manufacturerName';
+    public const string KEY_MNMN = 'mnmn';
+    public const string KEY_PRESENTATION_ID = 'presentationId';
+    public const string KEY_PRESENTATION_SETTINGS = 'presentationSettings';
+    public const string KEY_VERSION = 'version';
+    public const string KEY_VID = 'vid';
+    public const string UNEXPECTED_STRING_SPRINTF = '%s not set or not a string';
+
+    /**
+     * @param mixed[] $data
+     */
+    public function transform(array $data): DevicePresentationInterface;
+}
