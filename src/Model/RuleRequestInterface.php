@@ -5,26 +5,30 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Model;
 
 /**
- * A Rule's actions follow the vendor's recursive Action/Condition expression
- * language (if/sleep/command/scene/every/location/limit/toggle, each of which can
- * itself nest further actions and conditions). Modeling every variant as its own
- * typed class would add dozens of classes out of proportion with the rest of this
- * SDK, so actions are accepted here as raw arrays shaped per the vendor's Action
- * schema (https://developer.smartthings.com/docs/api/public/#operation/createRule)
- * and passed through to the API unmodified.
+ * A Rule's actions follow the vendor's recursive Action/Condition expression language. Each
+ * entry is either a typed ActionInterface (see the Action model tree) or a raw array shaped per
+ * the vendor's Action schema (https://developer.smartthings.com/docs/api/public/#operation/createRule),
+ * which is passed through to the API unmodified. Both kinds can be mixed in one list.
  */
 interface RuleRequestInterface
 {
     /**
-     * @return array<int, mixed[]>
+     * @return array<int, ActionInterface|mixed[]>
      */
     public function getActions(): array;
+
+    /**
+     * The typed form of the rule's sequence; it takes precedence over getSequence() when set.
+     */
+    public function getActionSequence(): ?ActionSequenceInterface;
 
     public function getName(): string;
 
     public function getSequence(): ?string;
 
     public function getTimeZoneId(): ?string;
+
+    public function setActionSequence(?ActionSequenceInterface $value): self;
 
     public function setSequence(?string $value): self;
 

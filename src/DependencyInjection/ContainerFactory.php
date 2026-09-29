@@ -33,6 +33,7 @@ use ChristianBrown\SmartThings\DependencyInjection\Registrar\SchemaConnectorRegi
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ServiceApiRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SubscriptionRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\TreeRegistrar;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use function array_map;
@@ -51,6 +52,7 @@ final class ContainerFactory implements ContainerFactoryInterface
         // API clients (which reference every transformer chain) come last.
         $this->registrars = [
             new CoreRegistrar($apiHost),
+            new TreeRegistrar(),
             new ShapeRegistrar(),
             new AppRegistrar(),
             new CapabilityRegistrar(),

@@ -6,6 +6,8 @@ namespace ChristianBrown\SmartThings;
 
 interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutomationInterface, SmartThingsCapabilityInterface, SmartThingsDeviceInterface, SmartThingsDeviceMetadataInterface, SmartThingsEdgeInterface, SmartThingsLocationInterface, SmartThingsOrganizationInterface, SmartThingsSchemaAppInviteInterface, SmartThingsTextToSpeechInterface, SmartThingsVirtualDeviceInterface
 {
+    public const string SERVICE_ACTION_SERIALIZER = 'smartthings.serializer.action_serializer';
+    public const string SERVICE_ACTION_TRANSFORMER = 'smartthings.transformer.action_transformer';
     public const string SERVICE_API_CLIENT = 'smartthings.api_client';
     public const string SERVICE_APP_API = 'smartthings.api.app_api';
     public const string SERVICE_APP_OAUTH_TRANSFORMER = 'smartthings.transformer.app_oauth_transformer';
