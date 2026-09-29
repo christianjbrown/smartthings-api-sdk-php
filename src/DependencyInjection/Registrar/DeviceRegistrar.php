@@ -19,6 +19,7 @@ use ChristianBrown\SmartThings\Transformer\DeviceComponentTransformer;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 final class DeviceRegistrar implements ServiceRegistrarInterface
 {
@@ -58,6 +59,7 @@ final class DeviceRegistrar implements ServiceRegistrarInterface
             ->setArguments(
                 [
                     $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_COMPONENTS_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_DETAILS_TRANSFORMER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_DEVICES_TRANSFORMER, DevicesTransformer::class)
