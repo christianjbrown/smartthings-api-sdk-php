@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Tests\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\SchemaApp;
+use ChristianBrown\SmartThings\Transformer\SchemaAppDetailsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\SchemaAppTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -29,7 +30,7 @@ final class SchemaAppTransformerTest extends TestCase
             SchemaAppTransformerInterface::KEY_ST_CLIENT_ID => 'test-client-id',
         ];
 
-        $transformer = new SchemaAppTransformer();
+        $transformer = new SchemaAppTransformer(self::createStub(SchemaAppDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -48,7 +49,7 @@ final class SchemaAppTransformerTest extends TestCase
     #[DataProvider('provideTransformOptionalFieldsCases')]
     public function testTransformOptionalFields(array $data, ?string $expectedAppName, ?string $expectedCertificationStatus, ?string $expectedPartnerName, ?string $expectedStClientId): void
     {
-        $transformer = new SchemaAppTransformer();
+        $transformer = new SchemaAppTransformer(self::createStub(SchemaAppDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -85,7 +86,7 @@ final class SchemaAppTransformerTest extends TestCase
     #[TestWith([[SchemaAppTransformerInterface::KEY_ENDPOINT_APP_ID => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new SchemaAppTransformer();
+        $transformer = new SchemaAppTransformer(self::createStub(SchemaAppDetailsTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(SchemaAppTransformerInterface::UNEXPECTED_STRING_SPRINTF, SchemaAppTransformerInterface::KEY_ENDPOINT_APP_ID));

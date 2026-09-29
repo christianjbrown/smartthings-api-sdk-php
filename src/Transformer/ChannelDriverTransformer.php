@@ -29,6 +29,9 @@ final class ChannelDriverTransformer implements ChannelDriverTransformerInterfac
         self::applyChannelId($channelDriver, $data);
         self::applyVersion($channelDriver, $data);
 
+        self::applyCreatedDate($channelDriver, $data);
+        self::applyLastModifiedDate($channelDriver, $data);
+
         return $channelDriver;
     }
 
@@ -44,6 +47,34 @@ final class ChannelDriverTransformer implements ChannelDriverTransformerInterfac
             return;
         }
         $channelDriver->setChannelId($data[self::KEY_CHANNEL_ID]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyCreatedDate(ChannelDriver $model, array $data): void
+    {
+        if (empty($data[self::KEY_CREATED_DATE])) {
+            return;
+        }
+        if (!is_string($data[self::KEY_CREATED_DATE])) {
+            return;
+        }
+        $model->setCreatedDate($data[self::KEY_CREATED_DATE]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyLastModifiedDate(ChannelDriver $model, array $data): void
+    {
+        if (empty($data[self::KEY_LAST_MODIFIED_DATE])) {
+            return;
+        }
+        if (!is_string($data[self::KEY_LAST_MODIFIED_DATE])) {
+            return;
+        }
+        $model->setLastModifiedDate($data[self::KEY_LAST_MODIFIED_DATE]);
     }
 
     /**

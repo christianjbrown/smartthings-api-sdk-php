@@ -12,7 +12,9 @@ interface HubInstalledDriverTransformerInterface
     public const string KEY_DESCRIPTION = 'description';
     public const string KEY_DEVELOPER = 'developer';
     public const string KEY_DRIVER_ID = 'driverId';
+    public const string KEY_IS_WWST = 'isWWST';
     public const string KEY_NAME = 'name';
+    public const string KEY_PERMISSIONS = 'permissions';
     public const string KEY_VENDOR_SUPPORT_INFORMATION = 'vendorSupportInformation';
     public const string KEY_VERSION = 'version';
     public const string UNEXPECTED_STRING_SPRINTF = '%s not set or not a string';

@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Tests\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\InstalledApp;
+use ChristianBrown\SmartThings\Transformer\InstalledAppDetailsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledAppTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -28,7 +29,7 @@ final class InstalledAppTransformerTest extends TestCase
             InstalledAppTransformerInterface::KEY_LOCATION_ID => 'test-location-id',
         ];
 
-        $transformer = new InstalledAppTransformer();
+        $transformer = new InstalledAppTransformer(self::createStub(InstalledAppDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -42,7 +43,7 @@ final class InstalledAppTransformerTest extends TestCase
 
     public function testTransformAllOptionalsAbsent(): void
     {
-        $transformer = new InstalledAppTransformer();
+        $transformer = new InstalledAppTransformer(self::createStub(InstalledAppDetailsTransformerInterface::class));
 
         $actual = $transformer->transform([InstalledAppTransformerInterface::KEY_INSTALLED_APP_ID => 'test-installed-app-id']);
 
@@ -65,7 +66,7 @@ final class InstalledAppTransformerTest extends TestCase
             $key => 42,
         ];
 
-        $transformer = new InstalledAppTransformer();
+        $transformer = new InstalledAppTransformer(self::createStub(InstalledAppDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -96,7 +97,7 @@ final class InstalledAppTransformerTest extends TestCase
     #[TestWith([[InstalledAppTransformerInterface::KEY_INSTALLED_APP_ID => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new InstalledAppTransformer();
+        $transformer = new InstalledAppTransformer(self::createStub(InstalledAppDetailsTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(InstalledAppTransformerInterface::UNEXPECTED_STRING_SPRINTF, InstalledAppTransformerInterface::KEY_INSTALLED_APP_ID));

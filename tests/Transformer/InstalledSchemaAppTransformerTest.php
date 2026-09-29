@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Tests\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\InstalledSchemaApp;
+use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppDetailsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -30,7 +31,7 @@ final class InstalledSchemaAppTransformerTest extends TestCase
             InstalledSchemaAppTransformerInterface::KEY_PARTNER_NAME => 'LIFX Inc.',
         ];
 
-        $transformer = new InstalledSchemaAppTransformer();
+        $transformer = new InstalledSchemaAppTransformer(self::createStub(InstalledSchemaAppDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -51,7 +52,7 @@ final class InstalledSchemaAppTransformerTest extends TestCase
     #[DataProvider('provideTransformOptionalFieldsCases')]
     public function testTransformOptionalFields(array $data, array $expected): void
     {
-        $transformer = new InstalledSchemaAppTransformer();
+        $transformer = new InstalledSchemaAppTransformer(self::createStub(InstalledSchemaAppDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -96,7 +97,7 @@ final class InstalledSchemaAppTransformerTest extends TestCase
     #[TestWith([[InstalledSchemaAppTransformerInterface::KEY_ISA_ID => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new InstalledSchemaAppTransformer();
+        $transformer = new InstalledSchemaAppTransformer(self::createStub(InstalledSchemaAppDetailsTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(InstalledSchemaAppTransformerInterface::UNEXPECTED_STRING_SPRINTF, InstalledSchemaAppTransformerInterface::KEY_ISA_ID));

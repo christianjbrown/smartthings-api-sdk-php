@@ -8,6 +8,8 @@ interface DevicePreferenceDefinitionInterface
 {
     public function getDescription(): ?string;
 
+    public function getExplicit(): ?bool;
+
     public function getName(): ?string;
 
     public function getPreferenceId(): string;
@@ -19,6 +21,8 @@ interface DevicePreferenceDefinitionInterface
     public function getTitle(): ?string;
 
     public function setDescription(?string $value): self;
+
+    public function setExplicit(?bool $value): self;
 
     public function setName(?string $value): self;
 

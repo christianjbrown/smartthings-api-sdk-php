@@ -8,6 +8,8 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\HubInstalledDriver;
 use ChristianBrown\SmartThings\Model\HubInstalledDriverInterface;
 
+use function is_array;
+use function is_bool;
 use function is_string;
 use function sprintf;
 
@@ -32,6 +34,9 @@ final class HubInstalledDriverTransformer implements HubInstalledDriverTransform
         self::applyName($driver, $data);
         self::applyVendorSupportInformation($driver, $data);
         self::applyVersion($driver, $data);
+
+        self::applyPermissions($driver, $data);
+        self::applyIsWWST($driver, $data);
 
         return $driver;
     }
@@ -81,6 +86,20 @@ final class HubInstalledDriverTransformer implements HubInstalledDriverTransform
     /**
      * @phpstan-param mixed[] $data
      */
+    private static function applyIsWWST(HubInstalledDriver $model, array $data): void
+    {
+        if (!isset($data[self::KEY_IS_WWST])) {
+            return;
+        }
+        if (!is_bool($data[self::KEY_IS_WWST])) {
+            return;
+        }
+        $model->setIsWWST($data[self::KEY_IS_WWST]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
     private static function applyName(HubInstalledDriver $driver, array $data): void
     {
         if (empty($data[self::KEY_NAME])) {
@@ -90,6 +109,20 @@ final class HubInstalledDriverTransformer implements HubInstalledDriverTransform
             return;
         }
         $driver->setName($data[self::KEY_NAME]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyPermissions(HubInstalledDriver $model, array $data): void
+    {
+        if (!isset($data[self::KEY_PERMISSIONS])) {
+            return;
+        }
+        if (!is_array($data[self::KEY_PERMISSIONS])) {
+            return;
+        }
+        $model->setPermissions($data[self::KEY_PERMISSIONS]);
     }
 
     /**

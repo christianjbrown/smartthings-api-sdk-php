@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ChristianBrown\SmartThings\Transformer;
+
+use ChristianBrown\SmartThings\Model\HubHealthDetailInterface;
+
+interface HubHealthDetailTransformerInterface
+{
+    public const string KEY_LOCATION_ID = 'locationId';
+    public const string KEY_SUBSCRIPTION_NAME = 'subscriptionName';
+    public const string UNEXPECTED_STRING_SPRINTF = '%s not set or not a string';
+
+    /**
+     * @param mixed[] $data
+     */
+    public function transform(array $data): HubHealthDetailInterface;
+}

@@ -14,7 +14,14 @@ interface HubInstalledDriverInterface
 
     public function getDriverId(): string;
 
+    public function getIsWWST(): ?bool;
+
     public function getName(): ?string;
+
+    /**
+     * @return mixed[]
+     */
+    public function getPermissions(): array;
 
     public function getVendorSupportInformation(): ?string;
 
@@ -28,7 +35,14 @@ interface HubInstalledDriverInterface
 
     public function setDriverId(string $value): self;
 
+    public function setIsWWST(?bool $value): self;
+
     public function setName(?string $value): self;
+
+    /**
+     * @param mixed[] $value
+     */
+    public function setPermissions(array $value): self;
 
     public function setVendorSupportInformation(?string $value): self;
 

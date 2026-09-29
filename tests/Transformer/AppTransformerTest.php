@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Tests\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\App;
+use ChristianBrown\SmartThings\Transformer\AppDetailsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\AppTransformer;
 use ChristianBrown\SmartThings\Transformer\AppTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -26,7 +27,7 @@ final class AppTransformerTest extends TestCase
             AppTransformerInterface::KEY_DISPLAY_NAME => 'test-display-name',
         ];
 
-        $transformer = new AppTransformer();
+        $transformer = new AppTransformer(self::createStub(AppDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -45,7 +46,7 @@ final class AppTransformerTest extends TestCase
     #[DataProvider('provideTransformOptionalFieldCombinationsCases')]
     public function testTransformOptionalFieldCombinations(array $data, ?string $expectedAppName, ?string $expectedAppType, ?string $expectedDisplayName): void
     {
-        $transformer = new AppTransformer();
+        $transformer = new AppTransformer(self::createStub(AppDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -93,7 +94,7 @@ final class AppTransformerTest extends TestCase
     #[TestWith([[AppTransformerInterface::KEY_APP_ID => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new AppTransformer();
+        $transformer = new AppTransformer(self::createStub(AppDetailsTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(AppTransformerInterface::UNEXPECTED_STRING_SPRINTF, AppTransformerInterface::KEY_APP_ID));

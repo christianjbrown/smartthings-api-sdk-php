@@ -7,6 +7,7 @@ namespace ChristianBrown\SmartThings\Tests\Transformer;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ServiceCapabilityData;
 use ChristianBrown\SmartThings\Model\ServiceMeasurementInterface;
+use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataDetailsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ServiceMeasurementsTransformerInterface;
@@ -45,7 +46,7 @@ final class ServiceCapabilityDataTransformerTest extends TestCase
             ->method('transform')
             ->willReturn($airQuality, $airQualityForecast, $forecast, $weather);
 
-        $transformer = new ServiceCapabilityDataTransformer($measurementsTransformer);
+        $transformer = new ServiceCapabilityDataTransformer($measurementsTransformer, self::createStub(ServiceCapabilityDataDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -75,7 +76,7 @@ final class ServiceCapabilityDataTransformerTest extends TestCase
         $measurementsTransformer->expects(self::never())
             ->method('transform');
 
-        $transformer = new ServiceCapabilityDataTransformer($measurementsTransformer);
+        $transformer = new ServiceCapabilityDataTransformer($measurementsTransformer, self::createStub(ServiceCapabilityDataDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -95,7 +96,7 @@ final class ServiceCapabilityDataTransformerTest extends TestCase
     #[TestWith([[ServiceCapabilityDataTransformerInterface::KEY_LOCATION_ID => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new ServiceCapabilityDataTransformer(self::createStub(ServiceMeasurementsTransformerInterface::class));
+        $transformer = new ServiceCapabilityDataTransformer(self::createStub(ServiceMeasurementsTransformerInterface::class), self::createStub(ServiceCapabilityDataDetailsTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(ServiceCapabilityDataTransformerInterface::UNEXPECTED_STRING_SPRINTF, ServiceCapabilityDataTransformerInterface::KEY_LOCATION_ID));

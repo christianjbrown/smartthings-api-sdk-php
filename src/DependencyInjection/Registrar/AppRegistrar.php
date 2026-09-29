@@ -19,6 +19,7 @@ use ChristianBrown\SmartThings\Transformer\AppTransformer;
 use ChristianBrown\SmartThings\Transformer\CreateAppResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\GenerateAppOauthResponseTransformer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 final class AppRegistrar implements ServiceRegistrarInterface
 {
@@ -30,7 +31,12 @@ final class AppRegistrar implements ServiceRegistrarInterface
         $container->register(SmartThingsInterface::SERVICE_UPDATE_APP_SETTINGS_REQUEST_SERIALIZER, UpdateAppSettingsRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_UPDATE_APP_REQUEST_SERIALIZER, UpdateAppRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_CREATE_APP_REQUEST_SERIALIZER, CreateAppRequestSerializer::class);
-        $container->register(SmartThingsInterface::SERVICE_APP_TRANSFORMER, AppTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_APP_TRANSFORMER, AppTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_APP_DETAILS_TRANSFORMER),
+                ]
+            );
         $container->register(SmartThingsInterface::SERVICE_APPS_TRANSFORMER, AppsTransformer::class)
             ->setArguments(
                 [

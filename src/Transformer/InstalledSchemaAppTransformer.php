@@ -6,13 +6,23 @@ namespace ChristianBrown\SmartThings\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\InstalledSchemaApp;
+use ChristianBrown\SmartThings\Model\InstalledSchemaAppDetailsInterface;
 use ChristianBrown\SmartThings\Model\InstalledSchemaAppInterface;
 
+use function array_flip;
+use function array_intersect_key;
 use function is_string;
 use function sprintf;
 
 final class InstalledSchemaAppTransformer implements InstalledSchemaAppTransformerInterface
 {
+    private InstalledSchemaAppDetailsTransformerInterface $installedSchemaAppDetailsTransformer;
+
+    public function __construct(InstalledSchemaAppDetailsTransformerInterface $installedSchemaAppDetailsTransformer)
+    {
+        $this->installedSchemaAppDetailsTransformer = $installedSchemaAppDetailsTransformer;
+    }
+
     /**
      * @param mixed[] $data
      */
@@ -32,6 +42,17 @@ final class InstalledSchemaAppTransformer implements InstalledSchemaAppTransform
         self::applyPageType($app, $data);
         self::applyPartnerName($app, $data);
 
+        self::applyEndpointAppId($app, $data);
+        self::applyIcon($app, $data);
+        self::applyIcon2x($app, $data);
+        self::applyIcon3x($app, $data);
+        self::applyPartnerSTConnection($app, $data);
+        self::applyStEulaFileName($app, $data);
+        self::applyStEulaLocksmithKey($app, $data);
+        self::applyDriverId($app, $data);
+
+        $this->applyDetails($app, $data);
+
         return $app;
     }
 
@@ -47,6 +68,89 @@ final class InstalledSchemaAppTransformer implements InstalledSchemaAppTransform
             return;
         }
         $app->setAppName($data[self::KEY_APP_NAME]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private function applyDetails(InstalledSchemaApp $model, array $data): void
+    {
+        if ([] === array_intersect_key($data, array_flip(self::DETAIL_KEYS))) {
+            return;
+        }
+        $details = $this->installedSchemaAppDetailsTransformer->transform($data);
+        self::copyDevices($model, $details);
+        self::copyViperAppLinks($model, $details);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyDriverId(InstalledSchemaApp $model, array $data): void
+    {
+        if (empty($data[self::KEY_DRIVER_ID])) {
+            return;
+        }
+        if (!is_string($data[self::KEY_DRIVER_ID])) {
+            return;
+        }
+        $model->setDriverId($data[self::KEY_DRIVER_ID]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyEndpointAppId(InstalledSchemaApp $model, array $data): void
+    {
+        if (empty($data[self::KEY_ENDPOINT_APP_ID])) {
+            return;
+        }
+        if (!is_string($data[self::KEY_ENDPOINT_APP_ID])) {
+            return;
+        }
+        $model->setEndpointAppId($data[self::KEY_ENDPOINT_APP_ID]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyIcon(InstalledSchemaApp $model, array $data): void
+    {
+        if (empty($data[self::KEY_ICON])) {
+            return;
+        }
+        if (!is_string($data[self::KEY_ICON])) {
+            return;
+        }
+        $model->setIcon($data[self::KEY_ICON]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyIcon2x(InstalledSchemaApp $model, array $data): void
+    {
+        if (empty($data[self::KEY_ICON2X])) {
+            return;
+        }
+        if (!is_string($data[self::KEY_ICON2X])) {
+            return;
+        }
+        $model->setIcon2x($data[self::KEY_ICON2X]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyIcon3x(InstalledSchemaApp $model, array $data): void
+    {
+        if (empty($data[self::KEY_ICON3X])) {
+            return;
+        }
+        if (!is_string($data[self::KEY_ICON3X])) {
+            return;
+        }
+        $model->setIcon3x($data[self::KEY_ICON3X]);
     }
 
     /**
@@ -103,5 +207,57 @@ final class InstalledSchemaAppTransformer implements InstalledSchemaAppTransform
             return;
         }
         $app->setPartnerName($data[self::KEY_PARTNER_NAME]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyPartnerSTConnection(InstalledSchemaApp $model, array $data): void
+    {
+        if (empty($data[self::KEY_PARTNER_STCONNECTION])) {
+            return;
+        }
+        if (!is_string($data[self::KEY_PARTNER_STCONNECTION])) {
+            return;
+        }
+        $model->setPartnerSTConnection($data[self::KEY_PARTNER_STCONNECTION]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyStEulaFileName(InstalledSchemaApp $model, array $data): void
+    {
+        if (empty($data[self::KEY_ST_EULA_FILE_NAME])) {
+            return;
+        }
+        if (!is_string($data[self::KEY_ST_EULA_FILE_NAME])) {
+            return;
+        }
+        $model->setStEulaFileName($data[self::KEY_ST_EULA_FILE_NAME]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private static function applyStEulaLocksmithKey(InstalledSchemaApp $model, array $data): void
+    {
+        if (empty($data[self::KEY_ST_EULA_LOCKSMITH_KEY])) {
+            return;
+        }
+        if (!is_string($data[self::KEY_ST_EULA_LOCKSMITH_KEY])) {
+            return;
+        }
+        $model->setStEulaLocksmithKey($data[self::KEY_ST_EULA_LOCKSMITH_KEY]);
+    }
+
+    private static function copyDevices(InstalledSchemaApp $model, InstalledSchemaAppDetailsInterface $details): void
+    {
+        $model->setDevices($details->getDevices() ?? []);
+    }
+
+    private static function copyViperAppLinks(InstalledSchemaApp $model, InstalledSchemaAppDetailsInterface $details): void
+    {
+        $model->setViperAppLinks($details->getViperAppLinks());
     }
 }

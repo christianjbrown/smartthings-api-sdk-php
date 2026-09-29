@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Tests\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Schedule;
+use ChristianBrown\SmartThings\Transformer\ScheduleDetailsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ScheduleTransformer;
 use ChristianBrown\SmartThings\Transformer\ScheduleTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -24,7 +25,7 @@ final class ScheduleTransformerTest extends TestCase
             ScheduleTransformerInterface::KEY_INSTALLED_APP_ID => 'test-installed-app-id',
         ];
 
-        $transformer = new ScheduleTransformer();
+        $transformer = new ScheduleTransformer(self::createStub(ScheduleDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -41,7 +42,7 @@ final class ScheduleTransformerTest extends TestCase
     #[DataProvider('provideTransformOptionalFieldCombinationsCases')]
     public function testTransformOptionalFieldCombinations(array $data, ?string $expectedInstalledAppId): void
     {
-        $transformer = new ScheduleTransformer();
+        $transformer = new ScheduleTransformer(self::createStub(ScheduleDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -77,7 +78,7 @@ final class ScheduleTransformerTest extends TestCase
     #[TestWith([[ScheduleTransformerInterface::KEY_NAME => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new ScheduleTransformer();
+        $transformer = new ScheduleTransformer(self::createStub(ScheduleDetailsTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(ScheduleTransformerInterface::UNEXPECTED_STRING_SPRINTF, ScheduleTransformerInterface::KEY_NAME));

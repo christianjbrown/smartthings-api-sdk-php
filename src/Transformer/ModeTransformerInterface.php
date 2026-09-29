@@ -8,6 +8,7 @@ use ChristianBrown\SmartThings\Model\ModeInterface;
 
 interface ModeTransformerInterface
 {
+    public const string KEY_ALLOWED = 'allowed';
     public const string KEY_ID = 'id';
     public const string KEY_LABEL = 'label';
     public const string KEY_NAME = 'name';

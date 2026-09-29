@@ -18,6 +18,7 @@ use ChristianBrown\SmartThings\Transformer\ServiceMeasurementsTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceMeasurementTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceSubscriptionReceiptTransformer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 final class ServiceApiRegistrar implements ServiceRegistrarInterface
 {
@@ -37,6 +38,7 @@ final class ServiceApiRegistrar implements ServiceRegistrarInterface
             ->setArguments(
                 [
                     $container->getDefinition(SmartThingsInterface::SERVICE_SERVICE_MEASUREMENTS_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_SERVICE_CAPABILITY_DATA_DETAILS_TRANSFORMER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_SERVICE_CAPABILITY_NAMES_TRANSFORMER, ServiceCapabilityNamesTransformer::class);
