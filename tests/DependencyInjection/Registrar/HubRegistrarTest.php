@@ -19,6 +19,8 @@ final class HubRegistrarTest extends TestCase
 
         (new HubRegistrar())->register($container);
 
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_HUB_DEVICE_UPDATE_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_HUB_DRIVER_INSTALL_REQUEST_SERIALIZER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_HUB_CHARACTERISTICS_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_HUB_ENROLLED_CHANNELS_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_HUB_ENROLLED_CHANNEL_TRANSFORMER));

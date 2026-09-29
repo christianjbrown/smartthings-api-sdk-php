@@ -60,11 +60,17 @@ use ChristianBrown\SmartThings\DependencyInjection\Registrar\SchemaConnectorRegi
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ServiceApiRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SubscriptionRegistrar;
 use ChristianBrown\SmartThings\Serializer\CapabilityLocalizationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\ChannelCreateRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\ChannelUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateAppRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateCapabilityPresentationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateCapabilityRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\DriverChannelCreateRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\DriverChannelUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\HubDeviceUpdateRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\HubDriverInstallRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppOauthRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppRequestSerializer;
@@ -312,6 +318,12 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CreateCapabilityPresentationRequestSerializer::class)]
 #[UsesClass(UpdateCapabilityPresentationRequestSerializer::class)]
 #[UsesClass(PreferenceLocalizationRequestSerializer::class)]
+#[UsesClass(ChannelCreateRequestSerializer::class)]
+#[UsesClass(ChannelUpdateRequestSerializer::class)]
+#[UsesClass(DriverChannelCreateRequestSerializer::class)]
+#[UsesClass(DriverChannelUpdateRequestSerializer::class)]
+#[UsesClass(HubDriverInstallRequestSerializer::class)]
+#[UsesClass(HubDeviceUpdateRequestSerializer::class)]
 final class SmartThingsTest extends TestCase
 {
     public function testConstructAcceptsCustomApiHost(): void

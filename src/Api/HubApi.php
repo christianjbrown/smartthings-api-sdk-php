@@ -7,17 +7,23 @@ namespace ChristianBrown\SmartThings\Api;
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
+use ChristianBrown\SmartThings\Model\HubDeviceUpdateRequestInterface;
+use ChristianBrown\SmartThings\Model\HubDriverInstallRequestInterface;
 use ChristianBrown\SmartThings\Model\HubEnrolledChannelInterface;
 use ChristianBrown\SmartThings\Model\HubInstalledDriverInterface;
 use ChristianBrown\SmartThings\Model\HubInterface;
+use ChristianBrown\SmartThings\Serializer\HubDeviceUpdateRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\HubDriverInstallRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\HubCharacteristicsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\HubEnrolledChannelsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\HubInstalledDriversTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\HubInstalledDriverTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\HubTransformerInterface;
 
+use function array_filter;
 use function rawurlencode;
 use function sprintf;
+use function var_export;
 
 final class HubApi implements HubApiInterface
 {
@@ -46,6 +52,8 @@ final class HubApi implements HubApiInterface
      */
     private array $driversCache = [];
     private HubCharacteristicsTransformerInterface $hubCharacteristicsTransformer;
+    private HubDeviceUpdateRequestSerializerInterface $hubDeviceUpdateRequestSerializer;
+    private HubDriverInstallRequestSerializerInterface $hubDriverInstallRequestSerializer;
     private HubEnrolledChannelsTransformerInterface $hubEnrolledChannelsTransformer;
     private HubInstalledDriversTransformerInterface $hubInstalledDriversTransformer;
     private HubInstalledDriverTransformerInterface $hubInstalledDriverTransformer;
@@ -53,7 +61,7 @@ final class HubApi implements HubApiInterface
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, HubTransformerInterface $hubTransformer, HubCharacteristicsTransformerInterface $hubCharacteristicsTransformer, HubInstalledDriverTransformerInterface $hubInstalledDriverTransformer, HubInstalledDriversTransformerInterface $hubInstalledDriversTransformer, HubEnrolledChannelsTransformerInterface $hubEnrolledChannelsTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, HubTransformerInterface $hubTransformer, HubCharacteristicsTransformerInterface $hubCharacteristicsTransformer, HubInstalledDriverTransformerInterface $hubInstalledDriverTransformer, HubInstalledDriversTransformerInterface $hubInstalledDriversTransformer, HubEnrolledChannelsTransformerInterface $hubEnrolledChannelsTransformer, TokenInterface $token, HubDriverInstallRequestSerializerInterface $hubDriverInstallRequestSerializer, HubDeviceUpdateRequestSerializerInterface $hubDeviceUpdateRequestSerializer)
     {
         $this->requestSender = $requestSender;
         $this->hubTransformer = $hubTransformer;
@@ -62,6 +70,25 @@ final class HubApi implements HubApiInterface
         $this->hubInstalledDriversTransformer = $hubInstalledDriversTransformer;
         $this->hubEnrolledChannelsTransformer = $hubEnrolledChannelsTransformer;
         $this->token = $token;
+        $this->hubDriverInstallRequestSerializer = $hubDriverInstallRequestSerializer;
+        $this->hubDeviceUpdateRequestSerializer = $hubDeviceUpdateRequestSerializer;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteHubByEui(string $hubEui): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_EUI_SPRINTF, rawurlencode($hubEui));
+        $this->requestSender->delete($url, [], $headers);
+        $this->cache = [];
+        $this->channelsCache = [];
+        $this->characteristicsCache = [];
+        $this->driverCache = [];
+        $this->driversCache = [];
     }
 
     /**
@@ -195,6 +222,50 @@ final class HubApi implements HubApiInterface
     }
 
     /**
+     * @throws RequestExceptionInterface
+     */
+    public function installDrivers(string $hubDeviceId, string $driverId, HubDriverInstallRequestInterface $request): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_DRIVER_SPRINTF, rawurlencode($hubDeviceId), rawurlencode($driverId));
+        $body = $this->hubDriverInstallRequestSerializer->serialize($request);
+        $this->requestSender->put($url, [], $headers, $body);
+        unset($this->driverCache[sprintf(self::CACHE_KEY_SPRINTF, $hubDeviceId, $driverId)]);
+        $this->driversCache = [];
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function uninstallDriver(string $hubDeviceId, string $driverId): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_DRIVER_SPRINTF, rawurlencode($hubDeviceId), rawurlencode($driverId));
+        $this->requestSender->delete($url, [], $headers);
+        unset($this->driverCache[sprintf(self::CACHE_KEY_SPRINTF, $hubDeviceId, $driverId)]);
+        $this->driversCache = [];
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function updateHubDevice(string $hubDeviceId, string $deviceId, HubDeviceUpdateRequestInterface $request, ?bool $forceUpdate = null): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_CHILD_DEVICE_SPRINTF, rawurlencode($hubDeviceId), rawurlencode($deviceId));
+        $query = array_filter([self::KEY_FORCE_UPDATE => self::formatBool($forceUpdate)], static fn (?string $value): bool => null !== $value);
+        $body = $this->hubDeviceUpdateRequestSerializer->serialize($request);
+        $this->requestSender->patch($url, $query, $headers, $body);
+        $this->driversCache = [];
+    }
+
+    /**
      * @return array<string, string>
      */
     private static function buildDriversQuery(?string $deviceId): array
@@ -206,6 +277,11 @@ final class HubApi implements HubApiInterface
         }
 
         return [self::KEY_DEVICE_ID => $deviceId];
+    }
+
+    private static function formatBool(?bool $value): ?string
+    {
+        return null === $value ? null : var_export($value, true);
     }
 
     /**

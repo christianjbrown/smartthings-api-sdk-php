@@ -50,6 +50,22 @@ final class DriverApi implements DriverApiInterface
     }
 
     /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteDriver(string $driverId): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($driverId));
+        $this->requestSender->delete($url, [], $headers);
+        unset($this->cache[$driverId]);
+        $this->versionCache = [];
+        $this->listCache = null;
+        $this->defaultsCache = null;
+    }
+
+    /**
      * @phpstan-impure
      *
      * @throws RequestExceptionInterface
