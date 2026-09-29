@@ -33,6 +33,7 @@ use ChristianBrown\SmartThings\DependencyInjection\Registrar\SceneRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ScheduleRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SchemaConnectorRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ServiceApiRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\ShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SubscriptionRegistrar;
 use ChristianBrown\SmartThings\SmartThingsInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -48,6 +49,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CapabilityRegistrar::class)]
 #[UsesClass(ChannelRegistrar::class)]
 #[UsesClass(CoreRegistrar::class)]
+#[UsesClass(ShapeRegistrar::class)]
 #[UsesClass(DeviceHealthRegistrar::class)]
 #[UsesClass(DeviceHistoryRegistrar::class)]
 #[UsesClass(DevicePreferenceDefinitionRegistrar::class)]

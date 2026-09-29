@@ -10,6 +10,7 @@ interface DriverApiInterface extends ApiInterface
 {
     public const string API_URL = 'https://api.smartthings.com/v1/drivers';
     public const string API_URL_DEFAULT = 'https://api.smartthings.com/v1/drivers/default';
+    public const string API_URL_PACKAGE = 'https://api.smartthings.com/v1/drivers/package';
     public const string API_URL_SPRINTF = 'https://api.smartthings.com/v1/drivers/%s';
     public const string API_URL_VERSION_SPRINTF = 'https://api.smartthings.com/v1/drivers/%s/versions/%s';
     public const string CACHE_KEY_SPRINTF = '%s/%s';
@@ -35,4 +36,10 @@ interface DriverApiInterface extends ApiInterface
     public function getOneById(string $driverId, bool $skipCache = false): DriverInterface;
 
     public function getOneByIdAndVersion(string $driverId, string $version, bool $skipCache = false): DriverInterface;
+
+    /**
+     * Uploads a driver package (a zip archive of the driver and its profile definitions) and returns the
+     * created driver. Refreshes the cached copy of the driver and invalidates the cached driver lists.
+     */
+    public function uploadDriverPackage(string $packageContents): DriverInterface;
 }

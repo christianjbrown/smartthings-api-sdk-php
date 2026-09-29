@@ -27,9 +27,11 @@ use ChristianBrown\SmartThings\Api\PresentationApiInterface;
 use ChristianBrown\SmartThings\Api\RuleApiInterface;
 use ChristianBrown\SmartThings\Api\SceneApiInterface;
 use ChristianBrown\SmartThings\Api\ScheduleApiInterface;
+use ChristianBrown\SmartThings\Api\SchemaAppInviteApiInterface;
 use ChristianBrown\SmartThings\Api\SchemaConnectorApiInterface;
 use ChristianBrown\SmartThings\Api\ServiceApiInterface;
 use ChristianBrown\SmartThings\Api\SubscriptionApiInterface;
+use ChristianBrown\SmartThings\Api\TextToSpeechApiInterface;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Api\VirtualDeviceApiInterface;
@@ -347,6 +349,20 @@ final class SmartThings implements SmartThingsInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    public function getSchemaAppInviteApi(): SchemaAppInviteApiInterface
+    {
+        /**
+         * @var SchemaAppInviteApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_SCHEMA_APP_INVITE_API);
+
+        return $service;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function getSchemaConnectorApi(): SchemaConnectorApiInterface
     {
         /**
@@ -381,6 +397,20 @@ final class SmartThings implements SmartThingsInterface
          * @var SubscriptionApiInterface $service
          */
         $service = $this->container->get(self::SERVICE_SUBSCRIPTION_API);
+
+        return $service;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getTextToSpeechApi(): TextToSpeechApiInterface
+    {
+        /**
+         * @var TextToSpeechApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_TEXT_TO_SPEECH_API);
 
         return $service;
     }

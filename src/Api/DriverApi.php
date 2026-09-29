@@ -26,6 +26,7 @@ final class DriverApi implements DriverApiInterface
      * @var ?array<int, DriverInterface>
      */
     private ?array $defaultsCache = null;
+    private DriverPackageUploaderInterface $driverPackageUploader;
     private DriversTransformerInterface $driversTransformer;
     private DriverTransformerInterface $driverTransformer;
 
@@ -41,12 +42,13 @@ final class DriverApi implements DriverApiInterface
      */
     private array $versionCache = [];
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DriverTransformerInterface $driverTransformer, DriversTransformerInterface $driversTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, DriverTransformerInterface $driverTransformer, DriversTransformerInterface $driversTransformer, TokenInterface $token, DriverPackageUploaderInterface $driverPackageUploader)
     {
         $this->requestSender = $requestSender;
         $this->driverTransformer = $driverTransformer;
         $this->driversTransformer = $driversTransformer;
         $this->token = $token;
+        $this->driverPackageUploader = $driverPackageUploader;
     }
 
     /**
@@ -148,6 +150,27 @@ final class DriverApi implements DriverApiInterface
         $url = sprintf(self::API_URL_VERSION_SPRINTF, rawurlencode($driverId), rawurlencode($version));
         $driver = $this->fetch($url);
         $this->versionCache[$cacheKey] = $driver;
+
+        return $driver;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function uploadDriverPackage(string $packageContents): DriverInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $data = $this->driverPackageUploader->upload(self::API_URL_PACKAGE, $headers, $packageContents);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $driver = $this->driverTransformer->transform($data);
+        $this->cache[$driver->getDriverId()] = $driver;
+        $this->listCache = null;
 
         return $driver;
     }

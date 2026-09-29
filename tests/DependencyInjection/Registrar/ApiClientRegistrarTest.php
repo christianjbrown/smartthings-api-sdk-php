@@ -19,6 +19,17 @@ final class ApiClientRegistrarTest extends TestCase
     {
         $container = new ContainerBuilder();
 
+        $container->register(SmartThingsInterface::SERVICE_DRIVER_PACKAGE_UPLOADER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_STATUS_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_PAGE_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_ACCEPTANCE_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_RECEIPT_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_REQUEST_SERIALIZER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_PLAYED_TEXT_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_PLAY_TEXT_REQUEST_SERIALIZER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_CONVERTED_TTS_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_TTS_REQUEST_SERIALIZER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_TTS_INFO_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SERVICE_SUBSCRIPTION_RECEIPT_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SERVICE_SUBSCRIPTION_REQUEST_SERIALIZER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_OAUTH_CREDENTIALS_REQUEST_SERIALIZER, stdClass::class);
@@ -154,5 +165,7 @@ final class ApiClientRegistrarTest extends TestCase
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SERVICE_API));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SUBSCRIPTION_API));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_VIRTUAL_DEVICE_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_TEXT_TO_SPEECH_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_API));
     }
 }

@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\DependencyInjection\Registrar;
 
 use ChristianBrown\SmartThings\DependencyInjection\ServiceRegistrarInterface;
 use ChristianBrown\SmartThings\Serializer\SchemaAppCreateRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\SchemaAppInviteRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SchemaAppUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SchemaOauthCredentialsRequestSerializer;
 use ChristianBrown\SmartThings\SmartThingsInterface;
@@ -21,6 +22,7 @@ final class SchemaConnectorRegistrar implements ServiceRegistrarInterface
 {
     public function register(ContainerBuilder $container): void
     {
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_REQUEST_SERIALIZER, SchemaAppInviteRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_OAUTH_CREDENTIALS_REQUEST_SERIALIZER, SchemaOauthCredentialsRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_UPDATE_REQUEST_SERIALIZER, SchemaAppUpdateRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_CREATE_REQUEST_SERIALIZER, SchemaAppCreateRequestSerializer::class);

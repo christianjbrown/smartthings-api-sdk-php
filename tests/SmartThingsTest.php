@@ -16,6 +16,7 @@ use ChristianBrown\SmartThings\Api\DevicePreferencesApi;
 use ChristianBrown\SmartThings\Api\DeviceProfileApi;
 use ChristianBrown\SmartThings\Api\DeviceStatusApi;
 use ChristianBrown\SmartThings\Api\DriverApi;
+use ChristianBrown\SmartThings\Api\DriverPackageUploader;
 use ChristianBrown\SmartThings\Api\HostOverridingJsonApiRequestSender;
 use ChristianBrown\SmartThings\Api\HubApi;
 use ChristianBrown\SmartThings\Api\InstalledAppApi;
@@ -27,9 +28,11 @@ use ChristianBrown\SmartThings\Api\PresentationApi;
 use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\ScheduleApi;
+use ChristianBrown\SmartThings\Api\SchemaAppInviteApi;
 use ChristianBrown\SmartThings\Api\SchemaConnectorApi;
 use ChristianBrown\SmartThings\Api\ServiceApi;
 use ChristianBrown\SmartThings\Api\SubscriptionApi;
+use ChristianBrown\SmartThings\Api\TextToSpeechApi;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\VirtualDeviceApi;
 use ChristianBrown\SmartThings\DependencyInjection\ContainerFactory;
@@ -58,6 +61,7 @@ use ChristianBrown\SmartThings\DependencyInjection\Registrar\SceneRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ScheduleRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SchemaConnectorRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ServiceApiRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\ShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SubscriptionRegistrar;
 use ChristianBrown\SmartThings\Serializer\CapabilityLocalizationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\ChannelCreateRequestSerializer;
@@ -71,11 +75,14 @@ use ChristianBrown\SmartThings\Serializer\DriverChannelUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\HubDeviceUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\HubDriverInstallRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\PlayTextRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SchemaAppCreateRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\SchemaAppInviteRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SchemaAppUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SchemaOauthCredentialsRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\ServiceSubscriptionRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\TtsRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppOauthRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppSettingsRequestSerializer;
@@ -96,6 +103,7 @@ use ChristianBrown\SmartThings\Transformer\ChannelDriversTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelDriverTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelsTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelTransformer;
+use ChristianBrown\SmartThings\Transformer\ConvertedTtsTransformer;
 use ChristianBrown\SmartThings\Transformer\CreateAppResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCommandResultsTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCommandResultTransformer;
@@ -147,6 +155,9 @@ use ChristianBrown\SmartThings\Transformer\ModesTransformer;
 use ChristianBrown\SmartThings\Transformer\ModeTransformer;
 use ChristianBrown\SmartThings\Transformer\OrganizationsTransformer;
 use ChristianBrown\SmartThings\Transformer\OrganizationTransformer;
+use ChristianBrown\SmartThings\Transformer\PageLinksTransformer;
+use ChristianBrown\SmartThings\Transformer\PageLinkTransformer;
+use ChristianBrown\SmartThings\Transformer\PlayedTextTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\RulesTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleTransformer;
@@ -154,6 +165,11 @@ use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
 use ChristianBrown\SmartThings\Transformer\SchedulesTransformer;
 use ChristianBrown\SmartThings\Transformer\ScheduleTransformer;
+use ChristianBrown\SmartThings\Transformer\SchemaAppInviteAcceptanceTransformer;
+use ChristianBrown\SmartThings\Transformer\SchemaAppInvitePageTransformer;
+use ChristianBrown\SmartThings\Transformer\SchemaAppInviteReceiptTransformer;
+use ChristianBrown\SmartThings\Transformer\SchemaAppInviteStatusTransformer;
+use ChristianBrown\SmartThings\Transformer\SchemaAppInviteTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppReceiptTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppTransformer;
@@ -168,6 +184,8 @@ use ChristianBrown\SmartThings\Transformer\ServiceMeasurementTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceSubscriptionReceiptTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
+use ChristianBrown\SmartThings\Transformer\TtsInfoTransformer;
+use ChristianBrown\SmartThings\Transformer\TtsVoiceTransformer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -179,6 +197,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CapabilityRegistrar::class)]
 #[UsesClass(ChannelRegistrar::class)]
 #[UsesClass(CoreRegistrar::class)]
+#[UsesClass(ShapeRegistrar::class)]
 #[UsesClass(ApiHost::class)]
 #[UsesClass(HostOverridingJsonApiRequestSender::class)]
 #[UsesClass(DeviceHealthRegistrar::class)]
@@ -336,6 +355,23 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(SchemaAppUpdateRequestSerializer::class)]
 #[UsesClass(SchemaOauthCredentialsRequestSerializer::class)]
 #[UsesClass(ServiceSubscriptionRequestSerializer::class)]
+#[UsesClass(TtsVoiceTransformer::class)]
+#[UsesClass(TtsInfoTransformer::class)]
+#[UsesClass(ConvertedTtsTransformer::class)]
+#[UsesClass(PlayedTextTransformer::class)]
+#[UsesClass(TextToSpeechApi::class)]
+#[UsesClass(TtsRequestSerializer::class)]
+#[UsesClass(PlayTextRequestSerializer::class)]
+#[UsesClass(SchemaAppInviteReceiptTransformer::class)]
+#[UsesClass(SchemaAppInviteAcceptanceTransformer::class)]
+#[UsesClass(SchemaAppInviteTransformer::class)]
+#[UsesClass(PageLinkTransformer::class)]
+#[UsesClass(PageLinksTransformer::class)]
+#[UsesClass(SchemaAppInvitePageTransformer::class)]
+#[UsesClass(SchemaAppInviteStatusTransformer::class)]
+#[UsesClass(SchemaAppInviteApi::class)]
+#[UsesClass(SchemaAppInviteRequestSerializer::class)]
+#[UsesClass(DriverPackageUploader::class)]
 final class SmartThingsTest extends TestCase
 {
     public function testConstructAcceptsCustomApiHost(): void
@@ -492,6 +528,13 @@ final class SmartThingsTest extends TestCase
         self::assertInstanceOf(ScheduleApi::class, $smartThings->getScheduleApi());
     }
 
+    public function testGetSchemaAppInviteApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(SchemaAppInviteApi::class, $smartThings->getSchemaAppInviteApi());
+    }
+
     public function testGetSchemaConnectorApi(): void
     {
         $smartThings = new SmartThings('token');
@@ -511,6 +554,13 @@ final class SmartThingsTest extends TestCase
         $smartThings = new SmartThings('token');
 
         self::assertInstanceOf(SubscriptionApi::class, $smartThings->getSubscriptionApi());
+    }
+
+    public function testGetTextToSpeechApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(TextToSpeechApi::class, $smartThings->getTextToSpeechApi());
     }
 
     public function testGetVirtualDeviceApi(): void

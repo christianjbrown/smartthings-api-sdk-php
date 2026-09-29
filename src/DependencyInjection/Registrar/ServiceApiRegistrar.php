@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\DependencyInjection\Registrar;
 
 use ChristianBrown\SmartThings\DependencyInjection\ServiceRegistrarInterface;
+use ChristianBrown\SmartThings\Serializer\PlayTextRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\ServiceSubscriptionRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\TtsRequestSerializer;
 use ChristianBrown\SmartThings\SmartThingsInterface;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityNamesTransformer;
@@ -21,6 +23,8 @@ final class ServiceApiRegistrar implements ServiceRegistrarInterface
 {
     public function register(ContainerBuilder $container): void
     {
+        $container->register(SmartThingsInterface::SERVICE_PLAY_TEXT_REQUEST_SERIALIZER, PlayTextRequestSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_TTS_REQUEST_SERIALIZER, TtsRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_SERVICE_SUBSCRIPTION_REQUEST_SERIALIZER, ServiceSubscriptionRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_SERVICE_MEASUREMENT_TRANSFORMER, ServiceMeasurementTransformer::class);
         $container->register(SmartThingsInterface::SERVICE_SERVICE_MEASUREMENTS_TRANSFORMER, ServiceMeasurementsTransformer::class)
