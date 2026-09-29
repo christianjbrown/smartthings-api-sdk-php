@@ -22,12 +22,19 @@ gitignored and Composer-installed, so run `composer install` first.
 
 | Task | Command |
 | --- | --- |
-| Run tests + coverage (opens HTML report) | `composer test` |
+| Run tests + coverage in parallel (opens HTML report) | `composer test` |
 | Run tests, no coverage | `php -d memory_limit=-1 ./bin/phpunit --no-coverage` |
 | Run one test | `php -d memory_limit=-1 ./bin/phpunit --filter DeviceTransformerTest` |
 | Check code style | `composer check-style` |
 | Auto-fix code style | `composer fix-style` |
 | Check / fix style on git diff only | `composer check-style-diff` / `composer fix-style-diff` |
+
+Tests run under **ParaTest** (`./bin/paratest`), one worker per core (`composer test` detects the core
+count; CI uses `nproc`) with `--max-batch-size=150`. Do not run the whole suite with plain phpunit and
+path coverage: coverage bookkeeping grows with every test held in one process, so a single process
+takes many hours, while short-lived workers take minutes. `phpunit.xml` declares no report, so ask for
+one on the command line (`--coverage-text=<file>`, plus `--coverage-html=<dir>` locally). Workers need
+`--passthru-php="-d memory_limit=-1"` because they do not inherit the parent's `php -d` options.
 
 After adding autoloadable files, run `composer dump-autoload` if the class isn't found.
 

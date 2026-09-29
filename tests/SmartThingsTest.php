@@ -145,6 +145,7 @@ use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\GroupVisibleConditionsSerializer;
 use ChristianBrown\SmartThings\Serializer\HubDeviceUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\HubDriverInstallRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\IndoorMapSerializer;
 use ChristianBrown\SmartThings\Serializer\ListForArgumentSerializer;
 use ChristianBrown\SmartThings\Serializer\ListForAutomationActionSerializer;
 use ChristianBrown\SmartThings\Serializer\ListForAutomationConditionSerializer;
@@ -220,7 +221,9 @@ use ChristianBrown\SmartThings\Serializer\UpdateAppRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppSettingsRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateCapabilityPresentationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateCapabilityRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateDeviceComponentSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateDeviceProfileRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateDeviceRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateSignatureTypeRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\VisibleConditionBaseSerializer;
 use ChristianBrown\SmartThings\Serializer\VisibleConditionForColorItemReferToSerializer;
@@ -240,7 +243,12 @@ use ChristianBrown\SmartThings\Transformer\AppSettingsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppTransformer;
 use ChristianBrown\SmartThings\Transformer\AppUiSettingsTransformer;
+use ChristianBrown\SmartThings\Transformer\AttributeDataSchemaTransformer;
+use ChristianBrown\SmartThings\Transformer\AttributePropertiesTransformer;
+use ChristianBrown\SmartThings\Transformer\AttributeSchemaTransformer;
 use ChristianBrown\SmartThings\Transformer\AttributeStateTransformer;
+use ChristianBrown\SmartThings\Transformer\AttributeUnitSchemaTransformer;
+use ChristianBrown\SmartThings\Transformer\AttributeValueSchemaTransformer;
 use ChristianBrown\SmartThings\Transformer\AttributeValueTransformer;
 use ChristianBrown\SmartThings\Transformer\AutomationForCapabilityActionsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\AutomationForCapabilityConditionsItemTransformer;
@@ -270,8 +278,16 @@ use ChristianBrown\SmartThings\Transformer\BasicPlusTvVolumeTransformer;
 use ChristianBrown\SmartThings\Transformer\BleD2DDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\ButtonForTvTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityArgumentI18nTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityArgumentLocalizationTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityAttributeLabelTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityAttributeLocalizationTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityAttributeTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityCommandLocalizationTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationValueTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespaceTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationDetailsTransformer;
@@ -286,6 +302,7 @@ use ChristianBrown\SmartThings\Transformer\ChannelDriverTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelsTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelTransformer;
 use ChristianBrown\SmartThings\Transformer\ClustersTransformer;
+use ChristianBrown\SmartThings\Transformer\CommandArgumentTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandClassesTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandMappingsTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandMappingTransformer;
@@ -367,6 +384,7 @@ use ChristianBrown\SmartThings\Transformer\EdgeDriverSupportedEndpointAppsAppsIt
 use ChristianBrown\SmartThings\Transformer\EdgeDriverSupportedEndpointAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\EmptyForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\EmptyWithAvailableSizeTransformer;
+use ChristianBrown\SmartThings\Transformer\EnumCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\EnumSliderForAutomationConditionSupportedOperatorsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\EnumSliderForAutomationConditionTransformer;
 use ChristianBrown\SmartThings\Transformer\ExcludedActionItemIdExcludeItemTransformer;
@@ -425,6 +443,7 @@ use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeStateTransformer
 use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeTransformer;
 use ChristianBrown\SmartThings\Transformer\LocaleReferencesTransformer;
 use ChristianBrown\SmartThings\Transformer\LocaleReferenceTransformer;
+use ChristianBrown\SmartThings\Transformer\LocalizationDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocalizationTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationParentTransformer;
@@ -468,6 +487,7 @@ use ChristianBrown\SmartThings\Transformer\PlayStopCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayStopStateTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayStopTransformer;
 use ChristianBrown\SmartThings\Transformer\PoCodesTransformer;
+use ChristianBrown\SmartThings\Transformer\PreferenceOptionLocalizationTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationSettingsForDevicePresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationSettingsTemperatureConversionsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationSettingsTransformer;
@@ -1134,6 +1154,26 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(TemperatureConversionsItemForDevicePresentationTransformer::class)]
 #[UsesClass(PresentationSettingsForDevicePresentationTransformer::class)]
 #[UsesClass(DevicePresentationTransformer::class)]
+#[UsesClass(AttributeValueSchemaTransformer::class)]
+#[UsesClass(AttributeUnitSchemaTransformer::class)]
+#[UsesClass(AttributeDataSchemaTransformer::class)]
+#[UsesClass(AttributePropertiesTransformer::class)]
+#[UsesClass(AttributeSchemaTransformer::class)]
+#[UsesClass(EnumCommandTransformer::class)]
+#[UsesClass(CapabilityAttributeTransformer::class)]
+#[UsesClass(CommandArgumentTransformer::class)]
+#[UsesClass(CapabilityCommandTransformer::class)]
+#[UsesClass(CapabilityDetailsTransformer::class)]
+#[UsesClass(PreferenceOptionLocalizationTransformer::class)]
+#[UsesClass(CapabilityAttributeLabelTransformer::class)]
+#[UsesClass(CapabilityAttributeLocalizationTransformer::class)]
+#[UsesClass(CapabilityArgumentI18nTransformer::class)]
+#[UsesClass(CapabilityArgumentLocalizationTransformer::class)]
+#[UsesClass(CapabilityCommandLocalizationTransformer::class)]
+#[UsesClass(LocalizationDetailsTransformer::class)]
+#[UsesClass(UpdateDeviceComponentSerializer::class)]
+#[UsesClass(IndoorMapSerializer::class)]
+#[UsesClass(UpdateDeviceRequestSerializer::class)]
 final class SmartThingsTest extends TestCase
 {
     public function testConstructAcceptsCustomApiHost(): void

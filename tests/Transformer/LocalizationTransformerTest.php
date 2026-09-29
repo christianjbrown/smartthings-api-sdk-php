@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Tests\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Localization;
+use ChristianBrown\SmartThings\Transformer\LocalizationDetailsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\LocalizationTransformer;
 use ChristianBrown\SmartThings\Transformer\LocalizationTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -27,7 +28,7 @@ final class LocalizationTransformerTest extends TestCase
             LocalizationTransformerInterface::KEY_DESCRIPTION => 'Une description',
         ];
 
-        $transformer = new LocalizationTransformer();
+        $transformer = new LocalizationTransformer(self::createStub(LocalizationDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -44,7 +45,7 @@ final class LocalizationTransformerTest extends TestCase
     #[DataProvider('provideTransformOptionalFieldsCases')]
     public function testTransformOptionalFields(array $data, ?string $expectedLabel, ?string $expectedDescription): void
     {
-        $transformer = new LocalizationTransformer();
+        $transformer = new LocalizationTransformer(self::createStub(LocalizationDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -75,7 +76,7 @@ final class LocalizationTransformerTest extends TestCase
     #[TestWith([[LocalizationTransformerInterface::KEY_TAG => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new LocalizationTransformer();
+        $transformer = new LocalizationTransformer(self::createStub(LocalizationDetailsTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(LocalizationTransformerInterface::UNEXPECTED_STRING_SPRINTF, LocalizationTransformerInterface::KEY_TAG));

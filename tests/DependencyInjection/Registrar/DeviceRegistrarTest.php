@@ -30,6 +30,5 @@ final class DeviceRegistrarTest extends TestCase
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_EVENT_SERIALIZER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_INSTALL_REQUEST_SERIALIZER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_TRANSFORMER));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_UPDATE_DEVICE_REQUEST_SERIALIZER));
     }
 }

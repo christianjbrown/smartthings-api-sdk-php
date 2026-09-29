@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Tests\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Capability;
+use ChristianBrown\SmartThings\Transformer\CapabilityDetailsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -26,7 +27,7 @@ final class CapabilityTransformerTest extends TestCase
             CapabilityTransformerInterface::KEY_VERSION => 1,
         ];
 
-        $transformer = new CapabilityTransformer();
+        $transformer = new CapabilityTransformer(self::createStub(CapabilityDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -45,7 +46,7 @@ final class CapabilityTransformerTest extends TestCase
     #[DataProvider('provideTransformOptionalFieldCombinationsCases')]
     public function testTransformOptionalFieldCombinations(array $data, ?string $expectedName, ?string $expectedStatus, ?int $expectedVersion): void
     {
-        $transformer = new CapabilityTransformer();
+        $transformer = new CapabilityTransformer(self::createStub(CapabilityDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -103,7 +104,7 @@ final class CapabilityTransformerTest extends TestCase
     #[TestWith([[CapabilityTransformerInterface::KEY_ID => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new CapabilityTransformer();
+        $transformer = new CapabilityTransformer(self::createStub(CapabilityDetailsTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(CapabilityTransformerInterface::UNEXPECTED_STRING_SPRINTF, CapabilityTransformerInterface::KEY_ID));

@@ -6,11 +6,25 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface UpdateDeviceRequestInterface
 {
+    /**
+     * @return null|array<int, UpdateDeviceComponentInterface>
+     */
+    public function getComponents(): ?array;
+
+    public function getIndoorMap(): ?IndoorMapInterface;
+
     public function getLabel(): ?string;
 
     public function getLocationId(): ?string;
 
     public function getRoomId(): ?string;
+
+    /**
+     * @param null|array<int, UpdateDeviceComponentInterface> $value
+     */
+    public function setComponents(?array $value): self;
+
+    public function setIndoorMap(?IndoorMapInterface $value): self;
 
     public function setLabel(?string $value): self;
 
