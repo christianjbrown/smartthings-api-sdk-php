@@ -18,6 +18,11 @@ interface DriverApiInterface extends ApiInterface
     public const string UNEXPECTED_RESPONSE_SPRINTF = '%s not set or not an array';
 
     /**
+     * Deletes a driver. Invalidates every cached copy of it and the cached driver lists.
+     */
+    public function deleteDriver(string $driverId): void;
+
+    /**
      * @return array<int, DriverInterface>
      */
     public function getDefaults(bool $skipCache = false): array;

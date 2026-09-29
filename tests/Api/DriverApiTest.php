@@ -31,6 +31,50 @@ final class DriverApiTest extends TestCase
      * @throws RequestExceptionInterface
      * @throws Exception
      */
+    public function testDeleteDriver(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(DriverApiInterface::API_URL_SPRINTF, 'test-driver-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), self::createStub(DriversTransformerInterface::class), new Token('test-api-token'));
+        $api->deleteDriver('test-driver-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteDriverInvalidatesCaches(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), self::createStub(DriversTransformerInterface::class), new Token('test-api-token'));
+
+        $api->getOneById('test-driver-id');
+        $api->deleteDriver('test-driver-id');
+        $api->getOneById('test-driver-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
     public function testGetDefaults(): void
     {
         $data = [
