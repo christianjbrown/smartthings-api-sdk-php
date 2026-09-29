@@ -19,6 +19,11 @@ final class CapabilityRegistrarTest extends TestCase
 
         (new CapabilityRegistrar())->register($container);
 
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_UPDATE_CAPABILITY_PRESENTATION_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CREATE_CAPABILITY_PRESENTATION_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CAPABILITY_LOCALIZATION_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_UPDATE_CAPABILITY_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CREATE_CAPABILITY_REQUEST_SERIALIZER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CAPABILITIES_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CAPABILITY_NAMESPACES_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CAPABILITY_NAMESPACE_TRANSFORMER));

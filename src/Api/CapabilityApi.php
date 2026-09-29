@@ -8,10 +8,25 @@ use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilityInterface;
+use ChristianBrown\SmartThings\Model\CapabilityLocalizationRequestInterface;
 use ChristianBrown\SmartThings\Model\CapabilityNamespaceInterface;
 use ChristianBrown\SmartThings\Model\CapabilityPresentationInterface;
+use ChristianBrown\SmartThings\Model\CreateCapabilityPresentationRequestInterface;
+use ChristianBrown\SmartThings\Model\CreateCapabilityRequestInterface;
 use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
 use ChristianBrown\SmartThings\Model\LocalizationInterface;
+use ChristianBrown\SmartThings\Model\UpdateCapabilityPresentationRequestInterface;
+use ChristianBrown\SmartThings\Model\UpdateCapabilityRequestInterface;
+use ChristianBrown\SmartThings\Serializer\CapabilityLocalizationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CapabilityLocalizationRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\CreateCapabilityPresentationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CreateCapabilityPresentationRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\CreateCapabilityRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CreateCapabilityRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\UpdateCapabilityPresentationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateCapabilityPresentationRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\UpdateCapabilityRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateCapabilityRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformerInterface;
@@ -19,6 +34,7 @@ use ChristianBrown\SmartThings\Transformer\CapabilityTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\LocaleReferencesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\LocalizationTransformerInterface;
 
+use function array_filter;
 use function is_array;
 use function rawurlencode;
 use function sprintf;
@@ -30,9 +46,12 @@ final class CapabilityApi implements CapabilityApiInterface
      */
     private array $cache = [];
     private CapabilitiesTransformerInterface $capabilitiesTransformer;
+    private ?CapabilityLocalizationRequestSerializerInterface $capabilityLocalizationRequestSerializer;
     private CapabilityNamespacesTransformerInterface $capabilityNamespacesTransformer;
     private CapabilityPresentationTransformerInterface $capabilityPresentationTransformer;
     private CapabilityTransformerInterface $capabilityTransformer;
+    private ?CreateCapabilityPresentationRequestSerializerInterface $createCapabilityPresentationRequestSerializer;
+    private ?CreateCapabilityRequestSerializerInterface $createCapabilityRequestSerializer;
 
     /**
      * @var ?array<int, CapabilityInterface>
@@ -67,13 +86,15 @@ final class CapabilityApi implements CapabilityApiInterface
      * @var array<string, LocalizationInterface>
      */
     private array $translationsCache = [];
+    private ?UpdateCapabilityPresentationRequestSerializerInterface $updateCapabilityPresentationRequestSerializer;
+    private ?UpdateCapabilityRequestSerializerInterface $updateCapabilityRequestSerializer;
 
     /**
      * @var array<string, array<int, CapabilityInterface>>
      */
     private array $versionsCache = [];
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, CapabilityTransformerInterface $capabilityTransformer, CapabilitiesTransformerInterface $capabilitiesTransformer, CapabilityNamespacesTransformerInterface $capabilityNamespacesTransformer, CapabilityPresentationTransformerInterface $capabilityPresentationTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, CapabilityTransformerInterface $capabilityTransformer, CapabilitiesTransformerInterface $capabilitiesTransformer, CapabilityNamespacesTransformerInterface $capabilityNamespacesTransformer, CapabilityPresentationTransformerInterface $capabilityPresentationTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token, ?CreateCapabilityRequestSerializerInterface $createCapabilityRequestSerializer = null, ?UpdateCapabilityRequestSerializerInterface $updateCapabilityRequestSerializer = null, ?CapabilityLocalizationRequestSerializerInterface $capabilityLocalizationRequestSerializer = null, ?CreateCapabilityPresentationRequestSerializerInterface $createCapabilityPresentationRequestSerializer = null, ?UpdateCapabilityPresentationRequestSerializerInterface $updateCapabilityPresentationRequestSerializer = null)
     {
         $this->requestSender = $requestSender;
         $this->capabilityTransformer = $capabilityTransformer;
@@ -83,6 +104,103 @@ final class CapabilityApi implements CapabilityApiInterface
         $this->localeReferencesTransformer = $localeReferencesTransformer;
         $this->localizationTransformer = $localizationTransformer;
         $this->token = $token;
+        $this->createCapabilityRequestSerializer = $createCapabilityRequestSerializer;
+        $this->updateCapabilityRequestSerializer = $updateCapabilityRequestSerializer;
+        $this->capabilityLocalizationRequestSerializer = $capabilityLocalizationRequestSerializer;
+        $this->createCapabilityPresentationRequestSerializer = $createCapabilityPresentationRequestSerializer;
+        $this->updateCapabilityPresentationRequestSerializer = $updateCapabilityPresentationRequestSerializer;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function createCapability(CreateCapabilityRequestInterface $request, ?string $namespace = null, ?string $organizationId = null): CapabilityInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
+        $query = array_filter([self::KEY_NAMESPACE => $namespace], static fn (?string $value): bool => null !== $value);
+        $body = $this->resolveCreateCapabilityRequestSerializer()->serialize($request);
+        $data = $this->requestSender->post(self::API_URL, $query, $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->capabilityTransformer->transform($data);
+        $this->listCache = null;
+        $this->namespaceCache = [];
+        $this->versionsCache = [];
+
+        return $result;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function createCapabilityLocalization(string $capabilityId, int $capabilityVersion, CapabilityLocalizationRequestInterface $request): LocalizationInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_LOCALES_SPRINTF, rawurlencode($capabilityId), $capabilityVersion);
+        $body = $this->resolveCapabilityLocalizationRequestSerializer()->serialize($request);
+        $data = $this->requestSender->post($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->localizationTransformer->transform($data);
+        $this->localesCache = [];
+
+        return $result;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function createCustomCapabilityPresentation(string $capabilityId, int $capabilityVersion, CreateCapabilityPresentationRequestInterface $request, ?string $organizationId = null): CapabilityPresentationInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
+        $url = sprintf(self::API_URL_PRESENTATION_SPRINTF, rawurlencode($capabilityId), $capabilityVersion);
+        $body = $this->resolveCreateCapabilityPresentationRequestSerializer()->serialize($request);
+        $data = $this->requestSender->post($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->capabilityPresentationTransformer->transform($data);
+        $this->presentationCache[sprintf(self::CACHE_KEY_SPRINTF, $capabilityId, $capabilityVersion)] = $result;
+
+        return $result;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteCapability(string $capabilityId, int $capabilityVersion, ?string $organizationId = null): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($capabilityId), $capabilityVersion);
+        $this->requestSender->delete($url, [], $headers);
+        unset($this->cache[sprintf(self::CACHE_KEY_SPRINTF, $capabilityId, $capabilityVersion)], $this->presentationCache[sprintf(self::CACHE_KEY_SPRINTF, $capabilityId, $capabilityVersion)]);
+        $this->localesCache = [];
+        $this->translationsCache = [];
+        $this->listCache = null;
+        $this->namespaceCache = [];
+        $this->versionsCache = [];
     }
 
     /**
@@ -311,6 +429,107 @@ final class CapabilityApi implements CapabilityApiInterface
     }
 
     /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function patchCapabilityLocalization(string $capabilityId, int $capabilityVersion, string $locale, CapabilityLocalizationRequestInterface $request): LocalizationInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_TRANSLATIONS_SPRINTF, rawurlencode($capabilityId), $capabilityVersion, rawurlencode($locale));
+        $body = $this->resolveCapabilityLocalizationRequestSerializer()->serialize($request);
+        $data = $this->requestSender->patch($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->localizationTransformer->transform($data);
+        $this->translationsCache[sprintf(self::TRANSLATIONS_CACHE_KEY_SPRINTF, $capabilityId, $capabilityVersion, $locale)] = $result;
+        $this->localesCache = [];
+
+        return $result;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function updateCapability(string $capabilityId, int $capabilityVersion, UpdateCapabilityRequestInterface $request, ?string $organizationId = null): CapabilityInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
+        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($capabilityId), $capabilityVersion);
+        $body = $this->resolveUpdateCapabilityRequestSerializer()->serialize($request);
+        $data = $this->requestSender->put($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->capabilityTransformer->transform($data);
+        $this->cache[sprintf(self::CACHE_KEY_SPRINTF, $capabilityId, $capabilityVersion)] = $result;
+        $this->listCache = null;
+        $this->namespaceCache = [];
+        $this->versionsCache = [];
+
+        return $result;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function updateCapabilityLocalization(string $capabilityId, int $capabilityVersion, string $locale, CapabilityLocalizationRequestInterface $request): LocalizationInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_TRANSLATIONS_SPRINTF, rawurlencode($capabilityId), $capabilityVersion, rawurlencode($locale));
+        $body = $this->resolveCapabilityLocalizationRequestSerializer()->serialize($request);
+        $data = $this->requestSender->put($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->localizationTransformer->transform($data);
+        $this->translationsCache[sprintf(self::TRANSLATIONS_CACHE_KEY_SPRINTF, $capabilityId, $capabilityVersion, $locale)] = $result;
+        $this->localesCache = [];
+
+        return $result;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function updateCustomCapabilityPresentation(string $capabilityId, int $capabilityVersion, UpdateCapabilityPresentationRequestInterface $request, ?string $organizationId = null): CapabilityPresentationInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
+        $url = sprintf(self::API_URL_PRESENTATION_SPRINTF, rawurlencode($capabilityId), $capabilityVersion);
+        $body = $this->resolveUpdateCapabilityPresentationRequestSerializer()->serialize($request);
+        $data = $this->requestSender->put($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->capabilityPresentationTransformer->transform($data);
+        $this->presentationCache[sprintf(self::CACHE_KEY_SPRINTF, $capabilityId, $capabilityVersion)] = $result;
+
+        return $result;
+    }
+
+    /**
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
@@ -331,5 +550,50 @@ final class CapabilityApi implements CapabilityApiInterface
         }
 
         return $this->capabilitiesTransformer->transform($data[self::KEY_ITEMS]);
+    }
+
+    /**
+     * Falls back to the default serializer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolveCapabilityLocalizationRequestSerializer(): CapabilityLocalizationRequestSerializerInterface
+    {
+        return $this->capabilityLocalizationRequestSerializer ?? new CapabilityLocalizationRequestSerializer();
+    }
+
+    /**
+     * Falls back to the default serializer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolveCreateCapabilityPresentationRequestSerializer(): CreateCapabilityPresentationRequestSerializerInterface
+    {
+        return $this->createCapabilityPresentationRequestSerializer ?? new CreateCapabilityPresentationRequestSerializer();
+    }
+
+    /**
+     * Falls back to the default serializer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolveCreateCapabilityRequestSerializer(): CreateCapabilityRequestSerializerInterface
+    {
+        return $this->createCapabilityRequestSerializer ?? new CreateCapabilityRequestSerializer();
+    }
+
+    /**
+     * Falls back to the default serializer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolveUpdateCapabilityPresentationRequestSerializer(): UpdateCapabilityPresentationRequestSerializerInterface
+    {
+        return $this->updateCapabilityPresentationRequestSerializer ?? new UpdateCapabilityPresentationRequestSerializer();
+    }
+
+    /**
+     * Falls back to the default serializer when the caller (or an older, hand-wired
+     * caller) did not supply one, keeping the appended constructor parameter optional.
+     */
+    private function resolveUpdateCapabilityRequestSerializer(): UpdateCapabilityRequestSerializerInterface
+    {
+        return $this->updateCapabilityRequestSerializer ?? new UpdateCapabilityRequestSerializer();
     }
 }

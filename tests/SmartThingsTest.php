@@ -59,12 +59,18 @@ use ChristianBrown\SmartThings\DependencyInjection\Registrar\ScheduleRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SchemaConnectorRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ServiceApiRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SubscriptionRegistrar;
+use ChristianBrown\SmartThings\Serializer\CapabilityLocalizationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateAppRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CreateCapabilityPresentationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CreateCapabilityRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializer;
 use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppOauthRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppSettingsRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateCapabilityPresentationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\UpdateCapabilityRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateSignatureTypeRequestSerializer;
 use ChristianBrown\SmartThings\SmartThings;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
@@ -300,6 +306,12 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(UpdateAppOauthRequestSerializer::class)]
 #[UsesClass(GenerateAppOauthRequestSerializer::class)]
 #[UsesClass(UpdateSignatureTypeRequestSerializer::class)]
+#[UsesClass(CreateCapabilityRequestSerializer::class)]
+#[UsesClass(UpdateCapabilityRequestSerializer::class)]
+#[UsesClass(CapabilityLocalizationRequestSerializer::class)]
+#[UsesClass(CreateCapabilityPresentationRequestSerializer::class)]
+#[UsesClass(UpdateCapabilityPresentationRequestSerializer::class)]
+#[UsesClass(PreferenceLocalizationRequestSerializer::class)]
 final class SmartThingsTest extends TestCase
 {
     public function testConstructAcceptsCustomApiHost(): void
