@@ -64,6 +64,11 @@ use ChristianBrown\SmartThings\DependencyInjection\Registrar\ServiceApiRegistrar
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SubscriptionRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\TreeRegistrar;
+use ChristianBrown\SmartThings\Serializer\ActionItemSerializer;
+use ChristianBrown\SmartThings\Serializer\AlternativeItemSerializer;
+use ChristianBrown\SmartThings\Serializer\AutomationForCapabilityActionsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\AutomationForCapabilityConditionsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\AutomationForCapabilitySerializer;
 use ChristianBrown\SmartThings\Serializer\CapabilityConfigurationSerializer;
 use ChristianBrown\SmartThings\Serializer\CapabilityConfigurationValueSerializer;
 use ChristianBrown\SmartThings\Serializer\CapabilityLocalizationRequestSerializer;
@@ -71,21 +76,52 @@ use ChristianBrown\SmartThings\Serializer\CapabilityReferenceRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\ChannelCreateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\ChannelUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateAppRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CreateCapabilityPresentationRequestDetailViewItemSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateCapabilityPresentationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateCapabilityRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateDeviceProfileRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\DashboardForCapabilitySerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceCategorySerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceProfileComponentRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\DriverChannelCreateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\DriverChannelUpdateRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\DynamicListForAutomationActionSerializer;
+use ChristianBrown\SmartThings\Serializer\DynamicListForAutomationConditionSerializer;
+use ChristianBrown\SmartThings\Serializer\EmptyWithAvailableSizeSerializer;
+use ChristianBrown\SmartThings\Serializer\EnumSliderForAutomationConditionSerializer;
+use ChristianBrown\SmartThings\Serializer\EnumSliderForAutomationConditionSupportedOperatorsItemSerializer;
 use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\HubDeviceUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\HubDriverInstallRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\ListForArgumentSerializer;
+use ChristianBrown\SmartThings\Serializer\ListForAutomationActionSerializer;
+use ChristianBrown\SmartThings\Serializer\ListForAutomationConditionSerializer;
+use ChristianBrown\SmartThings\Serializer\ListForDetailViewSerializer;
+use ChristianBrown\SmartThings\Serializer\ListWithAvailableSizeCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\ListWithAvailableSizeSerializer;
+use ChristianBrown\SmartThings\Serializer\ListWithAvailableSizeStateSerializer;
+use ChristianBrown\SmartThings\Serializer\MultiArgCommandArgumentsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\MultiArgCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\NumberFieldForArgumentSerializer;
+use ChristianBrown\SmartThings\Serializer\NumberFieldForAutomationActionSerializer;
+use ChristianBrown\SmartThings\Serializer\NumberFieldForAutomationConditionSerializer;
+use ChristianBrown\SmartThings\Serializer\NumberFieldSerializer;
+use ChristianBrown\SmartThings\Serializer\PanelItemForCapabilitySerializer;
+use ChristianBrown\SmartThings\Serializer\PlayPauseCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\PlayPauseSerializer;
+use ChristianBrown\SmartThings\Serializer\PlayPauseStateSerializer;
+use ChristianBrown\SmartThings\Serializer\PlayStopCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\PlayStopSerializer;
+use ChristianBrown\SmartThings\Serializer\PlayStopStateSerializer;
 use ChristianBrown\SmartThings\Serializer\PlayTextRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PreferenceDefinitionSerializer;
 use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\PresentationSettingsSerializer;
+use ChristianBrown\SmartThings\Serializer\PresentationSettingsTemperatureConversionsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\PushButtonSerializer;
+use ChristianBrown\SmartThings\Serializer\PushButtonWithAvailableSizeSerializer;
 use ChristianBrown\SmartThings\Serializer\RestrictionSerializer;
 use ChristianBrown\SmartThings\Serializer\RuleRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SchemaAppCreateRequestSerializer;
@@ -93,6 +129,36 @@ use ChristianBrown\SmartThings\Serializer\SchemaAppInviteRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SchemaAppUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SchemaOauthCredentialsRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\ServiceSubscriptionRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\SliderForArgumentSerializer;
+use ChristianBrown\SmartThings\Serializer\SliderForAutomationActionSerializer;
+use ChristianBrown\SmartThings\Serializer\SliderForAutomationConditionSerializer;
+use ChristianBrown\SmartThings\Serializer\SliderTypeSerializer;
+use ChristianBrown\SmartThings\Serializer\SliderWithAvailableSizeSerializer;
+use ChristianBrown\SmartThings\Serializer\StandbyPowerSwitchForDashboardSerializer;
+use ChristianBrown\SmartThings\Serializer\StandbyPowerSwitchForDashboardStateSerializer;
+use ChristianBrown\SmartThings\Serializer\StandbyPowerSwitchSerializer;
+use ChristianBrown\SmartThings\Serializer\StateItemSerializer;
+use ChristianBrown\SmartThings\Serializer\StatelessPowerToggleForDashboardSerializer;
+use ChristianBrown\SmartThings\Serializer\StateSerializer;
+use ChristianBrown\SmartThings\Serializer\StateWithAvailableSizeSerializer;
+use ChristianBrown\SmartThings\Serializer\StepperSerializer;
+use ChristianBrown\SmartThings\Serializer\StepperWithAvailableSizeCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\StepperWithAvailableSizeSerializer;
+use ChristianBrown\SmartThings\Serializer\StepperWithAvailableSizeStateSerializer;
+use ChristianBrown\SmartThings\Serializer\SupportedValuesForDynamicListSerializer;
+use ChristianBrown\SmartThings\Serializer\SupportedValuesForDynamicListValueMapSerializer;
+use ChristianBrown\SmartThings\Serializer\SwitchControlSerializer;
+use ChristianBrown\SmartThings\Serializer\SwitchForDashboardSerializer;
+use ChristianBrown\SmartThings\Serializer\TextButtonButtonsItemSerializer;
+use ChristianBrown\SmartThings\Serializer\TextButtonSerializer;
+use ChristianBrown\SmartThings\Serializer\TextFieldForArgumentSerializer;
+use ChristianBrown\SmartThings\Serializer\TextFieldForAutomationActionSerializer;
+use ChristianBrown\SmartThings\Serializer\TextFieldForAutomationConditionSerializer;
+use ChristianBrown\SmartThings\Serializer\TextFieldSerializer;
+use ChristianBrown\SmartThings\Serializer\ToggleSwitchForDashboardCommandSerializer;
+use ChristianBrown\SmartThings\Serializer\ToggleSwitchForDashboardSerializer;
+use ChristianBrown\SmartThings\Serializer\ToggleSwitchForDashboardStateSerializer;
+use ChristianBrown\SmartThings\Serializer\ToggleSwitchSerializer;
 use ChristianBrown\SmartThings\Serializer\TtsRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppOauthRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppRequestSerializer;
@@ -101,7 +167,10 @@ use ChristianBrown\SmartThings\Serializer\UpdateCapabilityPresentationRequestSer
 use ChristianBrown\SmartThings\Serializer\UpdateCapabilityRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateDeviceProfileRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateSignatureTypeRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\VisibleConditionBaseSerializer;
 use ChristianBrown\SmartThings\SmartThings;
+use ChristianBrown\SmartThings\Transformer\ActionItemTransformer;
+use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformer;
 use ChristianBrown\SmartThings\Transformer\AppDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
@@ -111,12 +180,16 @@ use ChristianBrown\SmartThings\Transformer\AppTransformer;
 use ChristianBrown\SmartThings\Transformer\AppUiSettingsTransformer;
 use ChristianBrown\SmartThings\Transformer\AttributeStateTransformer;
 use ChristianBrown\SmartThings\Transformer\AttributeValueTransformer;
+use ChristianBrown\SmartThings\Transformer\AutomationForCapabilityActionsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\AutomationForCapabilityConditionsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\AutomationForCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\BleD2DDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationValueTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespaceTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityPresentationDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitySubscriptionDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
@@ -130,7 +203,9 @@ use ChristianBrown\SmartThings\Transformer\CommandMappingsTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandMappingTransformer;
 use ChristianBrown\SmartThings\Transformer\ConvertedTtsTransformer;
 use ChristianBrown\SmartThings\Transformer\CreateAppResponseTransformer;
+use ChristianBrown\SmartThings\Transformer\CreateCapabilityPresentationRequestDetailViewItemTransformer;
 use ChristianBrown\SmartThings\Transformer\CronScheduleTransformer;
+use ChristianBrown\SmartThings\Transformer\DashboardForCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCapabilityReferenceTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCategoryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceCommandResultsTransformer;
@@ -174,9 +249,14 @@ use ChristianBrown\SmartThings\Transformer\DriverPermissionTransformer;
 use ChristianBrown\SmartThings\Transformer\DriversTransformer;
 use ChristianBrown\SmartThings\Transformer\DriverTransformer;
 use ChristianBrown\SmartThings\Transformer\DthDeviceDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\DynamicListForAutomationActionTransformer;
+use ChristianBrown\SmartThings\Transformer\DynamicListForAutomationConditionTransformer;
 use ChristianBrown\SmartThings\Transformer\EdgeChildDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\EdgeDriverSupportedEndpointAppsAppsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\EdgeDriverSupportedEndpointAppsTransformer;
+use ChristianBrown\SmartThings\Transformer\EmptyWithAvailableSizeTransformer;
+use ChristianBrown\SmartThings\Transformer\EnumSliderForAutomationConditionSupportedOperatorsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\EnumSliderForAutomationConditionTransformer;
 use ChristianBrown\SmartThings\Transformer\GenerateAppOauthResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\GroupDeviceDetailsDevicesItemComponentsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\GroupDeviceDetailsDevicesItemTransformer;
@@ -210,6 +290,13 @@ use ChristianBrown\SmartThings\Transformer\IrDeviceDetailsFunctionCodesTransform
 use ChristianBrown\SmartThings\Transformer\IrDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\LambdaSmartAppTransformer;
 use ChristianBrown\SmartThings\Transformer\LanDeviceDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\ListForArgumentTransformer;
+use ChristianBrown\SmartThings\Transformer\ListForAutomationActionTransformer;
+use ChristianBrown\SmartThings\Transformer\ListForAutomationConditionTransformer;
+use ChristianBrown\SmartThings\Transformer\ListForDetailViewTransformer;
+use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeCommandTransformer;
+use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeStateTransformer;
+use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeTransformer;
 use ChristianBrown\SmartThings\Transformer\LocaleReferencesTransformer;
 use ChristianBrown\SmartThings\Transformer\LocaleReferenceTransformer;
 use ChristianBrown\SmartThings\Transformer\LocalizationTransformer;
@@ -228,15 +315,32 @@ use ChristianBrown\SmartThings\Transformer\ModesTransformer;
 use ChristianBrown\SmartThings\Transformer\ModeSubscriptionDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\ModeTransformer;
 use ChristianBrown\SmartThings\Transformer\MqttDeviceDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\MultiArgCommandArgumentsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\MultiArgCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\NoticeTransformer;
+use ChristianBrown\SmartThings\Transformer\NumberFieldForArgumentTransformer;
+use ChristianBrown\SmartThings\Transformer\NumberFieldForAutomationActionTransformer;
+use ChristianBrown\SmartThings\Transformer\NumberFieldForAutomationConditionTransformer;
+use ChristianBrown\SmartThings\Transformer\NumberFieldTransformer;
 use ChristianBrown\SmartThings\Transformer\OcfDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\OrganizationsTransformer;
 use ChristianBrown\SmartThings\Transformer\OrganizationTransformer;
 use ChristianBrown\SmartThings\Transformer\OwnerTransformer;
 use ChristianBrown\SmartThings\Transformer\PageLinksTransformer;
 use ChristianBrown\SmartThings\Transformer\PageLinkTransformer;
+use ChristianBrown\SmartThings\Transformer\PanelItemForCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayedTextTransformer;
+use ChristianBrown\SmartThings\Transformer\PlayPauseCommandTransformer;
+use ChristianBrown\SmartThings\Transformer\PlayPauseStateTransformer;
+use ChristianBrown\SmartThings\Transformer\PlayPauseTransformer;
+use ChristianBrown\SmartThings\Transformer\PlayStopCommandTransformer;
+use ChristianBrown\SmartThings\Transformer\PlayStopStateTransformer;
+use ChristianBrown\SmartThings\Transformer\PlayStopTransformer;
+use ChristianBrown\SmartThings\Transformer\PresentationSettingsTemperatureConversionsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\PresentationSettingsTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationTransformer;
+use ChristianBrown\SmartThings\Transformer\PushButtonTransformer;
+use ChristianBrown\SmartThings\Transformer\PushButtonWithAvailableSizeTransformer;
 use ChristianBrown\SmartThings\Transformer\RestrictionTransformer;
 use ChristianBrown\SmartThings\Transformer\RoomIndoorMapTransformer;
 use ChristianBrown\SmartThings\Transformer\RulesTransformer;
@@ -270,14 +374,45 @@ use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceMeasurementsTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceMeasurementTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceSubscriptionReceiptTransformer;
+use ChristianBrown\SmartThings\Transformer\SliderForArgumentTransformer;
+use ChristianBrown\SmartThings\Transformer\SliderForAutomationActionTransformer;
+use ChristianBrown\SmartThings\Transformer\SliderForAutomationConditionTransformer;
+use ChristianBrown\SmartThings\Transformer\SliderTypeTransformer;
+use ChristianBrown\SmartThings\Transformer\SliderWithAvailableSizeTransformer;
+use ChristianBrown\SmartThings\Transformer\StandbyPowerSwitchForDashboardStateTransformer;
+use ChristianBrown\SmartThings\Transformer\StandbyPowerSwitchForDashboardTransformer;
+use ChristianBrown\SmartThings\Transformer\StandbyPowerSwitchTransformer;
+use ChristianBrown\SmartThings\Transformer\StateItemTransformer;
+use ChristianBrown\SmartThings\Transformer\StatelessPowerToggleForDashboardTransformer;
+use ChristianBrown\SmartThings\Transformer\StateTransformer;
+use ChristianBrown\SmartThings\Transformer\StateWithAvailableSizeTransformer;
+use ChristianBrown\SmartThings\Transformer\StepperTransformer;
+use ChristianBrown\SmartThings\Transformer\StepperWithAvailableSizeCommandTransformer;
+use ChristianBrown\SmartThings\Transformer\StepperWithAvailableSizeStateTransformer;
+use ChristianBrown\SmartThings\Transformer\StepperWithAvailableSizeTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
+use ChristianBrown\SmartThings\Transformer\SupportedValuesForDynamicListTransformer;
+use ChristianBrown\SmartThings\Transformer\SupportedValuesForDynamicListValueMapTransformer;
+use ChristianBrown\SmartThings\Transformer\SwitchControlTransformer;
+use ChristianBrown\SmartThings\Transformer\SwitchForDashboardTransformer;
+use ChristianBrown\SmartThings\Transformer\TextButtonButtonsItemTransformer;
+use ChristianBrown\SmartThings\Transformer\TextButtonTransformer;
+use ChristianBrown\SmartThings\Transformer\TextFieldForArgumentTransformer;
+use ChristianBrown\SmartThings\Transformer\TextFieldForAutomationActionTransformer;
+use ChristianBrown\SmartThings\Transformer\TextFieldForAutomationConditionTransformer;
+use ChristianBrown\SmartThings\Transformer\TextFieldTransformer;
+use ChristianBrown\SmartThings\Transformer\ToggleSwitchForDashboardCommandTransformer;
+use ChristianBrown\SmartThings\Transformer\ToggleSwitchForDashboardStateTransformer;
+use ChristianBrown\SmartThings\Transformer\ToggleSwitchForDashboardTransformer;
+use ChristianBrown\SmartThings\Transformer\ToggleSwitchTransformer;
 use ChristianBrown\SmartThings\Transformer\TtsInfoTransformer;
 use ChristianBrown\SmartThings\Transformer\TtsVoiceTransformer;
 use ChristianBrown\SmartThings\Transformer\ViperAppLinksTransformer;
 use ChristianBrown\SmartThings\Transformer\ViperDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\VirtualDeviceDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\VisibleConditionBaseTransformer;
 use ChristianBrown\SmartThings\Transformer\WebhookSmartAppTransformer;
 use ChristianBrown\SmartThings\Transformer\ZigbeeDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\ZigbeeGenericFingerprintTransformer;
@@ -570,6 +705,141 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CreateDeviceProfileRequestSerializer::class)]
 #[UsesClass(UpdateDeviceProfileRequestSerializer::class)]
 #[UsesClass(PreferenceRequestSerializer::class)]
+#[UsesClass(AlternativeItemSerializer::class)]
+#[UsesClass(StateItemSerializer::class)]
+#[UsesClass(PushButtonSerializer::class)]
+#[UsesClass(ToggleSwitchForDashboardCommandSerializer::class)]
+#[UsesClass(ToggleSwitchForDashboardStateSerializer::class)]
+#[UsesClass(ToggleSwitchForDashboardSerializer::class)]
+#[UsesClass(SwitchForDashboardSerializer::class)]
+#[UsesClass(StandbyPowerSwitchForDashboardStateSerializer::class)]
+#[UsesClass(StandbyPowerSwitchForDashboardSerializer::class)]
+#[UsesClass(StatelessPowerToggleForDashboardSerializer::class)]
+#[UsesClass(PlayPauseCommandSerializer::class)]
+#[UsesClass(PlayPauseStateSerializer::class)]
+#[UsesClass(PlayPauseSerializer::class)]
+#[UsesClass(PlayStopCommandSerializer::class)]
+#[UsesClass(PlayStopStateSerializer::class)]
+#[UsesClass(PlayStopSerializer::class)]
+#[UsesClass(ActionItemSerializer::class)]
+#[UsesClass(StepperWithAvailableSizeCommandSerializer::class)]
+#[UsesClass(StepperWithAvailableSizeStateSerializer::class)]
+#[UsesClass(StepperWithAvailableSizeSerializer::class)]
+#[UsesClass(ListWithAvailableSizeCommandSerializer::class)]
+#[UsesClass(ListWithAvailableSizeStateSerializer::class)]
+#[UsesClass(ListWithAvailableSizeSerializer::class)]
+#[UsesClass(PushButtonWithAvailableSizeSerializer::class)]
+#[UsesClass(StateWithAvailableSizeSerializer::class)]
+#[UsesClass(SliderWithAvailableSizeSerializer::class)]
+#[UsesClass(EmptyWithAvailableSizeSerializer::class)]
+#[UsesClass(PanelItemForCapabilitySerializer::class)]
+#[UsesClass(DashboardForCapabilitySerializer::class)]
+#[UsesClass(ToggleSwitchSerializer::class)]
+#[UsesClass(StandbyPowerSwitchSerializer::class)]
+#[UsesClass(SwitchControlSerializer::class)]
+#[UsesClass(SliderTypeSerializer::class)]
+#[UsesClass(TextButtonButtonsItemSerializer::class)]
+#[UsesClass(TextButtonSerializer::class)]
+#[UsesClass(ListForDetailViewSerializer::class)]
+#[UsesClass(TextFieldSerializer::class)]
+#[UsesClass(NumberFieldSerializer::class)]
+#[UsesClass(StepperSerializer::class)]
+#[UsesClass(StateSerializer::class)]
+#[UsesClass(VisibleConditionBaseSerializer::class)]
+#[UsesClass(CreateCapabilityPresentationRequestDetailViewItemSerializer::class)]
+#[UsesClass(SliderForAutomationConditionSerializer::class)]
+#[UsesClass(ListForAutomationConditionSerializer::class)]
+#[UsesClass(SupportedValuesForDynamicListValueMapSerializer::class)]
+#[UsesClass(SupportedValuesForDynamicListSerializer::class)]
+#[UsesClass(DynamicListForAutomationConditionSerializer::class)]
+#[UsesClass(NumberFieldForAutomationConditionSerializer::class)]
+#[UsesClass(TextFieldForAutomationConditionSerializer::class)]
+#[UsesClass(EnumSliderForAutomationConditionSupportedOperatorsItemSerializer::class)]
+#[UsesClass(EnumSliderForAutomationConditionSerializer::class)]
+#[UsesClass(AutomationForCapabilityConditionsItemSerializer::class)]
+#[UsesClass(SliderForAutomationActionSerializer::class)]
+#[UsesClass(ListForAutomationActionSerializer::class)]
+#[UsesClass(DynamicListForAutomationActionSerializer::class)]
+#[UsesClass(TextFieldForAutomationActionSerializer::class)]
+#[UsesClass(NumberFieldForAutomationActionSerializer::class)]
+#[UsesClass(SliderForArgumentSerializer::class)]
+#[UsesClass(ListForArgumentSerializer::class)]
+#[UsesClass(TextFieldForArgumentSerializer::class)]
+#[UsesClass(NumberFieldForArgumentSerializer::class)]
+#[UsesClass(MultiArgCommandArgumentsItemSerializer::class)]
+#[UsesClass(MultiArgCommandSerializer::class)]
+#[UsesClass(AutomationForCapabilityActionsItemSerializer::class)]
+#[UsesClass(AutomationForCapabilitySerializer::class)]
+#[UsesClass(PresentationSettingsTemperatureConversionsItemSerializer::class)]
+#[UsesClass(PresentationSettingsSerializer::class)]
+#[UsesClass(AlternativeItemTransformer::class)]
+#[UsesClass(StateItemTransformer::class)]
+#[UsesClass(PushButtonTransformer::class)]
+#[UsesClass(ToggleSwitchForDashboardCommandTransformer::class)]
+#[UsesClass(ToggleSwitchForDashboardStateTransformer::class)]
+#[UsesClass(ToggleSwitchForDashboardTransformer::class)]
+#[UsesClass(SwitchForDashboardTransformer::class)]
+#[UsesClass(StandbyPowerSwitchForDashboardStateTransformer::class)]
+#[UsesClass(StandbyPowerSwitchForDashboardTransformer::class)]
+#[UsesClass(StatelessPowerToggleForDashboardTransformer::class)]
+#[UsesClass(PlayPauseCommandTransformer::class)]
+#[UsesClass(PlayPauseStateTransformer::class)]
+#[UsesClass(PlayPauseTransformer::class)]
+#[UsesClass(PlayStopCommandTransformer::class)]
+#[UsesClass(PlayStopStateTransformer::class)]
+#[UsesClass(PlayStopTransformer::class)]
+#[UsesClass(ActionItemTransformer::class)]
+#[UsesClass(StepperWithAvailableSizeCommandTransformer::class)]
+#[UsesClass(StepperWithAvailableSizeStateTransformer::class)]
+#[UsesClass(StepperWithAvailableSizeTransformer::class)]
+#[UsesClass(ListWithAvailableSizeCommandTransformer::class)]
+#[UsesClass(ListWithAvailableSizeStateTransformer::class)]
+#[UsesClass(ListWithAvailableSizeTransformer::class)]
+#[UsesClass(PushButtonWithAvailableSizeTransformer::class)]
+#[UsesClass(StateWithAvailableSizeTransformer::class)]
+#[UsesClass(SliderWithAvailableSizeTransformer::class)]
+#[UsesClass(EmptyWithAvailableSizeTransformer::class)]
+#[UsesClass(PanelItemForCapabilityTransformer::class)]
+#[UsesClass(DashboardForCapabilityTransformer::class)]
+#[UsesClass(ToggleSwitchTransformer::class)]
+#[UsesClass(StandbyPowerSwitchTransformer::class)]
+#[UsesClass(SwitchControlTransformer::class)]
+#[UsesClass(SliderTypeTransformer::class)]
+#[UsesClass(TextButtonButtonsItemTransformer::class)]
+#[UsesClass(TextButtonTransformer::class)]
+#[UsesClass(ListForDetailViewTransformer::class)]
+#[UsesClass(TextFieldTransformer::class)]
+#[UsesClass(NumberFieldTransformer::class)]
+#[UsesClass(StepperTransformer::class)]
+#[UsesClass(StateTransformer::class)]
+#[UsesClass(VisibleConditionBaseTransformer::class)]
+#[UsesClass(CreateCapabilityPresentationRequestDetailViewItemTransformer::class)]
+#[UsesClass(SliderForAutomationConditionTransformer::class)]
+#[UsesClass(ListForAutomationConditionTransformer::class)]
+#[UsesClass(SupportedValuesForDynamicListValueMapTransformer::class)]
+#[UsesClass(SupportedValuesForDynamicListTransformer::class)]
+#[UsesClass(DynamicListForAutomationConditionTransformer::class)]
+#[UsesClass(NumberFieldForAutomationConditionTransformer::class)]
+#[UsesClass(TextFieldForAutomationConditionTransformer::class)]
+#[UsesClass(EnumSliderForAutomationConditionSupportedOperatorsItemTransformer::class)]
+#[UsesClass(EnumSliderForAutomationConditionTransformer::class)]
+#[UsesClass(AutomationForCapabilityConditionsItemTransformer::class)]
+#[UsesClass(SliderForAutomationActionTransformer::class)]
+#[UsesClass(ListForAutomationActionTransformer::class)]
+#[UsesClass(DynamicListForAutomationActionTransformer::class)]
+#[UsesClass(TextFieldForAutomationActionTransformer::class)]
+#[UsesClass(NumberFieldForAutomationActionTransformer::class)]
+#[UsesClass(SliderForArgumentTransformer::class)]
+#[UsesClass(ListForArgumentTransformer::class)]
+#[UsesClass(TextFieldForArgumentTransformer::class)]
+#[UsesClass(NumberFieldForArgumentTransformer::class)]
+#[UsesClass(MultiArgCommandArgumentsItemTransformer::class)]
+#[UsesClass(MultiArgCommandTransformer::class)]
+#[UsesClass(AutomationForCapabilityActionsItemTransformer::class)]
+#[UsesClass(AutomationForCapabilityTransformer::class)]
+#[UsesClass(PresentationSettingsTemperatureConversionsItemTransformer::class)]
+#[UsesClass(PresentationSettingsTransformer::class)]
+#[UsesClass(CapabilityPresentationDetailsTransformer::class)]
 final class SmartThingsTest extends TestCase
 {
     public function testConstructAcceptsCustomApiHost(): void

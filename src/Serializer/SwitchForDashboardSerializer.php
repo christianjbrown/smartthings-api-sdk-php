@@ -1,0 +1,48 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ChristianBrown\SmartThings\Serializer;
+
+use ChristianBrown\SmartThings\Model\SwitchForDashboardInterface;
+use ChristianBrown\SmartThings\Model\ToggleSwitchForDashboardStateInterface;
+
+use function array_filter;
+
+final class SwitchForDashboardSerializer implements SwitchForDashboardSerializerInterface
+{
+    private ToggleSwitchForDashboardCommandSerializerInterface $toggleSwitchForDashboardCommandSerializer;
+    private ToggleSwitchForDashboardStateSerializerInterface $toggleSwitchForDashboardStateSerializer;
+
+    public function __construct(ToggleSwitchForDashboardCommandSerializerInterface $toggleSwitchForDashboardCommandSerializer, ToggleSwitchForDashboardStateSerializerInterface $toggleSwitchForDashboardStateSerializer)
+    {
+        $this->toggleSwitchForDashboardCommandSerializer = $toggleSwitchForDashboardCommandSerializer;
+        $this->toggleSwitchForDashboardStateSerializer = $toggleSwitchForDashboardStateSerializer;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function serialize(SwitchForDashboardInterface $model): array
+    {
+        $serialized = [
+            self::KEY_COMMAND => $this->toggleSwitchForDashboardCommandSerializer->serialize($model->getCommand()),
+            self::KEY_STATE => $this->serializeOptionalState($model->getState()),
+        ];
+
+        // Omit null optionals rather than sending them as explicit nulls.
+        return array_filter($serialized, static fn (mixed $value): bool => null !== $value);
+    }
+
+    /**
+     * @return null|mixed[]
+     */
+    private function serializeOptionalState(?ToggleSwitchForDashboardStateInterface $value): ?array
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->toggleSwitchForDashboardStateSerializer->serialize($value);
+    }
+}

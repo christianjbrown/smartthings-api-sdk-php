@@ -6,9 +6,7 @@ namespace ChristianBrown\SmartThings\DependencyInjection\Registrar;
 
 use ChristianBrown\SmartThings\DependencyInjection\ServiceRegistrarInterface;
 use ChristianBrown\SmartThings\Serializer\CapabilityLocalizationRequestSerializer;
-use ChristianBrown\SmartThings\Serializer\CreateCapabilityPresentationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateCapabilityRequestSerializer;
-use ChristianBrown\SmartThings\Serializer\UpdateCapabilityPresentationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateCapabilityRequestSerializer;
 use ChristianBrown\SmartThings\SmartThingsInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
@@ -17,13 +15,12 @@ use ChristianBrown\SmartThings\Transformer\CapabilityNamespaceTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 final class CapabilityRegistrar implements ServiceRegistrarInterface
 {
     public function register(ContainerBuilder $container): void
     {
-        $container->register(SmartThingsInterface::SERVICE_UPDATE_CAPABILITY_PRESENTATION_REQUEST_SERIALIZER, UpdateCapabilityPresentationRequestSerializer::class);
-        $container->register(SmartThingsInterface::SERVICE_CREATE_CAPABILITY_PRESENTATION_REQUEST_SERIALIZER, CreateCapabilityPresentationRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_CAPABILITY_LOCALIZATION_REQUEST_SERIALIZER, CapabilityLocalizationRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_UPDATE_CAPABILITY_REQUEST_SERIALIZER, UpdateCapabilityRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_CREATE_CAPABILITY_REQUEST_SERIALIZER, CreateCapabilityRequestSerializer::class);
@@ -41,6 +38,11 @@ final class CapabilityRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_CAPABILITY_NAMESPACE_TRANSFORMER),
                 ]
             );
-        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_PRESENTATION_TRANSFORMER, CapabilityPresentationTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_PRESENTATION_TRANSFORMER, CapabilityPresentationTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_CAPABILITY_PRESENTATION_DETAILS_TRANSFORMER),
+                ]
+            );
     }
 }

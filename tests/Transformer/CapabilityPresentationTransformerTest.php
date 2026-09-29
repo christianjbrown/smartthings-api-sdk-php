@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Tests\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilityPresentation;
+use ChristianBrown\SmartThings\Transformer\CapabilityPresentationDetailsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -26,7 +27,7 @@ final class CapabilityPresentationTransformerTest extends TestCase
             CapabilityPresentationTransformerInterface::KEY_VERSION => 1,
         ];
 
-        $transformer = new CapabilityPresentationTransformer();
+        $transformer = new CapabilityPresentationTransformer(self::createStub(CapabilityPresentationDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -41,7 +42,7 @@ final class CapabilityPresentationTransformerTest extends TestCase
     #[TestWith([[CapabilityPresentationTransformerInterface::KEY_ID => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new CapabilityPresentationTransformer();
+        $transformer = new CapabilityPresentationTransformer(self::createStub(CapabilityPresentationDetailsTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(CapabilityPresentationTransformerInterface::UNEXPECTED_STRING_SPRINTF, CapabilityPresentationTransformerInterface::KEY_ID));
@@ -57,7 +58,7 @@ final class CapabilityPresentationTransformerTest extends TestCase
     #[DataProvider('provideTransformVersionCases')]
     public function testTransformVersion(array $data, ?int $expectedVersion): void
     {
-        $transformer = new CapabilityPresentationTransformer();
+        $transformer = new CapabilityPresentationTransformer(self::createStub(CapabilityPresentationDetailsTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 

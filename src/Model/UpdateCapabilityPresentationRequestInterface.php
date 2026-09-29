@@ -6,43 +6,25 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface UpdateCapabilityPresentationRequestInterface
 {
-    /**
-     * @return null|mixed[]
-     */
-    public function getAutomation(): ?array;
+    public function getAutomation(): ?AutomationForCapabilityInterface;
+
+    public function getDashboard(): ?DashboardForCapabilityInterface;
 
     /**
-     * @return null|mixed[]
-     */
-    public function getDashboard(): ?array;
-
-    /**
-     * @return null|mixed[]
+     * @return null|array<int, CreateCapabilityPresentationRequestDetailViewItemInterface>
      */
     public function getDetailView(): ?array;
 
-    /**
-     * @return null|mixed[]
-     */
-    public function getPresentationSettings(): ?array;
+    public function getPresentationSettings(): ?PresentationSettingsInterface;
+
+    public function setAutomation(?AutomationForCapabilityInterface $value): self;
+
+    public function setDashboard(?DashboardForCapabilityInterface $value): self;
 
     /**
-     * @param null|mixed[] $value
-     */
-    public function setAutomation(?array $value): self;
-
-    /**
-     * @param null|mixed[] $value
-     */
-    public function setDashboard(?array $value): self;
-
-    /**
-     * @param null|mixed[] $value
+     * @param null|array<int, CreateCapabilityPresentationRequestDetailViewItemInterface> $value
      */
     public function setDetailView(?array $value): self;
 
-    /**
-     * @param null|mixed[] $value
-     */
-    public function setPresentationSettings(?array $value): self;
+    public function setPresentationSettings(?PresentationSettingsInterface $value): self;
 }

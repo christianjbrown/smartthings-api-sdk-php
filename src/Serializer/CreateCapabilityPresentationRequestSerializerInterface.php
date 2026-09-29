@@ -18,5 +18,5 @@ interface CreateCapabilityPresentationRequestSerializerInterface
     /**
      * @return mixed[]
      */
-    public function serialize(CreateCapabilityPresentationRequestInterface $request): array;
+    public function serialize(CreateCapabilityPresentationRequestInterface $model): array;
 }
