@@ -25,9 +25,11 @@ use ChristianBrown\SmartThings\Api\PresentationApi;
 use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\ScheduleApi;
+use ChristianBrown\SmartThings\Api\SchemaAppInviteApi;
 use ChristianBrown\SmartThings\Api\SchemaConnectorApi;
 use ChristianBrown\SmartThings\Api\ServiceApi;
 use ChristianBrown\SmartThings\Api\SubscriptionApi;
+use ChristianBrown\SmartThings\Api\TextToSpeechApi;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Api\VirtualDeviceApi;
 use ChristianBrown\SmartThings\DependencyInjection\ServiceRegistrarInterface;
@@ -177,6 +179,7 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_DRIVER_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_DRIVERS_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_DRIVER_PACKAGE_UPLOADER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_HUB_API, HubApi::class)
@@ -329,6 +332,30 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_JSON_API_REQUEST_SENDER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_DEVICES_TRANSFORMER),
                     $this->token,
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_TEXT_TO_SPEECH_API, TextToSpeechApi::class)
+            ->setArguments(
+                [
+                    $container->getDefinition(SmartThingsInterface::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_TTS_INFO_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_TTS_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_CONVERTED_TTS_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_PLAY_TEXT_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_PLAYED_TEXT_TRANSFORMER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_API, SchemaAppInviteApi::class)
+            ->setArguments(
+                [
+                    $container->getDefinition(SmartThingsInterface::SERVICE_JSON_API_REQUEST_SENDER),
+                    $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_RECEIPT_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_ACCEPTANCE_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_PAGE_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_STATUS_TRANSFORMER),
                 ]
             );
     }
