@@ -63,6 +63,7 @@ use ChristianBrown\SmartThings\DependencyInjection\Registrar\SchemaConnectorRegi
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ServiceApiRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SubscriptionRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\TreeRegistrar;
 use ChristianBrown\SmartThings\Serializer\CapabilityLocalizationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\ChannelCreateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\ChannelUpdateRequestSerializer;
@@ -77,6 +78,7 @@ use ChristianBrown\SmartThings\Serializer\HubDeviceUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\HubDriverInstallRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PlayTextRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\RuleRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SchemaAppCreateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SchemaAppInviteRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\SchemaAppUpdateRequestSerializer;
@@ -197,6 +199,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(CapabilityRegistrar::class)]
 #[UsesClass(ChannelRegistrar::class)]
 #[UsesClass(CoreRegistrar::class)]
+#[UsesClass(TreeRegistrar::class)]
 #[UsesClass(ShapeRegistrar::class)]
 #[UsesClass(ApiHost::class)]
 #[UsesClass(HostOverridingJsonApiRequestSender::class)]
@@ -372,6 +375,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(SchemaAppInviteApi::class)]
 #[UsesClass(SchemaAppInviteRequestSerializer::class)]
 #[UsesClass(DriverPackageUploader::class)]
+#[UsesClass(RuleRequestSerializer::class)]
 final class SmartThingsTest extends TestCase
 {
     public function testConstructAcceptsCustomApiHost(): void

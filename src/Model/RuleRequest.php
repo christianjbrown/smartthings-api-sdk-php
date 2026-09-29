@@ -7,15 +7,16 @@ namespace ChristianBrown\SmartThings\Model;
 final class RuleRequest implements RuleRequestInterface
 {
     /**
-     * @var array<int, mixed[]>
+     * @var array<int, ActionInterface|mixed[]>
      */
     private array $actions;
+    private ?ActionSequenceInterface $actionSequence = null;
     private string $name;
     private ?string $sequence = null;
     private ?string $timeZoneId = null;
 
     /**
-     * @phpstan-param array<int, mixed[]> $actions
+     * @phpstan-param array<int, ActionInterface|mixed[]> $actions
      */
     public function __construct(string $name, array $actions)
     {
@@ -24,11 +25,16 @@ final class RuleRequest implements RuleRequestInterface
     }
 
     /**
-     * @return array<int, mixed[]>
+     * @return array<int, ActionInterface|mixed[]>
      */
     public function getActions(): array
     {
         return $this->actions;
+    }
+
+    public function getActionSequence(): ?ActionSequenceInterface
+    {
+        return $this->actionSequence;
     }
 
     public function getName(): string
@@ -44,6 +50,13 @@ final class RuleRequest implements RuleRequestInterface
     public function getTimeZoneId(): ?string
     {
         return $this->timeZoneId;
+    }
+
+    public function setActionSequence(?ActionSequenceInterface $value): RuleRequestInterface
+    {
+        $this->actionSequence = $value;
+
+        return $this;
     }
 
     public function setSequence(?string $value): RuleRequestInterface

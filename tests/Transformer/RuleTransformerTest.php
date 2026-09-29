@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Tests\Transformer;
 
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Rule;
+use ChristianBrown\SmartThings\Transformer\ActionTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\RuleTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -25,7 +26,7 @@ final class RuleTransformerTest extends TestCase
             RuleTransformerInterface::KEY_STATUS => 'Enabled',
         ];
 
-        $transformer = new RuleTransformer();
+        $transformer = new RuleTransformer(self::createStub(ActionTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -43,7 +44,7 @@ final class RuleTransformerTest extends TestCase
     #[DataProvider('provideTransformOptionalFieldCombinationsCases')]
     public function testTransformOptionalFieldCombinations(array $data, ?string $expectedName, ?string $expectedStatus): void
     {
-        $transformer = new RuleTransformer();
+        $transformer = new RuleTransformer(self::createStub(ActionTransformerInterface::class));
 
         $actual = $transformer->transform($data);
 
@@ -90,7 +91,7 @@ final class RuleTransformerTest extends TestCase
     #[TestWith([[RuleTransformerInterface::KEY_ID => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new RuleTransformer();
+        $transformer = new RuleTransformer(self::createStub(ActionTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(RuleTransformerInterface::UNEXPECTED_STRING_SPRINTF, RuleTransformerInterface::KEY_ID));
