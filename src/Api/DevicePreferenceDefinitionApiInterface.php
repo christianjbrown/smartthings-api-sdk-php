@@ -7,12 +7,15 @@ namespace ChristianBrown\SmartThings\Api;
 use ChristianBrown\SmartThings\Model\DevicePreferenceDefinitionInterface;
 use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
 use ChristianBrown\SmartThings\Model\LocalizationInterface;
+use ChristianBrown\SmartThings\Model\PreferenceLocalizationRequestInterface;
 use ChristianBrown\SmartThings\Model\PreferenceRequestInterface;
 
 interface DevicePreferenceDefinitionApiInterface extends ApiInterface
 {
     public const string API_URL = 'https://api.smartthings.com/v1/devicepreferences';
     public const string API_URL_LOCALES_SPRINTF = 'https://api.smartthings.com/v1/devicepreferences/%s/i18n';
+    public const string API_URL_PREFERENCE_LOCALIZATION_SPRINTF = 'https://api.smartthings.com/v1/preferences/%s/i18n/%s';
+    public const string API_URL_PREFERENCE_LOCALIZATIONS_SPRINTF = 'https://api.smartthings.com/v1/preferences/%s/i18n';
     public const string API_URL_SPRINTF = 'https://api.smartthings.com/v1/devicepreferences/%s';
     public const string API_URL_TRANSLATIONS_SPRINTF = 'https://api.smartthings.com/v1/devicepreferences/%s/i18n/%s';
     public const string CACHE_KEY_SPRINTF = '%s/%s';
@@ -26,6 +29,11 @@ interface DevicePreferenceDefinitionApiInterface extends ApiInterface
      * getMultiple() reflects the new preference.
      */
     public function createPreference(PreferenceRequestInterface $request): DevicePreferenceDefinitionInterface;
+
+    /**
+     * Creates a localization for a preference. Invalidates the cached locale list of the preference.
+     */
+    public function createPreferenceLocalization(string $preferenceId, PreferenceLocalizationRequestInterface $request): LocalizationInterface;
 
     /**
      * Deletes a Preference by id. Invalidates any cached copy of this preference and
@@ -52,4 +60,9 @@ interface DevicePreferenceDefinitionApiInterface extends ApiInterface
      * invalidates the cached preference lists.
      */
     public function updatePreferenceById(string $preferenceId, PreferenceRequestInterface $request): DevicePreferenceDefinitionInterface;
+
+    /**
+     * Replaces a localization of a preference. Invalidates the cached translations and the cached locale list of the preference.
+     */
+    public function updatePreferenceLocalization(string $preferenceId, string $locale, PreferenceLocalizationRequestInterface $request): LocalizationInterface;
 }

@@ -15,7 +15,12 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DevicePreferenceDefinitionInterface;
 use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
 use ChristianBrown\SmartThings\Model\LocalizationInterface;
+use ChristianBrown\SmartThings\Model\PreferenceLocalizationRequest;
+use ChristianBrown\SmartThings\Model\PreferenceLocalizationRequestInterface;
+use ChristianBrown\SmartThings\Model\PreferenceOptionLocalization;
 use ChristianBrown\SmartThings\Model\PreferenceRequest;
+use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializerInterface;
 use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PreferenceRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\DevicePreferenceDefinitionsTransformerInterface;
@@ -30,6 +35,9 @@ use PHPUnit\Framework\TestCase;
 use function rawurlencode;
 use function sprintf;
 
+#[CoversClass(PreferenceLocalizationRequestSerializer::class)]
+#[CoversClass(PreferenceOptionLocalization::class)]
+#[CoversClass(PreferenceLocalizationRequest::class)]
 #[CoversClass(DevicePreferenceDefinitionApi::class)]
 #[CoversClass(PreferenceRequest::class)]
 #[CoversClass(PreferenceRequestSerializer::class)]
@@ -106,6 +114,81 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $api->getMultiple();
         $api->createPreference(new PreferenceRequest('tempOffset', 'Temperature Offset', 'number', ['minimum' => -10.0]));
         $api->getMultiple();
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreatePreferenceLocalization(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(PreferenceLocalizationRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                sprintf(DevicePreferenceDefinitionApiInterface::API_URL_PREFERENCE_LOCALIZATIONS_SPRINTF, 'test-preference-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(PreferenceLocalizationRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(LocalizationInterface::class);
+
+        $transformer = self::createMock(LocalizationTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $transformer, new Token('test-api-token'), null, $serializer);
+        $actual = $api->createPreferenceLocalization('test-preference-id', $request);
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreatePreferenceLocalizationUnexpectedResponse(): void
+    {
+        $request = self::createStub(PreferenceLocalizationRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn([]);
+
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(DevicePreferenceDefinitionApiInterface::UNEXPECTED_RESPONSE);
+        $api->createPreferenceLocalization('test-preference-id', $request);
+    }
+
+    /**
+     * Without an injected serializer the default one is used.
+     *
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreatePreferenceLocalizationUsesDefaultSerializer(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn(['test-data']);
+
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+        $api->createPreferenceLocalization('test-preference-id', new PreferenceLocalizationRequest('test-tag', 'test-label'));
+
+        $this->addToAssertionCount(1);
     }
 
     /**
@@ -741,5 +824,62 @@ final class DevicePreferenceDefinitionApiTest extends TestCase
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DevicePreferenceDefinitionApiInterface::UNEXPECTED_RESPONSE);
         $api->updatePreferenceById('test-preference-id', new PreferenceRequest('tempOffset', 'Temperature Offset', 'number', ['minimum' => -10.0]));
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdatePreferenceLocalization(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(PreferenceLocalizationRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(DevicePreferenceDefinitionApiInterface::API_URL_PREFERENCE_LOCALIZATION_SPRINTF, 'test-preference-id', 'test-locale'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(PreferenceLocalizationRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(LocalizationInterface::class);
+
+        $transformer = self::createMock(LocalizationTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), $transformer, new Token('test-api-token'), null, $serializer);
+        $actual = $api->updatePreferenceLocalization('test-preference-id', 'test-locale', $request);
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdatePreferenceLocalizationUnexpectedResponse(): void
+    {
+        $request = self::createStub(PreferenceLocalizationRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->willReturn([]);
+
+        $api = new DevicePreferenceDefinitionApi($requestSender, self::createStub(DevicePreferenceDefinitionTransformerInterface::class), self::createStub(DevicePreferenceDefinitionsTransformerInterface::class), self::createStub(LocaleReferencesTransformerInterface::class), self::createStub(LocalizationTransformerInterface::class), new Token('test-api-token'));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(DevicePreferenceDefinitionApiInterface::UNEXPECTED_RESPONSE);
+        $api->updatePreferenceLocalization('test-preference-id', 'test-locale', $request);
     }
 }
