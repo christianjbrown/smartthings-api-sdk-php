@@ -14,9 +14,13 @@ use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ServiceCapabilityDataInterface;
 use ChristianBrown\SmartThings\Model\ServiceLocationInfoInterface;
+use ChristianBrown\SmartThings\Model\ServiceSubscriptionReceiptInterface;
+use ChristianBrown\SmartThings\Model\ServiceSubscriptionRequestInterface;
+use ChristianBrown\SmartThings\Serializer\ServiceSubscriptionRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityNamesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\ServiceSubscriptionReceiptTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\Exception;
@@ -28,6 +32,130 @@ use function sprintf;
 #[CoversClass(Token::class)]
 final class ServiceApiTest extends TestCase
 {
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateSubscription(): void
+    {
+        $data = ['test-data'];
+
+        $request = self::createStub(ServiceSubscriptionRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->with(
+                sprintf(ServiceApiInterface::API_URL_SUBSCRIPTIONS_SPRINTF, 'test-location-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn($data);
+
+        $serializer = self::createMock(ServiceSubscriptionRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $model = self::createStub(ServiceSubscriptionReceiptInterface::class);
+
+        $transformer = self::createMock(ServiceSubscriptionReceiptTransformerInterface::class);
+        $transformer->expects(self::once())->method('transform')
+            ->with($data)
+            ->willReturn($model);
+
+        $api = new ServiceApi($requestSender, self::createStub(ServiceLocationInfoTransformerInterface::class), self::createStub(ServiceCapabilityNamesTransformerInterface::class), self::createStub(ServiceCapabilityDataTransformerInterface::class), new Token('test-api-token'), $serializer, $transformer);
+        $actual = $api->createSubscription('test-location-id', $request);
+
+        self::assertSame($model, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testCreateSubscriptionUnexpectedResponse(): void
+    {
+        $request = self::createStub(ServiceSubscriptionRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('post')
+            ->willReturn([]);
+
+        $api = new ServiceApi($requestSender, self::createStub(ServiceLocationInfoTransformerInterface::class), self::createStub(ServiceCapabilityNamesTransformerInterface::class), self::createStub(ServiceCapabilityDataTransformerInterface::class), new Token('test-api-token'), self::createStub(ServiceSubscriptionRequestSerializerInterface::class), self::createStub(ServiceSubscriptionReceiptTransformerInterface::class));
+
+        $this->expectException(UnexpectedResponseException::class);
+        $this->expectExceptionMessage(ServiceApiInterface::UNEXPECTED_RESPONSE);
+        $api->createSubscription('test-location-id', $request);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteSubscription(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(ServiceApiInterface::API_URL_SUBSCRIPTION_SPRINTF, 'test-location-id', 'test-subscription-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new ServiceApi($requestSender, self::createStub(ServiceLocationInfoTransformerInterface::class), self::createStub(ServiceCapabilityNamesTransformerInterface::class), self::createStub(ServiceCapabilityDataTransformerInterface::class), new Token('test-api-token'), self::createStub(ServiceSubscriptionRequestSerializerInterface::class), self::createStub(ServiceSubscriptionReceiptTransformerInterface::class));
+        $api->deleteSubscription('test-location-id', 'test-subscription-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteSubscriptionInvalidatesInfoCache(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturn(['test-data']);
+        $requestSender->expects(self::once())->method('delete')
+            ->willReturn([]);
+
+        $api = new ServiceApi($requestSender, self::createStub(ServiceLocationInfoTransformerInterface::class), self::createStub(ServiceCapabilityNamesTransformerInterface::class), self::createStub(ServiceCapabilityDataTransformerInterface::class), new Token('test-api-token'), self::createStub(ServiceSubscriptionRequestSerializerInterface::class), self::createStub(ServiceSubscriptionReceiptTransformerInterface::class));
+
+        $api->getLocationInfo('test-location-id');
+        $api->deleteSubscription('test-location-id', 'test-subscription-id');
+        $api->getLocationInfo('test-location-id');
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testDeleteSubscriptionsByInstalledApp(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('delete')
+            ->with(
+                sprintf(ServiceApiInterface::API_URL_SUBSCRIPTIONS_SPRINTF, 'test-location-id'),
+                [ServiceApiInterface::KEY_ISA_ID => 'test-isa-id'],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ]
+            )
+            ->willReturn([]);
+
+        $api = new ServiceApi($requestSender, self::createStub(ServiceLocationInfoTransformerInterface::class), self::createStub(ServiceCapabilityNamesTransformerInterface::class), self::createStub(ServiceCapabilityDataTransformerInterface::class), new Token('test-api-token'), self::createStub(ServiceSubscriptionRequestSerializerInterface::class), self::createStub(ServiceSubscriptionReceiptTransformerInterface::class));
+        $api->deleteSubscriptionsByInstalledApp('test-location-id', 'test-isa-id');
+
+        $this->addToAssertionCount(1);
+    }
+
     /**
      * @throws RequestExceptionInterface
      * @throws Exception
@@ -303,6 +431,36 @@ final class ServiceApiTest extends TestCase
     }
 
     /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testUpdateSubscription(): void
+    {
+        $request = self::createStub(ServiceSubscriptionRequestInterface::class);
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('put')
+            ->with(
+                sprintf(ServiceApiInterface::API_URL_SUBSCRIPTION_SPRINTF, 'test-location-id', 'test-subscription-id'),
+                [],
+                [
+                    ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
+                ],
+                ['test-serialized-request']
+            )
+            ->willReturn([]);
+
+        $serializer = self::createMock(ServiceSubscriptionRequestSerializerInterface::class);
+        $serializer->expects(self::once())->method('serialize')
+            ->with($request)
+            ->willReturn(['test-serialized-request']);
+
+        $api = new ServiceApi($requestSender, self::createStub(ServiceLocationInfoTransformerInterface::class), self::createStub(ServiceCapabilityNamesTransformerInterface::class), self::createStub(ServiceCapabilityDataTransformerInterface::class), new Token('test-api-token'), $serializer, self::createStub(ServiceSubscriptionReceiptTransformerInterface::class));
+        $api->updateSubscription('test-location-id', 'test-subscription-id', $request);
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
      * @throws Exception
      */
     private static function createApi(
@@ -311,12 +469,6 @@ final class ServiceApiTest extends TestCase
         ?ServiceCapabilityNamesTransformerInterface $namesTransformer = null,
         ?ServiceCapabilityDataTransformerInterface $dataTransformer = null,
     ): ServiceApi {
-        return new ServiceApi(
-            $requestSender,
-            $locationInfoTransformer ?? self::createStub(ServiceLocationInfoTransformerInterface::class),
-            $namesTransformer ?? self::createStub(ServiceCapabilityNamesTransformerInterface::class),
-            $dataTransformer ?? self::createStub(ServiceCapabilityDataTransformerInterface::class),
-            new Token('test-api-token'),
-        );
+        return new ServiceApi($requestSender, $locationInfoTransformer ?? self::createStub(ServiceLocationInfoTransformerInterface::class), $namesTransformer ?? self::createStub(ServiceCapabilityNamesTransformerInterface::class), $dataTransformer ?? self::createStub(ServiceCapabilityDataTransformerInterface::class), new Token('test-api-token'), self::createStub(ServiceSubscriptionRequestSerializerInterface::class), self::createStub(ServiceSubscriptionReceiptTransformerInterface::class));
     }
 }

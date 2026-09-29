@@ -19,6 +19,12 @@ final class ApiClientRegistrarTest extends TestCase
     {
         $container = new ContainerBuilder();
 
+        $container->register(SmartThingsInterface::SERVICE_SERVICE_SUBSCRIPTION_RECEIPT_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_SERVICE_SUBSCRIPTION_REQUEST_SERIALIZER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_OAUTH_CREDENTIALS_REQUEST_SERIALIZER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_UPDATE_REQUEST_SERIALIZER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_RECEIPT_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_CREATE_REQUEST_SERIALIZER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_HUB_DEVICE_UPDATE_REQUEST_SERIALIZER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_HUB_DRIVER_INSTALL_REQUEST_SERIALIZER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DRIVER_CHANNEL_UPDATE_REQUEST_SERIALIZER, stdClass::class);

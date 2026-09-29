@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\DependencyInjection\Registrar;
 
 use ChristianBrown\SmartThings\DependencyInjection\ServiceRegistrarInterface;
+use ChristianBrown\SmartThings\Serializer\SchemaAppCreateRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\SchemaAppUpdateRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\SchemaOauthCredentialsRequestSerializer;
 use ChristianBrown\SmartThings\SmartThingsInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppTransformer;
+use ChristianBrown\SmartThings\Transformer\SchemaAppReceiptTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaPageTransformer;
@@ -17,6 +21,9 @@ final class SchemaConnectorRegistrar implements ServiceRegistrarInterface
 {
     public function register(ContainerBuilder $container): void
     {
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_OAUTH_CREDENTIALS_REQUEST_SERIALIZER, SchemaOauthCredentialsRequestSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_UPDATE_REQUEST_SERIALIZER, SchemaAppUpdateRequestSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_CREATE_REQUEST_SERIALIZER, SchemaAppCreateRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_TRANSFORMER, SchemaAppTransformer::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_APPS_TRANSFORMER, SchemaAppsTransformer::class)
             ->setArguments(
@@ -32,5 +39,6 @@ final class SchemaConnectorRegistrar implements ServiceRegistrarInterface
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_PAGE_TRANSFORMER, SchemaPageTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_RECEIPT_TRANSFORMER, SchemaAppReceiptTransformer::class);
     }
 }

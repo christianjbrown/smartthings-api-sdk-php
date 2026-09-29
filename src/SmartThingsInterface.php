@@ -128,9 +128,13 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_SCHEDULE_REQUEST_SERIALIZER = 'smartthings.serializer.schedule_request_serializer';
     public const string SERVICE_SCHEDULE_TRANSFORMER = 'smartthings.transformer.schedule_transformer';
     public const string SERVICE_SCHEDULES_TRANSFORMER = 'smartthings.transformer.schedules_transformer';
+    public const string SERVICE_SCHEMA_APP_CREATE_REQUEST_SERIALIZER = 'smartthings.serializer.schema_app_create_request_serializer';
+    public const string SERVICE_SCHEMA_APP_RECEIPT_TRANSFORMER = 'smartthings.transformer.schema_app_receipt_transformer';
     public const string SERVICE_SCHEMA_APP_TRANSFORMER = 'smartthings.transformer.schema_app_transformer';
+    public const string SERVICE_SCHEMA_APP_UPDATE_REQUEST_SERIALIZER = 'smartthings.serializer.schema_app_update_request_serializer';
     public const string SERVICE_SCHEMA_APPS_TRANSFORMER = 'smartthings.transformer.schema_apps_transformer';
     public const string SERVICE_SCHEMA_CONNECTOR_API = 'smartthings.api.schema_connector_api';
+    public const string SERVICE_SCHEMA_OAUTH_CREDENTIALS_REQUEST_SERIALIZER = 'smartthings.serializer.schema_oauth_credentials_request_serializer';
     public const string SERVICE_SCHEMA_PAGE_TRANSFORMER = 'smartthings.transformer.schema_page_transformer';
     public const string SERVICE_SERVICE_API = 'smartthings.api.service_api';
     public const string SERVICE_SERVICE_CAPABILITY_DATA_TRANSFORMER = 'smartthings.transformer.service_capability_data_transformer';
@@ -140,6 +144,8 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_SERVICE_LOCATION_INFO_TRANSFORMER = 'smartthings.transformer.service_location_info_transformer';
     public const string SERVICE_SERVICE_MEASUREMENT_TRANSFORMER = 'smartthings.transformer.service_measurement_transformer';
     public const string SERVICE_SERVICE_MEASUREMENTS_TRANSFORMER = 'smartthings.transformer.service_measurements_transformer';
+    public const string SERVICE_SERVICE_SUBSCRIPTION_RECEIPT_TRANSFORMER = 'smartthings.transformer.service_subscription_receipt_transformer';
+    public const string SERVICE_SERVICE_SUBSCRIPTION_REQUEST_SERIALIZER = 'smartthings.serializer.service_subscription_request_serializer';
     public const string SERVICE_SUBSCRIPTION_API = 'smartthings.api.subscription_api';
     public const string SERVICE_SUBSCRIPTION_REQUEST_SERIALIZER = 'smartthings.serializer.subscription_request_serializer';
     public const string SERVICE_SUBSCRIPTION_TRANSFORMER = 'smartthings.transformer.subscription_transformer';

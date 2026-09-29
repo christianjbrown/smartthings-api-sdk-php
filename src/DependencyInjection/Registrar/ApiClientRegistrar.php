@@ -295,6 +295,10 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_INSTALLED_SCHEMA_APPS_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_SCHEMA_PAGE_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_CREATE_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_RECEIPT_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_UPDATE_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_SCHEMA_OAUTH_CREDENTIALS_REQUEST_SERIALIZER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_SERVICE_API, ServiceApi::class)
@@ -305,6 +309,8 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_SERVICE_CAPABILITY_NAMES_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_SERVICE_CAPABILITY_DATA_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_SERVICE_SUBSCRIPTION_REQUEST_SERIALIZER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_SERVICE_SUBSCRIPTION_RECEIPT_TRANSFORMER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_SUBSCRIPTION_API, SubscriptionApi::class)

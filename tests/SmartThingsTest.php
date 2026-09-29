@@ -72,6 +72,10 @@ use ChristianBrown\SmartThings\Serializer\GenerateAppOauthRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\HubDeviceUpdateRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\HubDriverInstallRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\SchemaAppCreateRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\SchemaAppUpdateRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\SchemaOauthCredentialsRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\ServiceSubscriptionRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppOauthRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateAppSettingsRequestSerializer;
@@ -150,6 +154,7 @@ use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
 use ChristianBrown\SmartThings\Transformer\SchedulesTransformer;
 use ChristianBrown\SmartThings\Transformer\ScheduleTransformer;
+use ChristianBrown\SmartThings\Transformer\SchemaAppReceiptTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaPageTransformer;
@@ -160,6 +165,7 @@ use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoSubscriptionTransf
 use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceMeasurementsTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceMeasurementTransformer;
+use ChristianBrown\SmartThings\Transformer\ServiceSubscriptionReceiptTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -324,6 +330,12 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(DriverChannelUpdateRequestSerializer::class)]
 #[UsesClass(HubDriverInstallRequestSerializer::class)]
 #[UsesClass(HubDeviceUpdateRequestSerializer::class)]
+#[UsesClass(SchemaAppReceiptTransformer::class)]
+#[UsesClass(ServiceSubscriptionReceiptTransformer::class)]
+#[UsesClass(SchemaAppCreateRequestSerializer::class)]
+#[UsesClass(SchemaAppUpdateRequestSerializer::class)]
+#[UsesClass(SchemaOauthCredentialsRequestSerializer::class)]
+#[UsesClass(ServiceSubscriptionRequestSerializer::class)]
 final class SmartThingsTest extends TestCase
 {
     public function testConstructAcceptsCustomApiHost(): void

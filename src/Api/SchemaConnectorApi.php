@@ -8,14 +8,23 @@ use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\InstalledSchemaAppInterface;
+use ChristianBrown\SmartThings\Model\SchemaAppCreateRequestInterface;
 use ChristianBrown\SmartThings\Model\SchemaAppInterface;
+use ChristianBrown\SmartThings\Model\SchemaAppReceiptInterface;
+use ChristianBrown\SmartThings\Model\SchemaAppUpdateRequestInterface;
+use ChristianBrown\SmartThings\Model\SchemaOauthCredentialsRequestInterface;
 use ChristianBrown\SmartThings\Model\SchemaPageInterface;
+use ChristianBrown\SmartThings\Serializer\SchemaAppCreateRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\SchemaAppUpdateRequestSerializerInterface;
+use ChristianBrown\SmartThings\Serializer\SchemaOauthCredentialsRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\SchemaAppReceiptTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\SchemaAppsTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\SchemaAppTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\SchemaPageTransformerInterface;
 
+use function array_filter;
 use function is_array;
 use function rawurlencode;
 use function sprintf;
@@ -45,16 +54,30 @@ final class SchemaConnectorApi implements SchemaConnectorApiInterface
     private ?array $listCache = null;
 
     /**
+     * @var array<string, array<int, SchemaAppInterface>>
+     */
+    private array $organizationAppsCache = [];
+
+    /**
      * @var array<string, SchemaPageInterface>
      */
     private array $pageCache = [];
     private JsonApiRequestSenderInterface $requestSender;
+    private SchemaAppCreateRequestSerializerInterface $schemaAppCreateRequestSerializer;
+    private SchemaAppReceiptTransformerInterface $schemaAppReceiptTransformer;
     private SchemaAppsTransformerInterface $schemaAppsTransformer;
     private SchemaAppTransformerInterface $schemaAppTransformer;
+    private SchemaAppUpdateRequestSerializerInterface $schemaAppUpdateRequestSerializer;
+    private SchemaOauthCredentialsRequestSerializerInterface $schemaOauthCredentialsRequestSerializer;
     private SchemaPageTransformerInterface $schemaPageTransformer;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, SchemaAppTransformerInterface $schemaAppTransformer, SchemaAppsTransformerInterface $schemaAppsTransformer, InstalledSchemaAppTransformerInterface $installedSchemaAppTransformer, InstalledSchemaAppsTransformerInterface $installedSchemaAppsTransformer, SchemaPageTransformerInterface $schemaPageTransformer, TokenInterface $token)
+    /**
+     * @var array<string, array<int, SchemaAppInterface>>
+     */
+    private array $userAppsCache = [];
+
+    public function __construct(JsonApiRequestSenderInterface $requestSender, SchemaAppTransformerInterface $schemaAppTransformer, SchemaAppsTransformerInterface $schemaAppsTransformer, InstalledSchemaAppTransformerInterface $installedSchemaAppTransformer, InstalledSchemaAppsTransformerInterface $installedSchemaAppsTransformer, SchemaPageTransformerInterface $schemaPageTransformer, TokenInterface $token, SchemaAppCreateRequestSerializerInterface $schemaAppCreateRequestSerializer, SchemaAppReceiptTransformerInterface $schemaAppReceiptTransformer, SchemaAppUpdateRequestSerializerInterface $schemaAppUpdateRequestSerializer, SchemaOauthCredentialsRequestSerializerInterface $schemaOauthCredentialsRequestSerializer)
     {
         $this->requestSender = $requestSender;
         $this->schemaAppTransformer = $schemaAppTransformer;
@@ -63,6 +86,152 @@ final class SchemaConnectorApi implements SchemaConnectorApiInterface
         $this->installedSchemaAppsTransformer = $installedSchemaAppsTransformer;
         $this->schemaPageTransformer = $schemaPageTransformer;
         $this->token = $token;
+        $this->schemaAppCreateRequestSerializer = $schemaAppCreateRequestSerializer;
+        $this->schemaAppReceiptTransformer = $schemaAppReceiptTransformer;
+        $this->schemaAppUpdateRequestSerializer = $schemaAppUpdateRequestSerializer;
+        $this->schemaOauthCredentialsRequestSerializer = $schemaOauthCredentialsRequestSerializer;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function createApp(SchemaAppCreateRequestInterface $request, ?string $organizationId = null): SchemaAppReceiptInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
+        $body = $this->schemaAppCreateRequestSerializer->serialize($request);
+        $data = $this->requestSender->post(self::API_URL_APPS, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->schemaAppReceiptTransformer->transform($data);
+        $this->listCache = null;
+
+        return $result;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteApp(string $endpointAppId, ?string $organizationId = null): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
+        $url = sprintf(self::API_URL_APP_SPRINTF, rawurlencode($endpointAppId));
+        $this->requestSender->delete($url, [], $headers);
+        unset($this->cache[$endpointAppId]);
+        $this->listCache = null;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteInstalled(string $isaId): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_INSTALLED_APP_SPRINTF, rawurlencode($isaId));
+        $this->requestSender->delete($url, [], $headers);
+        unset($this->installedCache[$isaId]);
+        $this->installedListCache = [];
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function generateStOauthCredentials(SchemaOauthCredentialsRequestInterface $request, ?string $organizationId = null): SchemaAppReceiptInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
+        $body = $this->schemaOauthCredentialsRequestSerializer->serialize($request);
+        $data = $this->requestSender->post(self::API_URL_OAUTH_CREDENTIALS, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->schemaAppReceiptTransformer->transform($data);
+
+        return $result;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     *
+     * @return array<int, SchemaAppInterface>
+     */
+    public function getByOrganization(?string $organizationId = null, bool $skipCache = false): array
+    {
+        $cacheKey = (string) $organizationId;
+        if (!$skipCache) {
+            if (isset($this->organizationAppsCache[$cacheKey])) {
+                return $this->organizationAppsCache[$cacheKey];
+            }
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION_ID => $organizationId], static fn (?string $value): bool => null !== $value);
+        $data = $this->requestSender->get(self::API_URL_ORGANIZATION_APPS, [], $headers);
+
+        if (!isset($data[self::KEY_ENDPOINT_APPS])) {
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ENDPOINT_APPS));
+        }
+        if (!is_array($data[self::KEY_ENDPOINT_APPS])) {
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ENDPOINT_APPS));
+        }
+        $result = $this->schemaAppsTransformer->transform($data[self::KEY_ENDPOINT_APPS]);
+        $this->organizationAppsCache[$cacheKey] = $result;
+
+        return $result;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     *
+     * @return array<int, SchemaAppInterface>
+     */
+    public function getByUserId(string $userId, bool $skipCache = false): array
+    {
+        $cacheKey = $userId;
+        if (!$skipCache) {
+            if (isset($this->userAppsCache[$cacheKey])) {
+                return $this->userAppsCache[$cacheKey];
+            }
+        }
+
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_USER_APPS_SPRINTF, rawurlencode($userId));
+        $data = $this->requestSender->get($url, [], $headers);
+
+        if (!isset($data[self::KEY_ENDPOINT_APPS])) {
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ENDPOINT_APPS));
+        }
+        if (!is_array($data[self::KEY_ENDPOINT_APPS])) {
+            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ENDPOINT_APPS));
+        }
+        $result = $this->schemaAppsTransformer->transform($data[self::KEY_ENDPOINT_APPS]);
+        $this->userAppsCache[$cacheKey] = $result;
+
+        return $result;
     }
 
     /**
@@ -190,6 +359,21 @@ final class SchemaConnectorApi implements SchemaConnectorApiInterface
         $this->cache[$endpointAppId] = $app;
 
         return $app;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function updateApp(string $endpointAppId, SchemaAppUpdateRequestInterface $request, ?string $organizationId = null): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
+        $url = sprintf(self::API_URL_APP_SPRINTF, rawurlencode($endpointAppId));
+        $body = $this->schemaAppUpdateRequestSerializer->serialize($request);
+        $this->requestSender->put($url, [], $headers, $body);
+        unset($this->cache[$endpointAppId]);
+        $this->listCache = null;
     }
 
     /**

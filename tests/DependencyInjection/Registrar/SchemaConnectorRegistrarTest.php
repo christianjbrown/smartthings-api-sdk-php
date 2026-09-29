@@ -19,6 +19,10 @@ final class SchemaConnectorRegistrarTest extends TestCase
 
         (new SchemaConnectorRegistrar())->register($container);
 
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEMA_OAUTH_CREDENTIALS_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_UPDATE_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_CREATE_REQUEST_SERIALIZER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_RECEIPT_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_INSTALLED_SCHEMA_APPS_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_INSTALLED_SCHEMA_APP_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEMA_APPS_TRANSFORMER));

@@ -9,10 +9,15 @@ use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ServiceCapabilityDataInterface;
 use ChristianBrown\SmartThings\Model\ServiceLocationInfoInterface;
+use ChristianBrown\SmartThings\Model\ServiceSubscriptionReceiptInterface;
+use ChristianBrown\SmartThings\Model\ServiceSubscriptionRequestInterface;
+use ChristianBrown\SmartThings\Serializer\ServiceSubscriptionRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityNamesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\ServiceSubscriptionReceiptTransformerInterface;
 
+use function array_filter;
 use function rawurlencode;
 use function sprintf;
 
@@ -36,15 +41,70 @@ final class ServiceApi implements ServiceApiInterface
     private ServiceCapabilityDataTransformerInterface $serviceCapabilityDataTransformer;
     private ServiceCapabilityNamesTransformerInterface $serviceCapabilityNamesTransformer;
     private ServiceLocationInfoTransformerInterface $serviceLocationInfoTransformer;
+    private ServiceSubscriptionReceiptTransformerInterface $serviceSubscriptionReceiptTransformer;
+    private ServiceSubscriptionRequestSerializerInterface $serviceSubscriptionRequestSerializer;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, ServiceLocationInfoTransformerInterface $serviceLocationInfoTransformer, ServiceCapabilityNamesTransformerInterface $serviceCapabilityNamesTransformer, ServiceCapabilityDataTransformerInterface $serviceCapabilityDataTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, ServiceLocationInfoTransformerInterface $serviceLocationInfoTransformer, ServiceCapabilityNamesTransformerInterface $serviceCapabilityNamesTransformer, ServiceCapabilityDataTransformerInterface $serviceCapabilityDataTransformer, TokenInterface $token, ServiceSubscriptionRequestSerializerInterface $serviceSubscriptionRequestSerializer, ServiceSubscriptionReceiptTransformerInterface $serviceSubscriptionReceiptTransformer)
     {
         $this->requestSender = $requestSender;
         $this->serviceLocationInfoTransformer = $serviceLocationInfoTransformer;
         $this->serviceCapabilityNamesTransformer = $serviceCapabilityNamesTransformer;
         $this->serviceCapabilityDataTransformer = $serviceCapabilityDataTransformer;
         $this->token = $token;
+        $this->serviceSubscriptionRequestSerializer = $serviceSubscriptionRequestSerializer;
+        $this->serviceSubscriptionReceiptTransformer = $serviceSubscriptionReceiptTransformer;
+    }
+
+    /**
+     * @phpstan-impure
+     *
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function createSubscription(string $locationId, ServiceSubscriptionRequestInterface $request): ServiceSubscriptionReceiptInterface
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SUBSCRIPTIONS_SPRINTF, rawurlencode($locationId));
+        $body = $this->serviceSubscriptionRequestSerializer->serialize($request);
+        $data = $this->requestSender->post($url, [], $headers, $body);
+
+        if (empty($data)) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
+        }
+        $result = $this->serviceSubscriptionReceiptTransformer->transform($data);
+        unset($this->infoCache[$locationId]);
+
+        return $result;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteSubscription(string $locationId, string $subscriptionId): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SUBSCRIPTION_SPRINTF, rawurlencode($locationId), rawurlencode($subscriptionId));
+        $this->requestSender->delete($url, [], $headers);
+        unset($this->infoCache[$locationId]);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function deleteSubscriptionsByInstalledApp(string $locationId, string $isaId): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SUBSCRIPTIONS_SPRINTF, rawurlencode($locationId));
+        $query = array_filter([self::KEY_ISA_ID => $isaId], static fn (?string $value): bool => null !== $value);
+        $this->requestSender->delete($url, $query, $headers);
+        unset($this->infoCache[$locationId]);
     }
 
     /**
@@ -135,5 +195,19 @@ final class ServiceApi implements ServiceApiInterface
         $this->infoCache[$locationId] = $info;
 
         return $info;
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     */
+    public function updateSubscription(string $locationId, string $subscriptionId, ServiceSubscriptionRequestInterface $request): void
+    {
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ];
+        $url = sprintf(self::API_URL_SUBSCRIPTION_SPRINTF, rawurlencode($locationId), rawurlencode($subscriptionId));
+        $body = $this->serviceSubscriptionRequestSerializer->serialize($request);
+        $this->requestSender->put($url, [], $headers, $body);
+        unset($this->infoCache[$locationId]);
     }
 }
