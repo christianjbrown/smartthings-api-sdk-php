@@ -123,20 +123,21 @@ final class HubApi implements HubApiInterface
      *
      * @return array<int, HubEnrolledChannelInterface>
      */
-    public function getEnrolledChannels(string $hubId, bool $skipCache = false): array
+    public function getEnrolledChannels(string $hubId, bool $skipCache = false, ?string $acceptLanguage = null): array
     {
+        $cacheKey = sprintf(self::CACHE_KEY_SPRINTF, $hubId, (string) $acceptLanguage);
         if (!$skipCache) {
-            if (isset($this->channelsCache[$hubId])) {
-                return $this->channelsCache[$hubId];
+            if (isset($this->channelsCache[$cacheKey])) {
+                return $this->channelsCache[$cacheKey];
             }
         }
 
         // The enrolled-channels endpoint only lists driver channels, so the
         // channelType filter is fixed; the response is a top-level JSON array.
         $url = sprintf(self::API_URL_CHANNELS_SPRINTF, rawurlencode($hubId));
-        $data = $this->requestSender->get($url, [self::KEY_CHANNEL_TYPE => self::CHANNEL_TYPE_DRIVERS], $this->headers());
+        $data = $this->requestSender->get($url, [self::KEY_CHANNEL_TYPE => self::CHANNEL_TYPE_DRIVERS], $this->headers() + array_filter([self::HEADER_KEY_ACCEPT_LANGUAGE => $acceptLanguage], static fn (?string $value): bool => null !== $value));
         $channels = $this->hubEnrolledChannelsTransformer->transform($data);
-        $this->channelsCache[$hubId] = $channels;
+        $this->channelsCache[$cacheKey] = $channels;
 
         return $channels;
     }
@@ -176,9 +177,9 @@ final class HubApi implements HubApiInterface
      *
      * @return array<int, HubInstalledDriverInterface>
      */
-    public function getInstalledDrivers(string $hubId, ?string $deviceId = null, bool $skipCache = false): array
+    public function getInstalledDrivers(string $hubId, ?string $deviceId = null, bool $skipCache = false, ?string $acceptLanguage = null): array
     {
-        $cacheKey = sprintf(self::CACHE_KEY_SPRINTF, $hubId, (string) $deviceId);
+        $cacheKey = sprintf(self::CACHE_KEY_LANGUAGE_SPRINTF, $hubId, (string) $deviceId, (string) $acceptLanguage);
         if (!$skipCache) {
             if (isset($this->driversCache[$cacheKey])) {
                 return $this->driversCache[$cacheKey];
@@ -188,7 +189,7 @@ final class HubApi implements HubApiInterface
         // The response is a top-level JSON array, so it is handed to the
         // transformer as-is; an empty array is a valid, non-error result.
         $url = sprintf(self::API_URL_DRIVERS_SPRINTF, rawurlencode($hubId));
-        $data = $this->requestSender->get($url, self::buildDriversQuery($deviceId), $this->headers());
+        $data = $this->requestSender->get($url, self::buildDriversQuery($deviceId), $this->headers() + array_filter([self::HEADER_KEY_ACCEPT_LANGUAGE => $acceptLanguage], static fn (?string $value): bool => null !== $value));
         $drivers = $this->hubInstalledDriversTransformer->transform($data);
         $this->driversCache[$cacheKey] = $drivers;
 

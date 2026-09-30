@@ -17,6 +17,8 @@ interface DeviceProfileApiInterface extends ApiInterface
     public const string API_URL_SPRINTF = 'https://api.smartthings.com/v1/deviceprofiles/%s';
     public const string API_URL_TRANSLATIONS_SPRINTF = 'https://api.smartthings.com/v1/deviceprofiles/%s/i18n/%s';
     public const string CACHE_KEY_SPRINTF = '%s/%s';
+    public const string CACHE_VARIANT_PLAIN = '|';
+    public const string CACHE_VARIANT_SPRINTF = '%s|%s';
     public const string KEY_ITEMS = 'items';
     public const string KEY_PROFILE_ID = 'profileId';
     public const string UNEXPECTED_RESPONSE = 'Response not set or not an array';
@@ -26,13 +28,13 @@ interface DeviceProfileApiInterface extends ApiInterface
      * Creates a Device Profile. Invalidates the cached profile list so a subsequent
      * getMultiple() reflects the new profile.
      */
-    public function createDeviceProfile(CreateDeviceProfileRequestInterface $request): DeviceProfileInterface;
+    public function createDeviceProfile(CreateDeviceProfileRequestInterface $request, ?string $organizationId = null): DeviceProfileInterface;
 
     /**
      * Deletes a Device Profile by id. Invalidates any cached copy of this profile and
      * the cached profile list.
      */
-    public function deleteDeviceProfile(string $deviceProfileId): void;
+    public function deleteDeviceProfile(string $deviceProfileId, ?string $organizationId = null): void;
 
     /**
      * @return array<int, LocaleReferenceInterface>
@@ -45,9 +47,9 @@ interface DeviceProfileApiInterface extends ApiInterface
      *
      * @return array<int, DeviceProfileInterface>
      */
-    public function getMultiple(bool $skipCache = false, ?array $profileIds = null): array;
+    public function getMultiple(bool $skipCache = false, ?array $profileIds = null, ?string $organizationId = null): array;
 
-    public function getOneById(string $deviceProfileId, bool $skipCache = false): DeviceProfileInterface;
+    public function getOneById(string $deviceProfileId, bool $skipCache = false, ?string $organizationId = null, ?string $acceptLanguage = null): DeviceProfileInterface;
 
     public function getTranslations(string $deviceProfileId, string $tag, bool $skipCache = false): LocalizationInterface;
 
@@ -55,5 +57,5 @@ interface DeviceProfileApiInterface extends ApiInterface
      * Updates a currently deployed Device Profile. Refreshes the cached copy of this
      * profile and invalidates the cached profile list.
      */
-    public function updateDeviceProfile(string $deviceProfileId, UpdateDeviceProfileRequestInterface $request): DeviceProfileInterface;
+    public function updateDeviceProfile(string $deviceProfileId, UpdateDeviceProfileRequestInterface $request, ?string $organizationId = null): DeviceProfileInterface;
 }

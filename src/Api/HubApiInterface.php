@@ -19,6 +19,7 @@ interface HubApiInterface extends ApiInterface
     public const string API_URL_DRIVERS_SPRINTF = 'https://api.smartthings.com/v1/hubdevices/%s/drivers';
     public const string API_URL_EUI_SPRINTF = 'https://api.smartthings.com/v1/hubdevices/eui/%s';
     public const string API_URL_SPRINTF = 'https://api.smartthings.com/v1/hubdevices/%s';
+    public const string CACHE_KEY_LANGUAGE_SPRINTF = '%s/%s/%s';
     public const string CACHE_KEY_SPRINTF = '%s/%s';
     public const string CHANNEL_TYPE_DRIVERS = 'DRIVERS';
     public const string KEY_CHANNEL_TYPE = 'channelType';
@@ -39,14 +40,14 @@ interface HubApiInterface extends ApiInterface
     /**
      * @return array<int, HubEnrolledChannelInterface>
      */
-    public function getEnrolledChannels(string $hubId, bool $skipCache = false): array;
+    public function getEnrolledChannels(string $hubId, bool $skipCache = false, ?string $acceptLanguage = null): array;
 
     public function getInstalledDriver(string $hubId, string $driverId, bool $skipCache = false): HubInstalledDriverInterface;
 
     /**
      * @return array<int, HubInstalledDriverInterface>
      */
-    public function getInstalledDrivers(string $hubId, ?string $deviceId = null, bool $skipCache = false): array;
+    public function getInstalledDrivers(string $hubId, ?string $deviceId = null, bool $skipCache = false, ?string $acceptLanguage = null): array;
 
     public function getOneById(string $hubId, bool $skipCache = false): HubInterface;
 
