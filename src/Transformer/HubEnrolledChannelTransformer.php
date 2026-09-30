@@ -13,6 +13,13 @@ use function sprintf;
 
 final class HubEnrolledChannelTransformer implements HubEnrolledChannelTransformerInterface
 {
+    private ValueReaderInterface $valueReader;
+
+    public function __construct(ValueReaderInterface $valueReader)
+    {
+        $this->valueReader = $valueReader;
+    }
+
     /**
      * @param mixed[] $data
      */
@@ -29,6 +36,7 @@ final class HubEnrolledChannelTransformer implements HubEnrolledChannelTransform
         self::applyDescription($channel, $data);
         self::applyName($channel, $data);
         self::applySubscriptionUrl($channel, $data);
+        $this->applyDetails($channel, $data);
 
         return $channel;
     }
@@ -45,6 +53,16 @@ final class HubEnrolledChannelTransformer implements HubEnrolledChannelTransform
             return;
         }
         $channel->setDescription($data[self::KEY_DESCRIPTION]);
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private function applyDetails(HubEnrolledChannelInterface $channel, array $data): void
+    {
+        $channel->setCreatedDate($this->valueReader->string($data, self::KEY_CREATED_DATE));
+        $channel->setLastModifiedDate($this->valueReader->string($data, self::KEY_LAST_MODIFIED_DATE));
+        $channel->setIsWWST($this->valueReader->bool($data, self::KEY_IS_WWST));
     }
 
     /**

@@ -344,6 +344,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_LOCATION_CREATE_REQUEST_SERIALIZER = 'smartthings.serializer.create_location_request_serializer';
     public const string SERVICE_LOCATION_DETAILS_TRANSFORMER = 'smartthings.transformer.location_details_transformer';
     public const string SERVICE_LOCATION_MODE_API = 'smartthings.api.location_mode_api';
+    public const string SERVICE_LOCATION_PARENT_SERIALIZER = 'smartthings.serializer.location_parent_serializer';
     public const string SERVICE_LOCATION_PARENT_TRANSFORMER = 'smartthings.transformer.location_parent_transformer';
     public const string SERVICE_LOCATION_PATCH_REQUEST_SERIALIZER = 'smartthings.serializer.patch_location_request_serializer';
     public const string SERVICE_LOCATION_ROOM_API = 'smartthings.api.location_room_api';
@@ -561,6 +562,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_UPDATE_DEVICE_COMPONENT_SERIALIZER = 'smartthings.serializer.update_device_component_serializer';
     public const string SERVICE_UPDATE_DEVICE_REQUEST_SERIALIZER = 'smartthings.serializer.update_device_request_serializer';
     public const string SERVICE_UPDATE_SIGNATURE_TYPE_REQUEST_SERIALIZER = 'smartthings.serializer.update_signature_type_request_serializer';
+    public const string SERVICE_VALUE_READER = 'smartthings.transformer.value_reader';
     public const string SERVICE_VIPER_APP_LINKS_TRANSFORMER = 'smartthings.transformer.viper_app_links_transformer';
     public const string SERVICE_VIPER_DEVICE_DETAILS_TRANSFORMER = 'smartthings.transformer.viper_device_details_transformer';
     public const string SERVICE_VIRTUAL_DEVICE_API = 'smartthings.api.virtual_device_api';

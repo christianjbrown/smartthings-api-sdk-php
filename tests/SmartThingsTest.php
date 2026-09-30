@@ -105,6 +105,7 @@ use ChristianBrown\SmartThings\Serializer\CreateCapabilityPresentationRequestDet
 use ChristianBrown\SmartThings\Serializer\CreateCapabilityPresentationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateCapabilityRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\CreateDeviceProfileRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\CreateLocationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\DashboardForCapabilitySerializer;
 use ChristianBrown\SmartThings\Serializer\DescriptionItemSerializer;
 use ChristianBrown\SmartThings\Serializer\DescriptionsInAutomationSerializer;
@@ -155,6 +156,7 @@ use ChristianBrown\SmartThings\Serializer\ListForDetailViewSerializer;
 use ChristianBrown\SmartThings\Serializer\ListWithAvailableSizeCommandSerializer;
 use ChristianBrown\SmartThings\Serializer\ListWithAvailableSizeSerializer;
 use ChristianBrown\SmartThings\Serializer\ListWithAvailableSizeStateSerializer;
+use ChristianBrown\SmartThings\Serializer\LocationParentSerializer;
 use ChristianBrown\SmartThings\Serializer\MultiArgCommandArgumentsItemSerializer;
 use ChristianBrown\SmartThings\Serializer\MultiArgCommandSerializer;
 use ChristianBrown\SmartThings\Serializer\NumberFieldForArgumentSerializer;
@@ -573,6 +575,7 @@ use ChristianBrown\SmartThings\Transformer\ToggleSwitchForDashboardTransformer;
 use ChristianBrown\SmartThings\Transformer\ToggleSwitchTransformer;
 use ChristianBrown\SmartThings\Transformer\TtsInfoTransformer;
 use ChristianBrown\SmartThings\Transformer\TtsVoiceTransformer;
+use ChristianBrown\SmartThings\Transformer\ValueReader;
 use ChristianBrown\SmartThings\Transformer\ViperAppLinksTransformer;
 use ChristianBrown\SmartThings\Transformer\ViperDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\VirtualDeviceDetailsTransformer;
@@ -648,6 +651,9 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ScheduleApi::class)]
 #[UsesClass(SchemaConnectorApi::class)]
 #[UsesClass(PagingJsonApiRequestSender::class)]
+#[UsesClass(ValueReader::class)]
+#[UsesClass(LocationParentSerializer::class)]
+#[UsesClass(CreateLocationRequestSerializer::class)]
 #[UsesClass(RedirectLocationResponseMapper::class)]
 #[UsesClass(ServiceApi::class)]
 #[UsesClass(SubscriptionApi::class)]

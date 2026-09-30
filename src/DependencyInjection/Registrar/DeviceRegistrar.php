@@ -45,6 +45,9 @@ final class DeviceRegistrar implements ServiceRegistrarInterface
             ->setArguments(
                 [
                     $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_COMPONENT_CAPABILITIES_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VALUE_READER),
+                    new Reference(SmartThingsInterface::SERVICE_DEVICE_CATEGORY_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_RESTRICTION_TRANSFORMER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_DEVICE_COMPONENTS_TRANSFORMER, DeviceComponentsTransformer::class)

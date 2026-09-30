@@ -9,7 +9,10 @@ use ChristianBrown\SmartThings\Model\HubEnrolledChannelInterface;
 interface HubEnrolledChannelTransformerInterface
 {
     public const string KEY_CHANNEL_ID = 'channelId';
+    public const string KEY_CREATED_DATE = 'createdDate';
     public const string KEY_DESCRIPTION = 'description';
+    public const string KEY_IS_WWST = 'isWWST';
+    public const string KEY_LAST_MODIFIED_DATE = 'lastModifiedDate';
     public const string KEY_NAME = 'name';
     public const string KEY_SUBSCRIPTION_URL = 'subscriptionUrl';
     public const string UNEXPECTED_STRING_SPRINTF = '%s not set or not a string';

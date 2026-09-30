@@ -8,7 +8,13 @@ interface HubEnrolledChannelInterface
 {
     public function getChannelId(): string;
 
+    public function getCreatedDate(): ?string;
+
     public function getDescription(): ?string;
+
+    public function getIsWWST(): ?bool;
+
+    public function getLastModifiedDate(): ?string;
 
     public function getName(): ?string;
 
@@ -16,7 +22,13 @@ interface HubEnrolledChannelInterface
 
     public function setChannelId(string $value): self;
 
+    public function setCreatedDate(?string $value): self;
+
     public function setDescription(?string $value): self;
+
+    public function setIsWWST(?bool $value): self;
+
+    public function setLastModifiedDate(?string $value): self;
 
     public function setName(?string $value): self;
 
