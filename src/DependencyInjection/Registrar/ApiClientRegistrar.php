@@ -26,6 +26,7 @@ use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\ScheduleApi;
 use ChristianBrown\SmartThings\Api\SchemaAppInviteApi;
+use ChristianBrown\SmartThings\Api\SchemaAppOwnerApi;
 use ChristianBrown\SmartThings\Api\SchemaConnectorApi;
 use ChristianBrown\SmartThings\Api\ServiceApi;
 use ChristianBrown\SmartThings\Api\SubscriptionApi;
@@ -304,6 +305,15 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_SCHEDULES_TRANSFORMER),
                     $this->token,
                     $container->getDefinition(SmartThingsInterface::SERVICE_SCHEDULE_REQUEST_SERIALIZER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_OWNER_API, SchemaAppOwnerApi::class)
+            ->setArguments(
+                [
+                    $container->getDefinition(SmartThingsInterface::SERVICE_PAGING_JSON_API_REQUEST_SENDER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_ORGANIZATION_SCHEMA_APPS_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_USER_SCHEMA_APPS_TRANSFORMER),
+                    $this->token,
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_CONNECTOR_API, SchemaConnectorApi::class)

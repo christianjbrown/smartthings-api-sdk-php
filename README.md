@@ -224,6 +224,25 @@ echo $switch->getValue()['value'] ?? '', "\n";
 Installed app configuration entries are typed too: `InstalledAppConfigInterface::getConfigEntries()` returns the
 entries of each configuration name (string, device, permission, mode, scene, message and room configs).
 
+### Reading error bodies
+
+Failed requests surface as `RequestExceptionInterface` from `christianjbrown/api-client`. When the API sent an error
+body, read it with the error transformer:
+
+```php
+use ChristianBrown\ApiClient\Exception\Response\ResponseExceptionInterface;
+
+try {
+    $deviceApi->getOneById('a-device-id');
+} catch (ResponseExceptionInterface $exception) {
+    $error = $smartThings->getErrorResponseTransformer()->transform($exception->getDecodedBody() ?? []);
+    echo $error->getError()?->getCode(), ' ', $error->getRequestId(), "\n";
+}
+```
+
+`SchemaAppOwnerApi` (`getSchemaAppOwnerApi()`) returns the apps of an organization or a user with the wrapper fields
+(`getOrganizationIds()`, `getUserId()`).
+
 ### Filtering and query parameters
 
 List and get calls take the API's optional query parameters. The busier lists take a small query

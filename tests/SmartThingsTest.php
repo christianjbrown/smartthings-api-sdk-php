@@ -31,6 +31,7 @@ use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\ScheduleApi;
 use ChristianBrown\SmartThings\Api\SchemaAppInviteApi;
+use ChristianBrown\SmartThings\Api\SchemaAppOwnerApi;
 use ChristianBrown\SmartThings\Api\SchemaConnectorApi;
 use ChristianBrown\SmartThings\Api\ServiceApi;
 use ChristianBrown\SmartThings\Api\SubscriptionApi;
@@ -240,6 +241,7 @@ use ChristianBrown\SmartThings\Transformer\ActionItemTransformer;
 use ChristianBrown\SmartThings\Transformer\ActionListItemTransformer;
 use ChristianBrown\SmartThings\Transformer\ActionsArrayItemTransformer;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ApiErrorTransformer;
 use ChristianBrown\SmartThings\Transformer\AppDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppOauthTransformer;
@@ -397,6 +399,7 @@ use ChristianBrown\SmartThings\Transformer\EmptyWithAvailableSizeTransformer;
 use ChristianBrown\SmartThings\Transformer\EnumCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\EnumSliderForAutomationConditionSupportedOperatorsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\EnumSliderForAutomationConditionTransformer;
+use ChristianBrown\SmartThings\Transformer\ErrorResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\ExcludedActionItemIdExcludeItemTransformer;
 use ChristianBrown\SmartThings\Transformer\ExcludedActionItemIdTransformer;
 use ChristianBrown\SmartThings\Transformer\ExcludedActionItemTransformer;
@@ -480,6 +483,7 @@ use ChristianBrown\SmartThings\Transformer\NumberFieldForAutomationActionTransfo
 use ChristianBrown\SmartThings\Transformer\NumberFieldForAutomationConditionTransformer;
 use ChristianBrown\SmartThings\Transformer\NumberFieldTransformer;
 use ChristianBrown\SmartThings\Transformer\OcfDeviceDetailsTransformer;
+use ChristianBrown\SmartThings\Transformer\OrganizationSchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\OrganizationsTransformer;
 use ChristianBrown\SmartThings\Transformer\OrganizationTransformer;
 use ChristianBrown\SmartThings\Transformer\OwnerTransformer;
@@ -587,6 +591,7 @@ use ChristianBrown\SmartThings\Transformer\ToggleSwitchForDashboardTransformer;
 use ChristianBrown\SmartThings\Transformer\ToggleSwitchTransformer;
 use ChristianBrown\SmartThings\Transformer\TtsInfoTransformer;
 use ChristianBrown\SmartThings\Transformer\TtsVoiceTransformer;
+use ChristianBrown\SmartThings\Transformer\UserSchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\ValueReader;
 use ChristianBrown\SmartThings\Transformer\ViperAppLinksTransformer;
 use ChristianBrown\SmartThings\Transformer\ViperDeviceDetailsTransformer;
@@ -663,6 +668,11 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ScheduleApi::class)]
 #[UsesClass(SchemaConnectorApi::class)]
 #[UsesClass(PagingJsonApiRequestSender::class)]
+#[UsesClass(SchemaAppOwnerApi::class)]
+#[UsesClass(UserSchemaAppsTransformer::class)]
+#[UsesClass(OrganizationSchemaAppsTransformer::class)]
+#[UsesClass(ApiErrorTransformer::class)]
+#[UsesClass(ErrorResponseTransformer::class)]
 #[UsesClass(RoomConfigTransformer::class)]
 #[UsesClass(MessageConfigTransformer::class)]
 #[UsesClass(SceneConfigTransformer::class)]
@@ -1294,6 +1304,13 @@ final class SmartThingsTest extends TestCase
         self::assertInstanceOf(DriverApi::class, $smartThings->getDriverApi());
     }
 
+    public function testGetErrorResponseTransformer(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(ErrorResponseTransformer::class, $smartThings->getErrorResponseTransformer());
+    }
+
     public function testGetHubApi(): void
     {
         $smartThings = new SmartThings('token');
@@ -1369,6 +1386,13 @@ final class SmartThingsTest extends TestCase
         $smartThings = new SmartThings('token');
 
         self::assertInstanceOf(SchemaAppInviteApi::class, $smartThings->getSchemaAppInviteApi());
+    }
+
+    public function testGetSchemaAppOwnerApi(): void
+    {
+        $smartThings = new SmartThings('token');
+
+        self::assertInstanceOf(SchemaAppOwnerApi::class, $smartThings->getSchemaAppOwnerApi());
     }
 
     public function testGetSchemaConnectorApi(): void
