@@ -381,6 +381,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_OWNER_TRANSFORMER = 'smartthings.transformer.owner_transformer';
     public const string SERVICE_PAGE_LINK_TRANSFORMER = 'smartthings.transformer.page_link_transformer';
     public const string SERVICE_PAGE_LINKS_TRANSFORMER = 'smartthings.transformer.page_links_transformer';
+    public const string SERVICE_PAGING_JSON_API_REQUEST_SENDER = 'smartthings.paging_json_api_request_sender';
     public const string SERVICE_PANEL_FOR_DEVICE_CONFIG_ITEMS_ITEM_SERIALIZER = 'smartthings.serializer.panel_for_device_config_items_item_serializer';
     public const string SERVICE_PANEL_FOR_DEVICE_CONFIG_ITEMS_ITEM_TRANSFORMER = 'smartthings.transformer.panel_for_device_config_items_item_transformer';
     public const string SERVICE_PANEL_FOR_DEVICE_CONFIG_SERIALIZER = 'smartthings.serializer.panel_for_device_config_serializer';

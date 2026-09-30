@@ -76,6 +76,10 @@ mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
   lists take a `Model\*ListQuery` object (`QueryParametersInterface::getParameters()`); explicit
   arguments win over the object. Caches are keyed by the full URL, so a filtered call never returns an
   unfiltered result.
+- **Paging** — `Api\PagingJsonApiRequestSender` decorates the host-overriding sender for every client except
+  `DeviceHistoryApi` (which pages itself with a caller cap): a GET whose response has a list `items` and
+  `_links.next.href` is followed, page by page, up to a fixed cap set in `CoreRegistrar`, and the items are
+  merged into one response.
 - **Redirects** — `ServiceApi::getAlertLink()` is the one call whose answer is a redirect: it goes through
   `Api\AlertLinkRequester` (a Guzzle client with redirects and HTTP errors switched off, built in
   `CoreRegistrar`), which returns the `Location` header and turns anything else into an

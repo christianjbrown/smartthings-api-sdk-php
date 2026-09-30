@@ -15,7 +15,48 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 #[CoversClass(ApiClientRegistrar::class)]
 final class ApiClientRegistrarTest extends TestCase
 {
+    public function testListClientsFollowPagesAndTheHistoryClientDoesNot(): void
+    {
+        $container = $this->registered();
+
+        self::assertSame($container->getDefinition(SmartThingsInterface::SERVICE_PAGING_JSON_API_REQUEST_SENDER), $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_API)->getArgument(0));
+        self::assertSame($container->getDefinition(SmartThingsInterface::SERVICE_JSON_API_REQUEST_SENDER), $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_HISTORY_API)->getArgument(0));
+    }
+
     public function testRegister(): void
+    {
+        $container = $this->registered();
+
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_APP_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CAPABILITY_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CHANNEL_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_HEALTH_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_HISTORY_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PREFERENCES_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PREFERENCE_DEFINITION_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PROFILE_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_STATUS_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DRIVER_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_HUB_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_INSTALLED_APP_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_LOCATION_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_LOCATION_MODE_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_LOCATION_ROOM_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_ORGANIZATION_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_PRESENTATION_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_RULE_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCENE_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEDULE_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEMA_CONNECTOR_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SERVICE_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SUBSCRIPTION_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_VIRTUAL_DEVICE_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_TEXT_TO_SPEECH_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_API));
+    }
+
+    private function registered(): ContainerBuilder
     {
         $container = new ContainerBuilder();
 
@@ -108,6 +149,7 @@ final class ApiClientRegistrarTest extends TestCase
         $container->register(SmartThingsInterface::SERVICE_INSTALLED_SCHEMA_APPS_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_INSTALLED_SCHEMA_APP_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_JSON_API_REQUEST_SENDER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_PAGING_JSON_API_REQUEST_SENDER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_LOCALE_REFERENCES_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_LOCALIZATION_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_LOCATIONS_TRANSFORMER, stdClass::class);
@@ -146,32 +188,6 @@ final class ApiClientRegistrarTest extends TestCase
 
         (new ApiClientRegistrar($token))->register($container);
 
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_APP_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CAPABILITY_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_CHANNEL_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_HEALTH_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_HISTORY_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PREFERENCES_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PREFERENCE_DEFINITION_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_PROFILE_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DEVICE_STATUS_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DRIVER_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_HUB_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_INSTALLED_APP_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_LOCATION_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_LOCATION_MODE_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_LOCATION_ROOM_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_ORGANIZATION_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_PRESENTATION_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_RULE_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCENE_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEDULE_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEMA_CONNECTOR_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SERVICE_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SUBSCRIPTION_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_VIRTUAL_DEVICE_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_TEXT_TO_SPEECH_API));
-        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_API));
+        return $container;
     }
 }

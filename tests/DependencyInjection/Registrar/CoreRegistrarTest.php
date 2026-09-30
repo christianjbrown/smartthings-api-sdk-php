@@ -24,6 +24,9 @@ final class CoreRegistrarTest extends TestCase
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_API_CLIENT));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_RAW_JSON_API_REQUEST_SENDER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_JSON_API_REQUEST_SENDER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_PAGING_JSON_API_REQUEST_SENDER));
+        self::assertSame($container->getDefinition(SmartThingsInterface::SERVICE_JSON_API_REQUEST_SENDER), $container->getDefinition(SmartThingsInterface::SERVICE_PAGING_JSON_API_REQUEST_SENDER)->getArgument(0));
+        self::assertSame(100, $container->getDefinition(SmartThingsInterface::SERVICE_PAGING_JSON_API_REQUEST_SENDER)->getArgument(1));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_RAW_API_REQUEST_SENDER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_REQUEST_URL_BUILDER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_ALERT_LINK_RESPONSE_MAPPER));
