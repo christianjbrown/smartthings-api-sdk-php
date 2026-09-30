@@ -365,6 +365,12 @@ typed on its interface. Code that uses the `SmartThings` facade (`new SmartThing
 constructs `*Api` classes by hand has to pass the collaborators, including the
 `RequestUrlBuilderInterface` that the clients with query parameters take; the registrars list them.
 
+## :memo: Changelog
+
+Notable changes in each release are listed in [CHANGELOG.md](CHANGELOG.md).
+
+
+
 ## :page_facing_up: License
 
 Released under the [MIT License](LICENSE).
