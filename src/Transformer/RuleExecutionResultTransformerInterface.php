@@ -8,6 +8,7 @@ use ChristianBrown\SmartThings\Model\RuleExecutionResultInterface;
 
 interface RuleExecutionResultTransformerInterface
 {
+    public const string KEY_ACTIONS = 'actions';
     public const string KEY_EXECUTION_ID = 'executionId';
     public const string KEY_ID = 'id';
     public const string KEY_RESULT = 'result';

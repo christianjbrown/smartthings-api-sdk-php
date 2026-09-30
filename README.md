@@ -207,6 +207,9 @@ echo $sceneResult->getStatus() ?? 'unknown', "\n"; // e.g. "success"
 // Trigger a rule.
 $ruleResult = $ruleApi->execute('a-rule-id'); // RuleExecutionResultInterface
 echo $ruleResult->getResult() ?? 'unknown', "\n"; // e.g. "Success"
+foreach ($ruleResult->getActions() as $action) { // ActionExecutionResultInterface[]
+    echo $action->getActionId(), ' ', $action->getIf()?->getResult() ?? '', "\n";
+}
 ```
 
 ### Reading everything a device reports

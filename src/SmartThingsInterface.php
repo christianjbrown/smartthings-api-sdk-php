@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings;
 
 interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutomationInterface, SmartThingsCapabilityInterface, SmartThingsDeviceInterface, SmartThingsDeviceMetadataInterface, SmartThingsEdgeInterface, SmartThingsErrorInterface, SmartThingsLocationInterface, SmartThingsOrganizationInterface, SmartThingsSchemaAppInviteInterface, SmartThingsTextToSpeechInterface, SmartThingsVirtualDeviceInterface
 {
+    public const string SERVICE_ACTION_EXECUTION_RESULT_TRANSFORMER = 'smartthings.transformer.action_execution_result_transformer';
     public const string SERVICE_ACTION_ITEM_SERIALIZER = 'smartthings.serializer.action_item_serializer';
     public const string SERVICE_ACTION_ITEM_TRANSFORMER = 'smartthings.transformer.action_item_transformer';
     public const string SERVICE_ACTION_LIST_ITEM_TRANSFORMER = 'smartthings.transformer.action_list_item_transformer';
@@ -86,6 +87,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_BASIC_PLUS_TV_VOLUME_COMMAND_TRANSFORMER = 'smartthings.transformer.basic_plus_tv_volume_command_transformer';
     public const string SERVICE_BASIC_PLUS_TV_VOLUME_SERIALIZER = 'smartthings.serializer.basic_plus_tv_volume_serializer';
     public const string SERVICE_BASIC_PLUS_TV_VOLUME_TRANSFORMER = 'smartthings.transformer.basic_plus_tv_volume_transformer';
+    public const string SERVICE_BEHAVIOR_ABNORMAL_EXECUTION_RESULT_TRANSFORMER = 'smartthings.transformer.behavior_abnormal_execution_result_transformer';
     public const string SERVICE_BLE_D2_DDEVICE_DETAILS_TRANSFORMER = 'smartthings.transformer.ble_d2_ddevice_details_transformer';
     public const string SERVICE_BUTTON_FOR_TV_SERIALIZER = 'smartthings.serializer.button_for_tv_serializer';
     public const string SERVICE_BUTTON_FOR_TV_TRANSFORMER = 'smartthings.transformer.button_for_tv_transformer';
@@ -126,6 +128,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_CHANNEL_UPDATE_REQUEST_SERIALIZER = 'smartthings.serializer.channel_update_request_serializer';
     public const string SERVICE_CHANNELS_TRANSFORMER = 'smartthings.transformer.channels_transformer';
     public const string SERVICE_CLUSTERS_TRANSFORMER = 'smartthings.transformer.clusters_transformer';
+    public const string SERVICE_COMMAND_ACTION_EXECUTION_RESULT_TRANSFORMER = 'smartthings.transformer.command_action_execution_result_transformer';
     public const string SERVICE_COMMAND_ARGUMENT_TRANSFORMER = 'smartthings.transformer.command_argument_transformer';
     public const string SERVICE_COMMAND_CLASSES_TRANSFORMER = 'smartthings.transformer.command_classes_transformer';
     public const string SERVICE_COMMAND_MAPPING_TRANSFORMER = 'smartthings.transformer.command_mapping_transformer';
@@ -307,6 +310,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_HUB_TRANSFORMER = 'smartthings.transformer.hub_transformer';
     public const string SERVICE_ICON_IMAGE_TRANSFORMER = 'smartthings.transformer.icon_image_transformer';
     public const string SERVICE_ID_LESS_HEALTH_STATE_TRANSFORMER = 'smartthings.transformer.id_less_health_state_transformer';
+    public const string SERVICE_IF_ACTION_EXECUTION_RESULT_TRANSFORMER = 'smartthings.transformer.if_action_execution_result_transformer';
     public const string SERVICE_INDOOR_MAP_SERIALIZER = 'smartthings.serializer.indoor_map_serializer';
     public const string SERVICE_INDOOR_MAP_TRANSFORMER = 'smartthings.transformer.indoor_map_transformer';
     public const string SERVICE_INSTALLED_APP_API = 'smartthings.api.installed_app_api';
@@ -348,6 +352,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_LOCALE_REFERENCES_TRANSFORMER = 'smartthings.transformer.locale_references_transformer';
     public const string SERVICE_LOCALIZATION_DETAILS_TRANSFORMER = 'smartthings.transformer.localization_details_transformer';
     public const string SERVICE_LOCALIZATION_TRANSFORMER = 'smartthings.transformer.localization_transformer';
+    public const string SERVICE_LOCATION_ACTION_EXECUTION_RESULT_TRANSFORMER = 'smartthings.transformer.location_action_execution_result_transformer';
     public const string SERVICE_LOCATION_API = 'smartthings.api.location_api';
     public const string SERVICE_LOCATION_CREATE_REQUEST_SERIALIZER = 'smartthings.serializer.create_location_request_serializer';
     public const string SERVICE_LOCATION_DETAILS_TRANSFORMER = 'smartthings.transformer.location_details_transformer';
@@ -477,6 +482,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_SCHEMA_OAUTH_CREDENTIALS_REQUEST_SERIALIZER = 'smartthings.serializer.schema_oauth_credentials_request_serializer';
     public const string SERVICE_SCHEMA_PAGE_TRANSFORMER = 'smartthings.transformer.schema_page_transformer';
     public const string SERVICE_SECURITY_ARM_STATE_DETAIL_TRANSFORMER = 'smartthings.transformer.security_arm_state_detail_transformer';
+    public const string SERVICE_SECURITY_STATE_TRANSFORMER = 'smartthings.transformer.security_state_transformer';
     public const string SERVICE_SERVICE_API = 'smartthings.api.service_api';
     public const string SERVICE_SERVICE_CAPABILITY_DATA_ALERT_ITEM_LAST_UPDATE_TIME_TRANSFORMER = 'smartthings.transformer.service_capability_data_alert_item_last_update_time_transformer';
     public const string SERVICE_SERVICE_CAPABILITY_DATA_ALERT_ITEM_SEVERITY_TRANSFORMER = 'smartthings.transformer.service_capability_data_alert_item_severity_transformer';
@@ -491,6 +497,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_SERVICE_MEASUREMENTS_TRANSFORMER = 'smartthings.transformer.service_measurements_transformer';
     public const string SERVICE_SERVICE_SUBSCRIPTION_RECEIPT_TRANSFORMER = 'smartthings.transformer.service_subscription_receipt_transformer';
     public const string SERVICE_SERVICE_SUBSCRIPTION_REQUEST_SERIALIZER = 'smartthings.serializer.service_subscription_request_serializer';
+    public const string SERVICE_SLEEP_ACTION_EXECUTION_RESULT_TRANSFORMER = 'smartthings.transformer.sleep_action_execution_result_transformer';
     public const string SERVICE_SLIDER_FOR_ARGUMENT_SERIALIZER = 'smartthings.serializer.slider_for_argument_serializer';
     public const string SERVICE_SLIDER_FOR_ARGUMENT_TRANSFORMER = 'smartthings.transformer.slider_for_argument_transformer';
     public const string SERVICE_SLIDER_FOR_AUTOMATION_ACTION_SERIALIZER = 'smartthings.serializer.slider_for_automation_action_serializer';

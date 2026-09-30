@@ -237,6 +237,7 @@ use ChristianBrown\SmartThings\Serializer\VisibleConditionForDashboardStateSeria
 use ChristianBrown\SmartThings\Serializer\VisibleConditionForDetailViewSerializer;
 use ChristianBrown\SmartThings\Serializer\VisibleConditionSerializer;
 use ChristianBrown\SmartThings\SmartThings;
+use ChristianBrown\SmartThings\Transformer\ActionExecutionResultTransformer;
 use ChristianBrown\SmartThings\Transformer\ActionItemTransformer;
 use ChristianBrown\SmartThings\Transformer\ActionListItemTransformer;
 use ChristianBrown\SmartThings\Transformer\ActionsArrayItemTransformer;
@@ -281,6 +282,7 @@ use ChristianBrown\SmartThings\Transformer\BasicPlusTvDirectionalPadTransformer;
 use ChristianBrown\SmartThings\Transformer\BasicPlusTvTransformer;
 use ChristianBrown\SmartThings\Transformer\BasicPlusTvVolumeCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\BasicPlusTvVolumeTransformer;
+use ChristianBrown\SmartThings\Transformer\BehaviorAbnormalExecutionResultTransformer;
 use ChristianBrown\SmartThings\Transformer\BleD2DDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\ButtonForTvTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitiesTransformer;
@@ -309,6 +311,7 @@ use ChristianBrown\SmartThings\Transformer\ChannelDriverTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelsTransformer;
 use ChristianBrown\SmartThings\Transformer\ChannelTransformer;
 use ChristianBrown\SmartThings\Transformer\ClustersTransformer;
+use ChristianBrown\SmartThings\Transformer\CommandActionExecutionResultTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandArgumentTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandClassesTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandMappingsTransformer;
@@ -428,6 +431,7 @@ use ChristianBrown\SmartThings\Transformer\HubInstalledDriverTransformer;
 use ChristianBrown\SmartThings\Transformer\HubTransformer;
 use ChristianBrown\SmartThings\Transformer\IconImageTransformer;
 use ChristianBrown\SmartThings\Transformer\IdLessHealthStateTransformer;
+use ChristianBrown\SmartThings\Transformer\IfActionExecutionResultTransformer;
 use ChristianBrown\SmartThings\Transformer\IndoorMapTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformer;
@@ -458,6 +462,7 @@ use ChristianBrown\SmartThings\Transformer\LocaleReferencesTransformer;
 use ChristianBrown\SmartThings\Transformer\LocaleReferenceTransformer;
 use ChristianBrown\SmartThings\Transformer\LocalizationDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocalizationTransformer;
+use ChristianBrown\SmartThings\Transformer\LocationActionExecutionResultTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationParentTransformer;
 use ChristianBrown\SmartThings\Transformer\LocationRoomDetailsTransformer;
@@ -515,6 +520,7 @@ use ChristianBrown\SmartThings\Transformer\PushButtonWithAvailableSizeTransforme
 use ChristianBrown\SmartThings\Transformer\RestrictionTransformer;
 use ChristianBrown\SmartThings\Transformer\RoomConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\RoomIndoorMapTransformer;
+use ChristianBrown\SmartThings\Transformer\RuleExecutionResultTransformer;
 use ChristianBrown\SmartThings\Transformer\RulesTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneConfigTransformer;
@@ -535,6 +541,7 @@ use ChristianBrown\SmartThings\Transformer\SchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaPageTransformer;
 use ChristianBrown\SmartThings\Transformer\SecurityArmStateDetailTransformer;
+use ChristianBrown\SmartThings\Transformer\SecurityStateTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataAlertItemLastUpdateTimeTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataAlertItemSeverityTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceCapabilityDataAlertItemTransformer;
@@ -547,6 +554,7 @@ use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceMeasurementsTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceMeasurementTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceSubscriptionReceiptTransformer;
+use ChristianBrown\SmartThings\Transformer\SleepActionExecutionResultTransformer;
 use ChristianBrown\SmartThings\Transformer\SliderForArgumentTransformer;
 use ChristianBrown\SmartThings\Transformer\SliderForAutomationActionTransformer;
 use ChristianBrown\SmartThings\Transformer\SliderForAutomationConditionTransformer;
@@ -668,6 +676,14 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ScheduleApi::class)]
 #[UsesClass(SchemaConnectorApi::class)]
 #[UsesClass(PagingJsonApiRequestSender::class)]
+#[UsesClass(RuleExecutionResultTransformer::class)]
+#[UsesClass(ActionExecutionResultTransformer::class)]
+#[UsesClass(LocationActionExecutionResultTransformer::class)]
+#[UsesClass(CommandActionExecutionResultTransformer::class)]
+#[UsesClass(SleepActionExecutionResultTransformer::class)]
+#[UsesClass(IfActionExecutionResultTransformer::class)]
+#[UsesClass(BehaviorAbnormalExecutionResultTransformer::class)]
+#[UsesClass(SecurityStateTransformer::class)]
 #[UsesClass(SchemaAppOwnerApi::class)]
 #[UsesClass(UserSchemaAppsTransformer::class)]
 #[UsesClass(OrganizationSchemaAppsTransformer::class)]
