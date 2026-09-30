@@ -20,10 +20,12 @@ use ChristianBrown\SmartThings\Model\RuleInterface;
 use ChristianBrown\SmartThings\Model\RuleRequest;
 use ChristianBrown\SmartThings\Serializer\RuleRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\RuleRequestSerializerInterface;
+use ChristianBrown\SmartThings\Transformer\ActionExecutionResultTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\RuleExecutionResultTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleExecutionResultTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\RulesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\RuleTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\ValueReader;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\Exception;
@@ -36,6 +38,7 @@ use function sprintf;
 #[CoversClass(RequestUrlBuilder::class)]
 #[CoversClass(RuleExecutionResult::class)]
 #[CoversClass(RuleExecutionResultTransformer::class)]
+#[CoversClass(ValueReader::class)]
 #[CoversClass(RuleRequest::class)]
 #[CoversClass(RuleRequestSerializer::class)]
 #[CoversClass(Token::class)]
@@ -357,7 +360,7 @@ final class RuleApiTest extends TestCase
         $rulesTransformer = self::createStub(RulesTransformerInterface::class);
 
         // The real execution result transformer, so the parsed result is checked.
-        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'), new RuleExecutionResultTransformer(), self::createStub(RuleRequestSerializerInterface::class), new RequestUrlBuilder());
+        $ruleApi = new RuleApi($requestSender, $ruleTransformer, $rulesTransformer, new Token('test-api-token'), new RuleExecutionResultTransformer(self::createStub(ActionExecutionResultTransformerInterface::class), new ValueReader()), self::createStub(RuleRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $ruleApi->execute('a/b c');
 
         self::assertSame('test-execution-id', $actual->getExecutionId());

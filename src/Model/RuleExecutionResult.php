@@ -6,6 +6,10 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class RuleExecutionResult implements RuleExecutionResultInterface
 {
+    /**
+     * @var array<int, ActionExecutionResultInterface>
+     */
+    private array $actions = [];
     private string $executionId;
     private string $id;
     private ?string $result = null;
@@ -14,6 +18,14 @@ final class RuleExecutionResult implements RuleExecutionResultInterface
     {
         $this->executionId = $executionId;
         $this->id = $id;
+    }
+
+    /**
+     * @return array<int, ActionExecutionResultInterface>
+     */
+    public function getActions(): array
+    {
+        return $this->actions;
     }
 
     public function getExecutionId(): string
@@ -29,6 +41,16 @@ final class RuleExecutionResult implements RuleExecutionResultInterface
     public function getResult(): ?string
     {
         return $this->result;
+    }
+
+    /**
+     * @param array<int, ActionExecutionResultInterface> $value
+     */
+    public function setActions(array $value): RuleExecutionResultInterface
+    {
+        $this->actions = $value;
+
+        return $this;
     }
 
     public function setResult(?string $value): RuleExecutionResultInterface
