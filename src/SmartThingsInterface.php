@@ -12,6 +12,13 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_ACTION_SERIALIZER = 'smartthings.serializer.action_serializer';
     public const string SERVICE_ACTION_TRANSFORMER = 'smartthings.transformer.action_transformer';
     public const string SERVICE_ACTIONS_ARRAY_ITEM_TRANSFORMER = 'smartthings.transformer.actions_array_item_transformer';
+    public const string SERVICE_ALERT_LINK_API_REQUEST_SENDER = 'smartthings.alert_link_api_request_sender';
+    public const string SERVICE_ALERT_LINK_HANDLER_STACK = 'smartthings.alert_link_handler_stack';
+    public const string SERVICE_ALERT_LINK_HTTP_CLIENT = 'smartthings.alert_link_http_client';
+    public const string SERVICE_ALERT_LINK_JSON_API_REQUEST_SENDER = 'smartthings.alert_link_json_api_request_sender';
+    public const string SERVICE_ALERT_LINK_MIDDLEWARE = 'smartthings.alert_link_middleware';
+    public const string SERVICE_ALERT_LINK_RAW_JSON_API_REQUEST_SENDER = 'smartthings.alert_link_raw_json_api_request_sender';
+    public const string SERVICE_ALERT_LINK_RESPONSE_MAPPER = 'smartthings.api.alert_link_response_mapper';
     public const string SERVICE_ALTERNATIVE_ITEM_SERIALIZER = 'smartthings.serializer.alternative_item_serializer';
     public const string SERVICE_ALTERNATIVE_ITEM_TRANSFORMER = 'smartthings.transformer.alternative_item_transformer';
     public const string SERVICE_API_CLIENT = 'smartthings.api_client';
@@ -23,6 +30,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_APP_TRANSFORMER = 'smartthings.transformer.app_transformer';
     public const string SERVICE_APP_UI_SETTINGS_TRANSFORMER = 'smartthings.transformer.app_ui_settings_transformer';
     public const string SERVICE_APPS_TRANSFORMER = 'smartthings.transformer.apps_transformer';
+    public const string SERVICE_ARRAY_TO_JSON_TRANSFORMER = 'smartthings.array_to_json_transformer';
     public const string SERVICE_ATTRIBUTE_DATA_SCHEMA_TRANSFORMER = 'smartthings.transformer.attribute_data_schema_transformer';
     public const string SERVICE_ATTRIBUTE_PROPERTIES_TRANSFORMER = 'smartthings.transformer.attribute_properties_transformer';
     public const string SERVICE_ATTRIBUTE_SCHEMA_TRANSFORMER = 'smartthings.transformer.attribute_schema_transformer';

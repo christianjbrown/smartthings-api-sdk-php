@@ -76,6 +76,10 @@ mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
   lists take a `Model\*ListQuery` object (`QueryParametersInterface::getParameters()`); explicit
   arguments win over the object. Caches are keyed by the full URL, so a filtered call never returns an
   unfiltered result.
+- **Redirects** — `ServiceApi::getAlertLink()` is the one call whose answer is a redirect: it goes through
+  `Api\AlertLinkRequester` (a Guzzle client with redirects and HTTP errors switched off, built in
+  `CoreRegistrar`), which returns the `Location` header and turns anything else into an
+  `UnexpectedResponseException`.
 - **`Api/`** — HTTP clients (`DeviceApi`, `DeviceStatusApi`, `LocationApi`, `LocationRoomApi`). Each is
   constructed with a `JsonApiRequestSenderInterface` (from `christianjbrown/api-client` — no
   Guzzle/PSR-18 used directly), its transformer(s), and a `string $apiToken`. They send an

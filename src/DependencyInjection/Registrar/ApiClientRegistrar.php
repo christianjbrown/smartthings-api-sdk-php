@@ -331,6 +331,7 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_SERVICE_SUBSCRIPTION_REQUEST_SERIALIZER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_SERVICE_SUBSCRIPTION_RECEIPT_TRANSFORMER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_REQUEST_URL_BUILDER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_ALERT_LINK_JSON_API_REQUEST_SENDER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_SUBSCRIPTION_API, SubscriptionApi::class)
