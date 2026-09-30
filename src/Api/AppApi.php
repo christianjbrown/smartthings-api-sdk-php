@@ -8,6 +8,7 @@ use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AppInterface;
+use ChristianBrown\SmartThings\Model\AppListQueryInterface;
 use ChristianBrown\SmartThings\Model\AppOauthInterface;
 use ChristianBrown\SmartThings\Model\AppSettingsInterface;
 use ChristianBrown\SmartThings\Model\CreateAppRequestInterface;
@@ -54,9 +55,9 @@ final class AppApi implements AppApiInterface
     private GenerateAppOauthResponseTransformerInterface $generateAppOauthResponseTransformer;
 
     /**
-     * @var ?array<int, AppInterface>
+     * @var array<string, array<int, AppInterface>>
      */
-    private ?array $listCache = null;
+    private array $listCache = [];
 
     /**
      * @var array<string, AppOauthInterface>
@@ -73,8 +74,9 @@ final class AppApi implements AppApiInterface
     private UpdateAppRequestSerializerInterface $updateAppRequestSerializer;
     private UpdateAppSettingsRequestSerializerInterface $updateAppSettingsRequestSerializer;
     private UpdateSignatureTypeRequestSerializerInterface $updateSignatureTypeRequestSerializer;
+    private RequestUrlBuilderInterface $urlBuilder;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, AppTransformerInterface $appTransformer, AppsTransformerInterface $appsTransformer, AppOauthTransformerInterface $appOauthTransformer, AppSettingsTransformerInterface $appSettingsTransformer, TokenInterface $token, CreateAppRequestSerializerInterface $createAppRequestSerializer, CreateAppResponseTransformerInterface $createAppResponseTransformer, UpdateAppRequestSerializerInterface $updateAppRequestSerializer, UpdateAppSettingsRequestSerializerInterface $updateAppSettingsRequestSerializer, UpdateAppOauthRequestSerializerInterface $updateAppOauthRequestSerializer, GenerateAppOauthRequestSerializerInterface $generateAppOauthRequestSerializer, GenerateAppOauthResponseTransformerInterface $generateAppOauthResponseTransformer, UpdateSignatureTypeRequestSerializerInterface $updateSignatureTypeRequestSerializer)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, AppTransformerInterface $appTransformer, AppsTransformerInterface $appsTransformer, AppOauthTransformerInterface $appOauthTransformer, AppSettingsTransformerInterface $appSettingsTransformer, TokenInterface $token, CreateAppRequestSerializerInterface $createAppRequestSerializer, CreateAppResponseTransformerInterface $createAppResponseTransformer, UpdateAppRequestSerializerInterface $updateAppRequestSerializer, UpdateAppSettingsRequestSerializerInterface $updateAppSettingsRequestSerializer, UpdateAppOauthRequestSerializerInterface $updateAppOauthRequestSerializer, GenerateAppOauthRequestSerializerInterface $generateAppOauthRequestSerializer, GenerateAppOauthResponseTransformerInterface $generateAppOauthResponseTransformer, UpdateSignatureTypeRequestSerializerInterface $updateSignatureTypeRequestSerializer, RequestUrlBuilderInterface $urlBuilder)
     {
         $this->requestSender = $requestSender;
         $this->appTransformer = $appTransformer;
@@ -90,6 +92,7 @@ final class AppApi implements AppApiInterface
         $this->generateAppOauthRequestSerializer = $generateAppOauthRequestSerializer;
         $this->generateAppOauthResponseTransformer = $generateAppOauthResponseTransformer;
         $this->updateSignatureTypeRequestSerializer = $updateSignatureTypeRequestSerializer;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -111,7 +114,7 @@ final class AppApi implements AppApiInterface
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $result = $this->createAppResponseTransformer->transform($data);
-        $this->listCache = null;
+        $this->listCache = [];
 
         return $result;
     }
@@ -127,7 +130,7 @@ final class AppApi implements AppApiInterface
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($appNameOrId));
         $this->requestSender->delete($url, [], $headers);
         unset($this->cache[$appNameOrId], $this->oauthCache[$appNameOrId], $this->settingsCache[$appNameOrId]);
-        $this->listCache = null;
+        $this->listCache = [];
     }
 
     /**
@@ -162,18 +165,20 @@ final class AppApi implements AppApiInterface
      *
      * @return array<int, AppInterface>
      */
-    public function getMultiple(bool $skipCache = false): array
+    public function getMultiple(bool $skipCache = false, ?AppListQueryInterface $query = null): array
     {
+        // The full URL, query included, identifies the request, so it keys the cache.
+        $url = $this->urlBuilder->build(self::API_URL, [], $query);
         if (!$skipCache) {
-            if (null !== $this->listCache) {
-                return $this->listCache;
+            if (isset($this->listCache[$url])) {
+                return $this->listCache[$url];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $data = $this->requestSender->get(self::API_URL, [], $headers);
+        $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data[self::KEY_ITEMS])) {
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
@@ -182,7 +187,7 @@ final class AppApi implements AppApiInterface
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
         }
         $apps = $this->appsTransformer->transform($data[self::KEY_ITEMS]);
-        $this->listCache = $apps;
+        $this->listCache[$url] = $apps;
 
         return $apps;
     }
@@ -193,7 +198,7 @@ final class AppApi implements AppApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function getOauth(string $appNameOrId, bool $skipCache = false): AppOauthInterface
+    public function getOauth(string $appNameOrId, bool $skipCache = false, ?bool $consistentRead = null): AppOauthInterface
     {
         if (!$skipCache) {
             if (isset($this->oauthCache[$appNameOrId])) {
@@ -201,7 +206,7 @@ final class AppApi implements AppApiInterface
             }
         }
 
-        $url = sprintf(self::API_URL_OAUTH_SPRINTF, rawurlencode($appNameOrId));
+        $url = $this->urlBuilder->build(sprintf(self::API_URL_OAUTH_SPRINTF, rawurlencode($appNameOrId)), [self::KEY_CONSISTENT_READ => $consistentRead]);
         $data = $this->fetch($url);
         $oauth = $this->appOauthTransformer->transform($data);
         $this->oauthCache[$appNameOrId] = $oauth;
@@ -287,7 +292,7 @@ final class AppApi implements AppApiInterface
         }
         $result = $this->appTransformer->transform($data);
         $this->cache[$appNameOrId] = $result;
-        $this->listCache = null;
+        $this->listCache = [];
 
         return $result;
     }

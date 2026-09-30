@@ -9,6 +9,7 @@ use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Api\ApiInterface;
 use ChristianBrown\SmartThings\Api\LocationApi;
 use ChristianBrown\SmartThings\Api\LocationApiInterface;
+use ChristianBrown\SmartThings\Api\RequestUrlBuilder;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
@@ -36,6 +37,7 @@ use function sprintf;
 #[CoversClass(CreateLocationRequest::class)]
 #[CoversClass(CreateLocationRequestSerializer::class)]
 #[CoversClass(LocationApi::class)]
+#[CoversClass(RequestUrlBuilder::class)]
 #[CoversClass(LocationPatchField::class)]
 #[CoversClass(PatchLocationRequest::class)]
 #[CoversClass(PatchLocationRequestSerializer::class)]
@@ -82,7 +84,7 @@ final class LocationApiTest extends TestCase
 
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), $createLocationRequestSerializer, self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), $createLocationRequestSerializer, self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $locationApi->createLocation($request);
 
         self::assertSame($location, $actual);
@@ -115,7 +117,7 @@ final class LocationApiTest extends TestCase
         $locationsTransformer->method('transform')
             ->willReturn([$location]);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
 
         $locationApi->getMultiple();
         $locationApi->createLocation(new CreateLocationRequest('Home', 'GBR'));
@@ -135,7 +137,7 @@ final class LocationApiTest extends TestCase
         $locationTransformer = self::createStub(LocationTransformerInterface::class);
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationApiInterface::UNEXPECTED_RESPONSE);
@@ -162,7 +164,7 @@ final class LocationApiTest extends TestCase
         $locationTransformer = self::createStub(LocationTransformerInterface::class);
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
         $locationApi->deleteLocation('test-location-id');
 
         $this->addToAssertionCount(1);
@@ -191,7 +193,7 @@ final class LocationApiTest extends TestCase
 
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
 
         $locationApi->getOneById('test-location-id');
         $locationApi->deleteLocation('test-location-id');
@@ -218,7 +220,7 @@ final class LocationApiTest extends TestCase
         $locationTransformer = self::createStub(LocationTransformerInterface::class);
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
         $locationApi->deleteLocation('test-location-id', true);
 
         $this->addToAssertionCount(1);
@@ -244,7 +246,7 @@ final class LocationApiTest extends TestCase
         $locationTransformer = self::createStub(LocationTransformerInterface::class);
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
         $locationApi->deleteLocation('test-location-id', false);
 
         $this->addToAssertionCount(1);
@@ -280,7 +282,7 @@ final class LocationApiTest extends TestCase
             ->with($data[LocationApiInterface::KEY_ITEMS])
             ->willReturn($locations);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $locationApi->getMultiple();
 
         self::assertSame($locations, $actual);
@@ -311,7 +313,7 @@ final class LocationApiTest extends TestCase
             ->with($data[LocationApiInterface::KEY_ITEMS])
             ->willReturn($locations);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
 
         // Second call is served from the cache without hitting the API.
         self::assertSame($locations, $locationApi->getMultiple());
@@ -342,7 +344,7 @@ final class LocationApiTest extends TestCase
             ->with($data[LocationApiInterface::KEY_ITEMS])
             ->willReturn($locations);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($locations, $locationApi->getMultiple());
@@ -375,7 +377,7 @@ final class LocationApiTest extends TestCase
         $locationTransformer = self::createStub(LocationTransformerInterface::class);
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(LocationApiInterface::UNEXPECTED_RESPONSE_SPRINTF, LocationApiInterface::KEY_ITEMS));
@@ -410,7 +412,7 @@ final class LocationApiTest extends TestCase
 
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $locationApi->getOneById('test-location-id');
 
         self::assertSame($location, $actual);
@@ -446,7 +448,7 @@ final class LocationApiTest extends TestCase
 
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
 
         // Second call for the same locationId is served from the cache without hitting the API.
         self::assertSame($location, $locationApi->getOneById('test-location-id'));
@@ -483,7 +485,7 @@ final class LocationApiTest extends TestCase
 
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $locationApi->getOneById($locationId);
 
         self::assertSame($location, $actual);
@@ -518,7 +520,7 @@ final class LocationApiTest extends TestCase
 
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($location, $locationApi->getOneById('test-location-id'));
@@ -547,7 +549,7 @@ final class LocationApiTest extends TestCase
         $locationTransformer = self::createStub(LocationTransformerInterface::class);
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationApiInterface::UNEXPECTED_RESPONSE);
@@ -590,7 +592,7 @@ final class LocationApiTest extends TestCase
 
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), $patchLocationRequestSerializer);
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), $patchLocationRequestSerializer, new RequestUrlBuilder());
         $actual = $locationApi->patchLocation('test-location-id', $request);
 
         self::assertSame($location, $actual);
@@ -624,7 +626,7 @@ final class LocationApiTest extends TestCase
         $locationsTransformer->method('transform')
             ->willReturn([$location]);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
 
         self::assertSame($location, $locationApi->patchLocation('test-location-id', new PatchLocationRequest()));
         self::assertSame($location, $locationApi->getOneById('test-location-id'));
@@ -644,7 +646,7 @@ final class LocationApiTest extends TestCase
         $locationTransformer = self::createStub(LocationTransformerInterface::class);
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationApiInterface::UNEXPECTED_RESPONSE);
@@ -687,7 +689,7 @@ final class LocationApiTest extends TestCase
 
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), $updateLocationRequestSerializer, self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), $updateLocationRequestSerializer, self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $locationApi->updateLocation('test-location-id', $request);
 
         self::assertSame($location, $actual);
@@ -716,7 +718,7 @@ final class LocationApiTest extends TestCase
 
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
 
         self::assertSame($location, $locationApi->updateLocation('test-location-id', new UpdateLocationRequest('Home')));
         self::assertSame($location, $locationApi->getOneById('test-location-id'));
@@ -735,7 +737,7 @@ final class LocationApiTest extends TestCase
         $locationTransformer = self::createStub(LocationTransformerInterface::class);
         $locationsTransformer = self::createStub(LocationsTransformerInterface::class);
 
-        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class));
+        $locationApi = new LocationApi($requestSender, $locationTransformer, $locationsTransformer, new Token('test-api-token'), self::createStub(CreateLocationRequestSerializerInterface::class), self::createStub(UpdateLocationRequestSerializerInterface::class), self::createStub(PatchLocationRequestSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationApiInterface::UNEXPECTED_RESPONSE);

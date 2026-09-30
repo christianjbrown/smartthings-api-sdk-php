@@ -40,14 +40,16 @@ final class LocationRoomApi implements LocationRoomApiInterface
     private LocationRoomsTransformerInterface $roomsTransformer;
     private LocationRoomTransformerInterface $roomTransformer;
     private TokenInterface $token;
+    private RequestUrlBuilderInterface $urlBuilder;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, LocationRoomTransformerInterface $roomTransformer, LocationRoomsTransformerInterface $roomsTransformer, DevicesTransformerInterface $devicesTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, LocationRoomTransformerInterface $roomTransformer, LocationRoomsTransformerInterface $roomsTransformer, DevicesTransformerInterface $devicesTransformer, TokenInterface $token, RequestUrlBuilderInterface $urlBuilder)
     {
         $this->requestSender = $requestSender;
         $this->roomTransformer = $roomTransformer;
         $this->roomsTransformer = $roomsTransformer;
         $this->devicesTransformer = $devicesTransformer;
         $this->token = $token;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -56,14 +58,14 @@ final class LocationRoomApi implements LocationRoomApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function createRoom(LocationInterface $location, string $name): LocationRoomInterface
+    public function createRoom(LocationInterface $location, string $name, ?bool $allowed = null): LocationRoomInterface
     {
         $locationId = $location->getLocationId();
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $url = sprintf(self::API_URL_LIST_SPRINTF, rawurlencode($locationId));
+        $url = $this->urlBuilder->build(sprintf(self::API_URL_LIST_SPRINTF, rawurlencode($locationId)), [self::KEY_ALLOWED => $allowed]);
         $body = [self::KEY_NAME => $name];
         $data = $this->requestSender->post($url, [], $headers, $body);
 

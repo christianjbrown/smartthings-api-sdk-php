@@ -9,6 +9,7 @@ use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Api\ApiInterface;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApiInterface;
+use ChristianBrown\SmartThings\Api\RequestUrlBuilder;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\MissingInputException;
@@ -28,6 +29,7 @@ use function rawurlencode;
 use function sprintf;
 
 #[CoversClass(LocationRoomApi::class)]
+#[CoversClass(RequestUrlBuilder::class)]
 #[CoversClass(Token::class)]
 final class LocationRoomApiTest extends TestCase
 {
@@ -64,7 +66,7 @@ final class LocationRoomApiTest extends TestCase
 
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $roomApi->createRoom($location, 'test-room-name');
 
         self::assertSame($room, $actual);
@@ -99,7 +101,7 @@ final class LocationRoomApiTest extends TestCase
         $roomsTransformer->method('transform')
             ->willReturn([$room]);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
 
         $roomApi->getMultiple($location);
         $roomApi->createRoom($location, 'test-room-name');
@@ -123,7 +125,7 @@ final class LocationRoomApiTest extends TestCase
         $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationRoomApiInterface::UNEXPECTED_RESPONSE);
@@ -154,7 +156,7 @@ final class LocationRoomApiTest extends TestCase
         $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
         $roomApi->deleteRoom($location, 'test-room-id');
 
         $this->addToAssertionCount(1);
@@ -187,7 +189,7 @@ final class LocationRoomApiTest extends TestCase
 
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
 
         $roomApi->getOneByLocationAndId($location, 'test-room-id');
         $roomApi->deleteRoom($location, 'test-room-id');
@@ -230,7 +232,7 @@ final class LocationRoomApiTest extends TestCase
 
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
 
         // Second call for the same roomId is served from the cache without hitting the API.
         self::assertSame($room, $roomApi->getOneByDevice($device));
@@ -269,7 +271,7 @@ final class LocationRoomApiTest extends TestCase
             ->with($data[LocationRoomApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $roomApi = new LocationRoomApi($requestSender, self::createStub(LocationRoomTransformerInterface::class), self::createStub(LocationRoomsTransformerInterface::class), $devicesTransformer, new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, self::createStub(LocationRoomTransformerInterface::class), self::createStub(LocationRoomsTransformerInterface::class), $devicesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $roomApi->getDevicesInRoom($location, 'test-room-id');
 
         self::assertSame($devices, $actual);
@@ -302,7 +304,7 @@ final class LocationRoomApiTest extends TestCase
             ->with($data[LocationRoomApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $roomApi = new LocationRoomApi($requestSender, self::createStub(LocationRoomTransformerInterface::class), self::createStub(LocationRoomsTransformerInterface::class), $devicesTransformer, new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, self::createStub(LocationRoomTransformerInterface::class), self::createStub(LocationRoomsTransformerInterface::class), $devicesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         // Second call for the same roomId is served from the cache without hitting the API.
         self::assertSame($devices, $roomApi->getDevicesInRoom($location, 'test-room-id'));
@@ -341,7 +343,7 @@ final class LocationRoomApiTest extends TestCase
             ->with($data[LocationRoomApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $roomApi = new LocationRoomApi($requestSender, self::createStub(LocationRoomTransformerInterface::class), self::createStub(LocationRoomsTransformerInterface::class), $devicesTransformer, new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, self::createStub(LocationRoomTransformerInterface::class), self::createStub(LocationRoomsTransformerInterface::class), $devicesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $roomApi->getDevicesInRoom($location, 'x/y z');
 
         self::assertSame($devices, $actual);
@@ -373,7 +375,7 @@ final class LocationRoomApiTest extends TestCase
             ->with($data[LocationRoomApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $roomApi = new LocationRoomApi($requestSender, self::createStub(LocationRoomTransformerInterface::class), self::createStub(LocationRoomsTransformerInterface::class), $devicesTransformer, new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, self::createStub(LocationRoomTransformerInterface::class), self::createStub(LocationRoomsTransformerInterface::class), $devicesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($devices, $roomApi->getDevicesInRoom($location, 'test-room-id'));
@@ -407,7 +409,7 @@ final class LocationRoomApiTest extends TestCase
             )
             ->willReturn($data);
 
-        $roomApi = new LocationRoomApi($requestSender, self::createStub(LocationRoomTransformerInterface::class), self::createStub(LocationRoomsTransformerInterface::class), self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, self::createStub(LocationRoomTransformerInterface::class), self::createStub(LocationRoomsTransformerInterface::class), self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(LocationRoomApiInterface::UNEXPECTED_RESPONSE_SPRINTF, LocationRoomApiInterface::KEY_ITEMS));
@@ -448,7 +450,7 @@ final class LocationRoomApiTest extends TestCase
             ->with($data[LocationRoomApiInterface::KEY_ITEMS])
             ->willReturn($rooms);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $roomApi->getMultiple($location);
 
         self::assertSame($rooms, $actual);
@@ -483,7 +485,7 @@ final class LocationRoomApiTest extends TestCase
             ->with($data[LocationRoomApiInterface::KEY_ITEMS])
             ->willReturn($rooms);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
 
         // Second call for the same locationId is served from the cache without hitting the API.
         self::assertSame($rooms, $roomApi->getMultiple($location));
@@ -524,7 +526,7 @@ final class LocationRoomApiTest extends TestCase
             ->with($data[LocationRoomApiInterface::KEY_ITEMS])
             ->willReturn($rooms);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $roomApi->getMultiple($location);
 
         self::assertSame($rooms, $actual);
@@ -558,7 +560,7 @@ final class LocationRoomApiTest extends TestCase
             ->with($data[LocationRoomApiInterface::KEY_ITEMS])
             ->willReturn($rooms);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($rooms, $roomApi->getMultiple($location));
@@ -595,7 +597,7 @@ final class LocationRoomApiTest extends TestCase
         $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(LocationRoomApiInterface::UNEXPECTED_RESPONSE_SPRINTF, LocationRoomApiInterface::KEY_ITEMS));
@@ -636,7 +638,7 @@ final class LocationRoomApiTest extends TestCase
 
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $roomApi->getOneByDevice($device);
 
         self::assertSame($room, $actual);
@@ -656,7 +658,7 @@ final class LocationRoomApiTest extends TestCase
         $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
 
         $this->expectException(MissingInputException::class);
         $this->expectExceptionMessage(LocationRoomApiInterface::MISSING_LOCATION_ID);
@@ -679,7 +681,7 @@ final class LocationRoomApiTest extends TestCase
         $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
 
         $this->expectException(MissingInputException::class);
         $this->expectExceptionMessage(LocationRoomApiInterface::MISSING_ROOM_ID);
@@ -718,7 +720,7 @@ final class LocationRoomApiTest extends TestCase
 
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $roomApi->getOneByLocationAndId($location, 'test-room-id');
 
         self::assertSame($room, $actual);
@@ -758,7 +760,7 @@ final class LocationRoomApiTest extends TestCase
 
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $roomApi->getOneByLocationAndId($location, $roomId);
 
         self::assertSame($room, $actual);
@@ -790,7 +792,7 @@ final class LocationRoomApiTest extends TestCase
         $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationRoomApiInterface::UNEXPECTED_RESPONSE);
@@ -832,7 +834,7 @@ final class LocationRoomApiTest extends TestCase
 
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($room, $roomApi->getOneByDevice($device));
@@ -872,7 +874,7 @@ final class LocationRoomApiTest extends TestCase
 
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $roomApi->updateRoom($location, 'test-room-id', 'test-room-name');
 
         self::assertSame($room, $actual);
@@ -908,7 +910,7 @@ final class LocationRoomApiTest extends TestCase
 
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
 
         self::assertSame($room, $roomApi->updateRoom($location, 'test-room-id', 'test-room-name'));
         self::assertSame($room, $roomApi->getOneByLocationAndId($location, 'test-room-id'));
@@ -931,7 +933,7 @@ final class LocationRoomApiTest extends TestCase
         $roomTransformer = self::createStub(LocationRoomTransformerInterface::class);
         $roomsTransformer = self::createStub(LocationRoomsTransformerInterface::class);
 
-        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'));
+        $roomApi = new LocationRoomApi($requestSender, $roomTransformer, $roomsTransformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationRoomApiInterface::UNEXPECTED_RESPONSE);

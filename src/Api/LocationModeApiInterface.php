@@ -15,6 +15,7 @@ interface LocationModeApiInterface extends ApiInterface
     public const string KEY_ITEMS = 'items';
     public const string KEY_LABEL = 'label';
     public const string KEY_MODE_ID = 'modeId';
+    public const string KEY_REQUEST_ID = 'requestId';
     public const string UNEXPECTED_RESPONSE = 'Response not set or not an array';
     public const string UNEXPECTED_RESPONSE_SPRINTF = '%s not set or not an array';
 
@@ -35,7 +36,7 @@ interface LocationModeApiInterface extends ApiInterface
      * Deletes a Mode from the Location. Invalidates any cached copy of this Mode and
      * the cached mode list for this location.
      */
-    public function deleteMode(LocationInterface $location, string $modeId): void;
+    public function deleteMode(LocationInterface $location, string $modeId, ?string $requestId = null): void;
 
     public function getCurrent(LocationInterface $location, bool $skipCache = false): ModeInterface;
 

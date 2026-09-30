@@ -10,6 +10,7 @@ use ChristianBrown\SmartThings\Exception\MissingInputException;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\RuleExecutionResultInterface;
 use ChristianBrown\SmartThings\Model\RuleInterface;
+use ChristianBrown\SmartThings\Model\RuleListQueryInterface;
 use ChristianBrown\SmartThings\Model\RuleRequestInterface;
 use ChristianBrown\SmartThings\Serializer\RuleRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\RuleExecutionResultTransformerInterface;
@@ -28,7 +29,7 @@ final class RuleApi implements RuleApiInterface
     private array $cache = [];
 
     /**
-     * @var array<string, array<int, RuleInterface>>
+     * @var array<string, array<string, array<int, RuleInterface>>>
      */
     private array $listCache = [];
     private JsonApiRequestSenderInterface $requestSender;
@@ -37,8 +38,9 @@ final class RuleApi implements RuleApiInterface
     private RulesTransformerInterface $rulesTransformer;
     private RuleTransformerInterface $ruleTransformer;
     private TokenInterface $token;
+    private RequestUrlBuilderInterface $urlBuilder;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, RuleTransformerInterface $ruleTransformer, RulesTransformerInterface $rulesTransformer, TokenInterface $token, RuleExecutionResultTransformerInterface $ruleExecutionResultTransformer, RuleRequestSerializerInterface $ruleRequestSerializer)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, RuleTransformerInterface $ruleTransformer, RulesTransformerInterface $rulesTransformer, TokenInterface $token, RuleExecutionResultTransformerInterface $ruleExecutionResultTransformer, RuleRequestSerializerInterface $ruleRequestSerializer, RequestUrlBuilderInterface $urlBuilder)
     {
         $this->requestSender = $requestSender;
         $this->ruleTransformer = $ruleTransformer;
@@ -46,6 +48,7 @@ final class RuleApi implements RuleApiInterface
         $this->token = $token;
         $this->ruleExecutionResultTransformer = $ruleExecutionResultTransformer;
         $this->ruleRequestSerializer = $ruleRequestSerializer;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -139,22 +142,22 @@ final class RuleApi implements RuleApiInterface
      *
      * @return array<int, RuleInterface>
      */
-    public function getMultiple(string $locationId, bool $skipCache = false): array
+    public function getMultiple(string $locationId, bool $skipCache = false, ?RuleListQueryInterface $query = null): array
     {
         if ('' === $locationId) {
             throw new MissingInputException(self::MISSING_LOCATION_ID);
         }
+        $url = $this->urlBuilder->build(self::API_URL, [self::KEY_LOCATION_ID => $locationId], $query);
         if (!$skipCache) {
-            if (isset($this->listCache[$locationId])) {
-                return $this->listCache[$locationId];
+            if (isset($this->listCache[$locationId][$url])) {
+                return $this->listCache[$locationId][$url];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $query = [self::KEY_LOCATION_ID => $locationId];
-        $data = $this->requestSender->get(self::API_URL, $query, $headers);
+        $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data[self::KEY_ITEMS])) {
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
@@ -163,7 +166,7 @@ final class RuleApi implements RuleApiInterface
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
         }
         $rules = $this->rulesTransformer->transform($data[self::KEY_ITEMS]);
-        $this->listCache[$locationId] = $rules;
+        $this->listCache[$locationId][$url] = $rules;
 
         return $rules;
     }

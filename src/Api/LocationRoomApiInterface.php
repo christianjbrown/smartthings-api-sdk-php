@@ -13,6 +13,7 @@ interface LocationRoomApiInterface extends ApiInterface
     public const string API_URL_DEVICES_SPRINTF = 'https://api.smartthings.com/v1/locations/%s/rooms/%s/devices';
     public const string API_URL_LIST_SPRINTF = 'https://api.smartthings.com/v1/locations/%s/rooms';
     public const string API_URL_SPRINTF = 'https://api.smartthings.com/v1/locations/%s/rooms/%s';
+    public const string KEY_ALLOWED = 'allowed';
     public const string KEY_ITEMS = 'items';
     public const string KEY_NAME = 'name';
     public const string MISSING_LOCATION_ID = 'Device has no location id';
@@ -24,7 +25,7 @@ interface LocationRoomApiInterface extends ApiInterface
      * Creates a new Room in the Location. Invalidates the cached room list for this
      * location so a subsequent getMultiple() reflects the new Room.
      */
-    public function createRoom(LocationInterface $location, string $name): LocationRoomInterface;
+    public function createRoom(LocationInterface $location, string $name, ?bool $allowed = null): LocationRoomInterface;
 
     /**
      * Deletes a Room from the Location. Invalidates any cached copy of this Room and

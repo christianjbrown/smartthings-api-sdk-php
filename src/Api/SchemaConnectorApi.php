@@ -37,7 +37,7 @@ final class SchemaConnectorApi implements SchemaConnectorApiInterface
     private array $cache = [];
 
     /**
-     * @var array<string, InstalledSchemaAppInterface>
+     * @var array<string, array<string, InstalledSchemaAppInterface>>
      */
     private array $installedCache = [];
 
@@ -71,13 +71,14 @@ final class SchemaConnectorApi implements SchemaConnectorApiInterface
     private SchemaOauthCredentialsRequestSerializerInterface $schemaOauthCredentialsRequestSerializer;
     private SchemaPageTransformerInterface $schemaPageTransformer;
     private TokenInterface $token;
+    private RequestUrlBuilderInterface $urlBuilder;
 
     /**
      * @var array<string, array<int, SchemaAppInterface>>
      */
     private array $userAppsCache = [];
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, SchemaAppTransformerInterface $schemaAppTransformer, SchemaAppsTransformerInterface $schemaAppsTransformer, InstalledSchemaAppTransformerInterface $installedSchemaAppTransformer, InstalledSchemaAppsTransformerInterface $installedSchemaAppsTransformer, SchemaPageTransformerInterface $schemaPageTransformer, TokenInterface $token, SchemaAppCreateRequestSerializerInterface $schemaAppCreateRequestSerializer, SchemaAppReceiptTransformerInterface $schemaAppReceiptTransformer, SchemaAppUpdateRequestSerializerInterface $schemaAppUpdateRequestSerializer, SchemaOauthCredentialsRequestSerializerInterface $schemaOauthCredentialsRequestSerializer)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, SchemaAppTransformerInterface $schemaAppTransformer, SchemaAppsTransformerInterface $schemaAppsTransformer, InstalledSchemaAppTransformerInterface $installedSchemaAppTransformer, InstalledSchemaAppsTransformerInterface $installedSchemaAppsTransformer, SchemaPageTransformerInterface $schemaPageTransformer, TokenInterface $token, SchemaAppCreateRequestSerializerInterface $schemaAppCreateRequestSerializer, SchemaAppReceiptTransformerInterface $schemaAppReceiptTransformer, SchemaAppUpdateRequestSerializerInterface $schemaAppUpdateRequestSerializer, SchemaOauthCredentialsRequestSerializerInterface $schemaOauthCredentialsRequestSerializer, RequestUrlBuilderInterface $urlBuilder)
     {
         $this->requestSender = $requestSender;
         $this->schemaAppTransformer = $schemaAppTransformer;
@@ -90,6 +91,7 @@ final class SchemaConnectorApi implements SchemaConnectorApiInterface
         $this->schemaAppReceiptTransformer = $schemaAppReceiptTransformer;
         $this->schemaAppUpdateRequestSerializer = $schemaAppUpdateRequestSerializer;
         $this->schemaOauthCredentialsRequestSerializer = $schemaOauthCredentialsRequestSerializer;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -240,22 +242,22 @@ final class SchemaConnectorApi implements SchemaConnectorApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function getInstalledById(string $isaId, bool $skipCache = false): InstalledSchemaAppInterface
+    public function getInstalledById(string $isaId, bool $skipCache = false, ?bool $redirectRequested = null, ?bool $jsonRspRequested = null): InstalledSchemaAppInterface
     {
+        $url = $this->urlBuilder->build(sprintf(self::API_URL_INSTALLED_APP_SPRINTF, rawurlencode($isaId)), [self::KEY_REDIRECT_REQUESTED => $redirectRequested, self::KEY_JSON_RSP_REQUESTED => $jsonRspRequested]);
         if (!$skipCache) {
-            if (isset($this->installedCache[$isaId])) {
-                return $this->installedCache[$isaId];
+            if (isset($this->installedCache[$isaId][$url])) {
+                return $this->installedCache[$isaId][$url];
             }
         }
 
-        $url = sprintf(self::API_URL_INSTALLED_APP_SPRINTF, rawurlencode($isaId));
         $data = $this->requestSender->get($url, [], $this->headers());
 
         if (empty($data)) {
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $app = $this->installedSchemaAppTransformer->transform($data);
-        $this->installedCache[$isaId] = $app;
+        $this->installedCache[$isaId][$url] = $app;
 
         return $app;
     }

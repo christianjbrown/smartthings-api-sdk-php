@@ -14,6 +14,7 @@ interface DriverApiInterface extends ApiInterface
     public const string API_URL_SPRINTF = 'https://api.smartthings.com/v1/drivers/%s';
     public const string API_URL_VERSION_SPRINTF = 'https://api.smartthings.com/v1/drivers/%s/versions/%s';
     public const string CACHE_KEY_SPRINTF = '%s/%s';
+    public const string KEY_DRIVER_IDS = 'driverIds';
     public const string KEY_ITEMS = 'items';
     public const string UNEXPECTED_RESPONSE = 'Response not set or not an array';
     public const string UNEXPECTED_RESPONSE_SPRINTF = '%s not set or not an array';
@@ -29,9 +30,12 @@ interface DriverApiInterface extends ApiInterface
     public function getDefaults(bool $skipCache = false): array;
 
     /**
+     * @param bool                    $skipCache Fetch again instead of using the cached list
+     * @param null|array<int, string> $driverIds
+     *
      * @return array<int, DriverInterface>
      */
-    public function getMultiple(bool $skipCache = false): array;
+    public function getMultiple(bool $skipCache = false, ?array $driverIds = null): array;
 
     public function getOneById(string $driverId, bool $skipCache = false): DriverInterface;
 

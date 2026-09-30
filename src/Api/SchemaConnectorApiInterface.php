@@ -25,7 +25,9 @@ interface SchemaConnectorApiInterface extends ApiInterface
     public const string CACHE_KEY_SPRINTF = '%s/%s';
     public const string KEY_ENDPOINT_APPS = 'endpointApps';
     public const string KEY_INSTALLED_SMART_APPS = 'installedSmartApps';
+    public const string KEY_JSON_RSP_REQUESTED = 'jsonRspRequested';
     public const string KEY_LOCATION_ID = 'locationId';
+    public const string KEY_REDIRECT_REQUESTED = 'redirectRequested';
     public const string KEY_TYPE = 'type';
     public const string TYPE_OAUTH_LINK = 'oauthLink';
     public const string UNEXPECTED_RESPONSE = 'Response not set or not an array';
@@ -65,7 +67,7 @@ interface SchemaConnectorApiInterface extends ApiInterface
      */
     public function getByUserId(string $userId, bool $skipCache = false): array;
 
-    public function getInstalledById(string $isaId, bool $skipCache = false): InstalledSchemaAppInterface;
+    public function getInstalledById(string $isaId, bool $skipCache = false, ?bool $redirectRequested = null, ?bool $jsonRspRequested = null): InstalledSchemaAppInterface;
 
     /**
      * @return array<int, InstalledSchemaAppInterface>

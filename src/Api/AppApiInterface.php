@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Api;
 
 use ChristianBrown\SmartThings\Model\AppInterface;
+use ChristianBrown\SmartThings\Model\AppListQueryInterface;
 use ChristianBrown\SmartThings\Model\AppOauthInterface;
 use ChristianBrown\SmartThings\Model\AppSettingsInterface;
 use ChristianBrown\SmartThings\Model\CreateAppRequestInterface;
@@ -26,6 +27,7 @@ interface AppApiInterface extends ApiInterface
     public const string API_URL_SIGNATURE_TYPE_SPRINTF = 'https://api.smartthings.com/v1/apps/%s/signature-type';
     public const string API_URL_SPRINTF = 'https://api.smartthings.com/v1/apps/%s';
     public const string KEY_ACCOUNT_ID = 'accountId';
+    public const string KEY_CONSISTENT_READ = 'consistentRead';
     public const string KEY_ITEMS = 'items';
     public const string KEY_REQUIRE_CONFIRMATION = 'requireConfirmation';
     public const string KEY_SIGNATURE_TYPE = 'signatureType';
@@ -50,9 +52,9 @@ interface AppApiInterface extends ApiInterface
     /**
      * @return array<int, AppInterface>
      */
-    public function getMultiple(bool $skipCache = false): array;
+    public function getMultiple(bool $skipCache = false, ?AppListQueryInterface $query = null): array;
 
-    public function getOauth(string $appNameOrId, bool $skipCache = false): AppOauthInterface;
+    public function getOauth(string $appNameOrId, bool $skipCache = false, ?bool $consistentRead = null): AppOauthInterface;
 
     public function getOneById(string $appNameOrId, bool $skipCache = false): AppInterface;
 

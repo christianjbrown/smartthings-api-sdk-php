@@ -34,7 +34,7 @@ final class ServiceApi implements ServiceApiInterface
     private array $infoCache = [];
 
     /**
-     * @var array<string, array<int, string>>
+     * @var array<string, array<string, array<int, string>>>
      */
     private array $namesCache = [];
     private JsonApiRequestSenderInterface $requestSender;
@@ -44,8 +44,9 @@ final class ServiceApi implements ServiceApiInterface
     private ServiceSubscriptionReceiptTransformerInterface $serviceSubscriptionReceiptTransformer;
     private ServiceSubscriptionRequestSerializerInterface $serviceSubscriptionRequestSerializer;
     private TokenInterface $token;
+    private RequestUrlBuilderInterface $urlBuilder;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, ServiceLocationInfoTransformerInterface $serviceLocationInfoTransformer, ServiceCapabilityNamesTransformerInterface $serviceCapabilityNamesTransformer, ServiceCapabilityDataTransformerInterface $serviceCapabilityDataTransformer, TokenInterface $token, ServiceSubscriptionRequestSerializerInterface $serviceSubscriptionRequestSerializer, ServiceSubscriptionReceiptTransformerInterface $serviceSubscriptionReceiptTransformer)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, ServiceLocationInfoTransformerInterface $serviceLocationInfoTransformer, ServiceCapabilityNamesTransformerInterface $serviceCapabilityNamesTransformer, ServiceCapabilityDataTransformerInterface $serviceCapabilityDataTransformer, TokenInterface $token, ServiceSubscriptionRequestSerializerInterface $serviceSubscriptionRequestSerializer, ServiceSubscriptionReceiptTransformerInterface $serviceSubscriptionReceiptTransformer, RequestUrlBuilderInterface $urlBuilder)
     {
         $this->requestSender = $requestSender;
         $this->serviceLocationInfoTransformer = $serviceLocationInfoTransformer;
@@ -54,6 +55,7 @@ final class ServiceApi implements ServiceApiInterface
         $this->token = $token;
         $this->serviceSubscriptionRequestSerializer = $serviceSubscriptionRequestSerializer;
         $this->serviceSubscriptionReceiptTransformer = $serviceSubscriptionReceiptTransformer;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -115,25 +117,25 @@ final class ServiceApi implements ServiceApiInterface
      *
      * @return array<int, string>
      */
-    public function getAvailableCapabilities(string $locationId, bool $skipCache = false): array
+    public function getAvailableCapabilities(string $locationId, bool $skipCache = false, ?string $postalCode = null): array
     {
+        $url = $this->urlBuilder->build(sprintf(self::API_URL_CAPABILITIES_SPRINTF, rawurlencode($locationId)), [self::KEY_POSTAL_CODE => $postalCode]);
         if (!$skipCache) {
-            if (isset($this->namesCache[$locationId])) {
-                return $this->namesCache[$locationId];
+            if (isset($this->namesCache[$locationId][$url])) {
+                return $this->namesCache[$locationId][$url];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $url = sprintf(self::API_URL_CAPABILITIES_SPRINTF, rawurlencode($locationId));
         $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data)) {
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $names = $this->serviceCapabilityNamesTransformer->transform($data);
-        $this->namesCache[$locationId] = $names;
+        $this->namesCache[$locationId][$url] = $names;
 
         return $names;
     }
@@ -144,9 +146,10 @@ final class ServiceApi implements ServiceApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function getCapability(string $locationId, string $name, bool $skipCache = false): ServiceCapabilityDataInterface
+    public function getCapability(string $locationId, string $name, bool $skipCache = false, ?string $postalCode = null): ServiceCapabilityDataInterface
     {
-        $cacheKey = sprintf(self::CACHE_KEY_SPRINTF, $locationId, $name);
+        $url = $this->urlBuilder->build(sprintf(self::API_URL_CAPABILITIES_SPRINTF, rawurlencode($locationId)), [self::KEY_NAME => $name, self::KEY_POSTAL_CODE => $postalCode]);
+        $cacheKey = $url;
         if (!$skipCache) {
             if (isset($this->capabilityCache[$cacheKey])) {
                 return $this->capabilityCache[$cacheKey];
@@ -156,8 +159,7 @@ final class ServiceApi implements ServiceApiInterface
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $url = sprintf(self::API_URL_CAPABILITIES_SPRINTF, rawurlencode($locationId));
-        $data = $this->requestSender->get($url, [self::KEY_NAME => $name], $headers);
+        $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data)) {
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);

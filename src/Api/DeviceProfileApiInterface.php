@@ -18,6 +18,7 @@ interface DeviceProfileApiInterface extends ApiInterface
     public const string API_URL_TRANSLATIONS_SPRINTF = 'https://api.smartthings.com/v1/deviceprofiles/%s/i18n/%s';
     public const string CACHE_KEY_SPRINTF = '%s/%s';
     public const string KEY_ITEMS = 'items';
+    public const string KEY_PROFILE_ID = 'profileId';
     public const string UNEXPECTED_RESPONSE = 'Response not set or not an array';
     public const string UNEXPECTED_RESPONSE_SPRINTF = '%s not set or not an array';
 
@@ -39,9 +40,12 @@ interface DeviceProfileApiInterface extends ApiInterface
     public function getLocales(string $deviceProfileId, bool $skipCache = false): array;
 
     /**
+     * @param bool                    $skipCache  Fetch again instead of using the cached list
+     * @param null|array<int, string> $profileIds
+     *
      * @return array<int, DeviceProfileInterface>
      */
-    public function getMultiple(bool $skipCache = false): array;
+    public function getMultiple(bool $skipCache = false, ?array $profileIds = null): array;
 
     public function getOneById(string $deviceProfileId, bool $skipCache = false): DeviceProfileInterface;
 

@@ -9,6 +9,7 @@ use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Api\ApiInterface;
 use ChristianBrown\SmartThings\Api\DeviceApi;
 use ChristianBrown\SmartThings\Api\DeviceApiInterface;
+use ChristianBrown\SmartThings\Api\RequestUrlBuilder;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
@@ -19,6 +20,7 @@ use ChristianBrown\SmartThings\Model\DeviceEvent;
 use ChristianBrown\SmartThings\Model\DeviceInstallApp;
 use ChristianBrown\SmartThings\Model\DeviceInstallRequest;
 use ChristianBrown\SmartThings\Model\DeviceInterface;
+use ChristianBrown\SmartThings\Model\DeviceListQuery;
 use ChristianBrown\SmartThings\Model\UpdateDeviceRequest;
 use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializer;
 use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializerInterface;
@@ -43,6 +45,7 @@ use function rawurlencode;
 use function sprintf;
 
 #[CoversClass(DeviceApi::class)]
+#[CoversClass(RequestUrlBuilder::class)]
 #[CoversClass(DeviceCommand::class)]
 #[CoversClass(DeviceCommandResult::class)]
 #[CoversClass(DeviceCommandResultsTransformer::class)]
@@ -53,6 +56,7 @@ use function sprintf;
 #[CoversClass(DeviceInstallApp::class)]
 #[CoversClass(DeviceInstallRequest::class)]
 #[CoversClass(DeviceInstallRequestSerializer::class)]
+#[CoversClass(DeviceListQuery::class)]
 #[CoversClass(Token::class)]
 #[CoversClass(UpdateDeviceRequest::class)]
 #[CoversClass(UpdateDeviceRequestSerializer::class)]
@@ -86,7 +90,7 @@ final class DeviceApiTest extends TestCase
         $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), $deviceEventSerializer);
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), $deviceEventSerializer, new RequestUrlBuilder());
         $deviceApi->createEvents('test-device-id', [$event]);
 
         $this->addToAssertionCount(1);
@@ -105,7 +109,7 @@ final class DeviceApiTest extends TestCase
         $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
         $deviceApi->createEvents('test-device-id', [new DeviceEvent('active')]);
 
         $this->addToAssertionCount(1);
@@ -131,7 +135,7 @@ final class DeviceApiTest extends TestCase
         $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
         $deviceApi->deleteDevice('test-device-id');
 
         $this->addToAssertionCount(1);
@@ -160,7 +164,7 @@ final class DeviceApiTest extends TestCase
 
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
 
         $deviceApi->getOneById('test-device-id');
         $deviceApi->deleteDevice('test-device-id');
@@ -204,7 +208,7 @@ final class DeviceApiTest extends TestCase
         $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), $deviceCommandSerializer, $deviceCommandResultsTransformer, self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), $deviceCommandSerializer, $deviceCommandResultsTransformer, self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
         $actual = $deviceApi->executeCommands('test-device-id', [$command]);
 
         self::assertSame($results, $actual);
@@ -234,7 +238,7 @@ final class DeviceApiTest extends TestCase
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
         // The real serializer and results transformer, so the encoded body and the parsed results are checked.
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), new DeviceCommandSerializer(), new DeviceCommandResultsTransformer(new DeviceCommandResultTransformer()), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), new DeviceCommandSerializer(), new DeviceCommandResultsTransformer(new DeviceCommandResultTransformer()), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
         $actual = $deviceApi->executeCommands('a/b c', [new DeviceCommand('switch', 'on')]);
 
         self::assertSame('ACCEPTED', $actual[0]->getStatus());
@@ -256,7 +260,7 @@ final class DeviceApiTest extends TestCase
         $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DeviceApiInterface::UNEXPECTED_RESPONSE_SPRINTF, DeviceApiInterface::KEY_RESULTS));
@@ -289,7 +293,7 @@ final class DeviceApiTest extends TestCase
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
         $deviceCommandResultsTransformer = self::createStub(DeviceCommandResultsTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), new DeviceCommandSerializer(), $deviceCommandResultsTransformer, self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), new DeviceCommandSerializer(), $deviceCommandResultsTransformer, self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
         $deviceApi->executeCommands('test-device-id', [], $ordered);
     }
 
@@ -323,10 +327,35 @@ final class DeviceApiTest extends TestCase
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
         $actual = $deviceApi->getMultiple();
 
         self::assertSame($devices, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetMultipleAppliesTheQuery(): void
+    {
+        $data = [DeviceApiInterface::KEY_ITEMS => ['test-item-1']];
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())->method('get')
+            ->with(
+                DeviceApiInterface::API_URL.'?capabilitiesMode=or&capability=switch&capability=lock&includeStatus=true&locationId=explicit-location',
+                [],
+                [ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token')]
+            )
+            ->willReturn($data);
+        $devices = [self::createStub(DeviceInterface::class)];
+        $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
+        $devicesTransformer->method('transform')->willReturn($devices);
+
+        $query = (new DeviceListQuery())->setCapabilities(['switch', 'lock'])->setCapabilitiesMode('or')->setIncludeStatus(true)->setLocationIds(['query-location']);
+        $deviceApi = new DeviceApi($requestSender, self::createStub(DeviceTransformerInterface::class), $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
+
+        self::assertSame($devices, $deviceApi->getMultiple('explicit-location', false, $query));
     }
 
     /**
@@ -354,7 +383,7 @@ final class DeviceApiTest extends TestCase
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
 
         // Second call is served from the cache without hitting the API.
         self::assertSame($devices, $deviceApi->getMultiple());
@@ -386,7 +415,7 @@ final class DeviceApiTest extends TestCase
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
 
         self::assertSame($devices, $deviceApi->getMultiple('test-location-a'));
         self::assertSame($devices, $deviceApi->getMultiple('test-location-b'));
@@ -405,8 +434,8 @@ final class DeviceApiTest extends TestCase
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::once())->method('get')
             ->with(
-                DeviceApiInterface::API_URL,
-                [DeviceApiInterface::KEY_LOCATION_ID => 'test-location-id'],
+                DeviceApiInterface::API_URL.'?locationId=test-location-id',
+                [],
                 [
                     ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
@@ -422,7 +451,7 @@ final class DeviceApiTest extends TestCase
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
         $actual = $deviceApi->getMultiple('test-location-id');
 
         self::assertSame($devices, $actual);
@@ -452,7 +481,7 @@ final class DeviceApiTest extends TestCase
             ->with($data[DeviceApiInterface::KEY_ITEMS])
             ->willReturn($devices);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($devices, $deviceApi->getMultiple());
@@ -485,7 +514,7 @@ final class DeviceApiTest extends TestCase
         $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DeviceApiInterface::UNEXPECTED_RESPONSE_SPRINTF, DeviceApiInterface::KEY_ITEMS));
@@ -520,7 +549,7 @@ final class DeviceApiTest extends TestCase
 
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
         $actual = $deviceApi->getOneById('test-device-id');
 
         self::assertSame($device, $actual);
@@ -556,7 +585,7 @@ final class DeviceApiTest extends TestCase
 
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
 
         // Second call for the same deviceId is served from the cache without hitting the API.
         self::assertSame($device, $deviceApi->getOneById('test-device-id'));
@@ -593,10 +622,34 @@ final class DeviceApiTest extends TestCase
 
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
         $actual = $deviceApi->getOneById($deviceId);
 
         self::assertSame($device, $actual);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws Exception
+     */
+    public function testGetOneByIdSendsIncludeStatusAndCachesPerVariant(): void
+    {
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::exactly(2))->method('get')
+            ->willReturnMap([
+                [sprintf(DeviceApiInterface::API_URL_SPRINTF, 'test-device-id'), [], [ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token')], ['plain']],
+                [sprintf(DeviceApiInterface::API_URL_SPRINTF, 'test-device-id').'?includeStatus=true', [], [ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token')], ['variant']],
+            ]);
+        $plain = self::createStub(DeviceInterface::class);
+        $variant = self::createStub(DeviceInterface::class);
+        $transformer = self::createStub(DeviceTransformerInterface::class);
+        $transformer->method('transform')->willReturnMap([[['plain'], $plain], [['variant'], $variant]]);
+        $deviceApi = new DeviceApi($requestSender, $transformer, self::createStub(DevicesTransformerInterface::class), new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
+
+        self::assertSame($plain, $deviceApi->getOneById('test-device-id'));
+        self::assertSame($variant, $deviceApi->getOneById('test-device-id', false, true));
+        self::assertSame($plain, $deviceApi->getOneById('test-device-id'));
+        self::assertSame($variant, $deviceApi->getOneById('test-device-id', false, true));
     }
 
     /**
@@ -628,7 +681,7 @@ final class DeviceApiTest extends TestCase
 
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($device, $deviceApi->getOneById('test-device-id'));
@@ -657,7 +710,7 @@ final class DeviceApiTest extends TestCase
         $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DeviceApiInterface::UNEXPECTED_RESPONSE);
@@ -702,7 +755,7 @@ final class DeviceApiTest extends TestCase
 
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), $deviceInstallRequestSerializer, self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), $deviceInstallRequestSerializer, self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
         $actual = $deviceApi->installDevice($request);
 
         self::assertSame($device, $actual);
@@ -735,7 +788,7 @@ final class DeviceApiTest extends TestCase
 
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
 
         self::assertSame($device, $deviceApi->installDevice($request));
         self::assertSame($device, $deviceApi->getOneById('test-device-id'));
@@ -756,7 +809,7 @@ final class DeviceApiTest extends TestCase
         $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DeviceApiInterface::UNEXPECTED_RESPONSE);
@@ -799,7 +852,7 @@ final class DeviceApiTest extends TestCase
 
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), $updateDeviceRequestSerializer, self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), $updateDeviceRequestSerializer, self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
         $actual = $deviceApi->updateDevice('test-device-id', $request);
 
         self::assertSame($device, $actual);
@@ -830,7 +883,7 @@ final class DeviceApiTest extends TestCase
 
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
 
         self::assertSame($device, $deviceApi->updateDevice('test-device-id', $request));
         self::assertSame($device, $deviceApi->getOneById('test-device-id'));
@@ -851,7 +904,7 @@ final class DeviceApiTest extends TestCase
         $deviceTransformer = self::createStub(DeviceTransformerInterface::class);
         $devicesTransformer = self::createStub(DevicesTransformerInterface::class);
 
-        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class));
+        $deviceApi = new DeviceApi($requestSender, $deviceTransformer, $devicesTransformer, new Token('test-api-token'), self::createStub(DeviceCommandSerializerInterface::class), self::createStub(DeviceCommandResultsTransformerInterface::class), self::createStub(DeviceInstallRequestSerializerInterface::class), self::createStub(UpdateDeviceRequestSerializerInterface::class), self::createStub(DeviceEventSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DeviceApiInterface::UNEXPECTED_RESPONSE);
