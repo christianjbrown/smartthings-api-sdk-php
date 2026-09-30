@@ -29,7 +29,7 @@ interface DevicePreferenceDefinitionApiInterface extends ApiInterface
      * Creates a Preference. Invalidates the cached preference lists so a subsequent
      * getMultiple() reflects the new preference.
      */
-    public function createPreference(PreferenceRequestInterface $request): DevicePreferenceDefinitionInterface;
+    public function createPreference(PreferenceRequestInterface $request, ?string $organizationId = null): DevicePreferenceDefinitionInterface;
 
     /**
      * Creates a localization for a preference. Invalidates the cached locale list of the preference.
@@ -40,7 +40,7 @@ interface DevicePreferenceDefinitionApiInterface extends ApiInterface
      * Deletes a Preference by id. Invalidates any cached copy of this preference and
      * the cached preference lists.
      */
-    public function deletePreferenceById(string $preferenceId): void;
+    public function deletePreferenceById(string $preferenceId, ?string $organizationId = null): void;
 
     /**
      * @return array<int, LocaleReferenceInterface>
@@ -60,7 +60,7 @@ interface DevicePreferenceDefinitionApiInterface extends ApiInterface
      * Updates a Preference by id. Refreshes the cached copy of this preference and
      * invalidates the cached preference lists.
      */
-    public function updatePreferenceById(string $preferenceId, PreferenceRequestInterface $request): DevicePreferenceDefinitionInterface;
+    public function updatePreferenceById(string $preferenceId, PreferenceRequestInterface $request, ?string $organizationId = null): DevicePreferenceDefinitionInterface;
 
     /**
      * Replaces a localization of a preference. Invalidates the cached translations and the cached locale list of the preference.

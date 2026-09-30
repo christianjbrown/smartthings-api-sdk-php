@@ -74,11 +74,11 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function createPreference(PreferenceRequestInterface $request): DevicePreferenceDefinitionInterface
+    public function createPreference(PreferenceRequestInterface $request, ?string $organizationId = null): DevicePreferenceDefinitionInterface
     {
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
         $body = $this->preferenceRequestSerializer->serialize($request);
         $data = $this->requestSender->post(self::API_URL, [], $headers, $body);
 
@@ -118,11 +118,11 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
     /**
      * @throws RequestExceptionInterface
      */
-    public function deletePreferenceById(string $preferenceId): void
+    public function deletePreferenceById(string $preferenceId, ?string $organizationId = null): void
     {
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($preferenceId));
         $this->requestSender->delete($url, [], $headers);
         unset($this->cache[$preferenceId]);
@@ -263,11 +263,11 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function updatePreferenceById(string $preferenceId, PreferenceRequestInterface $request): DevicePreferenceDefinitionInterface
+    public function updatePreferenceById(string $preferenceId, PreferenceRequestInterface $request, ?string $organizationId = null): DevicePreferenceDefinitionInterface
     {
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($preferenceId));
         $body = $this->preferenceRequestSerializer->serialize($request);
         $data = $this->requestSender->put($url, [], $headers, $body);

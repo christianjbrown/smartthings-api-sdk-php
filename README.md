@@ -227,6 +227,14 @@ $devices = $deviceApi->getMultiple(null, false, $query);
 $device = $deviceApi->getOneById('a-device-id', false, true); // includeStatus
 ```
 
+Calls the API scopes to an organization or a language take them as a trailing optional argument
+(`$organizationId` sends `X-ST-Organization`, `$acceptLanguage` sends `Accept-Language`), for
+example `$deviceProfileApi->getOneById('a-profile-id', false, 'an-org-id', 'fr-FR')`. Cached
+responses are kept per organization and language.
+
+`ServiceApi::getAlertLink()` returns the address the coordinate service redirects to for a
+location's weather alert page. The redirect is read, not followed.
+
 The other query objects are `InstalledAppListQuery`, `AppListQuery`, `RuleListQuery`,
 `LocationListQuery` and `PreferenceListQuery`. Each response is cached per full request, so
 the same call with a different filter is fetched again.

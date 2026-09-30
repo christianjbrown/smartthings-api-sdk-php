@@ -19,17 +19,17 @@ use function sprintf;
 final class LocationModeApi implements LocationModeApiInterface
 {
     /**
-     * @var array<string, ModeInterface>
+     * @var array<string, array<string, ModeInterface>>
      */
     private array $cache = [];
 
     /**
-     * @var array<string, ModeInterface>
+     * @var array<string, array<string, ModeInterface>>
      */
     private array $currentCache = [];
 
     /**
-     * @var array<string, array<int, ModeInterface>>
+     * @var array<string, array<string, array<int, ModeInterface>>>
      */
     private array $listCache = [];
     private ModesTransformerInterface $modesTransformer;
@@ -68,7 +68,7 @@ final class LocationModeApi implements LocationModeApiInterface
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $mode = $this->modeTransformer->transform($data);
-        $this->currentCache[$locationId] = $mode;
+        $this->currentCache[$locationId] = [self::CACHE_LANGUAGE_PLAIN => $mode];
 
         return $mode;
     }
@@ -79,13 +79,13 @@ final class LocationModeApi implements LocationModeApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function createMode(LocationInterface $location, string $label): ModeInterface
+    public function createMode(LocationInterface $location, string $label, ?string $acceptLanguage = null): ModeInterface
     {
         $locationId = $location->getLocationId();
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + array_filter([self::HEADER_KEY_ACCEPT_LANGUAGE => $acceptLanguage], static fn (?string $value): bool => null !== $value);
         $url = sprintf(self::API_URL_LIST_SPRINTF, rawurlencode($locationId));
         $body = [self::KEY_LABEL => $label];
         $data = $this->requestSender->post($url, [], $headers, $body);
@@ -120,18 +120,19 @@ final class LocationModeApi implements LocationModeApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function getCurrent(LocationInterface $location, bool $skipCache = false): ModeInterface
+    public function getCurrent(LocationInterface $location, bool $skipCache = false, ?string $acceptLanguage = null): ModeInterface
     {
         $locationId = $location->getLocationId();
+        $language = (string) $acceptLanguage;
         if (!$skipCache) {
-            if (isset($this->currentCache[$locationId])) {
-                return $this->currentCache[$locationId];
+            if (isset($this->currentCache[$locationId][$language])) {
+                return $this->currentCache[$locationId][$language];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + array_filter([self::HEADER_KEY_ACCEPT_LANGUAGE => $acceptLanguage], static fn (?string $value): bool => null !== $value);
         $url = sprintf(self::API_URL_CURRENT_SPRINTF, rawurlencode($locationId));
         $data = $this->requestSender->get($url, [], $headers);
 
@@ -139,7 +140,7 @@ final class LocationModeApi implements LocationModeApiInterface
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $mode = $this->modeTransformer->transform($data);
-        $this->currentCache[$locationId] = $mode;
+        $this->currentCache[$locationId][$language] = $mode;
 
         return $mode;
     }
@@ -152,18 +153,19 @@ final class LocationModeApi implements LocationModeApiInterface
      *
      * @return array<int, ModeInterface>
      */
-    public function getMultiple(LocationInterface $location, bool $skipCache = false): array
+    public function getMultiple(LocationInterface $location, bool $skipCache = false, ?string $acceptLanguage = null): array
     {
         $locationId = $location->getLocationId();
+        $language = (string) $acceptLanguage;
         if (!$skipCache) {
-            if (isset($this->listCache[$locationId])) {
-                return $this->listCache[$locationId];
+            if (isset($this->listCache[$locationId][$language])) {
+                return $this->listCache[$locationId][$language];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + array_filter([self::HEADER_KEY_ACCEPT_LANGUAGE => $acceptLanguage], static fn (?string $value): bool => null !== $value);
         $url = sprintf(self::API_URL_LIST_SPRINTF, rawurlencode($locationId));
         $data = $this->requestSender->get($url, [], $headers);
 
@@ -174,7 +176,7 @@ final class LocationModeApi implements LocationModeApiInterface
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
         }
         $modes = $this->modesTransformer->transform($data[self::KEY_ITEMS]);
-        $this->listCache[$locationId] = $modes;
+        $this->listCache[$locationId][$language] = $modes;
 
         return $modes;
     }
@@ -185,17 +187,18 @@ final class LocationModeApi implements LocationModeApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function getOneByLocationAndId(LocationInterface $location, string $modeId, bool $skipCache = false): ModeInterface
+    public function getOneByLocationAndId(LocationInterface $location, string $modeId, bool $skipCache = false, ?string $acceptLanguage = null): ModeInterface
     {
+        $language = (string) $acceptLanguage;
         if (!$skipCache) {
-            if (isset($this->cache[$modeId])) {
-                return $this->cache[$modeId];
+            if (isset($this->cache[$modeId][$language])) {
+                return $this->cache[$modeId][$language];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + array_filter([self::HEADER_KEY_ACCEPT_LANGUAGE => $acceptLanguage], static fn (?string $value): bool => null !== $value);
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($location->getLocationId()), rawurlencode($modeId));
         $data = $this->requestSender->get($url, [], $headers);
 
@@ -203,7 +206,7 @@ final class LocationModeApi implements LocationModeApiInterface
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $mode = $this->modeTransformer->transform($data);
-        $this->cache[$modeId] = $mode;
+        $this->cache[$modeId][$language] = $mode;
 
         return $mode;
     }
@@ -214,13 +217,13 @@ final class LocationModeApi implements LocationModeApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function updateMode(LocationInterface $location, string $modeId, string $label): ModeInterface
+    public function updateMode(LocationInterface $location, string $modeId, string $label, ?string $acceptLanguage = null): ModeInterface
     {
         $locationId = $location->getLocationId();
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + array_filter([self::HEADER_KEY_ACCEPT_LANGUAGE => $acceptLanguage], static fn (?string $value): bool => null !== $value);
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($locationId), rawurlencode($modeId));
         $body = [self::KEY_LABEL => $label];
         $data = $this->requestSender->put($url, [], $headers, $body);
@@ -229,7 +232,7 @@ final class LocationModeApi implements LocationModeApiInterface
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $mode = $this->modeTransformer->transform($data);
-        $this->cache[$modeId] = $mode;
+        $this->cache[$modeId] = [self::CACHE_LANGUAGE_PLAIN => $mode];
         unset($this->listCache[$locationId]);
 
         return $mode;

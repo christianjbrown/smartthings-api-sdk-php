@@ -30,6 +30,7 @@ interface CapabilityApiInterface extends ApiInterface
     public const string KEY_MANUFACTURER_NAME = 'manufacturerName';
     public const string KEY_NAMESPACE = 'namespace';
     public const string KEY_PRESENTATION_ID = 'presentationId';
+    public const string NAMESPACE_CACHE_KEY_SPRINTF = '%s/%s';
     public const string TRANSLATIONS_CACHE_KEY_SPRINTF = '%s/%d/%s';
     public const string UNEXPECTED_RESPONSE = 'Response not set or not an array';
     public const string UNEXPECTED_RESPONSE_SPRINTF = '%s not set or not an array';
@@ -67,7 +68,7 @@ interface CapabilityApiInterface extends ApiInterface
     /**
      * @return array<int, CapabilityInterface>
      */
-    public function getMultipleByNamespace(string $namespace, bool $skipCache = false): array;
+    public function getMultipleByNamespace(string $namespace, bool $skipCache = false, ?string $organizationId = null): array;
 
     /**
      * @return array<int, CapabilityNamespaceInterface>
@@ -76,7 +77,7 @@ interface CapabilityApiInterface extends ApiInterface
 
     public function getOneByIdAndVersion(string $capabilityId, int $version, bool $skipCache = false): CapabilityInterface;
 
-    public function getPresentation(string $capabilityId, int $version, bool $skipCache = false): CapabilityPresentationInterface;
+    public function getPresentation(string $capabilityId, int $version, bool $skipCache = false, ?string $acceptLanguage = null): CapabilityPresentationInterface;
 
     public function getTranslations(string $capabilityId, int $version, string $tag, bool $skipCache = false, ?string $presentationId = null, ?string $manufacturerName = null): LocalizationInterface;
 

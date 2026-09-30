@@ -71,7 +71,7 @@ final class CapabilityApi implements CapabilityApiInterface
     private ?array $namespacesCache = null;
 
     /**
-     * @var array<string, CapabilityPresentationInterface>
+     * @var array<string, array<string, CapabilityPresentationInterface>>
      */
     private array $presentationCache = [];
     private JsonApiRequestSenderInterface $requestSender;
@@ -177,7 +177,7 @@ final class CapabilityApi implements CapabilityApiInterface
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $result = $this->capabilityPresentationTransformer->transform($data);
-        $this->presentationCache[sprintf(self::CACHE_KEY_SPRINTF, $capabilityId, $capabilityVersion)] = $result;
+        $this->presentationCache[sprintf(self::CACHE_KEY_SPRINTF, $capabilityId, $capabilityVersion)] = ['' => $result];
 
         return $result;
     }
@@ -265,17 +265,19 @@ final class CapabilityApi implements CapabilityApiInterface
      *
      * @return array<int, CapabilityInterface>
      */
-    public function getMultipleByNamespace(string $namespace, bool $skipCache = false): array
+    public function getMultipleByNamespace(string $namespace, bool $skipCache = false, ?string $organizationId = null): array
     {
+        // Casting keeps a missing organization and a real id as distinct string keys.
+        $cacheKey = sprintf(self::NAMESPACE_CACHE_KEY_SPRINTF, $namespace, (string) $organizationId);
         if (!$skipCache) {
-            if (isset($this->namespaceCache[$namespace])) {
-                return $this->namespaceCache[$namespace];
+            if (isset($this->namespaceCache[$cacheKey])) {
+                return $this->namespaceCache[$cacheKey];
             }
         }
 
         $url = sprintf(self::API_URL_NAMESPACE_SPRINTF, rawurlencode($namespace));
-        $capabilities = $this->fetchList($url);
-        $this->namespaceCache[$namespace] = $capabilities;
+        $capabilities = $this->fetchList($url, array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value));
+        $this->namespaceCache[$cacheKey] = $capabilities;
 
         return $capabilities;
     }
@@ -348,18 +350,19 @@ final class CapabilityApi implements CapabilityApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function getPresentation(string $capabilityId, int $version, bool $skipCache = false): CapabilityPresentationInterface
+    public function getPresentation(string $capabilityId, int $version, bool $skipCache = false, ?string $acceptLanguage = null): CapabilityPresentationInterface
     {
         $cacheKey = sprintf(self::CACHE_KEY_SPRINTF, $capabilityId, $version);
+        $language = (string) $acceptLanguage;
         if (!$skipCache) {
-            if (isset($this->presentationCache[$cacheKey])) {
-                return $this->presentationCache[$cacheKey];
+            if (isset($this->presentationCache[$cacheKey][$language])) {
+                return $this->presentationCache[$cacheKey][$language];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + array_filter([self::HEADER_KEY_ACCEPT_LANGUAGE => $acceptLanguage], static fn (?string $value): bool => null !== $value);
         $url = sprintf(self::API_URL_PRESENTATION_SPRINTF, rawurlencode($capabilityId), $version);
         $data = $this->requestSender->get($url, [], $headers);
 
@@ -367,7 +370,7 @@ final class CapabilityApi implements CapabilityApiInterface
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $presentation = $this->capabilityPresentationTransformer->transform($data);
-        $this->presentationCache[$cacheKey] = $presentation;
+        $this->presentationCache[$cacheKey][$language] = $presentation;
 
         return $presentation;
     }
@@ -521,22 +524,25 @@ final class CapabilityApi implements CapabilityApiInterface
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $result = $this->capabilityPresentationTransformer->transform($data);
-        $this->presentationCache[sprintf(self::CACHE_KEY_SPRINTF, $capabilityId, $capabilityVersion)] = $result;
+        $this->presentationCache[sprintf(self::CACHE_KEY_SPRINTF, $capabilityId, $capabilityVersion)] = ['' => $result];
 
         return $result;
     }
 
     /**
+     * @param string                $url          The list URL
+     * @param array<string, string> $extraHeaders Headers sent besides the authorization
+     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
      * @return array<int, CapabilityInterface>
      */
-    private function fetchList(string $url): array
+    private function fetchList(string $url, array $extraHeaders = []): array
     {
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + $extraHeaders;
         $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data[self::KEY_ITEMS])) {

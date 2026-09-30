@@ -18,11 +18,14 @@ use ChristianBrown\SmartThings\Transformer\ServiceLocationInfoTransformerInterfa
 use ChristianBrown\SmartThings\Transformer\ServiceSubscriptionReceiptTransformerInterface;
 
 use function array_filter;
+use function is_string;
 use function rawurlencode;
 use function sprintf;
 
 final class ServiceApi implements ServiceApiInterface
 {
+    private JsonApiRequestSenderInterface $alertLinkRequestSender;
+
     /**
      * @var array<string, ServiceCapabilityDataInterface>
      */
@@ -46,7 +49,7 @@ final class ServiceApi implements ServiceApiInterface
     private TokenInterface $token;
     private RequestUrlBuilderInterface $urlBuilder;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, ServiceLocationInfoTransformerInterface $serviceLocationInfoTransformer, ServiceCapabilityNamesTransformerInterface $serviceCapabilityNamesTransformer, ServiceCapabilityDataTransformerInterface $serviceCapabilityDataTransformer, TokenInterface $token, ServiceSubscriptionRequestSerializerInterface $serviceSubscriptionRequestSerializer, ServiceSubscriptionReceiptTransformerInterface $serviceSubscriptionReceiptTransformer, RequestUrlBuilderInterface $urlBuilder)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, ServiceLocationInfoTransformerInterface $serviceLocationInfoTransformer, ServiceCapabilityNamesTransformerInterface $serviceCapabilityNamesTransformer, ServiceCapabilityDataTransformerInterface $serviceCapabilityDataTransformer, TokenInterface $token, ServiceSubscriptionRequestSerializerInterface $serviceSubscriptionRequestSerializer, ServiceSubscriptionReceiptTransformerInterface $serviceSubscriptionReceiptTransformer, RequestUrlBuilderInterface $urlBuilder, JsonApiRequestSenderInterface $alertLinkRequestSender)
     {
         $this->requestSender = $requestSender;
         $this->serviceLocationInfoTransformer = $serviceLocationInfoTransformer;
@@ -56,6 +59,7 @@ final class ServiceApi implements ServiceApiInterface
         $this->serviceSubscriptionRequestSerializer = $serviceSubscriptionRequestSerializer;
         $this->serviceSubscriptionReceiptTransformer = $serviceSubscriptionReceiptTransformer;
         $this->urlBuilder = $urlBuilder;
+        $this->alertLinkRequestSender = $alertLinkRequestSender;
     }
 
     /**
@@ -107,6 +111,29 @@ final class ServiceApi implements ServiceApiInterface
         $query = array_filter([self::KEY_ISA_ID => $isaId], static fn (?string $value): bool => null !== $value);
         $this->requestSender->delete($url, $query, $headers);
         unset($this->infoCache[$locationId]);
+    }
+
+    /**
+     * @throws RequestExceptionInterface
+     * @throws UnexpectedResponseException
+     */
+    public function getAlertLink(string $locationId, ?string $postalCode = null, ?string $subscriptionId = null, ?string $units = null, ?string $acceptLanguage = null): string
+    {
+        $url = $this->urlBuilder->build(sprintf(self::API_URL_ALERT_LINK_SPRINTF, rawurlencode($locationId)), [self::KEY_POSTAL_CODE => $postalCode, self::KEY_SUBSCRIPTION_ID => $subscriptionId]);
+        $headers = [
+            self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
+        ] + array_filter([self::HEADER_KEY_UNITS => $units, self::HEADER_KEY_ACCEPT_LANGUAGE => $acceptLanguage], static fn (?string $value): bool => null !== $value);
+
+        $data = $this->alertLinkRequestSender->get($url, [], $headers);
+
+        if (!isset($data[self::KEY_LOCATION])) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_LOCATION);
+        }
+        if (!is_string($data[self::KEY_LOCATION])) {
+            throw new UnexpectedResponseException(self::UNEXPECTED_LOCATION);
+        }
+
+        return $data[self::KEY_LOCATION];
     }
 
     /**

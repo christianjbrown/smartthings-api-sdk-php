@@ -26,7 +26,7 @@ use function sprintf;
 final class DeviceProfileApi implements DeviceProfileApiInterface
 {
     /**
-     * @var array<string, DeviceProfileInterface>
+     * @var array<string, array<string, DeviceProfileInterface>>
      */
     private array $cache = [];
     private CreateDeviceProfileRequestSerializerInterface $createDeviceProfileRequestSerializer;
@@ -73,11 +73,11 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function createDeviceProfile(CreateDeviceProfileRequestInterface $request): DeviceProfileInterface
+    public function createDeviceProfile(CreateDeviceProfileRequestInterface $request, ?string $organizationId = null): DeviceProfileInterface
     {
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
         $body = $this->createDeviceProfileRequestSerializer->serialize($request);
         $data = $this->requestSender->post(self::API_URL, [], $headers, $body);
 
@@ -93,11 +93,11 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
     /**
      * @throws RequestExceptionInterface
      */
-    public function deleteDeviceProfile(string $deviceProfileId): void
+    public function deleteDeviceProfile(string $deviceProfileId, ?string $organizationId = null): void
     {
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($deviceProfileId));
         $this->requestSender->delete($url, [], $headers);
         unset($this->cache[$deviceProfileId]);
@@ -149,18 +149,19 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
      *
      * @return array<int, DeviceProfileInterface>
      */
-    public function getMultiple(bool $skipCache = false, ?array $profileIds = null): array
+    public function getMultiple(bool $skipCache = false, ?array $profileIds = null, ?string $organizationId = null): array
     {
         $url = $this->urlBuilder->build(self::API_URL, [self::KEY_PROFILE_ID => $profileIds]);
+        $cacheKey = sprintf(self::CACHE_VARIANT_SPRINTF, $url, (string) $organizationId);
         if (!$skipCache) {
-            if (isset($this->listCache[$url])) {
-                return $this->listCache[$url];
+            if (isset($this->listCache[$cacheKey])) {
+                return $this->listCache[$cacheKey];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
         $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data[self::KEY_ITEMS])) {
@@ -170,7 +171,7 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
         }
         $profiles = $this->deviceProfilesTransformer->transform($data[self::KEY_ITEMS]);
-        $this->listCache[$url] = $profiles;
+        $this->listCache[$cacheKey] = $profiles;
 
         return $profiles;
     }
@@ -181,17 +182,18 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function getOneById(string $deviceProfileId, bool $skipCache = false): DeviceProfileInterface
+    public function getOneById(string $deviceProfileId, bool $skipCache = false, ?string $organizationId = null, ?string $acceptLanguage = null): DeviceProfileInterface
     {
+        $variant = sprintf(self::CACHE_VARIANT_SPRINTF, (string) $organizationId, (string) $acceptLanguage);
         if (!$skipCache) {
-            if (isset($this->cache[$deviceProfileId])) {
-                return $this->cache[$deviceProfileId];
+            if (isset($this->cache[$deviceProfileId][$variant])) {
+                return $this->cache[$deviceProfileId][$variant];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value) + array_filter([self::HEADER_KEY_ACCEPT_LANGUAGE => $acceptLanguage], static fn (?string $value): bool => null !== $value);
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($deviceProfileId));
         $data = $this->requestSender->get($url, [], $headers);
 
@@ -199,7 +201,7 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $profile = $this->deviceProfileTransformer->transform($data);
-        $this->cache[$deviceProfileId] = $profile;
+        $this->cache[$deviceProfileId][$variant] = $profile;
 
         return $profile;
     }
@@ -240,11 +242,11 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function updateDeviceProfile(string $deviceProfileId, UpdateDeviceProfileRequestInterface $request): DeviceProfileInterface
+    public function updateDeviceProfile(string $deviceProfileId, UpdateDeviceProfileRequestInterface $request, ?string $organizationId = null): DeviceProfileInterface
     {
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
-        ];
+        ] + array_filter([self::HEADER_KEY_ORGANIZATION => $organizationId], static fn (?string $value): bool => null !== $value);
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($deviceProfileId));
         $body = $this->updateDeviceProfileRequestSerializer->serialize($request);
         $data = $this->requestSender->put($url, [], $headers, $body);
@@ -253,7 +255,7 @@ final class DeviceProfileApi implements DeviceProfileApiInterface
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $profile = $this->deviceProfileTransformer->transform($data);
-        $this->cache[$deviceProfileId] = $profile;
+        $this->cache[$deviceProfileId] = [self::CACHE_VARIANT_PLAIN => $profile];
         $this->listCache = [];
 
         return $profile;

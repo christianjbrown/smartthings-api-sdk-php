@@ -25,6 +25,7 @@ use ChristianBrown\SmartThings\Api\LocationModeApi;
 use ChristianBrown\SmartThings\Api\LocationRoomApi;
 use ChristianBrown\SmartThings\Api\OrganizationApi;
 use ChristianBrown\SmartThings\Api\PresentationApi;
+use ChristianBrown\SmartThings\Api\RedirectLocationResponseMapper;
 use ChristianBrown\SmartThings\Api\RuleApi;
 use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\ScheduleApi;
@@ -645,6 +646,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(SceneApi::class)]
 #[UsesClass(ScheduleApi::class)]
 #[UsesClass(SchemaConnectorApi::class)]
+#[UsesClass(RedirectLocationResponseMapper::class)]
 #[UsesClass(ServiceApi::class)]
 #[UsesClass(SubscriptionApi::class)]
 #[UsesClass(VirtualDeviceApi::class)]
