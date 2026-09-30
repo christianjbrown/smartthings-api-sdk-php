@@ -7,6 +7,7 @@ namespace ChristianBrown\SmartThings\Api;
 use ChristianBrown\SmartThings\Model\DevicePreferenceDefinitionInterface;
 use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
 use ChristianBrown\SmartThings\Model\LocalizationInterface;
+use ChristianBrown\SmartThings\Model\PreferenceListQueryInterface;
 use ChristianBrown\SmartThings\Model\PreferenceLocalizationRequestInterface;
 use ChristianBrown\SmartThings\Model\PreferenceRequestInterface;
 
@@ -49,7 +50,7 @@ interface DevicePreferenceDefinitionApiInterface extends ApiInterface
     /**
      * @return array<int, DevicePreferenceDefinitionInterface>
      */
-    public function getMultiple(?string $namespace = null, bool $skipCache = false): array;
+    public function getMultiple(?string $namespace = null, bool $skipCache = false, ?PreferenceListQueryInterface $query = null): array;
 
     public function getOneById(string $preferenceId, bool $skipCache = false): DevicePreferenceDefinitionInterface;
 

@@ -9,6 +9,7 @@ use ChristianBrown\SmartThings\Model\DeviceCommandResultInterface;
 use ChristianBrown\SmartThings\Model\DeviceEventInterface;
 use ChristianBrown\SmartThings\Model\DeviceInstallRequestInterface;
 use ChristianBrown\SmartThings\Model\DeviceInterface;
+use ChristianBrown\SmartThings\Model\DeviceListQueryInterface;
 use ChristianBrown\SmartThings\Model\UpdateDeviceRequestInterface;
 
 interface DeviceApiInterface extends ApiInterface
@@ -19,6 +20,7 @@ interface DeviceApiInterface extends ApiInterface
     public const string API_URL_SPRINTF = 'https://api.smartthings.com/v1/devices/%s';
     public const string KEY_COMMANDS = 'commands';
     public const string KEY_DEVICE_EVENTS = 'deviceEvents';
+    public const string KEY_INCLUDE_STATUS = 'includeStatus';
     public const string KEY_ITEMS = 'items';
     public const string KEY_LOCATION_ID = 'locationId';
     public const string KEY_ORDERED = 'ordered';
@@ -56,9 +58,9 @@ interface DeviceApiInterface extends ApiInterface
     /**
      * @return array<int, DeviceInterface>
      */
-    public function getMultiple(?string $locationId = null, bool $skipCache = false): array;
+    public function getMultiple(?string $locationId = null, bool $skipCache = false, ?DeviceListQueryInterface $query = null): array;
 
-    public function getOneById(string $deviceId, bool $skipCache = false): DeviceInterface;
+    public function getOneById(string $deviceId, bool $skipCache = false, ?bool $includeStatus = null): DeviceInterface;
 
     /**
      * Installs a SmartApp-managed device. Requires installed app principal.

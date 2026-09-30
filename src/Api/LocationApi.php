@@ -9,6 +9,7 @@ use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CreateLocationRequestInterface;
 use ChristianBrown\SmartThings\Model\LocationInterface;
+use ChristianBrown\SmartThings\Model\LocationListQueryInterface;
 use ChristianBrown\SmartThings\Model\PatchLocationRequestInterface;
 use ChristianBrown\SmartThings\Model\UpdateLocationRequestInterface;
 use ChristianBrown\SmartThings\Serializer\CreateLocationRequestSerializerInterface;
@@ -24,23 +25,24 @@ use function sprintf;
 final class LocationApi implements LocationApiInterface
 {
     /**
-     * @var array<string, LocationInterface>
+     * @var array<string, array<string, LocationInterface>>
      */
     private array $cache = [];
     private CreateLocationRequestSerializerInterface $createLocationRequestSerializer;
 
     /**
-     * @var ?array<int, LocationInterface>
+     * @var array<string, array<int, LocationInterface>>
      */
-    private ?array $listCache = null;
+    private array $listCache = [];
     private LocationsTransformerInterface $locationsTransformer;
     private LocationTransformerInterface $locationTransformer;
     private PatchLocationRequestSerializerInterface $patchLocationRequestSerializer;
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
     private UpdateLocationRequestSerializerInterface $updateLocationRequestSerializer;
+    private RequestUrlBuilderInterface $urlBuilder;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, LocationTransformerInterface $locationTransformer, LocationsTransformerInterface $locationsTransformer, TokenInterface $token, CreateLocationRequestSerializerInterface $createLocationRequestSerializer, UpdateLocationRequestSerializerInterface $updateLocationRequestSerializer, PatchLocationRequestSerializerInterface $patchLocationRequestSerializer)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, LocationTransformerInterface $locationTransformer, LocationsTransformerInterface $locationsTransformer, TokenInterface $token, CreateLocationRequestSerializerInterface $createLocationRequestSerializer, UpdateLocationRequestSerializerInterface $updateLocationRequestSerializer, PatchLocationRequestSerializerInterface $patchLocationRequestSerializer, RequestUrlBuilderInterface $urlBuilder)
     {
         $this->requestSender = $requestSender;
         $this->locationTransformer = $locationTransformer;
@@ -49,6 +51,7 @@ final class LocationApi implements LocationApiInterface
         $this->createLocationRequestSerializer = $createLocationRequestSerializer;
         $this->updateLocationRequestSerializer = $updateLocationRequestSerializer;
         $this->patchLocationRequestSerializer = $patchLocationRequestSerializer;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -57,20 +60,20 @@ final class LocationApi implements LocationApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function createLocation(CreateLocationRequestInterface $request): LocationInterface
+    public function createLocation(CreateLocationRequestInterface $request, ?bool $allowed = null): LocationInterface
     {
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
         $body = $this->createLocationRequestSerializer->serialize($request);
-        $data = $this->requestSender->post(self::API_URL, [], $headers, $body);
+        $data = $this->requestSender->post($this->urlBuilder->build(self::API_URL, [self::KEY_ALLOWED => $allowed]), [], $headers, $body);
 
         if (empty($data)) {
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $location = $this->locationTransformer->transform($data);
-        $this->cache[$location->getLocationId()] = $location;
-        $this->listCache = null;
+        $this->cache[$location->getLocationId()] = [sprintf(self::API_URL_SPRINTF, rawurlencode($location->getLocationId())) => $location];
+        $this->listCache = [];
 
         return $location;
     }
@@ -86,7 +89,7 @@ final class LocationApi implements LocationApiInterface
         $url = sprintf(self::API_URL_SPRINTF, rawurlencode($locationId));
         $this->requestSender->delete($url, self::buildForceQuery($force), $headers);
         unset($this->cache[$locationId]);
-        $this->listCache = null;
+        $this->listCache = [];
     }
 
     /**
@@ -97,18 +100,20 @@ final class LocationApi implements LocationApiInterface
      *
      * @return array<int, LocationInterface>
      */
-    public function getMultiple(bool $skipCache = false): array
+    public function getMultiple(bool $skipCache = false, ?LocationListQueryInterface $query = null): array
     {
+        // The full URL, query included, identifies the request, so it keys the cache.
+        $url = $this->urlBuilder->build(self::API_URL, [], $query);
         if (!$skipCache) {
-            if (null !== $this->listCache) {
-                return $this->listCache;
+            if (isset($this->listCache[$url])) {
+                return $this->listCache[$url];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $data = $this->requestSender->get(self::API_URL, [], $headers);
+        $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data[self::KEY_ITEMS])) {
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
@@ -117,7 +122,7 @@ final class LocationApi implements LocationApiInterface
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
         }
         $locations = $this->locationsTransformer->transform($data[self::KEY_ITEMS]);
-        $this->listCache = $locations;
+        $this->listCache[$url] = $locations;
 
         return $locations;
     }
@@ -128,25 +133,25 @@ final class LocationApi implements LocationApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function getOneById(string $locationId, bool $skipCache = false): LocationInterface
+    public function getOneById(string $locationId, bool $skipCache = false, ?bool $allowed = null): LocationInterface
     {
+        $url = $this->urlBuilder->build(sprintf(self::API_URL_SPRINTF, rawurlencode($locationId)), [self::KEY_ALLOWED => $allowed]);
         if (!$skipCache) {
-            if (isset($this->cache[$locationId])) {
-                return $this->cache[$locationId];
+            if (isset($this->cache[$locationId][$url])) {
+                return $this->cache[$locationId][$url];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($locationId));
         $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data)) {
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $location = $this->locationTransformer->transform($data);
-        $this->cache[$locationId] = $location;
+        $this->cache[$locationId][$url] = $location;
 
         return $location;
     }
@@ -170,8 +175,8 @@ final class LocationApi implements LocationApiInterface
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $location = $this->locationTransformer->transform($data);
-        $this->cache[$locationId] = $location;
-        $this->listCache = null;
+        $this->cache[$locationId] = [$url => $location];
+        $this->listCache = [];
 
         return $location;
     }
@@ -195,8 +200,8 @@ final class LocationApi implements LocationApiInterface
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $location = $this->locationTransformer->transform($data);
-        $this->cache[$locationId] = $location;
-        $this->listCache = null;
+        $this->cache[$locationId] = [$url => $location];
+        $this->listCache = [];
 
         return $location;
     }

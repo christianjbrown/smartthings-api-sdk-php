@@ -7,6 +7,7 @@ namespace ChristianBrown\SmartThings\Api;
 use ChristianBrown\SmartThings\Exception\MissingInputException;
 use ChristianBrown\SmartThings\Model\RuleExecutionResultInterface;
 use ChristianBrown\SmartThings\Model\RuleInterface;
+use ChristianBrown\SmartThings\Model\RuleListQueryInterface;
 use ChristianBrown\SmartThings\Model\RuleRequestInterface;
 
 interface RuleApiInterface extends ApiInterface
@@ -53,7 +54,7 @@ interface RuleApiInterface extends ApiInterface
     /**
      * @return array<int, RuleInterface>
      */
-    public function getMultiple(string $locationId, bool $skipCache = false): array;
+    public function getMultiple(string $locationId, bool $skipCache = false, ?RuleListQueryInterface $query = null): array;
 
     public function getOneById(string $ruleId, string $locationId, bool $skipCache = false): RuleInterface;
 

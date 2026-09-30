@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Api;
 
 use ChristianBrown\SmartThings\Model\CreateLocationRequestInterface;
 use ChristianBrown\SmartThings\Model\LocationInterface;
+use ChristianBrown\SmartThings\Model\LocationListQueryInterface;
 use ChristianBrown\SmartThings\Model\PatchLocationRequestInterface;
 use ChristianBrown\SmartThings\Model\UpdateLocationRequestInterface;
 
@@ -13,6 +14,7 @@ interface LocationApiInterface extends ApiInterface
 {
     public const string API_URL = 'https://api.smartthings.com/v1/locations';
     public const string API_URL_SPRINTF = 'https://api.smartthings.com/v1/locations/%s';
+    public const string KEY_ALLOWED = 'allowed';
     public const string KEY_FORCE = 'force';
     public const string KEY_ITEMS = 'items';
     public const string UNEXPECTED_RESPONSE = 'Response not set or not an array';
@@ -22,7 +24,7 @@ interface LocationApiInterface extends ApiInterface
      * Creates a new Location. Invalidates the cached location list so a subsequent
      * getMultiple() reflects the new Location.
      */
-    public function createLocation(CreateLocationRequestInterface $request): LocationInterface;
+    public function createLocation(CreateLocationRequestInterface $request, ?bool $allowed = null): LocationInterface;
 
     /**
      * Deletes a Location from the user's account. Invalidates any cached copy of this
@@ -33,9 +35,9 @@ interface LocationApiInterface extends ApiInterface
     /**
      * @return array<int, LocationInterface>
      */
-    public function getMultiple(bool $skipCache = false): array;
+    public function getMultiple(bool $skipCache = false, ?LocationListQueryInterface $query = null): array;
 
-    public function getOneById(string $locationId, bool $skipCache = false): LocationInterface;
+    public function getOneById(string $locationId, bool $skipCache = false, ?bool $allowed = null): LocationInterface;
 
     /**
      * Updates or unsets one or more of a Location's latitude, longitude and

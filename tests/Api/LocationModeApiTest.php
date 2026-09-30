@@ -9,6 +9,7 @@ use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Api\ApiInterface;
 use ChristianBrown\SmartThings\Api\LocationModeApi;
 use ChristianBrown\SmartThings\Api\LocationModeApiInterface;
+use ChristianBrown\SmartThings\Api\RequestUrlBuilder;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
@@ -25,6 +26,7 @@ use function rawurlencode;
 use function sprintf;
 
 #[CoversClass(LocationModeApi::class)]
+#[CoversClass(RequestUrlBuilder::class)]
 #[CoversClass(Token::class)]
 final class LocationModeApiTest extends TestCase
 {
@@ -61,7 +63,7 @@ final class LocationModeApiTest extends TestCase
 
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $modeApi->changeCurrent($location, 'test-mode-id');
 
         self::assertSame($mode, $actual);
@@ -97,7 +99,7 @@ final class LocationModeApiTest extends TestCase
 
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         self::assertSame($mode, $modeApi->changeCurrent($location, 'test-mode-id'));
         self::assertSame($mode, $modeApi->getCurrent($location));
@@ -120,7 +122,7 @@ final class LocationModeApiTest extends TestCase
         $modeTransformer = self::createStub(ModeTransformerInterface::class);
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationModeApiInterface::UNEXPECTED_RESPONSE);
@@ -160,7 +162,7 @@ final class LocationModeApiTest extends TestCase
 
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $modeApi->createMode($location, 'test-mode-label');
 
         self::assertSame($mode, $actual);
@@ -195,7 +197,7 @@ final class LocationModeApiTest extends TestCase
         $modesTransformer->method('transform')
             ->willReturn([$mode]);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         $modeApi->getMultiple($location);
         $modeApi->createMode($location, 'test-mode-label');
@@ -219,7 +221,7 @@ final class LocationModeApiTest extends TestCase
         $modeTransformer = self::createStub(ModeTransformerInterface::class);
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationModeApiInterface::UNEXPECTED_RESPONSE);
@@ -250,7 +252,7 @@ final class LocationModeApiTest extends TestCase
         $modeTransformer = self::createStub(ModeTransformerInterface::class);
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
         $modeApi->deleteMode($location, 'test-mode-id');
 
         $this->addToAssertionCount(1);
@@ -283,7 +285,7 @@ final class LocationModeApiTest extends TestCase
 
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         $modeApi->getOneByLocationAndId($location, 'test-mode-id');
         $modeApi->deleteMode($location, 'test-mode-id');
@@ -322,7 +324,7 @@ final class LocationModeApiTest extends TestCase
 
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $modeApi->getCurrent($location);
 
         self::assertSame($mode, $actual);
@@ -355,7 +357,7 @@ final class LocationModeApiTest extends TestCase
 
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         // Second call for the same locationId is served from the cache without hitting the API.
         self::assertSame($mode, $modeApi->getCurrent($location));
@@ -388,7 +390,7 @@ final class LocationModeApiTest extends TestCase
 
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($mode, $modeApi->getCurrent($location));
@@ -421,7 +423,7 @@ final class LocationModeApiTest extends TestCase
         $modeTransformer = self::createStub(ModeTransformerInterface::class);
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationModeApiInterface::UNEXPECTED_RESPONSE);
@@ -462,7 +464,7 @@ final class LocationModeApiTest extends TestCase
             ->with($data[LocationModeApiInterface::KEY_ITEMS])
             ->willReturn($modes);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $modeApi->getMultiple($location);
 
         self::assertSame($modes, $actual);
@@ -497,7 +499,7 @@ final class LocationModeApiTest extends TestCase
             ->with($data[LocationModeApiInterface::KEY_ITEMS])
             ->willReturn($modes);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         // Second call for the same locationId is served from the cache without hitting the API.
         self::assertSame($modes, $modeApi->getMultiple($location));
@@ -532,7 +534,7 @@ final class LocationModeApiTest extends TestCase
             ->with($data[LocationModeApiInterface::KEY_ITEMS])
             ->willReturn($modes);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($modes, $modeApi->getMultiple($location));
@@ -562,7 +564,7 @@ final class LocationModeApiTest extends TestCase
         $modeTransformer = self::createStub(ModeTransformerInterface::class);
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(LocationModeApiInterface::UNEXPECTED_RESPONSE_SPRINTF, LocationModeApiInterface::KEY_ITEMS));
@@ -601,7 +603,7 @@ final class LocationModeApiTest extends TestCase
 
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $modeApi->getOneByLocationAndId($location, 'test-mode-id');
 
         self::assertSame($mode, $actual);
@@ -634,7 +636,7 @@ final class LocationModeApiTest extends TestCase
 
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         // Second call for the same modeId is served from the cache without hitting the API.
         self::assertSame($mode, $modeApi->getOneByLocationAndId($location, 'test-mode-id'));
@@ -675,7 +677,7 @@ final class LocationModeApiTest extends TestCase
 
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $modeApi->getOneByLocationAndId($location, $modeId);
 
         self::assertSame($mode, $actual);
@@ -707,7 +709,7 @@ final class LocationModeApiTest extends TestCase
 
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($mode, $modeApi->getOneByLocationAndId($location, 'test-mode-id'));
@@ -740,7 +742,7 @@ final class LocationModeApiTest extends TestCase
         $modeTransformer = self::createStub(ModeTransformerInterface::class);
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationModeApiInterface::UNEXPECTED_RESPONSE);
@@ -780,7 +782,7 @@ final class LocationModeApiTest extends TestCase
 
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
         $actual = $modeApi->updateMode($location, 'test-mode-id', 'test-mode-label');
 
         self::assertSame($mode, $actual);
@@ -816,7 +818,7 @@ final class LocationModeApiTest extends TestCase
 
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         self::assertSame($mode, $modeApi->updateMode($location, 'test-mode-id', 'test-mode-label'));
         self::assertSame($mode, $modeApi->getOneByLocationAndId($location, 'test-mode-id'));
@@ -839,7 +841,7 @@ final class LocationModeApiTest extends TestCase
         $modeTransformer = self::createStub(ModeTransformerInterface::class);
         $modesTransformer = self::createStub(ModesTransformerInterface::class);
 
-        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'));
+        $modeApi = new LocationModeApi($requestSender, $modeTransformer, $modesTransformer, new Token('test-api-token'), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(LocationModeApiInterface::UNEXPECTED_RESPONSE);

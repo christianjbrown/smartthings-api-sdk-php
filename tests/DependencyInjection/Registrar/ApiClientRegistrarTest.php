@@ -29,6 +29,7 @@ final class ApiClientRegistrarTest extends TestCase
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_ACCEPTANCE_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_RECEIPT_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_INVITE_REQUEST_SERIALIZER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_REQUEST_URL_BUILDER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_PLAYED_TEXT_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_PLAY_TEXT_REQUEST_SERIALIZER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_CONVERTED_TTS_TRANSFORMER, stdClass::class);

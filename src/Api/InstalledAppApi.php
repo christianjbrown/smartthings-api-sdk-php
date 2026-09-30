@@ -11,6 +11,7 @@ use ChristianBrown\SmartThings\Model\CoordinateAliasRequestInterface;
 use ChristianBrown\SmartThings\Model\CreateInstalledAppEventsRequestInterface;
 use ChristianBrown\SmartThings\Model\InstalledAppConfigInterface;
 use ChristianBrown\SmartThings\Model\InstalledAppInterface;
+use ChristianBrown\SmartThings\Model\InstalledAppListQueryInterface;
 use ChristianBrown\SmartThings\Serializer\CoordinateAliasRequestSerializerInterface;
 use ChristianBrown\SmartThings\Serializer\CreateInstalledAppEventsRequestSerializerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigsTransformerInterface;
@@ -26,7 +27,7 @@ use function sprintf;
 final class InstalledAppApi implements InstalledAppApiInterface
 {
     /**
-     * @var array<string, InstalledAppInterface>
+     * @var array<string, array<string, InstalledAppInterface>>
      */
     private array $cache = [];
 
@@ -36,7 +37,7 @@ final class InstalledAppApi implements InstalledAppApiInterface
     private array $configCache = [];
 
     /**
-     * @var array<string, array<int, InstalledAppConfigInterface>>
+     * @var array<string, array<string, array<int, InstalledAppConfigInterface>>>
      */
     private array $configsCache = [];
     private CoordinateAliasRequestSerializerInterface $coordinateAliasRequestSerializer;
@@ -53,8 +54,9 @@ final class InstalledAppApi implements InstalledAppApiInterface
     private ?InstalledAppInterface $meCache = null;
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
+    private RequestUrlBuilderInterface $urlBuilder;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, InstalledAppTransformerInterface $installedAppTransformer, InstalledAppsTransformerInterface $installedAppsTransformer, InstalledAppConfigTransformerInterface $installedAppConfigTransformer, InstalledAppConfigsTransformerInterface $installedAppConfigsTransformer, TokenInterface $token, CreateInstalledAppEventsRequestSerializerInterface $createInstalledAppEventsRequestSerializer, CoordinateAliasRequestSerializerInterface $coordinateAliasRequestSerializer)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, InstalledAppTransformerInterface $installedAppTransformer, InstalledAppsTransformerInterface $installedAppsTransformer, InstalledAppConfigTransformerInterface $installedAppConfigTransformer, InstalledAppConfigsTransformerInterface $installedAppConfigsTransformer, TokenInterface $token, CreateInstalledAppEventsRequestSerializerInterface $createInstalledAppEventsRequestSerializer, CoordinateAliasRequestSerializerInterface $coordinateAliasRequestSerializer, RequestUrlBuilderInterface $urlBuilder)
     {
         $this->requestSender = $requestSender;
         $this->installedAppTransformer = $installedAppTransformer;
@@ -64,6 +66,7 @@ final class InstalledAppApi implements InstalledAppApiInterface
         $this->token = $token;
         $this->createInstalledAppEventsRequestSerializer = $createInstalledAppEventsRequestSerializer;
         $this->coordinateAliasRequestSerializer = $coordinateAliasRequestSerializer;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -146,18 +149,18 @@ final class InstalledAppApi implements InstalledAppApiInterface
      *
      * @return array<int, InstalledAppConfigInterface>
      */
-    public function getConfigs(string $installedAppId, bool $skipCache = false): array
+    public function getConfigs(string $installedAppId, bool $skipCache = false, ?string $configurationStatus = null): array
     {
+        $url = $this->urlBuilder->build(sprintf(self::API_URL_CONFIGS_SPRINTF, rawurlencode($installedAppId)), [self::KEY_CONFIGURATION_STATUS => $configurationStatus]);
         if (!$skipCache) {
-            if (isset($this->configsCache[$installedAppId])) {
-                return $this->configsCache[$installedAppId];
+            if (isset($this->configsCache[$installedAppId][$url])) {
+                return $this->configsCache[$installedAppId][$url];
             }
         }
 
-        $url = sprintf(self::API_URL_CONFIGS_SPRINTF, rawurlencode($installedAppId));
-        $items = $this->fetchList([], $url);
+        $items = $this->fetchList($url);
         $configs = $this->installedAppConfigsTransformer->transform($items);
-        $this->configsCache[$installedAppId] = $configs;
+        $this->configsCache[$installedAppId][$url] = $configs;
 
         return $configs;
     }
@@ -215,20 +218,19 @@ final class InstalledAppApi implements InstalledAppApiInterface
      *
      * @return array<int, InstalledAppInterface>
      */
-    public function getMultiple(?string $locationId = null, bool $skipCache = false): array
+    public function getMultiple(?string $locationId = null, bool $skipCache = false, ?InstalledAppListQueryInterface $query = null): array
     {
-        // Cache per location; casting keeps null and a real id as distinct
-        // string keys without adding a null-coalescing branch to this method.
-        $cacheKey = (string) $locationId;
+        // The full URL, query included, identifies the request, so it keys the cache.
+        $url = $this->urlBuilder->build(self::API_URL, [self::KEY_LOCATION_ID => $locationId], $query);
         if (!$skipCache) {
-            if (isset($this->listCache[$cacheKey])) {
-                return $this->listCache[$cacheKey];
+            if (isset($this->listCache[$url])) {
+                return $this->listCache[$url];
             }
         }
 
-        $items = $this->fetchList(self::buildQuery($locationId), self::API_URL);
+        $items = $this->fetchList($url);
         $installedApps = $this->installedAppsTransformer->transform($items);
-        $this->listCache[$cacheKey] = $installedApps;
+        $this->listCache[$url] = $installedApps;
 
         return $installedApps;
     }
@@ -239,25 +241,25 @@ final class InstalledAppApi implements InstalledAppApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function getOneById(string $installedAppId, bool $skipCache = false): InstalledAppInterface
+    public function getOneById(string $installedAppId, bool $skipCache = false, ?bool $allowed = null): InstalledAppInterface
     {
+        $url = $this->urlBuilder->build(sprintf(self::API_URL_SPRINTF, rawurlencode($installedAppId)), [self::KEY_ALLOWED => $allowed]);
         if (!$skipCache) {
-            if (isset($this->cache[$installedAppId])) {
-                return $this->cache[$installedAppId];
+            if (isset($this->cache[$installedAppId][$url])) {
+                return $this->cache[$installedAppId][$url];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($installedAppId));
         $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data)) {
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $installedApp = $this->installedAppTransformer->transform($data);
-        $this->cache[$installedAppId] = $installedApp;
+        $this->cache[$installedAppId][$url] = $installedApp;
 
         return $installedApp;
     }
@@ -276,33 +278,17 @@ final class InstalledAppApi implements InstalledAppApiInterface
     }
 
     /**
-     * @return array<string, string>
-     */
-    private static function buildQuery(?string $locationId): array
-    {
-        // Isolated so the optional filter is its own path, not multiplied
-        // against the cache and response-shape guards in getMultiple().
-        if (null === $locationId) {
-            return [];
-        }
-
-        return [self::KEY_LOCATION_ID => $locationId];
-    }
-
-    /**
-     * @param array<string, string> $query
-     *
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      *
      * @return mixed[]
      */
-    private function fetchList(array $query, string $url): array
+    private function fetchList(string $url): array
     {
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $data = $this->requestSender->get($url, $query, $headers);
+        $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data[self::KEY_ITEMS])) {
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));

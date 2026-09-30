@@ -11,6 +11,7 @@ use ChristianBrown\ApiClient\Transformer\JsonToArrayTransformer;
 use ChristianBrown\SmartThings\Api\ApiHostInterface;
 use ChristianBrown\SmartThings\Api\DriverPackageUploader;
 use ChristianBrown\SmartThings\Api\HostOverridingJsonApiRequestSender;
+use ChristianBrown\SmartThings\Api\RequestUrlBuilder;
 use ChristianBrown\SmartThings\DependencyInjection\ServiceRegistrarInterface;
 use ChristianBrown\SmartThings\SmartThingsInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -39,6 +40,7 @@ final class CoreRegistrar implements ServiceRegistrarInterface
             );
         $container->register(SmartThingsInterface::SERVICE_RAW_API_REQUEST_SENDER, ApiRequestSenderInterface::class)
             ->setFactory([new Reference(SmartThingsInterface::SERVICE_API_CLIENT), 'getApiRequestSender']);
+        $container->register(SmartThingsInterface::SERVICE_REQUEST_URL_BUILDER, RequestUrlBuilder::class);
         $container->register(SmartThingsInterface::SERVICE_JSON_TO_ARRAY_TRANSFORMER, JsonToArrayTransformer::class);
         $container->register(SmartThingsInterface::SERVICE_DRIVER_PACKAGE_UPLOADER, DriverPackageUploader::class)
             ->setArguments(

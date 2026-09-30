@@ -9,6 +9,7 @@ use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Api\ApiInterface;
 use ChristianBrown\SmartThings\Api\InstalledAppApi;
 use ChristianBrown\SmartThings\Api\InstalledAppApiInterface;
+use ChristianBrown\SmartThings\Api\RequestUrlBuilder;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
@@ -31,6 +32,7 @@ use function rawurlencode;
 use function sprintf;
 
 #[CoversClass(InstalledAppApi::class)]
+#[CoversClass(RequestUrlBuilder::class)]
 #[CoversClass(Token::class)]
 final class InstalledAppApiTest extends TestCase
 {
@@ -58,7 +60,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($request)
             ->willReturn(['test-serialized-request']);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), $serializer, self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), $serializer, self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
         $api->createEvents('test-installed-app-id', $request);
 
         $this->addToAssertionCount(1);
@@ -81,7 +83,7 @@ final class InstalledAppApiTest extends TestCase
             )
             ->willReturn([]);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
         $api->deleteCoordinateAlias('test-installed-app-id', 'test-alias-name');
 
         $this->addToAssertionCount(1);
@@ -104,7 +106,7 @@ final class InstalledAppApiTest extends TestCase
             )
             ->willReturn([]);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
         $api->deleteInstallation('test-installed-app-id');
 
         $this->addToAssertionCount(1);
@@ -122,7 +124,7 @@ final class InstalledAppApiTest extends TestCase
         $requestSender->expects(self::once())->method('delete')
             ->willReturn([]);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         $api->getOneById('test-installed-app-id');
         $api->deleteInstallation('test-installed-app-id');
@@ -157,7 +159,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data)
             ->willReturn($config);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), $configTransformer, self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), $configTransformer, self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $api->getConfig('test-installed-app-id', 'test-config-id');
 
         self::assertSame($config, $actual);
@@ -184,7 +186,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data)
             ->willReturn($config);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), $configTransformer, self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), $configTransformer, self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         // Second call for the same ids is served from the cache without hitting the API.
         self::assertSame($config, $api->getConfig('test-installed-app-id', 'test-config-id'));
@@ -219,7 +221,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data)
             ->willReturn($config);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), $configTransformer, self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), $configTransformer, self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $api->getConfig($installedAppId, $configurationId);
 
         self::assertSame($config, $actual);
@@ -253,7 +255,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data[InstalledAppApiInterface::KEY_ITEMS])
             ->willReturn($configs);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), $configsTransformer, new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), $configsTransformer, new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $api->getConfigs('test-installed-app-id');
 
         self::assertSame($configs, $actual);
@@ -282,7 +284,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data[InstalledAppApiInterface::KEY_ITEMS])
             ->willReturn($configs);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), $configsTransformer, new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), $configsTransformer, new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         // Second call for the same installed app is served from the cache without hitting the API.
         self::assertSame($configs, $api->getConfigs('test-installed-app-id'));
@@ -309,7 +311,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data)
             ->willReturn($config);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), $configTransformer, self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), $configTransformer, self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($config, $api->getConfig('test-installed-app-id', 'test-config-id'));
@@ -338,7 +340,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data[InstalledAppApiInterface::KEY_ITEMS])
             ->willReturn($configs);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), $configsTransformer, new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), $configsTransformer, new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($configs, $api->getConfigs('test-installed-app-id'));
@@ -361,7 +363,7 @@ final class InstalledAppApiTest extends TestCase
         $requestSender->expects(self::once())->method('get')
             ->willReturn($data);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(InstalledAppApiInterface::UNEXPECTED_RESPONSE_SPRINTF, InstalledAppApiInterface::KEY_ITEMS));
@@ -380,7 +382,7 @@ final class InstalledAppApiTest extends TestCase
         $requestSender->expects(self::once())->method('get')
             ->willReturn([]);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(InstalledAppApiInterface::UNEXPECTED_RESPONSE);
@@ -406,7 +408,7 @@ final class InstalledAppApiTest extends TestCase
             )
             ->willReturn($data);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $api->getCoordinateAliasCapability('test-installed-app-id', 'test-alias-name', 'test-name');
 
         self::assertSame($data, $actual);
@@ -438,7 +440,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data)
             ->willReturn($installedApp);
 
-        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $api->getMe();
 
         self::assertSame($installedApp, $actual);
@@ -465,7 +467,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data)
             ->willReturn($installedApp);
 
-        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         // Second call is served from the cache without hitting the API.
         self::assertSame($installedApp, $api->getMe());
@@ -492,7 +494,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data)
             ->willReturn($installedApp);
 
-        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($installedApp, $api->getMe());
@@ -511,7 +513,7 @@ final class InstalledAppApiTest extends TestCase
         $requestSender->expects(self::once())->method('get')
             ->willReturn([]);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(InstalledAppApiInterface::UNEXPECTED_RESPONSE);
@@ -546,7 +548,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data[InstalledAppApiInterface::KEY_ITEMS])
             ->willReturn($installedApps);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), $installedAppsTransformer, self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), $installedAppsTransformer, self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $api->getMultiple();
 
         self::assertSame($installedApps, $actual);
@@ -575,7 +577,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data[InstalledAppApiInterface::KEY_ITEMS])
             ->willReturn($installedApps);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), $installedAppsTransformer, self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), $installedAppsTransformer, self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         // Second call with the same filter is served from the cache without hitting the API.
         self::assertSame($installedApps, $api->getMultiple());
@@ -595,8 +597,8 @@ final class InstalledAppApiTest extends TestCase
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::once())->method('get')
             ->with(
-                InstalledAppApiInterface::API_URL,
-                [InstalledAppApiInterface::KEY_LOCATION_ID => 'test-location-id'],
+                InstalledAppApiInterface::API_URL.'?locationId=test-location-id',
+                [],
                 [
                     ApiInterface::HEADER_KEY_AUTHORIZATION => sprintf(TokenInterface::AUTHORIZATION_HEADER_VALUE_SPRINTF, 'test-api-token'),
                 ]
@@ -610,7 +612,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data[InstalledAppApiInterface::KEY_ITEMS])
             ->willReturn($installedApps);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), $installedAppsTransformer, self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), $installedAppsTransformer, self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $api->getMultiple('test-location-id');
 
         self::assertSame($installedApps, $actual);
@@ -638,7 +640,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data[InstalledAppApiInterface::KEY_ITEMS])
             ->willReturn($installedApps);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), $installedAppsTransformer, self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), $installedAppsTransformer, self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($installedApps, $api->getMultiple());
@@ -668,7 +670,7 @@ final class InstalledAppApiTest extends TestCase
             )
             ->willReturn($data);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(InstalledAppApiInterface::UNEXPECTED_RESPONSE_SPRINTF, InstalledAppApiInterface::KEY_ITEMS));
@@ -701,7 +703,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data)
             ->willReturn($installedApp);
 
-        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $api->getOneById('test-installed-app-id');
 
         self::assertSame($installedApp, $actual);
@@ -728,7 +730,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data)
             ->willReturn($installedApp);
 
-        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         // Second call for the same installed app is served from the cache without hitting the API.
         self::assertSame($installedApp, $api->getOneById('test-installed-app-id'));
@@ -763,7 +765,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data)
             ->willReturn($installedApp);
 
-        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
         $actual = $api->getOneById($installedAppId);
 
         self::assertSame($installedApp, $actual);
@@ -789,7 +791,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($data)
             ->willReturn($installedApp);
 
-        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, $installedAppTransformer, self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($installedApp, $api->getOneById('test-installed-app-id'));
@@ -808,7 +810,7 @@ final class InstalledAppApiTest extends TestCase
         $requestSender->expects(self::once())->method('get')
             ->willReturn([]);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class));
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), self::createStub(CoordinateAliasRequestSerializerInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(InstalledAppApiInterface::UNEXPECTED_RESPONSE);
@@ -839,7 +841,7 @@ final class InstalledAppApiTest extends TestCase
             ->with($request)
             ->willReturn(['test-serialized-request']);
 
-        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), $serializer);
+        $api = new InstalledAppApi($requestSender, self::createStub(InstalledAppTransformerInterface::class), self::createStub(InstalledAppsTransformerInterface::class), self::createStub(InstalledAppConfigTransformerInterface::class), self::createStub(InstalledAppConfigsTransformerInterface::class), new Token('test-api-token'), self::createStub(CreateInstalledAppEventsRequestSerializerInterface::class), $serializer, new RequestUrlBuilder());
         $api->putCoordinateAlias('test-installed-app-id', 'test-alias-name', $request);
 
         $this->addToAssertionCount(1);

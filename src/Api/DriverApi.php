@@ -31,24 +31,26 @@ final class DriverApi implements DriverApiInterface
     private DriverTransformerInterface $driverTransformer;
 
     /**
-     * @var ?array<int, DriverInterface>
+     * @var array<string, array<int, DriverInterface>>
      */
-    private ?array $listCache = null;
+    private array $listCache = [];
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
+    private RequestUrlBuilderInterface $urlBuilder;
 
     /**
      * @var array<string, DriverInterface>
      */
     private array $versionCache = [];
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DriverTransformerInterface $driverTransformer, DriversTransformerInterface $driversTransformer, TokenInterface $token, DriverPackageUploaderInterface $driverPackageUploader)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, DriverTransformerInterface $driverTransformer, DriversTransformerInterface $driversTransformer, TokenInterface $token, DriverPackageUploaderInterface $driverPackageUploader, RequestUrlBuilderInterface $urlBuilder)
     {
         $this->requestSender = $requestSender;
         $this->driverTransformer = $driverTransformer;
         $this->driversTransformer = $driversTransformer;
         $this->token = $token;
         $this->driverPackageUploader = $driverPackageUploader;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -63,7 +65,7 @@ final class DriverApi implements DriverApiInterface
         $this->requestSender->delete($url, [], $headers);
         unset($this->cache[$driverId]);
         $this->versionCache = [];
-        $this->listCache = null;
+        $this->listCache = [];
         $this->defaultsCache = null;
     }
 
@@ -90,6 +92,9 @@ final class DriverApi implements DriverApiInterface
     }
 
     /**
+     * @param bool                    $skipCache Fetch again instead of using the cached list
+     * @param null|array<int, string> $driverIds
+     *
      * @phpstan-impure
      *
      * @throws RequestExceptionInterface
@@ -97,16 +102,17 @@ final class DriverApi implements DriverApiInterface
      *
      * @return array<int, DriverInterface>
      */
-    public function getMultiple(bool $skipCache = false): array
+    public function getMultiple(bool $skipCache = false, ?array $driverIds = null): array
     {
+        $url = $this->urlBuilder->build(self::API_URL, [self::KEY_DRIVER_IDS => $driverIds]);
         if (!$skipCache) {
-            if (null !== $this->listCache) {
-                return $this->listCache;
+            if (isset($this->listCache[$url])) {
+                return $this->listCache[$url];
             }
         }
 
-        $drivers = $this->fetchList(self::API_URL);
-        $this->listCache = $drivers;
+        $drivers = $this->fetchList($url);
+        $this->listCache[$url] = $drivers;
 
         return $drivers;
     }
@@ -170,7 +176,7 @@ final class DriverApi implements DriverApiInterface
         }
         $driver = $this->driverTransformer->transform($data);
         $this->cache[$driver->getDriverId()] = $driver;
-        $this->listCache = null;
+        $this->listCache = [];
 
         return $driver;
     }

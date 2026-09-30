@@ -10,6 +10,7 @@ use ChristianBrown\SmartThings\Api\ApiInterface;
 use ChristianBrown\SmartThings\Api\DriverApi;
 use ChristianBrown\SmartThings\Api\DriverApiInterface;
 use ChristianBrown\SmartThings\Api\DriverPackageUploaderInterface;
+use ChristianBrown\SmartThings\Api\RequestUrlBuilder;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
@@ -25,6 +26,7 @@ use function rawurlencode;
 use function sprintf;
 
 #[CoversClass(DriverApi::class)]
+#[CoversClass(RequestUrlBuilder::class)]
 #[CoversClass(Token::class)]
 final class DriverApiTest extends TestCase
 {
@@ -45,7 +47,7 @@ final class DriverApiTest extends TestCase
             )
             ->willReturn([]);
 
-        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
         $api->deleteDriver('test-driver-id');
 
         $this->addToAssertionCount(1);
@@ -63,7 +65,7 @@ final class DriverApiTest extends TestCase
         $requestSender->expects(self::once())->method('delete')
             ->willReturn([]);
 
-        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         $api->getOneById('test-driver-id');
         $api->deleteDriver('test-driver-id');
@@ -100,7 +102,7 @@ final class DriverApiTest extends TestCase
             ->with($data[DriverApiInterface::KEY_ITEMS])
             ->willReturn($drivers);
 
-        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), $driversTransformer, new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), $driversTransformer, new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         self::assertSame($drivers, $api->getDefaults());
     }
@@ -119,7 +121,7 @@ final class DriverApiTest extends TestCase
         $driversTransformer = self::createMock(DriversTransformerInterface::class);
         $driversTransformer->expects(self::once())->method('transform')->willReturn($drivers);
 
-        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), $driversTransformer, new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), $driversTransformer, new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         // Second call is served from the cache without hitting the API.
         self::assertSame($drivers, $api->getDefaults());
@@ -140,7 +142,7 @@ final class DriverApiTest extends TestCase
         $driversTransformer = self::createMock(DriversTransformerInterface::class);
         $driversTransformer->expects(self::exactly(2))->method('transform')->willReturn($drivers);
 
-        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), $driversTransformer, new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), $driversTransformer, new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($drivers, $api->getDefaults());
@@ -175,7 +177,7 @@ final class DriverApiTest extends TestCase
             ->with($data[DriverApiInterface::KEY_ITEMS])
             ->willReturn($drivers);
 
-        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), $driversTransformer, new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), $driversTransformer, new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         self::assertSame($drivers, $api->getMultiple());
     }
@@ -194,7 +196,7 @@ final class DriverApiTest extends TestCase
         $driversTransformer = self::createMock(DriversTransformerInterface::class);
         $driversTransformer->expects(self::once())->method('transform')->willReturn($drivers);
 
-        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), $driversTransformer, new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), $driversTransformer, new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         // Second call is served from the cache without hitting the API.
         self::assertSame($drivers, $api->getMultiple());
@@ -215,7 +217,7 @@ final class DriverApiTest extends TestCase
         $driversTransformer = self::createMock(DriversTransformerInterface::class);
         $driversTransformer->expects(self::exactly(2))->method('transform')->willReturn($drivers);
 
-        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), $driversTransformer, new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), $driversTransformer, new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($drivers, $api->getMultiple());
@@ -237,7 +239,7 @@ final class DriverApiTest extends TestCase
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::once())->method('get')->willReturn($data);
 
-        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DriverApiInterface::UNEXPECTED_RESPONSE_SPRINTF, DriverApiInterface::KEY_ITEMS));
@@ -270,7 +272,7 @@ final class DriverApiTest extends TestCase
             ->with($data)
             ->willReturn($driver);
 
-        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         self::assertSame($driver, $api->getOneById('test-driver-id'));
     }
@@ -301,7 +303,7 @@ final class DriverApiTest extends TestCase
             ->with($data)
             ->willReturn($driver);
 
-        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         self::assertSame($driver, $api->getOneByIdAndVersion('test-driver-id', 'test-version'));
     }
@@ -320,7 +322,7 @@ final class DriverApiTest extends TestCase
         $driverTransformer = self::createMock(DriverTransformerInterface::class);
         $driverTransformer->expects(self::once())->method('transform')->willReturn($driver);
 
-        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         // Second call for the same id and version is served from the cache without hitting the API.
         self::assertSame($driver, $api->getOneByIdAndVersion('test-driver-id', 'test-version'));
@@ -355,7 +357,7 @@ final class DriverApiTest extends TestCase
             ->with($data)
             ->willReturn($driver);
 
-        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         self::assertSame($driver, $api->getOneByIdAndVersion($driverId, $version));
     }
@@ -374,7 +376,7 @@ final class DriverApiTest extends TestCase
         $driverTransformer = self::createMock(DriverTransformerInterface::class);
         $driverTransformer->expects(self::exactly(2))->method('transform')->willReturn($driver);
 
-        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($driver, $api->getOneByIdAndVersion('test-driver-id', 'test-version'));
@@ -392,7 +394,7 @@ final class DriverApiTest extends TestCase
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::once())->method('get')->willReturn([]);
 
-        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DriverApiInterface::UNEXPECTED_RESPONSE);
@@ -413,7 +415,7 @@ final class DriverApiTest extends TestCase
         $driverTransformer = self::createMock(DriverTransformerInterface::class);
         $driverTransformer->expects(self::once())->method('transform')->willReturn($driver);
 
-        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         // Second call for the same id is served from the cache without hitting the API.
         self::assertSame($driver, $api->getOneById('test-driver-id'));
@@ -448,7 +450,7 @@ final class DriverApiTest extends TestCase
             ->with($data)
             ->willReturn($driver);
 
-        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         self::assertSame($driver, $api->getOneById($driverId));
     }
@@ -467,7 +469,7 @@ final class DriverApiTest extends TestCase
         $driverTransformer = self::createMock(DriverTransformerInterface::class);
         $driverTransformer->expects(self::exactly(2))->method('transform')->willReturn($driver);
 
-        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($driver, $api->getOneById('test-driver-id'));
@@ -485,7 +487,7 @@ final class DriverApiTest extends TestCase
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
         $requestSender->expects(self::once())->method('get')->willReturn([]);
 
-        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class));
+        $api = new DriverApi($requestSender, self::createStub(DriverTransformerInterface::class), self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), self::createStub(DriverPackageUploaderInterface::class), new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DriverApiInterface::UNEXPECTED_RESPONSE);
@@ -521,7 +523,7 @@ final class DriverApiTest extends TestCase
 
         $requestSender = self::createStub(JsonApiRequestSenderInterface::class);
 
-        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), $uploader);
+        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), $uploader, new RequestUrlBuilder());
 
         self::assertSame($driver, $api->uploadDriverPackage('test-zip-contents'));
     }
@@ -545,7 +547,7 @@ final class DriverApiTest extends TestCase
         $uploader = self::createStub(DriverPackageUploaderInterface::class);
         $uploader->method('upload')->willReturn(['test-driver-data']);
 
-        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), $uploader);
+        $api = new DriverApi($requestSender, $driverTransformer, self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), $uploader, new RequestUrlBuilder());
 
         $api->getOneById('test-driver-id');
         $api->uploadDriverPackage('test-zip-contents');
@@ -563,7 +565,7 @@ final class DriverApiTest extends TestCase
         $uploader = self::createStub(DriverPackageUploaderInterface::class);
         $uploader->method('upload')->willReturn([]);
 
-        $api = new DriverApi(self::createStub(JsonApiRequestSenderInterface::class), self::createStub(DriverTransformerInterface::class), self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), $uploader);
+        $api = new DriverApi(self::createStub(JsonApiRequestSenderInterface::class), self::createStub(DriverTransformerInterface::class), self::createStub(DriversTransformerInterface::class), new Token('test-api-token'), $uploader, new RequestUrlBuilder());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DriverApiInterface::UNEXPECTED_RESPONSE);

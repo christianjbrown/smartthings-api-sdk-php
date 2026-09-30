@@ -18,6 +18,7 @@ interface ServiceApiInterface extends ApiInterface
     public const string CACHE_KEY_SPRINTF = '%s/%s';
     public const string KEY_ISA_ID = 'isaId';
     public const string KEY_NAME = 'name';
+    public const string KEY_POSTAL_CODE = 'postalCode';
     public const string UNEXPECTED_RESPONSE = 'Response not set or not an array';
 
     /**
@@ -38,9 +39,9 @@ interface ServiceApiInterface extends ApiInterface
     /**
      * @return array<int, string>
      */
-    public function getAvailableCapabilities(string $locationId, bool $skipCache = false): array;
+    public function getAvailableCapabilities(string $locationId, bool $skipCache = false, ?string $postalCode = null): array;
 
-    public function getCapability(string $locationId, string $name, bool $skipCache = false): ServiceCapabilityDataInterface;
+    public function getCapability(string $locationId, string $name, bool $skipCache = false, ?string $postalCode = null): ServiceCapabilityDataInterface;
 
     public function getLocationInfo(string $locationId, bool $skipCache = false): ServiceLocationInfoInterface;
 

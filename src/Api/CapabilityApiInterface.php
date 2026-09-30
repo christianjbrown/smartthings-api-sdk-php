@@ -27,7 +27,9 @@ interface CapabilityApiInterface extends ApiInterface
     public const string API_URL_VERSIONS_SPRINTF = 'https://api.smartthings.com/v1/capabilities/%s';
     public const string CACHE_KEY_SPRINTF = '%s/%d';
     public const string KEY_ITEMS = 'items';
+    public const string KEY_MANUFACTURER_NAME = 'manufacturerName';
     public const string KEY_NAMESPACE = 'namespace';
+    public const string KEY_PRESENTATION_ID = 'presentationId';
     public const string TRANSLATIONS_CACHE_KEY_SPRINTF = '%s/%d/%s';
     public const string UNEXPECTED_RESPONSE = 'Response not set or not an array';
     public const string UNEXPECTED_RESPONSE_SPRINTF = '%s not set or not an array';
@@ -76,7 +78,7 @@ interface CapabilityApiInterface extends ApiInterface
 
     public function getPresentation(string $capabilityId, int $version, bool $skipCache = false): CapabilityPresentationInterface;
 
-    public function getTranslations(string $capabilityId, int $version, string $tag, bool $skipCache = false): LocalizationInterface;
+    public function getTranslations(string $capabilityId, int $version, string $tag, bool $skipCache = false, ?string $presentationId = null, ?string $manufacturerName = null): LocalizationInterface;
 
     /**
      * @return array<int, CapabilityInterface>

@@ -36,13 +36,15 @@ final class LocationModeApi implements LocationModeApiInterface
     private ModeTransformerInterface $modeTransformer;
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
+    private RequestUrlBuilderInterface $urlBuilder;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, ModeTransformerInterface $modeTransformer, ModesTransformerInterface $modesTransformer, TokenInterface $token)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, ModeTransformerInterface $modeTransformer, ModesTransformerInterface $modesTransformer, TokenInterface $token, RequestUrlBuilderInterface $urlBuilder)
     {
         $this->requestSender = $requestSender;
         $this->modeTransformer = $modeTransformer;
         $this->modesTransformer = $modesTransformer;
         $this->token = $token;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -100,14 +102,14 @@ final class LocationModeApi implements LocationModeApiInterface
     /**
      * @throws RequestExceptionInterface
      */
-    public function deleteMode(LocationInterface $location, string $modeId): void
+    public function deleteMode(LocationInterface $location, string $modeId, ?string $requestId = null): void
     {
         $locationId = $location->getLocationId();
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($locationId), rawurlencode($modeId));
+        $url = $this->urlBuilder->build(sprintf(self::API_URL_SPRINTF, rawurlencode($locationId), rawurlencode($modeId)), [self::KEY_REQUEST_ID => $requestId]);
         $this->requestSender->delete($url, [], $headers);
         unset($this->cache[$modeId], $this->listCache[$locationId]);
     }

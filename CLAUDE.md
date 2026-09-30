@@ -70,6 +70,12 @@ mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
   `SmartThingsInterface` itself is split into nine narrower role interfaces by domain (see
   `src/SmartThings*Interface.php`), which it extends — existing code that type-hints against
   `SmartThingsInterface` is unaffected.
+- **Query parameters** — optional query parameters go through `Api\RequestUrlBuilder` (behind
+  `RequestUrlBuilderInterface`, injected into each client that takes any): it drops nulls, sends lists as
+  repeated parameters and booleans as `true`/`false`, and returns the URL with its query. The busier
+  lists take a `Model\*ListQuery` object (`QueryParametersInterface::getParameters()`); explicit
+  arguments win over the object. Caches are keyed by the full URL, so a filtered call never returns an
+  unfiltered result.
 - **`Api/`** — HTTP clients (`DeviceApi`, `DeviceStatusApi`, `LocationApi`, `LocationRoomApi`). Each is
   constructed with a `JsonApiRequestSenderInterface` (from `christianjbrown/api-client` — no
   Guzzle/PSR-18 used directly), its transformer(s), and a `string $apiToken`. They send an

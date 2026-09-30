@@ -12,6 +12,7 @@ use ChristianBrown\SmartThings\Model\DeviceCommandResultInterface;
 use ChristianBrown\SmartThings\Model\DeviceEventInterface;
 use ChristianBrown\SmartThings\Model\DeviceInstallRequestInterface;
 use ChristianBrown\SmartThings\Model\DeviceInterface;
+use ChristianBrown\SmartThings\Model\DeviceListQueryInterface;
 use ChristianBrown\SmartThings\Model\UpdateDeviceRequestInterface;
 use ChristianBrown\SmartThings\Serializer\DeviceCommandSerializerInterface;
 use ChristianBrown\SmartThings\Serializer\DeviceEventSerializerInterface;
@@ -33,7 +34,7 @@ final class DeviceApi implements DeviceApiInterface
     private array $cache = [];
 
     /**
-     * @var array<string, DeviceInterface>
+     * @var array<string, array<string, DeviceInterface>>
      */
     private array $deviceCache = [];
     private DeviceCommandResultsTransformerInterface $deviceCommandResultsTransformer;
@@ -45,8 +46,9 @@ final class DeviceApi implements DeviceApiInterface
     private JsonApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
     private UpdateDeviceRequestSerializerInterface $updateDeviceRequestSerializer;
+    private RequestUrlBuilderInterface $urlBuilder;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceTransformerInterface $deviceTransformer, DevicesTransformerInterface $devicesTransformer, TokenInterface $token, DeviceCommandSerializerInterface $deviceCommandSerializer, DeviceCommandResultsTransformerInterface $deviceCommandResultsTransformer, DeviceInstallRequestSerializerInterface $deviceInstallRequestSerializer, UpdateDeviceRequestSerializerInterface $updateDeviceRequestSerializer, DeviceEventSerializerInterface $deviceEventSerializer)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceTransformerInterface $deviceTransformer, DevicesTransformerInterface $devicesTransformer, TokenInterface $token, DeviceCommandSerializerInterface $deviceCommandSerializer, DeviceCommandResultsTransformerInterface $deviceCommandResultsTransformer, DeviceInstallRequestSerializerInterface $deviceInstallRequestSerializer, UpdateDeviceRequestSerializerInterface $updateDeviceRequestSerializer, DeviceEventSerializerInterface $deviceEventSerializer, RequestUrlBuilderInterface $urlBuilder)
     {
         $this->requestSender = $requestSender;
         $this->deviceTransformer = $deviceTransformer;
@@ -57,6 +59,7 @@ final class DeviceApi implements DeviceApiInterface
         $this->deviceInstallRequestSerializer = $deviceInstallRequestSerializer;
         $this->updateDeviceRequestSerializer = $updateDeviceRequestSerializer;
         $this->deviceEventSerializer = $deviceEventSerializer;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -124,21 +127,20 @@ final class DeviceApi implements DeviceApiInterface
      *
      * @return array<int, DeviceInterface>
      */
-    public function getMultiple(?string $locationId = null, bool $skipCache = false): array
+    public function getMultiple(?string $locationId = null, bool $skipCache = false, ?DeviceListQueryInterface $query = null): array
     {
-        // Cache per location; casting keeps null and a real id as distinct
-        // string keys without adding a null-coalescing branch to this method.
-        $cacheKey = (string) $locationId;
+        // The full URL, query included, identifies the request, so it keys the cache.
+        $url = $this->urlBuilder->build(self::API_URL, [self::KEY_LOCATION_ID => $locationId], $query);
         if (!$skipCache) {
-            if (isset($this->cache[$cacheKey])) {
-                return $this->cache[$cacheKey];
+            if (isset($this->cache[$url])) {
+                return $this->cache[$url];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $data = $this->requestSender->get(self::API_URL, self::buildQuery($locationId), $headers);
+        $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data[self::KEY_ITEMS])) {
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
@@ -147,7 +149,7 @@ final class DeviceApi implements DeviceApiInterface
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
         }
         $devices = $this->devicesTransformer->transform($data[self::KEY_ITEMS]);
-        $this->cache[$cacheKey] = $devices;
+        $this->cache[$url] = $devices;
 
         return $devices;
     }
@@ -158,25 +160,25 @@ final class DeviceApi implements DeviceApiInterface
      * @throws RequestExceptionInterface
      * @throws UnexpectedResponseException
      */
-    public function getOneById(string $deviceId, bool $skipCache = false): DeviceInterface
+    public function getOneById(string $deviceId, bool $skipCache = false, ?bool $includeStatus = null): DeviceInterface
     {
+        $url = $this->urlBuilder->build(sprintf(self::API_URL_SPRINTF, rawurlencode($deviceId)), [self::KEY_INCLUDE_STATUS => $includeStatus]);
         if (!$skipCache) {
-            if (isset($this->deviceCache[$deviceId])) {
-                return $this->deviceCache[$deviceId];
+            if (isset($this->deviceCache[$deviceId][$url])) {
+                return $this->deviceCache[$deviceId][$url];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $url = sprintf(self::API_URL_SPRINTF, rawurlencode($deviceId));
         $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data)) {
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $device = $this->deviceTransformer->transform($data);
-        $this->deviceCache[$deviceId] = $device;
+        $this->deviceCache[$deviceId][$url] = $device;
 
         return $device;
     }
@@ -199,7 +201,7 @@ final class DeviceApi implements DeviceApiInterface
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $device = $this->deviceTransformer->transform($data);
-        $this->deviceCache[$device->getDeviceId()] = $device;
+        $this->deviceCache[$device->getDeviceId()] = [sprintf(self::API_URL_SPRINTF, rawurlencode($device->getDeviceId())) => $device];
 
         return $device;
     }
@@ -223,7 +225,7 @@ final class DeviceApi implements DeviceApiInterface
             throw new UnexpectedResponseException(self::UNEXPECTED_RESPONSE);
         }
         $device = $this->deviceTransformer->transform($data);
-        $this->deviceCache[$deviceId] = $device;
+        $this->deviceCache[$deviceId] = [$url => $device];
 
         return $device;
     }
@@ -240,19 +242,5 @@ final class DeviceApi implements DeviceApiInterface
         }
 
         return [self::KEY_ORDERED => $ordered ? 'true' : 'false'];
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private static function buildQuery(?string $locationId): array
-    {
-        // Isolated so the optional filter is its own path, not multiplied
-        // against the cache and response-shape guards in getMultiple().
-        if (null === $locationId) {
-            return [];
-        }
-
-        return [self::KEY_LOCATION_ID => $locationId];
     }
 }

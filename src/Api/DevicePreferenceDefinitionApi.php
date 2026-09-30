@@ -10,6 +10,7 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DevicePreferenceDefinitionInterface;
 use ChristianBrown\SmartThings\Model\LocaleReferenceInterface;
 use ChristianBrown\SmartThings\Model\LocalizationInterface;
+use ChristianBrown\SmartThings\Model\PreferenceListQueryInterface;
 use ChristianBrown\SmartThings\Model\PreferenceLocalizationRequestInterface;
 use ChristianBrown\SmartThings\Model\PreferenceRequestInterface;
 use ChristianBrown\SmartThings\Serializer\PreferenceLocalizationRequestSerializerInterface;
@@ -52,8 +53,9 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
      * @var array<string, LocalizationInterface>
      */
     private array $translationsCache = [];
+    private RequestUrlBuilderInterface $urlBuilder;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DevicePreferenceDefinitionTransformerInterface $devicePreferenceDefinitionTransformer, DevicePreferenceDefinitionsTransformerInterface $devicePreferenceDefinitionsTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token, PreferenceRequestSerializerInterface $preferenceRequestSerializer, PreferenceLocalizationRequestSerializerInterface $preferenceLocalizationRequestSerializer)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, DevicePreferenceDefinitionTransformerInterface $devicePreferenceDefinitionTransformer, DevicePreferenceDefinitionsTransformerInterface $devicePreferenceDefinitionsTransformer, LocaleReferencesTransformerInterface $localeReferencesTransformer, LocalizationTransformerInterface $localizationTransformer, TokenInterface $token, PreferenceRequestSerializerInterface $preferenceRequestSerializer, PreferenceLocalizationRequestSerializerInterface $preferenceLocalizationRequestSerializer, RequestUrlBuilderInterface $urlBuilder)
     {
         $this->requestSender = $requestSender;
         $this->devicePreferenceDefinitionTransformer = $devicePreferenceDefinitionTransformer;
@@ -63,6 +65,7 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
         $this->token = $token;
         $this->preferenceRequestSerializer = $preferenceRequestSerializer;
         $this->preferenceLocalizationRequestSerializer = $preferenceLocalizationRequestSerializer;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -168,21 +171,20 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
      *
      * @return array<int, DevicePreferenceDefinitionInterface>
      */
-    public function getMultiple(?string $namespace = null, bool $skipCache = false): array
+    public function getMultiple(?string $namespace = null, bool $skipCache = false, ?PreferenceListQueryInterface $query = null): array
     {
-        // Cache per namespace; casting keeps null and a real namespace as distinct
-        // string keys without adding a null-coalescing branch to this method.
-        $cacheKey = (string) $namespace;
+        // The full URL, query included, identifies the request, so it keys the cache.
+        $url = $this->urlBuilder->build(self::API_URL, [self::KEY_NAMESPACE => $namespace], $query);
         if (!$skipCache) {
-            if (isset($this->listCache[$cacheKey])) {
-                return $this->listCache[$cacheKey];
+            if (isset($this->listCache[$url])) {
+                return $this->listCache[$url];
             }
         }
 
         $headers = [
             self::HEADER_KEY_AUTHORIZATION => $this->token->toAuthorizationHeaderValue(),
         ];
-        $data = $this->requestSender->get(self::API_URL, self::buildQuery($namespace), $headers);
+        $data = $this->requestSender->get($url, [], $headers);
 
         if (empty($data[self::KEY_ITEMS])) {
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
@@ -191,7 +193,7 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
             throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_RESPONSE_SPRINTF, self::KEY_ITEMS));
         }
         $definitions = $this->devicePreferenceDefinitionsTransformer->transform($data[self::KEY_ITEMS]);
-        $this->listCache[$cacheKey] = $definitions;
+        $this->listCache[$url] = $definitions;
 
         return $definitions;
     }
@@ -303,19 +305,5 @@ final class DevicePreferenceDefinitionApi implements DevicePreferenceDefinitionA
         unset($this->localesCache[$preferenceId]);
 
         return $result;
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private static function buildQuery(?string $namespace): array
-    {
-        // Isolated so the optional filter is its own path, not multiplied
-        // against the cache and response-shape guards in getMultiple().
-        if (null === $namespace) {
-            return [];
-        }
-
-        return [self::KEY_NAMESPACE => $namespace];
     }
 }

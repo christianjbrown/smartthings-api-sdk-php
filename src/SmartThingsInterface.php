@@ -416,6 +416,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_PUSH_BUTTON_WITH_AVAILABLE_SIZE_TRANSFORMER = 'smartthings.transformer.push_button_with_available_size_transformer';
     public const string SERVICE_RAW_API_REQUEST_SENDER = 'smartthings.raw_api_request_sender';
     public const string SERVICE_RAW_JSON_API_REQUEST_SENDER = 'smartthings.raw_json_api_request_sender';
+    public const string SERVICE_REQUEST_URL_BUILDER = 'smartthings.api.request_url_builder';
     public const string SERVICE_RESTRICTION_SERIALIZER = 'smartthings.serializer.restriction_serializer';
     public const string SERVICE_RESTRICTION_TRANSFORMER = 'smartthings.transformer.restriction_transformer';
     public const string SERVICE_ROOM_INDOOR_MAP_TRANSFORMER = 'smartthings.transformer.room_indoor_map_transformer';

@@ -209,6 +209,28 @@ $ruleResult = $ruleApi->execute('a-rule-id'); // RuleExecutionResultInterface
 echo $ruleResult->getResult() ?? 'unknown', "\n"; // e.g. "Success"
 ```
 
+### Filtering and query parameters
+
+List and get calls take the API's optional query parameters. The busier lists take a small query
+object; the rest take plain optional arguments after `$skipCache`. Lists such as `capability` or
+`driverIds` are sent as repeated parameters, as the API expects.
+
+```php
+use ChristianBrown\SmartThings\Model\DeviceListQuery;
+
+$query = (new DeviceListQuery())
+    ->setCapabilities(['switch', 'switchLevel'])
+    ->setCapabilitiesMode('or')
+    ->setIncludeStatus(true);
+$devices = $deviceApi->getMultiple(null, false, $query);
+
+$device = $deviceApi->getOneById('a-device-id', false, true); // includeStatus
+```
+
+The other query objects are `InstalledAppListQuery`, `AppListQuery`, `RuleListQuery`,
+`LocationListQuery` and `PreferenceListQuery`. Each response is cached per full request, so
+the same call with a different filter is fetched again.
+
 ## :rotating_light: Error handling
 
 Everything this library throws implements `ChristianBrown\SmartThings\Exception\ExceptionInterface`, so a single `catch` covers it all:
@@ -291,7 +313,8 @@ transformer for a collaborator you leave out. Every collaborator of an `*Api` cl
 transformers and serializers that take collaborators, is now a required constructor argument
 typed on its interface. Code that uses the `SmartThings` facade (`new SmartThings($token)` and the
 `get*Api()` getters) is unaffected, because the facade's registrars wire everything. Code that
-constructs `*Api` classes by hand has to pass the collaborators; the registrars list them.
+constructs `*Api` classes by hand has to pass the collaborators, including the
+`RequestUrlBuilderInterface` that the clients with query parameters take; the registrars list them.
 
 ## :page_facing_up: License
 
