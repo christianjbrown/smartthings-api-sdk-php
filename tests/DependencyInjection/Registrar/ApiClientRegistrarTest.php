@@ -48,6 +48,7 @@ final class ApiClientRegistrarTest extends TestCase
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_RULE_API));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCENE_API));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEDULE_API));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEMA_APP_OWNER_API));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SCHEMA_CONNECTOR_API));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SERVICE_API));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_SUBSCRIPTION_API));
@@ -178,6 +179,8 @@ final class ApiClientRegistrarTest extends TestCase
         $container->register(SmartThingsInterface::SERVICE_SCHEDULES_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEDULE_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_APPS_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_ORGANIZATION_SCHEMA_APPS_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_USER_SCHEMA_APPS_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_PAGE_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_SERVICE_CAPABILITY_DATA_TRANSFORMER, stdClass::class);

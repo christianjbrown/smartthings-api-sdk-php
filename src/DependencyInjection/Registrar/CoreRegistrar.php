@@ -19,6 +19,8 @@ use ChristianBrown\SmartThings\Api\RedirectLocationResponseMapper;
 use ChristianBrown\SmartThings\Api\RequestUrlBuilder;
 use ChristianBrown\SmartThings\DependencyInjection\ServiceRegistrarInterface;
 use ChristianBrown\SmartThings\SmartThingsInterface;
+use ChristianBrown\SmartThings\Transformer\ApiErrorTransformer;
+use ChristianBrown\SmartThings\Transformer\ErrorResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\ValueReader;
 use Closure;
 use GuzzleHttp\Client;
@@ -62,6 +64,15 @@ final class CoreRegistrar implements ServiceRegistrarInterface
             ->setFactory([new Reference(SmartThingsInterface::SERVICE_API_CLIENT), 'getApiRequestSender']);
         $container->register(SmartThingsInterface::SERVICE_REQUEST_URL_BUILDER, RequestUrlBuilder::class);
         $container->register(SmartThingsInterface::SERVICE_VALUE_READER, ValueReader::class);
+        $container->register(SmartThingsInterface::SERVICE_API_ERROR_TRANSFORMER, ApiErrorTransformer::class)
+            ->setArguments([$container->getDefinition(SmartThingsInterface::SERVICE_VALUE_READER)]);
+        $container->register(SmartThingsInterface::SERVICE_ERROR_RESPONSE_TRANSFORMER, ErrorResponseTransformer::class)
+            ->setArguments(
+                [
+                    $container->getDefinition(SmartThingsInterface::SERVICE_API_ERROR_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_VALUE_READER),
+                ]
+            );
         $container->register(SmartThingsInterface::SERVICE_ALERT_LINK_RESPONSE_MAPPER, RedirectLocationResponseMapper::class);
         $container->register(SmartThingsInterface::SERVICE_ALERT_LINK_MIDDLEWARE, Closure::class)
             ->setFactory([Middleware::class, 'mapResponse'])

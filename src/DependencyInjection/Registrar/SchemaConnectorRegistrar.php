@@ -12,10 +12,12 @@ use ChristianBrown\SmartThings\Serializer\SchemaOauthCredentialsRequestSerialize
 use ChristianBrown\SmartThings\SmartThingsInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledSchemaAppTransformer;
+use ChristianBrown\SmartThings\Transformer\OrganizationSchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppReceiptTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppsTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaAppTransformer;
 use ChristianBrown\SmartThings\Transformer\SchemaPageTransformer;
+use ChristianBrown\SmartThings\Transformer\UserSchemaAppsTransformer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -53,5 +55,19 @@ final class SchemaConnectorRegistrar implements ServiceRegistrarInterface
             );
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_PAGE_TRANSFORMER, SchemaPageTransformer::class);
         $container->register(SmartThingsInterface::SERVICE_SCHEMA_APP_RECEIPT_TRANSFORMER, SchemaAppReceiptTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_ORGANIZATION_SCHEMA_APPS_TRANSFORMER, OrganizationSchemaAppsTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_SCHEMA_APPS_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VALUE_READER),
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_USER_SCHEMA_APPS_TRANSFORMER, UserSchemaAppsTransformer::class)
+            ->setArguments(
+                [
+                    new Reference(SmartThingsInterface::SERVICE_SCHEMA_APPS_TRANSFORMER),
+                    new Reference(SmartThingsInterface::SERVICE_VALUE_READER),
+                ]
+            );
     }
 }

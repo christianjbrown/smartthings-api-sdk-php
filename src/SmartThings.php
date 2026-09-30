@@ -28,6 +28,7 @@ use ChristianBrown\SmartThings\Api\RuleApiInterface;
 use ChristianBrown\SmartThings\Api\SceneApiInterface;
 use ChristianBrown\SmartThings\Api\ScheduleApiInterface;
 use ChristianBrown\SmartThings\Api\SchemaAppInviteApiInterface;
+use ChristianBrown\SmartThings\Api\SchemaAppOwnerApiInterface;
 use ChristianBrown\SmartThings\Api\SchemaConnectorApiInterface;
 use ChristianBrown\SmartThings\Api\ServiceApiInterface;
 use ChristianBrown\SmartThings\Api\SubscriptionApiInterface;
@@ -36,6 +37,7 @@ use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Api\VirtualDeviceApiInterface;
 use ChristianBrown\SmartThings\DependencyInjection\ContainerFactory;
+use ChristianBrown\SmartThings\Transformer\ErrorResponseTransformerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -209,6 +211,20 @@ final class SmartThings implements SmartThingsInterface
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    public function getErrorResponseTransformer(): ErrorResponseTransformerInterface
+    {
+        /**
+         * @var ErrorResponseTransformerInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_ERROR_RESPONSE_TRANSFORMER);
+
+        return $service;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function getHubApi(): HubApiInterface
     {
         /**
@@ -355,6 +371,20 @@ final class SmartThings implements SmartThingsInterface
          * @var SchemaAppInviteApiInterface $service
          */
         $service = $this->container->get(self::SERVICE_SCHEMA_APP_INVITE_API);
+
+        return $service;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getSchemaAppOwnerApi(): SchemaAppOwnerApiInterface
+    {
+        /**
+         * @var SchemaAppOwnerApiInterface $service
+         */
+        $service = $this->container->get(self::SERVICE_SCHEMA_APP_OWNER_API);
 
         return $service;
     }

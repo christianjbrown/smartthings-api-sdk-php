@@ -37,6 +37,8 @@ final class CoreRegistrarTest extends TestCase
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_ALERT_LINK_RAW_JSON_API_REQUEST_SENDER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_ALERT_LINK_JSON_API_REQUEST_SENDER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_ARRAY_TO_JSON_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_API_ERROR_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_ERROR_RESPONSE_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_JSON_TO_ARRAY_TRANSFORMER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_DRIVER_PACKAGE_UPLOADER));
     }

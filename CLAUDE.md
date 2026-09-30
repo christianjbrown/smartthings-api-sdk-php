@@ -67,7 +67,7 @@ mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
   capabilities, apps, edge, organizations/services, i18n, and so on), each implementing
   `ServiceRegistrarInterface::register(ContainerBuilder $container): void`. Adding a new API group
   means adding one registrar and one line in `ContainerFactory`, not editing a single giant method.
-  `SmartThingsInterface` itself is split into nine narrower role interfaces by domain (see
+  `SmartThingsInterface` itself is split into ten narrower role interfaces by domain (see
   `src/SmartThings*Interface.php`), which it extends — existing code that type-hints against
   `SmartThingsInterface` is unaffected.
 - **Query parameters** — optional query parameters go through `Api\RequestUrlBuilder` (behind
