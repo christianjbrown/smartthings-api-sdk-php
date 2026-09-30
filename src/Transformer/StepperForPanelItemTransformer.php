@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\StepperForPanelItem;
 use ChristianBrown\SmartThings\Model\StepperForPanelItemCommandInterface;
 use ChristianBrown\SmartThings\Model\StepperForPanelItemInterface;
@@ -13,7 +12,6 @@ use ChristianBrown\SmartThings\Model\StepperForPanelItemStateInterface;
 use function is_array;
 use function is_numeric;
 use function is_string;
-use function sprintf;
 
 final class StepperForPanelItemTransformer implements StepperForPanelItemTransformerInterface
 {
@@ -55,13 +53,13 @@ final class StepperForPanelItemTransformer implements StepperForPanelItemTransfo
     /**
      * @param mixed[] $data
      */
-    private function requireCommand(array $data): StepperForPanelItemCommandInterface
+    private function requireCommand(array $data): ?StepperForPanelItemCommandInterface
     {
         if (!isset($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
         if (!is_array($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
 
         return $this->stepperForPanelItemCommandTransformer->transform($data[self::KEY_COMMAND]);
@@ -75,10 +73,10 @@ final class StepperForPanelItemTransformer implements StepperForPanelItemTransfo
     private static function requireRange(array $data): array
     {
         if (!isset($data[self::KEY_RANGE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RANGE));
+            return [];
         }
         if (!is_array($data[self::KEY_RANGE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RANGE));
+            return [];
         }
 
         return $data[self::KEY_RANGE];
@@ -87,13 +85,13 @@ final class StepperForPanelItemTransformer implements StepperForPanelItemTransfo
     /**
      * @param mixed[] $data
      */
-    private static function requireSize(array $data): string
+    private static function requireSize(array $data): ?string
     {
         if (empty($data[self::KEY_SIZE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_SIZE));
+            return null;
         }
         if (!is_string($data[self::KEY_SIZE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_SIZE));
+            return null;
         }
 
         return $data[self::KEY_SIZE];
@@ -102,13 +100,13 @@ final class StepperForPanelItemTransformer implements StepperForPanelItemTransfo
     /**
      * @param mixed[] $data
      */
-    private function requireState(array $data): StepperForPanelItemStateInterface
+    private function requireState(array $data): ?StepperForPanelItemStateInterface
     {
         if (!isset($data[self::KEY_STATE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_STATE));
+            return null;
         }
         if (!is_array($data[self::KEY_STATE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_STATE));
+            return null;
         }
 
         return $this->stepperForPanelItemStateTransformer->transform($data[self::KEY_STATE]);
@@ -117,13 +115,13 @@ final class StepperForPanelItemTransformer implements StepperForPanelItemTransfo
     /**
      * @param mixed[] $data
      */
-    private static function requireStep(array $data): float
+    private static function requireStep(array $data): ?float
     {
         if (!isset($data[self::KEY_STEP])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_NUMBER_SPRINTF, self::KEY_STEP));
+            return null;
         }
         if (!is_numeric($data[self::KEY_STEP])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_NUMBER_SPRINTF, self::KEY_STEP));
+            return null;
         }
 
         return (float) $data[self::KEY_STEP];

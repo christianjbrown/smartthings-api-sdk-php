@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AttributeStateInterface;
 use ChristianBrown\SmartThings\Model\CapabilityConfigurationInterface;
 use ChristianBrown\SmartThings\Model\DeviceCapabilityReference;
@@ -17,8 +16,6 @@ use ChristianBrown\SmartThings\Transformer\RestrictionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(DeviceCapabilityReference::class)]
 #[CoversClass(DeviceCapabilityReferenceTransformer::class)]
@@ -75,6 +72,28 @@ final class DeviceCapabilityReferenceTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getConfig());
         self::assertNull($transformer->transform($base + [DeviceCapabilityReferenceTransformerInterface::KEY_CONFIG => 'test-not-array'])->getConfig());
         self::assertSame($capabilityConfigurationModel, $transformer->transform($base + [DeviceCapabilityReferenceTransformerInterface::KEY_CONFIG => ['test-nested']])->getConfig());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new DeviceCapabilityReferenceTransformer(self::createStub(CapabilityConfigurationTransformerInterface::class), self::createStub(RestrictionTransformerInterface::class), self::createStub(AttributeStateTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'idAbsent' => [[], 'getId', null];
+        yield 'idWrongType' => [[DeviceCapabilityReferenceTransformerInterface::KEY_ID => 42], 'getId', null];
     }
 
     /**
@@ -167,27 +186,5 @@ final class DeviceCapabilityReferenceTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getStatus());
         self::assertNull($transformer->transform($base + [DeviceCapabilityReferenceTransformerInterface::KEY_STATUS => 'test-not-array'])->getStatus());
         self::assertSame(['test-key' => $attributeStateModel], $transformer->transform($base + [DeviceCapabilityReferenceTransformerInterface::KEY_STATUS => ['test-key' => ['test-nested'], 'test-skipped' => 'test-not-array']])->getStatus());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new DeviceCapabilityReferenceTransformer(self::createStub(CapabilityConfigurationTransformerInterface::class), self::createStub(RestrictionTransformerInterface::class), self::createStub(AttributeStateTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'idAbsent' => [[], sprintf(DeviceCapabilityReferenceTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceCapabilityReferenceTransformerInterface::KEY_ID)];
-        yield 'idWrongType' => [[DeviceCapabilityReferenceTransformerInterface::KEY_ID => 42], sprintf(DeviceCapabilityReferenceTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceCapabilityReferenceTransformerInterface::KEY_ID)];
     }
 }

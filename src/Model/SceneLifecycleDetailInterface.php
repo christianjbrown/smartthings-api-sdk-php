@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface SceneLifecycleDetailInterface
 {
-    public function getLocationId(): string;
+    public function getLocationId(): ?string;
 
     public function getSubscriptionName(): ?string;
 

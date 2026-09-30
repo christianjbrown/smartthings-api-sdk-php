@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceIntegrationProfileKeyInterface;
 use ChristianBrown\SmartThings\Model\ZWaveManufacturerFingerprint;
 use ChristianBrown\SmartThings\Transformer\DeviceIntegrationProfileKeyTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\ZWaveManufacturerFingerprintTransform
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(ZWaveManufacturerFingerprint::class)]
 #[CoversClass(ZWaveManufacturerFingerprintTransformer::class)]
@@ -53,6 +50,28 @@ final class ZWaveManufacturerFingerprintTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getDeviceIntegrationProfileKey());
         self::assertNull($transformer->transform($base + [ZWaveManufacturerFingerprintTransformerInterface::KEY_DEVICE_INTEGRATION_PROFILE_KEY => 'test-not-array'])->getDeviceIntegrationProfileKey());
         self::assertSame($deviceIntegrationProfileKeyModel, $transformer->transform($base + [ZWaveManufacturerFingerprintTransformerInterface::KEY_DEVICE_INTEGRATION_PROFILE_KEY => ['test-nested']])->getDeviceIntegrationProfileKey());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new ZWaveManufacturerFingerprintTransformer(self::createStub(DeviceIntegrationProfileKeyTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'productTypeAbsent' => [[], 'getProductType', null];
+        yield 'productTypeWrongType' => [[ZWaveManufacturerFingerprintTransformerInterface::KEY_PRODUCT_TYPE => 'not-int'], 'getProductType', null];
     }
 
     /**
@@ -95,27 +114,5 @@ final class ZWaveManufacturerFingerprintTransformerTest extends TestCase
         self::assertNull($actual->getManufacturerId());
         self::assertNull($actual->getProductId());
         self::assertNull($actual->getDeviceIntegrationProfileKey());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new ZWaveManufacturerFingerprintTransformer(self::createStub(DeviceIntegrationProfileKeyTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'productTypeAbsent' => [[], sprintf(ZWaveManufacturerFingerprintTransformerInterface::UNEXPECTED_INT_SPRINTF, ZWaveManufacturerFingerprintTransformerInterface::KEY_PRODUCT_TYPE)];
-        yield 'productTypeWrongType' => [[ZWaveManufacturerFingerprintTransformerInterface::KEY_PRODUCT_TYPE => 'not-int'], sprintf(ZWaveManufacturerFingerprintTransformerInterface::UNEXPECTED_INT_SPRINTF, ZWaveManufacturerFingerprintTransformerInterface::KEY_PRODUCT_TYPE)];
     }
 }

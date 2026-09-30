@@ -6,15 +6,15 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class ServiceSubscriptionReceipt implements ServiceSubscriptionReceiptInterface
 {
-    private string $locationId;
+    private ?string $locationId;
     private ?string $subscriptionId = null;
 
-    public function __construct(string $locationId)
+    public function __construct(?string $locationId)
     {
         $this->locationId = $locationId;
     }
 
-    public function getLocationId(): string
+    public function getLocationId(): ?string
     {
         return $this->locationId;
     }

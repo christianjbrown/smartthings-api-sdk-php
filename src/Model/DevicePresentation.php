@@ -36,13 +36,13 @@ final class DevicePresentation implements DevicePresentationInterface
      */
     private ?array $language = null;
     private ?string $manufacturerName = null;
-    private string $mnmn;
+    private ?string $mnmn;
     private ?string $presentationId = null;
     private ?PresentationSettingsForDevicePresentationInterface $presentationSettings = null;
     private ?string $version = null;
-    private string $vid;
+    private ?string $vid;
 
-    public function __construct(string $mnmn, string $vid)
+    public function __construct(?string $mnmn, ?string $vid)
     {
         $this->mnmn = $mnmn;
         $this->vid = $vid;
@@ -113,7 +113,7 @@ final class DevicePresentation implements DevicePresentationInterface
         return $this->manufacturerName;
     }
 
-    public function getMnmn(): string
+    public function getMnmn(): ?string
     {
         return $this->mnmn;
     }
@@ -133,7 +133,7 @@ final class DevicePresentation implements DevicePresentationInterface
         return $this->version;
     }
 
-    public function getVid(): string
+    public function getVid(): ?string
     {
         return $this->vid;
     }

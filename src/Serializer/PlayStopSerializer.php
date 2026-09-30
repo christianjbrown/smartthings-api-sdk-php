@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Serializer;
 
+use ChristianBrown\SmartThings\Model\PlayStopCommandInterface;
+
 use ChristianBrown\SmartThings\Model\PlayStopInterface;
+use ChristianBrown\SmartThings\Model\PlayStopStateInterface;
+
+use function array_filter;
 
 final class PlayStopSerializer implements PlayStopSerializerInterface
 {
@@ -22,9 +27,33 @@ final class PlayStopSerializer implements PlayStopSerializerInterface
      */
     public function serialize(PlayStopInterface $model): array
     {
-        return [
-            self::KEY_COMMAND => $this->playStopCommandSerializer->serialize($model->getCommand()),
-            self::KEY_STATE => $this->playStopStateSerializer->serialize($model->getState()),
-        ];
+        return array_filter([
+            self::KEY_COMMAND => $this->serializeOptionalPlayStopCommand($model->getCommand()),
+            self::KEY_STATE => $this->serializeOptionalPlayStopState($model->getState()),
+        ], static fn (mixed $value): bool => null !== $value);
+    }
+
+    /**
+     * @return null|mixed[]
+     */
+    private function serializeOptionalPlayStopCommand(?PlayStopCommandInterface $value): ?array
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->playStopCommandSerializer->serialize($value);
+    }
+
+    /**
+     * @return null|mixed[]
+     */
+    private function serializeOptionalPlayStopState(?PlayStopStateInterface $value): ?array
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->playStopStateSerializer->serialize($value);
     }
 }

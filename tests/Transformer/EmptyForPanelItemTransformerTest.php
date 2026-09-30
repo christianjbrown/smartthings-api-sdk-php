@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\EmptyForPanelItem;
 use ChristianBrown\SmartThings\Transformer\EmptyForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\EmptyForPanelItemTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(EmptyForPanelItem::class)]
 #[CoversClass(EmptyForPanelItemTransformer::class)]
@@ -34,22 +31,22 @@ final class EmptyForPanelItemTransformerTest extends TestCase
     /**
      * @param array<string, mixed> $data
      */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
     {
         $transformer = new EmptyForPanelItemTransformer();
 
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
     }
 
     /**
-     * @return iterable<string, array{array<string, mixed>, string}>
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
      */
-    public static function provideTransformUnexpectedCases(): iterable
+    public static function provideTransformLenientCases(): iterable
     {
-        yield 'sizeAbsent' => [[], sprintf(EmptyForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, EmptyForPanelItemTransformerInterface::KEY_SIZE)];
-        yield 'sizeWrongType' => [[EmptyForPanelItemTransformerInterface::KEY_SIZE => 42], sprintf(EmptyForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, EmptyForPanelItemTransformerInterface::KEY_SIZE)];
+        yield 'sizeAbsent' => [[], 'getSize', null];
+        yield 'sizeWrongType' => [[EmptyForPanelItemTransformerInterface::KEY_SIZE => 42], 'getSize', null];
     }
 }

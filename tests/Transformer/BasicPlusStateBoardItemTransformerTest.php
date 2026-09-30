@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\BasicPlusStateBoardColorsInterface;
 use ChristianBrown\SmartThings\Model\BasicPlusStateBoardItem;
@@ -17,8 +16,6 @@ use ChristianBrown\SmartThings\Transformer\VisibleConditionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(BasicPlusStateBoardItem::class)]
 #[CoversClass(BasicPlusStateBoardItemTransformer::class)]
@@ -107,6 +104,34 @@ final class BasicPlusStateBoardItemTransformerTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new BasicPlusStateBoardItemTransformer(self::createStub(AlternativeItemTransformerInterface::class), self::createStub(BasicPlusStateBoardColorsTransformerInterface::class), self::createStub(VisibleConditionTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'capabilityAbsent' => [[BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusStateBoardItemTransformerInterface::KEY_VALUE => 'test-value', BasicPlusStateBoardItemTransformerInterface::KEY_LABEL => 'test-label'], 'getCapability', null];
+        yield 'capabilityWrongType' => [[BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusStateBoardItemTransformerInterface::KEY_VALUE => 'test-value', BasicPlusStateBoardItemTransformerInterface::KEY_LABEL => 'test-label', BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
+        yield 'componentAbsent' => [[BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusStateBoardItemTransformerInterface::KEY_VALUE => 'test-value', BasicPlusStateBoardItemTransformerInterface::KEY_LABEL => 'test-label'], 'getComponent', null];
+        yield 'componentWrongType' => [[BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusStateBoardItemTransformerInterface::KEY_VALUE => 'test-value', BasicPlusStateBoardItemTransformerInterface::KEY_LABEL => 'test-label', BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT => 42], 'getComponent', null];
+        yield 'valueAbsent' => [[BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusStateBoardItemTransformerInterface::KEY_LABEL => 'test-label'], 'getValue', null];
+        yield 'valueWrongType' => [[BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusStateBoardItemTransformerInterface::KEY_LABEL => 'test-label', BasicPlusStateBoardItemTransformerInterface::KEY_VALUE => 42], 'getValue', null];
+        yield 'labelAbsent' => [[BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusStateBoardItemTransformerInterface::KEY_VALUE => 'test-value'], 'getLabel', null];
+        yield 'labelWrongType' => [[BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusStateBoardItemTransformerInterface::KEY_VALUE => 'test-value', BasicPlusStateBoardItemTransformerInterface::KEY_LABEL => 42], 'getLabel', null];
+    }
+
+    /**
      * Each optional field in each of its states: absent, present but the wrong type, or valid.
      *
      * @param array<string, mixed> $extra
@@ -166,34 +191,6 @@ final class BasicPlusStateBoardItemTransformerTest extends TestCase
         self::assertNull($actual->getColors());
         self::assertNull($actual->getOperator());
         self::assertNull($actual->getVisibleConditions());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new BasicPlusStateBoardItemTransformer(self::createStub(AlternativeItemTransformerInterface::class), self::createStub(BasicPlusStateBoardColorsTransformerInterface::class), self::createStub(VisibleConditionTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'capabilityAbsent' => [[BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusStateBoardItemTransformerInterface::KEY_VALUE => 'test-value', BasicPlusStateBoardItemTransformerInterface::KEY_LABEL => 'test-label'], sprintf(BasicPlusStateBoardItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusStateBoardItemTransformerInterface::KEY_VALUE => 'test-value', BasicPlusStateBoardItemTransformerInterface::KEY_LABEL => 'test-label', BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY => 42], sprintf(BasicPlusStateBoardItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY)];
-        yield 'componentAbsent' => [[BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusStateBoardItemTransformerInterface::KEY_VALUE => 'test-value', BasicPlusStateBoardItemTransformerInterface::KEY_LABEL => 'test-label'], sprintf(BasicPlusStateBoardItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT)];
-        yield 'componentWrongType' => [[BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusStateBoardItemTransformerInterface::KEY_VALUE => 'test-value', BasicPlusStateBoardItemTransformerInterface::KEY_LABEL => 'test-label', BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT => 42], sprintf(BasicPlusStateBoardItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT)];
-        yield 'valueAbsent' => [[BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusStateBoardItemTransformerInterface::KEY_LABEL => 'test-label'], sprintf(BasicPlusStateBoardItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusStateBoardItemTransformerInterface::KEY_VALUE)];
-        yield 'valueWrongType' => [[BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusStateBoardItemTransformerInterface::KEY_LABEL => 'test-label', BasicPlusStateBoardItemTransformerInterface::KEY_VALUE => 42], sprintf(BasicPlusStateBoardItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusStateBoardItemTransformerInterface::KEY_VALUE)];
-        yield 'labelAbsent' => [[BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusStateBoardItemTransformerInterface::KEY_VALUE => 'test-value'], sprintf(BasicPlusStateBoardItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusStateBoardItemTransformerInterface::KEY_LABEL)];
-        yield 'labelWrongType' => [[BasicPlusStateBoardItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusStateBoardItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusStateBoardItemTransformerInterface::KEY_VALUE => 'test-value', BasicPlusStateBoardItemTransformerInterface::KEY_LABEL => 42], sprintf(BasicPlusStateBoardItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusStateBoardItemTransformerInterface::KEY_LABEL)];
     }
 
     public function testTransformVisibleConditions(): void

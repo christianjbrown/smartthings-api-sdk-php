@@ -7,9 +7,9 @@ namespace ChristianBrown\SmartThings\Model;
 final class CapabilityAttributeLabel implements CapabilityAttributeLabelInterface
 {
     private ?string $description = null;
-    private string $label;
+    private ?string $label;
 
-    public function __construct(string $label)
+    public function __construct(?string $label)
     {
         $this->label = $label;
     }
@@ -19,7 +19,7 @@ final class CapabilityAttributeLabel implements CapabilityAttributeLabelInterfac
         return $this->description;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }

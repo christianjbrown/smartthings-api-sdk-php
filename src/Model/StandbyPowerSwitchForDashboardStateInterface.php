@@ -13,11 +13,11 @@ interface StandbyPowerSwitchForDashboardStateInterface
 
     public function getLabel(): ?string;
 
-    public function getOff(): string;
+    public function getOff(): ?string;
 
-    public function getOn(): string;
+    public function getOn(): ?string;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function getValueType(): ?string;
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\StandbyPowerSwitchForDashboardState;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\StandbyPowerSwitchForDashboardStateTr
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(StandbyPowerSwitchForDashboardState::class)]
 #[CoversClass(StandbyPowerSwitchForDashboardStateTransformer::class)]
@@ -60,6 +57,32 @@ final class StandbyPowerSwitchForDashboardStateTransformerTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new StandbyPowerSwitchForDashboardStateTransformer(self::createStub(AlternativeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'valueAbsent' => [[StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_ON => 'test-on', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_OFF => 'test-off'], 'getValue', null];
+        yield 'valueWrongType' => [[StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_ON => 'test-on', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_OFF => 'test-off', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_VALUE => 42], 'getValue', null];
+        yield 'onAbsent' => [[StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_OFF => 'test-off'], 'getOn', null];
+        yield 'onWrongType' => [[StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_OFF => 'test-off', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_ON => 42], 'getOn', null];
+        yield 'offAbsent' => [[StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_ON => 'test-on'], 'getOff', null];
+        yield 'offWrongType' => [[StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_ON => 'test-on', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_OFF => 42], 'getOff', null];
+    }
+
+    /**
      * Each optional field in each of its states: absent, present but the wrong type, or valid.
      *
      * @param array<string, mixed> $extra
@@ -99,31 +122,5 @@ final class StandbyPowerSwitchForDashboardStateTransformerTest extends TestCase
         self::assertNull($actual->getValueType());
         self::assertNull($actual->getLabel());
         self::assertNull($actual->getAlternatives());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new StandbyPowerSwitchForDashboardStateTransformer(self::createStub(AlternativeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'valueAbsent' => [[StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_ON => 'test-on', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_OFF => 'test-off'], sprintf(StandbyPowerSwitchForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_VALUE)];
-        yield 'valueWrongType' => [[StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_ON => 'test-on', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_OFF => 'test-off', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_VALUE => 42], sprintf(StandbyPowerSwitchForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_VALUE)];
-        yield 'onAbsent' => [[StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_OFF => 'test-off'], sprintf(StandbyPowerSwitchForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_ON)];
-        yield 'onWrongType' => [[StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_OFF => 'test-off', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_ON => 42], sprintf(StandbyPowerSwitchForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_ON)];
-        yield 'offAbsent' => [[StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_ON => 'test-on'], sprintf(StandbyPowerSwitchForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_OFF)];
-        yield 'offWrongType' => [[StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_ON => 'test-on', StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_OFF => 42], sprintf(StandbyPowerSwitchForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, StandbyPowerSwitchForDashboardStateTransformerInterface::KEY_OFF)];
     }
 }

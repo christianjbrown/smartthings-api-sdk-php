@@ -16,7 +16,7 @@ interface EnumSliderForAutomationConditionInterface
      */
     public function getSupportedOperators(): ?array;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     /**
      * @param null|array<int, EnumSliderForAutomationConditionSupportedOperatorsItemInterface> $value

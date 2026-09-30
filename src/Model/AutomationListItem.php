@@ -6,10 +6,10 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class AutomationListItem implements AutomationListItemInterface
 {
-    private string $capability;
+    private ?string $capability;
     private ?string $component = null;
     private ?string $description = null;
-    private string $displayType;
+    private ?string $displayType;
     private ?DynamicListForAutomationConditionInterface $dynamicList = null;
     private ?bool $emphasis = null;
     private ?EnumSliderForAutomationConditionInterface $enumSlider = null;
@@ -18,7 +18,7 @@ final class AutomationListItem implements AutomationListItemInterface
      * @var null|array<int, ExcludedConditionItemInterface>
      */
     private ?array $exclusion = null;
-    private string $label;
+    private ?string $label;
     private ?ListForAutomationConditionInterface $list = null;
     private ?NumberFieldForAutomationConditionInterface $numberField = null;
     private ?SliderForAutomationConditionInterface $slider = null;
@@ -26,14 +26,14 @@ final class AutomationListItem implements AutomationListItemInterface
     private ?int $version = null;
     private ?VisibleConditionInterface $visibleCondition = null;
 
-    public function __construct(string $capability, string $label, string $displayType)
+    public function __construct(?string $capability, ?string $label, ?string $displayType)
     {
         $this->capability = $capability;
         $this->label = $label;
         $this->displayType = $displayType;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
@@ -48,7 +48,7 @@ final class AutomationListItem implements AutomationListItemInterface
         return $this->description;
     }
 
-    public function getDisplayType(): string
+    public function getDisplayType(): ?string
     {
         return $this->displayType;
     }
@@ -76,7 +76,7 @@ final class AutomationListItem implements AutomationListItemInterface
         return $this->exclusion;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }

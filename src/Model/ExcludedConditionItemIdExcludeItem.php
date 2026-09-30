@@ -10,11 +10,11 @@ final class ExcludedConditionItemIdExcludeItem implements ExcludedConditionItemI
      * @var null|array<int, ExcludedConditionItemIdExcludeItemAttributesItemInterface>
      */
     private ?array $attributes = null;
-    private string $capability;
+    private ?string $capability;
     private ?string $component = null;
     private ?int $version = null;
 
-    public function __construct(string $capability)
+    public function __construct(?string $capability)
     {
         $this->capability = $capability;
     }
@@ -27,7 +27,7 @@ final class ExcludedConditionItemIdExcludeItem implements ExcludedConditionItemI
         return $this->attributes;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }

@@ -6,21 +6,21 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class StepperForPanelItem implements StepperForPanelItemInterface
 {
-    private StepperForPanelItemCommandInterface $command;
+    private ?StepperForPanelItemCommandInterface $command;
 
     /**
      * @var mixed[]
      */
     private array $range;
-    private string $size;
-    private StepperForPanelItemStateInterface $state;
-    private float $step;
+    private ?string $size;
+    private ?StepperForPanelItemStateInterface $state;
+    private ?float $step;
     private ?string $supportedValues = null;
 
     /**
      * @phpstan-param mixed[] $range
      */
-    public function __construct(StepperForPanelItemCommandInterface $command, float $step, array $range, StepperForPanelItemStateInterface $state, string $size)
+    public function __construct(?StepperForPanelItemCommandInterface $command, ?float $step, array $range, ?StepperForPanelItemStateInterface $state, ?string $size)
     {
         $this->command = $command;
         $this->step = $step;
@@ -29,7 +29,7 @@ final class StepperForPanelItem implements StepperForPanelItemInterface
         $this->size = $size;
     }
 
-    public function getCommand(): StepperForPanelItemCommandInterface
+    public function getCommand(): ?StepperForPanelItemCommandInterface
     {
         return $this->command;
     }
@@ -42,17 +42,17 @@ final class StepperForPanelItem implements StepperForPanelItemInterface
         return $this->range;
     }
 
-    public function getSize(): string
+    public function getSize(): ?string
     {
         return $this->size;
     }
 
-    public function getState(): StepperForPanelItemStateInterface
+    public function getState(): ?StepperForPanelItemStateInterface
     {
         return $this->state;
     }
 
-    public function getStep(): float
+    public function getStep(): ?float
     {
         return $this->step;
     }

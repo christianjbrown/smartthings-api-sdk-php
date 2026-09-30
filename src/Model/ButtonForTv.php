@@ -7,13 +7,13 @@ namespace ChristianBrown\SmartThings\Model;
 final class ButtonForTv implements ButtonForTvInterface
 {
     private ?string $argument = null;
-    private string $capability;
-    private string $command;
-    private string $component;
+    private ?string $capability;
+    private ?string $command;
+    private ?string $component;
     private ?string $iconUrl = null;
     private ?int $version = null;
 
-    public function __construct(string $capability, string $component, string $command)
+    public function __construct(?string $capability, ?string $component, ?string $command)
     {
         $this->capability = $capability;
         $this->component = $component;
@@ -25,17 +25,17 @@ final class ButtonForTv implements ButtonForTvInterface
         return $this->argument;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }

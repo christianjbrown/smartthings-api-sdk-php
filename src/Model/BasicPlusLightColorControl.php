@@ -6,14 +6,14 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class BasicPlusLightColorControl implements BasicPlusLightColorControlInterface
 {
-    private string $capability;
-    private BasicPlusLightColorControlColorInterface $color;
-    private string $command;
-    private string $component;
+    private ?string $capability;
+    private ?BasicPlusLightColorControlColorInterface $color;
+    private ?string $command;
+    private ?string $component;
     private ?string $value = null;
     private ?int $version = null;
 
-    public function __construct(string $component, string $capability, string $command, BasicPlusLightColorControlColorInterface $color)
+    public function __construct(?string $component, ?string $capability, ?string $command, ?BasicPlusLightColorControlColorInterface $color)
     {
         $this->component = $component;
         $this->capability = $capability;
@@ -21,22 +21,22 @@ final class BasicPlusLightColorControl implements BasicPlusLightColorControlInte
         $this->color = $color;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getColor(): BasicPlusLightColorControlColorInterface
+    public function getColor(): ?BasicPlusLightColorControlColorInterface
     {
         return $this->color;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }

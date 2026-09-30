@@ -11,5 +11,5 @@ interface DriverPermissionInterface
      */
     public function getAttributes(): array;
 
-    public function getName(): string;
+    public function getName(): ?string;
 }

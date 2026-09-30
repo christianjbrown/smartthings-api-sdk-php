@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\PreferenceOptionLocalization;
 use ChristianBrown\SmartThings\Transformer\PreferenceOptionLocalizationTransformer;
 use ChristianBrown\SmartThings\Transformer\PreferenceOptionLocalizationTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(PreferenceOptionLocalization::class)]
 #[CoversClass(PreferenceOptionLocalizationTransformer::class)]
@@ -34,22 +31,22 @@ final class PreferenceOptionLocalizationTransformerTest extends TestCase
     /**
      * @param array<string, mixed> $data
      */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
     {
         $transformer = new PreferenceOptionLocalizationTransformer();
 
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
     }
 
     /**
-     * @return iterable<string, array{array<string, mixed>, string}>
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
      */
-    public static function provideTransformUnexpectedCases(): iterable
+    public static function provideTransformLenientCases(): iterable
     {
-        yield 'labelAbsent' => [[], sprintf(PreferenceOptionLocalizationTransformerInterface::UNEXPECTED_STRING_SPRINTF, PreferenceOptionLocalizationTransformerInterface::KEY_LABEL)];
-        yield 'labelWrongType' => [[PreferenceOptionLocalizationTransformerInterface::KEY_LABEL => 42], sprintf(PreferenceOptionLocalizationTransformerInterface::UNEXPECTED_STRING_SPRINTF, PreferenceOptionLocalizationTransformerInterface::KEY_LABEL)];
+        yield 'labelAbsent' => [[], 'getLabel', null];
+        yield 'labelWrongType' => [[PreferenceOptionLocalizationTransformerInterface::KEY_LABEL => 42], 'getLabel', null];
     }
 }

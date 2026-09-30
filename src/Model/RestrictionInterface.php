@@ -8,7 +8,7 @@ interface RestrictionInterface
 {
     public function getHistoryRetentionTTLDays(): ?int;
 
-    public function getTier(): int;
+    public function getTier(): ?int;
 
     public function getVisibleWhenRestricted(): ?bool;
 

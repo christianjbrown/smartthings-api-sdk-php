@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Serializer;
 
+use ChristianBrown\SmartThings\Model\BasicPlusLightColorControlColorInterface;
 use ChristianBrown\SmartThings\Model\BasicPlusLightColorControlInterface;
 
 use function array_filter;
@@ -28,10 +29,22 @@ final class BasicPlusLightColorControlSerializer implements BasicPlusLightColorC
             self::KEY_VERSION => $model->getVersion(),
             self::KEY_COMMAND => $model->getCommand(),
             self::KEY_VALUE => $model->getValue(),
-            self::KEY_COLOR => $this->basicPlusLightColorControlColorSerializer->serialize($model->getColor()),
+            self::KEY_COLOR => $this->serializeOptionalBasicPlusLightColorControlColor($model->getColor()),
         ];
 
         // Omit null optionals rather than sending them as explicit nulls.
         return array_filter($serialized, static fn (mixed $value): bool => null !== $value);
+    }
+
+    /**
+     * @return null|mixed[]
+     */
+    private function serializeOptionalBasicPlusLightColorControlColor(?BasicPlusLightColorControlColorInterface $value): ?array
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->basicPlusLightColorControlColorSerializer->serialize($value);
     }
 }

@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface PlayStopInterface
 {
-    public function getCommand(): PlayStopCommandInterface;
+    public function getCommand(): ?PlayStopCommandInterface;
 
-    public function getState(): PlayStopStateInterface;
+    public function getState(): ?PlayStopStateInterface;
 }

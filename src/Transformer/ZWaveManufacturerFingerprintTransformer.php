@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ZWaveManufacturerFingerprint;
 use ChristianBrown\SmartThings\Model\ZWaveManufacturerFingerprintInterface;
 
 use function is_array;
 use function is_int;
-use function sprintf;
 
 final class ZWaveManufacturerFingerprintTransformer implements ZWaveManufacturerFingerprintTransformerInterface
 {
@@ -80,13 +78,13 @@ final class ZWaveManufacturerFingerprintTransformer implements ZWaveManufacturer
     /**
      * @param mixed[] $data
      */
-    private static function requireProductType(array $data): int
+    private static function requireProductType(array $data): ?int
     {
         if (!isset($data[self::KEY_PRODUCT_TYPE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_INT_SPRINTF, self::KEY_PRODUCT_TYPE));
+            return null;
         }
         if (!is_int($data[self::KEY_PRODUCT_TYPE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_INT_SPRINTF, self::KEY_PRODUCT_TYPE));
+            return null;
         }
 
         return $data[self::KEY_PRODUCT_TYPE];

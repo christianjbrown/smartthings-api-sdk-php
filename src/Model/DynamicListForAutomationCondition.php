@@ -11,11 +11,11 @@ final class DynamicListForAutomationCondition implements DynamicListForAutomatio
      */
     private ?array $alternatives = null;
     private ?bool $multiSelectable = null;
-    private SupportedValuesForDynamicListInterface $supportedValues;
-    private string $value;
+    private ?SupportedValuesForDynamicListInterface $supportedValues;
+    private ?string $value;
     private ?string $valueType = null;
 
-    public function __construct(string $value, SupportedValuesForDynamicListInterface $supportedValues)
+    public function __construct(?string $value, ?SupportedValuesForDynamicListInterface $supportedValues)
     {
         $this->value = $value;
         $this->supportedValues = $supportedValues;
@@ -34,12 +34,12 @@ final class DynamicListForAutomationCondition implements DynamicListForAutomatio
         return $this->multiSelectable;
     }
 
-    public function getSupportedValues(): SupportedValuesForDynamicListInterface
+    public function getSupportedValues(): ?SupportedValuesForDynamicListInterface
     {
         return $this->supportedValues;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

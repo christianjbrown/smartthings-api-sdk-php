@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\VisibleConditionForDetailView;
 use ChristianBrown\SmartThings\Transformer\VisibleConditionForDetailViewTransformer;
 use ChristianBrown\SmartThings\Transformer\VisibleConditionForDetailViewTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(VisibleConditionForDetailView::class)]
 #[CoversClass(VisibleConditionForDetailViewTransformer::class)]
@@ -43,6 +40,36 @@ final class VisibleConditionForDetailViewTransformerTest extends TestCase
         self::assertSame('test-capability', $actual->getCapability());
         self::assertSame(7, $actual->getVersion());
         self::assertTrue($actual->getHideOnUnmatch());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new VisibleConditionForDetailViewTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'valueAbsent' => [[VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getValue', null];
+        yield 'valueWrongType' => [[VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 42], 'getValue', null];
+        yield 'operatorAbsent' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getOperator', null];
+        yield 'operatorWrongType' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 42], 'getOperator', null];
+        yield 'operandAbsent' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getOperand', null];
+        yield 'operandWrongType' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 42], 'getOperand', null];
+        yield 'componentAbsent' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getComponent', null];
+        yield 'componentWrongType' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 42], 'getComponent', null];
+        yield 'capabilityAbsent' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component'], 'getCapability', null];
+        yield 'capabilityWrongType' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
     }
 
     /**
@@ -85,35 +112,5 @@ final class VisibleConditionForDetailViewTransformerTest extends TestCase
         self::assertNull($actual->getValueType());
         self::assertNull($actual->getVersion());
         self::assertNull($actual->getHideOnUnmatch());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new VisibleConditionForDetailViewTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'valueAbsent' => [[VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(VisibleConditionForDetailViewTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDetailViewTransformerInterface::KEY_VALUE)];
-        yield 'valueWrongType' => [[VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 42], sprintf(VisibleConditionForDetailViewTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDetailViewTransformerInterface::KEY_VALUE)];
-        yield 'operatorAbsent' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(VisibleConditionForDetailViewTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR)];
-        yield 'operatorWrongType' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 42], sprintf(VisibleConditionForDetailViewTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR)];
-        yield 'operandAbsent' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(VisibleConditionForDetailViewTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND)];
-        yield 'operandWrongType' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 42], sprintf(VisibleConditionForDetailViewTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND)];
-        yield 'componentAbsent' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(VisibleConditionForDetailViewTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT)];
-        yield 'componentWrongType' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 42], sprintf(VisibleConditionForDetailViewTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT)];
-        yield 'capabilityAbsent' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component'], sprintf(VisibleConditionForDetailViewTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[VisibleConditionForDetailViewTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDetailViewTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDetailViewTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDetailViewTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY => 42], sprintf(VisibleConditionForDetailViewTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDetailViewTransformerInterface::KEY_CAPABILITY)];
     }
 }

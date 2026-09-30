@@ -6,21 +6,21 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class CronSchedule implements CronScheduleInterface
 {
-    private string $expression;
-    private string $timezone;
+    private ?string $expression;
+    private ?string $timezone;
 
-    public function __construct(string $expression, string $timezone)
+    public function __construct(?string $expression, ?string $timezone)
     {
         $this->expression = $expression;
         $this->timezone = $timezone;
     }
 
-    public function getExpression(): string
+    public function getExpression(): ?string
     {
         return $this->expression;
     }
 
-    public function getTimezone(): string
+    public function getTimezone(): ?string
     {
         return $this->timezone;
     }

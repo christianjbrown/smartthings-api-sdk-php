@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CronSchedule;
 use ChristianBrown\SmartThings\Model\CronScheduleInterface;
 
 use function is_string;
-use function sprintf;
 
 final class CronScheduleTransformer implements CronScheduleTransformerInterface
 {
@@ -26,13 +24,13 @@ final class CronScheduleTransformer implements CronScheduleTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireExpression(array $data): string
+    private static function requireExpression(array $data): ?string
     {
         if (empty($data[self::KEY_EXPRESSION])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_EXPRESSION));
+            return null;
         }
         if (!is_string($data[self::KEY_EXPRESSION])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_EXPRESSION));
+            return null;
         }
 
         return $data[self::KEY_EXPRESSION];
@@ -41,13 +39,13 @@ final class CronScheduleTransformer implements CronScheduleTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireTimezone(array $data): string
+    private static function requireTimezone(array $data): ?string
     {
         if (empty($data[self::KEY_TIMEZONE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_TIMEZONE));
+            return null;
         }
         if (!is_string($data[self::KEY_TIMEZONE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_TIMEZONE));
+            return null;
         }
 
         return $data[self::KEY_TIMEZONE];

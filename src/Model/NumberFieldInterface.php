@@ -8,7 +8,7 @@ interface NumberFieldInterface
 {
     public function getArgumentType(): ?string;
 
-    public function getCommand(): string;
+    public function getCommand(): ?string;
 
     /**
      * @return null|mixed[]

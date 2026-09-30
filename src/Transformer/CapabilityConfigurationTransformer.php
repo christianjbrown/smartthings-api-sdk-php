@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilityConfiguration;
 use ChristianBrown\SmartThings\Model\CapabilityConfigurationInterface;
 use ChristianBrown\SmartThings\Model\CapabilityConfigurationValueInterface;
@@ -13,7 +12,6 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use function is_array;
-use function sprintf;
 
 final class CapabilityConfigurationTransformer implements CapabilityConfigurationTransformerInterface
 {
@@ -42,10 +40,10 @@ final class CapabilityConfigurationTransformer implements CapabilityConfiguratio
     private function requireValues(array $data): array
     {
         if (!isset($data[self::KEY_VALUES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_VALUES));
+            return [];
         }
         if (!is_array($data[self::KEY_VALUES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_VALUES));
+            return [];
         }
 
         return $this->transformListCapabilityConfigurationValue($data[self::KEY_VALUES]);

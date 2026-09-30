@@ -11,9 +11,9 @@ interface BasicPlusProgressBarsStateItemInterface
      */
     public function getAlternatives(): ?array;
 
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getComponent(): string;
+    public function getComponent(): ?string;
 
     /**
      * @return null|array<int, DeviceConfigEntryForDashboardStateFormatInfoItemInterface>
@@ -22,7 +22,7 @@ interface BasicPlusProgressBarsStateItemInterface
 
     public function getIconUrl(): ?string;
 
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
     public function getPlacement(): ?string;
 

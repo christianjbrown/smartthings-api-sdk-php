@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Serializer;
 
+use ChristianBrown\SmartThings\Model\BasicPlusTvDirectionalPadCommandInterface;
 use ChristianBrown\SmartThings\Model\BasicPlusTvDirectionalPadInterface;
 
 use function array_filter;
@@ -26,10 +27,22 @@ final class BasicPlusTvDirectionalPadSerializer implements BasicPlusTvDirectiona
             self::KEY_CAPABILITY => $model->getCapability(),
             self::KEY_VERSION => $model->getVersion(),
             self::KEY_COMPONENT => $model->getComponent(),
-            self::KEY_COMMAND => $this->basicPlusTvDirectionalPadCommandSerializer->serialize($model->getCommand()),
+            self::KEY_COMMAND => $this->serializeOptionalBasicPlusTvDirectionalPadCommand($model->getCommand()),
         ];
 
         // Omit null optionals rather than sending them as explicit nulls.
         return array_filter($serialized, static fn (mixed $value): bool => null !== $value);
+    }
+
+    /**
+     * @return null|mixed[]
+     */
+    private function serializeOptionalBasicPlusTvDirectionalPadCommand(?BasicPlusTvDirectionalPadCommandInterface $value): ?array
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->basicPlusTvDirectionalPadCommandSerializer->serialize($value);
     }
 }

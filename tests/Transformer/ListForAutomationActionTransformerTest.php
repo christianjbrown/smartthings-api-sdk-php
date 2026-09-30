@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\ListForAutomationAction;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\ListForAutomationActionTransformerInt
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(ListForAutomationAction::class)]
 #[CoversClass(ListForAutomationActionTransformer::class)]
@@ -40,6 +37,28 @@ final class ListForAutomationActionTransformerTest extends TestCase
         self::assertSame('test-supported-values', $actual->getSupportedValues());
         self::assertSame('test-command', $actual->getCommand());
         self::assertSame('test-argument-type', $actual->getArgumentType());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new ListForAutomationActionTransformer(self::createStub(AlternativeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'alternativesAbsent' => [[], 'getAlternatives', []];
+        yield 'alternativesWrongType' => [[ListForAutomationActionTransformerInterface::KEY_ALTERNATIVES => 'not-array'], 'getAlternatives', []];
     }
 
     /**
@@ -85,27 +104,5 @@ final class ListForAutomationActionTransformerTest extends TestCase
         self::assertNull($actual->getSupportedValues());
         self::assertNull($actual->getCommand());
         self::assertNull($actual->getArgumentType());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new ListForAutomationActionTransformer(self::createStub(AlternativeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'alternativesAbsent' => [[], sprintf(ListForAutomationActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ListForAutomationActionTransformerInterface::KEY_ALTERNATIVES)];
-        yield 'alternativesWrongType' => [[ListForAutomationActionTransformerInterface::KEY_ALTERNATIVES => 'not-array'], sprintf(ListForAutomationActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ListForAutomationActionTransformerInterface::KEY_ALTERNATIVES)];
     }
 }

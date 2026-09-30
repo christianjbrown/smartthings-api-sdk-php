@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DthDeviceDetails;
 use ChristianBrown\SmartThings\Model\DthDeviceDetailsInterface;
 
 use function is_bool;
 use function is_string;
-use function sprintf;
 
 final class DthDeviceDetailsTransformer implements DthDeviceDetailsTransformerInterface
 {
@@ -148,13 +146,13 @@ final class DthDeviceDetailsTransformer implements DthDeviceDetailsTransformerIn
     /**
      * @param mixed[] $data
      */
-    private static function requireCompletedSetup(array $data): bool
+    private static function requireCompletedSetup(array $data): ?bool
     {
         if (!isset($data[self::KEY_COMPLETED_SETUP])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_BOOL_SPRINTF, self::KEY_COMPLETED_SETUP));
+            return null;
         }
         if (!is_bool($data[self::KEY_COMPLETED_SETUP])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_BOOL_SPRINTF, self::KEY_COMPLETED_SETUP));
+            return null;
         }
 
         return $data[self::KEY_COMPLETED_SETUP];
@@ -163,13 +161,13 @@ final class DthDeviceDetailsTransformer implements DthDeviceDetailsTransformerIn
     /**
      * @param mixed[] $data
      */
-    private static function requireDeviceTypeId(array $data): string
+    private static function requireDeviceTypeId(array $data): ?string
     {
         if (empty($data[self::KEY_DEVICE_TYPE_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DEVICE_TYPE_ID));
+            return null;
         }
         if (!is_string($data[self::KEY_DEVICE_TYPE_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DEVICE_TYPE_ID));
+            return null;
         }
 
         return $data[self::KEY_DEVICE_TYPE_ID];
@@ -178,13 +176,13 @@ final class DthDeviceDetailsTransformer implements DthDeviceDetailsTransformerIn
     /**
      * @param mixed[] $data
      */
-    private static function requireDeviceTypeName(array $data): string
+    private static function requireDeviceTypeName(array $data): ?string
     {
         if (empty($data[self::KEY_DEVICE_TYPE_NAME])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DEVICE_TYPE_NAME));
+            return null;
         }
         if (!is_string($data[self::KEY_DEVICE_TYPE_NAME])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DEVICE_TYPE_NAME));
+            return null;
         }
 
         return $data[self::KEY_DEVICE_TYPE_NAME];

@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\SecurityArmStateDetail;
 use ChristianBrown\SmartThings\Transformer\SecurityArmStateDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\SecurityArmStateDetailTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(SecurityArmStateDetail::class)]
 #[CoversClass(SecurityArmStateDetailTransformer::class)]
@@ -31,6 +28,28 @@ final class SecurityArmStateDetailTransformerTest extends TestCase
 
         self::assertSame('test-subscription-name', $actual->getSubscriptionName());
         self::assertSame('test-location-id', $actual->getLocationId());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new SecurityArmStateDetailTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'locationIdAbsent' => [[], 'getLocationId', null];
+        yield 'locationIdWrongType' => [[SecurityArmStateDetailTransformerInterface::KEY_LOCATION_ID => 42], 'getLocationId', null];
     }
 
     /**
@@ -65,27 +84,5 @@ final class SecurityArmStateDetailTransformerTest extends TestCase
         $actual = $transformer->transform([SecurityArmStateDetailTransformerInterface::KEY_LOCATION_ID => 'test-location-id']);
 
         self::assertNull($actual->getSubscriptionName());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new SecurityArmStateDetailTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'locationIdAbsent' => [[], sprintf(SecurityArmStateDetailTransformerInterface::UNEXPECTED_STRING_SPRINTF, SecurityArmStateDetailTransformerInterface::KEY_LOCATION_ID)];
-        yield 'locationIdWrongType' => [[SecurityArmStateDetailTransformerInterface::KEY_LOCATION_ID => 42], sprintf(SecurityArmStateDetailTransformerInterface::UNEXPECTED_STRING_SPRINTF, SecurityArmStateDetailTransformerInterface::KEY_LOCATION_ID)];
     }
 }

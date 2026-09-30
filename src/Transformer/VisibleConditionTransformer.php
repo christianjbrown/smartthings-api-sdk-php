@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\VisibleCondition;
 use ChristianBrown\SmartThings\Model\VisibleConditionInterface;
 
 use function is_int;
 use function is_string;
-use function sprintf;
 
 final class VisibleConditionTransformer implements VisibleConditionTransformerInterface
 {
@@ -58,13 +56,13 @@ final class VisibleConditionTransformer implements VisibleConditionTransformerIn
     /**
      * @param mixed[] $data
      */
-    private static function requireCapability(array $data): string
+    private static function requireCapability(array $data): ?string
     {
         if (empty($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
         if (!is_string($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
 
         return $data[self::KEY_CAPABILITY];
@@ -73,13 +71,13 @@ final class VisibleConditionTransformer implements VisibleConditionTransformerIn
     /**
      * @param mixed[] $data
      */
-    private static function requireComponent(array $data): string
+    private static function requireComponent(array $data): ?string
     {
         if (empty($data[self::KEY_COMPONENT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMPONENT));
+            return null;
         }
         if (!is_string($data[self::KEY_COMPONENT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMPONENT));
+            return null;
         }
 
         return $data[self::KEY_COMPONENT];
@@ -88,13 +86,13 @@ final class VisibleConditionTransformer implements VisibleConditionTransformerIn
     /**
      * @param mixed[] $data
      */
-    private static function requireOperand(array $data): string
+    private static function requireOperand(array $data): ?string
     {
         if (empty($data[self::KEY_OPERAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OPERAND));
+            return null;
         }
         if (!is_string($data[self::KEY_OPERAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OPERAND));
+            return null;
         }
 
         return $data[self::KEY_OPERAND];
@@ -103,13 +101,13 @@ final class VisibleConditionTransformer implements VisibleConditionTransformerIn
     /**
      * @param mixed[] $data
      */
-    private static function requireOperator(array $data): string
+    private static function requireOperator(array $data): ?string
     {
         if (empty($data[self::KEY_OPERATOR])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OPERATOR));
+            return null;
         }
         if (!is_string($data[self::KEY_OPERATOR])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OPERATOR));
+            return null;
         }
 
         return $data[self::KEY_OPERATOR];
@@ -118,13 +116,13 @@ final class VisibleConditionTransformer implements VisibleConditionTransformerIn
     /**
      * @param mixed[] $data
      */
-    private static function requireValue(array $data): string
+    private static function requireValue(array $data): ?string
     {
         if (empty($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_VALUE));
+            return null;
         }
         if (!is_string($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_VALUE));
+            return null;
         }
 
         return $data[self::KEY_VALUE];

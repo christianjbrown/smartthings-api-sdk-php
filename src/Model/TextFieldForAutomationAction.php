@@ -7,14 +7,14 @@ namespace ChristianBrown\SmartThings\Model;
 final class TextFieldForAutomationAction implements TextFieldForAutomationActionInterface
 {
     private ?string $argumentType = null;
-    private string $command;
+    private ?string $command;
 
     /**
      * @var null|mixed[]
      */
     private ?array $range = null;
 
-    public function __construct(string $command)
+    public function __construct(?string $command)
     {
         $this->command = $command;
     }
@@ -24,7 +24,7 @@ final class TextFieldForAutomationAction implements TextFieldForAutomationAction
         return $this->argumentType;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }

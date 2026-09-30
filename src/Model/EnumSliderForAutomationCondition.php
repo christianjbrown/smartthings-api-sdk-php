@@ -15,12 +15,12 @@ final class EnumSliderForAutomationCondition implements EnumSliderForAutomationC
      * @var null|array<int, EnumSliderForAutomationConditionSupportedOperatorsItemInterface>
      */
     private ?array $supportedOperators = null;
-    private string $value;
+    private ?string $value;
 
     /**
      * @phpstan-param array<int, AlternativeItemInterface> $alternatives
      */
-    public function __construct(array $alternatives, string $value)
+    public function __construct(array $alternatives, ?string $value)
     {
         $this->alternatives = $alternatives;
         $this->value = $value;
@@ -42,7 +42,7 @@ final class EnumSliderForAutomationCondition implements EnumSliderForAutomationC
         return $this->supportedOperators;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

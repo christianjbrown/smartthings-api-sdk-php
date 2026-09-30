@@ -6,11 +6,11 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface ActionsArrayItemInterface
 {
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
     public function getComponent(): ?string;
 
-    public function getDisplayType(): string;
+    public function getDisplayType(): ?string;
 
     public function getGroup(): ?string;
 

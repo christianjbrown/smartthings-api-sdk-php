@@ -6,11 +6,11 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface BasicPlusCameraImageInterface
 {
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getComponent(): string;
+    public function getComponent(): ?string;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function getVersion(): ?int;
 

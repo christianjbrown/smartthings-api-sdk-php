@@ -18,6 +18,23 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(DynamicListForAutomationActionSerializer::class)]
 final class DynamicListForAutomationActionSerializerTest extends TestCase
 {
+    public function testSerializeNestedAbsent(): void
+    {
+        $supportedValuesForDynamicListSerializer = self::createStub(SupportedValuesForDynamicListSerializerInterface::class);
+        $supportedValuesForDynamicListSerializer->method('serialize')->willReturn(['test-serialized-supported-values-for-dynamic-list']);
+        $alternativeItemModel = self::createStub(AlternativeItemInterface::class);
+        $alternativeItemSerializer = self::createStub(AlternativeItemSerializerInterface::class);
+        $alternativeItemSerializer->method('serialize')->willReturn(['test-serialized-alternative-item']);
+        $model = new DynamicListForAutomationAction(null);
+
+        $serializer = new DynamicListForAutomationActionSerializer($supportedValuesForDynamicListSerializer, $alternativeItemSerializer);
+
+        self::assertSame(
+            [],
+            $serializer->serialize($model)
+        );
+    }
+
     public function testSerializeRequiredFieldsOnly(): void
     {
         $supportedValuesForDynamicListModel = self::createStub(SupportedValuesForDynamicListInterface::class);

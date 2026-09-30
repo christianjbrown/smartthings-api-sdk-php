@@ -10,9 +10,9 @@ interface EqualsConditionInterface
 
     public function getChangesOnly(): ?bool;
 
-    public function getLeft(): OperandInterface;
+    public function getLeft(): ?OperandInterface;
 
-    public function getRight(): OperandInterface;
+    public function getRight(): ?OperandInterface;
 
     public function setAggregation(?string $value): self;
 

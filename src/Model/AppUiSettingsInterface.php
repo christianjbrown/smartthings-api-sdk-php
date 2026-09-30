@@ -6,13 +6,13 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface AppUiSettingsInterface
 {
-    public function getDashboardCardsEnabled(): bool;
+    public function getDashboardCardsEnabled(): ?bool;
 
     public function getPluginId(): ?string;
 
     public function getPluginUri(): ?string;
 
-    public function getPreInstallDashboardCardsEnabled(): bool;
+    public function getPreInstallDashboardCardsEnabled(): ?bool;
 
     public function setPluginId(?string $value): self;
 

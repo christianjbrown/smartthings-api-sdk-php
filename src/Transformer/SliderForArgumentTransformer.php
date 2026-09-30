@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\SliderForArgument;
 use ChristianBrown\SmartThings\Model\SliderForArgumentInterface;
@@ -15,7 +14,6 @@ use function array_values;
 use function is_array;
 use function is_numeric;
 use function is_string;
-use function sprintf;
 
 final class SliderForArgumentTransformer implements SliderForArgumentTransformerInterface
 {
@@ -115,13 +113,13 @@ final class SliderForArgumentTransformer implements SliderForArgumentTransformer
     /**
      * @param mixed[] $data
      */
-    private static function requireName(array $data): string
+    private static function requireName(array $data): ?string
     {
         if (empty($data[self::KEY_NAME])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_NAME));
+            return null;
         }
         if (!is_string($data[self::KEY_NAME])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_NAME));
+            return null;
         }
 
         return $data[self::KEY_NAME];
@@ -135,10 +133,10 @@ final class SliderForArgumentTransformer implements SliderForArgumentTransformer
     private static function requireRange(array $data): array
     {
         if (!isset($data[self::KEY_RANGE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RANGE));
+            return [];
         }
         if (!is_array($data[self::KEY_RANGE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RANGE));
+            return [];
         }
 
         return $data[self::KEY_RANGE];

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\PanelForDeviceConfig;
 use ChristianBrown\SmartThings\Model\PanelForDeviceConfigItemsItemInterface;
 use ChristianBrown\SmartThings\Model\VisibleConditionInterface;
@@ -15,8 +14,6 @@ use ChristianBrown\SmartThings\Transformer\VisibleConditionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(PanelForDeviceConfig::class)]
 #[CoversClass(PanelForDeviceConfigTransformer::class)]
@@ -45,6 +42,28 @@ final class PanelForDeviceConfigTransformerTest extends TestCase
         self::assertSame('test-operator', $actual->getOperator());
         self::assertSame([$visibleConditionModel], $actual->getVisibleConditions());
         self::assertTrue($actual->getHideDashboardActions());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new PanelForDeviceConfigTransformer(self::createStub(PanelForDeviceConfigItemsItemTransformerInterface::class), self::createStub(VisibleConditionTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'itemsAbsent' => [[], 'getItems', []];
+        yield 'itemsWrongType' => [[PanelForDeviceConfigTransformerInterface::KEY_ITEMS => 'not-array'], 'getItems', []];
     }
 
     /**
@@ -90,28 +109,6 @@ final class PanelForDeviceConfigTransformerTest extends TestCase
         self::assertNull($actual->getOperator());
         self::assertNull($actual->getVisibleConditions());
         self::assertNull($actual->getHideDashboardActions());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new PanelForDeviceConfigTransformer(self::createStub(PanelForDeviceConfigItemsItemTransformerInterface::class), self::createStub(VisibleConditionTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'itemsAbsent' => [[], sprintf(PanelForDeviceConfigTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, PanelForDeviceConfigTransformerInterface::KEY_ITEMS)];
-        yield 'itemsWrongType' => [[PanelForDeviceConfigTransformerInterface::KEY_ITEMS => 'not-array'], sprintf(PanelForDeviceConfigTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, PanelForDeviceConfigTransformerInterface::KEY_ITEMS)];
     }
 
     public function testTransformVisibleConditions(): void

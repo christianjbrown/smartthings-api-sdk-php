@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface ConvertedTtsInterface
 {
-    public function getAudioUrl(): string;
+    public function getAudioUrl(): ?string;
 
-    public function getMessage(): string;
+    public function getMessage(): ?string;
 }

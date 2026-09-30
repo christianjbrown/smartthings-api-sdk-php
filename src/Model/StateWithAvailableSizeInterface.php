@@ -16,7 +16,7 @@ interface StateWithAvailableSizeInterface
      */
     public function getAvailableSizes(): ?array;
 
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
     public function getUnit(): ?string;
 

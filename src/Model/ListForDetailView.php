@@ -6,15 +6,15 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class ListForDetailView implements ListForDetailViewInterface
 {
-    private ListWithAvailableSizeCommandInterface $command;
+    private ?ListWithAvailableSizeCommandInterface $command;
     private ?ListWithAvailableSizeStateInterface $state = null;
 
-    public function __construct(ListWithAvailableSizeCommandInterface $command)
+    public function __construct(?ListWithAvailableSizeCommandInterface $command)
     {
         $this->command = $command;
     }
 
-    public function getCommand(): ListWithAvailableSizeCommandInterface
+    public function getCommand(): ?ListWithAvailableSizeCommandInterface
     {
         return $this->command;
     }

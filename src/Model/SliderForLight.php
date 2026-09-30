@@ -7,10 +7,10 @@ namespace ChristianBrown\SmartThings\Model;
 final class SliderForLight implements SliderForLightInterface
 {
     private ?string $argumentType = null;
-    private string $capability;
-    private string $command;
-    private string $component;
-    private string $label;
+    private ?string $capability;
+    private ?string $command;
+    private ?string $component;
+    private ?string $label;
 
     /**
      * @var mixed[]
@@ -19,14 +19,14 @@ final class SliderForLight implements SliderForLightInterface
     private ?float $step = null;
     private ?string $supportedValues = null;
     private ?string $unit = null;
-    private string $value;
+    private ?string $value;
     private ?string $valueType = null;
     private ?int $version = null;
 
     /**
      * @phpstan-param mixed[] $range
      */
-    public function __construct(string $component, string $capability, array $range, string $command, string $value, string $label)
+    public function __construct(?string $component, ?string $capability, array $range, ?string $command, ?string $value, ?string $label)
     {
         $this->component = $component;
         $this->capability = $capability;
@@ -41,22 +41,22 @@ final class SliderForLight implements SliderForLightInterface
         return $this->argumentType;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }
@@ -84,7 +84,7 @@ final class SliderForLight implements SliderForLightInterface
         return $this->unit;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

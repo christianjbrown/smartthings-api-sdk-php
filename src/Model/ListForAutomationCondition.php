@@ -12,13 +12,13 @@ final class ListForAutomationCondition implements ListForAutomationConditionInte
     private array $alternatives;
     private ?bool $multiSelectable = null;
     private ?string $supportedValues = null;
-    private string $value;
+    private ?string $value;
     private ?string $valueType = null;
 
     /**
      * @phpstan-param array<int, AlternativeItemInterface> $alternatives
      */
-    public function __construct(array $alternatives, string $value)
+    public function __construct(array $alternatives, ?string $value)
     {
         $this->alternatives = $alternatives;
         $this->value = $value;
@@ -42,7 +42,7 @@ final class ListForAutomationCondition implements ListForAutomationConditionInte
         return $this->supportedValues;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

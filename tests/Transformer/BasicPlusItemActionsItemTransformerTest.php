@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusItemActionsItem;
 use ChristianBrown\SmartThings\Model\VisibleConditionInterface;
 use ChristianBrown\SmartThings\Transformer\BasicPlusItemActionsItemTransformer;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\VisibleConditionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(BasicPlusItemActionsItem::class)]
 #[CoversClass(BasicPlusItemActionsItemTransformer::class)]
@@ -50,6 +47,32 @@ final class BasicPlusItemActionsItemTransformerTest extends TestCase
         self::assertSame(7, $actual->getVersion());
         self::assertSame('test-operator', $actual->getOperator());
         self::assertSame([$visibleConditionModel], $actual->getVisibleConditions());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new BasicPlusItemActionsItemTransformer(self::createStub(VisibleConditionTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'commandAbsent' => [[BasicPlusItemActionsItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusItemActionsItemTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getCommand', null];
+        yield 'commandWrongType' => [[BasicPlusItemActionsItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusItemActionsItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusItemActionsItemTransformerInterface::KEY_COMMAND => 42], 'getCommand', null];
+        yield 'componentAbsent' => [[BasicPlusItemActionsItemTransformerInterface::KEY_COMMAND => 'test-command', BasicPlusItemActionsItemTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getComponent', null];
+        yield 'componentWrongType' => [[BasicPlusItemActionsItemTransformerInterface::KEY_COMMAND => 'test-command', BasicPlusItemActionsItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusItemActionsItemTransformerInterface::KEY_COMPONENT => 42], 'getComponent', null];
+        yield 'capabilityAbsent' => [[BasicPlusItemActionsItemTransformerInterface::KEY_COMMAND => 'test-command', BasicPlusItemActionsItemTransformerInterface::KEY_COMPONENT => 'test-component'], 'getCapability', null];
+        yield 'capabilityWrongType' => [[BasicPlusItemActionsItemTransformerInterface::KEY_COMMAND => 'test-command', BasicPlusItemActionsItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusItemActionsItemTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
     }
 
     /**
@@ -104,32 +127,6 @@ final class BasicPlusItemActionsItemTransformerTest extends TestCase
         self::assertNull($actual->getVersion());
         self::assertNull($actual->getOperator());
         self::assertNull($actual->getVisibleConditions());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new BasicPlusItemActionsItemTransformer(self::createStub(VisibleConditionTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'commandAbsent' => [[BasicPlusItemActionsItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusItemActionsItemTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(BasicPlusItemActionsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusItemActionsItemTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[BasicPlusItemActionsItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusItemActionsItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusItemActionsItemTransformerInterface::KEY_COMMAND => 42], sprintf(BasicPlusItemActionsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusItemActionsItemTransformerInterface::KEY_COMMAND)];
-        yield 'componentAbsent' => [[BasicPlusItemActionsItemTransformerInterface::KEY_COMMAND => 'test-command', BasicPlusItemActionsItemTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(BasicPlusItemActionsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusItemActionsItemTransformerInterface::KEY_COMPONENT)];
-        yield 'componentWrongType' => [[BasicPlusItemActionsItemTransformerInterface::KEY_COMMAND => 'test-command', BasicPlusItemActionsItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusItemActionsItemTransformerInterface::KEY_COMPONENT => 42], sprintf(BasicPlusItemActionsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusItemActionsItemTransformerInterface::KEY_COMPONENT)];
-        yield 'capabilityAbsent' => [[BasicPlusItemActionsItemTransformerInterface::KEY_COMMAND => 'test-command', BasicPlusItemActionsItemTransformerInterface::KEY_COMPONENT => 'test-component'], sprintf(BasicPlusItemActionsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusItemActionsItemTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[BasicPlusItemActionsItemTransformerInterface::KEY_COMMAND => 'test-command', BasicPlusItemActionsItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusItemActionsItemTransformerInterface::KEY_CAPABILITY => 42], sprintf(BasicPlusItemActionsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusItemActionsItemTransformerInterface::KEY_CAPABILITY)];
     }
 
     public function testTransformVisibleConditions(): void

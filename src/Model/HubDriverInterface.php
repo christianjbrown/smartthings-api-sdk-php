@@ -8,7 +8,7 @@ interface HubDriverInterface
 {
     public function getChannelId(): ?string;
 
-    public function getDriverId(): string;
+    public function getDriverId(): ?string;
 
     public function getDriverVersion(): ?string;
 

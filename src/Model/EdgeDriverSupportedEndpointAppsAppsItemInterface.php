@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface EdgeDriverSupportedEndpointAppsAppsItemInterface
 {
-    public function getAppName(): string;
+    public function getAppName(): ?string;
 
-    public function getVersion(): string;
+    public function getVersion(): ?string;
 }

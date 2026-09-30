@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\ListForArgument;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\ListForArgumentTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(ListForArgument::class)]
 #[CoversClass(ListForArgumentTransformer::class)]
@@ -40,6 +37,30 @@ final class ListForArgumentTransformerTest extends TestCase
         self::assertSame('test-supported-values', $actual->getSupportedValues());
         self::assertSame('test-name', $actual->getName());
         self::assertSame('test-argument-type', $actual->getArgumentType());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new ListForArgumentTransformer(self::createStub(AlternativeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'alternativesAbsent' => [[ListForArgumentTransformerInterface::KEY_NAME => 'test-name'], 'getAlternatives', []];
+        yield 'alternativesWrongType' => [[ListForArgumentTransformerInterface::KEY_NAME => 'test-name', ListForArgumentTransformerInterface::KEY_ALTERNATIVES => 'not-array'], 'getAlternatives', []];
+        yield 'nameAbsent' => [[ListForArgumentTransformerInterface::KEY_ALTERNATIVES => ['test-nested']], 'getName', null];
+        yield 'nameWrongType' => [[ListForArgumentTransformerInterface::KEY_ALTERNATIVES => ['test-nested'], ListForArgumentTransformerInterface::KEY_NAME => 42], 'getName', null];
     }
 
     /**
@@ -81,29 +102,5 @@ final class ListForArgumentTransformerTest extends TestCase
 
         self::assertNull($actual->getSupportedValues());
         self::assertNull($actual->getArgumentType());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new ListForArgumentTransformer(self::createStub(AlternativeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'alternativesAbsent' => [[ListForArgumentTransformerInterface::KEY_NAME => 'test-name'], sprintf(ListForArgumentTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ListForArgumentTransformerInterface::KEY_ALTERNATIVES)];
-        yield 'alternativesWrongType' => [[ListForArgumentTransformerInterface::KEY_NAME => 'test-name', ListForArgumentTransformerInterface::KEY_ALTERNATIVES => 'not-array'], sprintf(ListForArgumentTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ListForArgumentTransformerInterface::KEY_ALTERNATIVES)];
-        yield 'nameAbsent' => [[ListForArgumentTransformerInterface::KEY_ALTERNATIVES => ['test-nested']], sprintf(ListForArgumentTransformerInterface::UNEXPECTED_STRING_SPRINTF, ListForArgumentTransformerInterface::KEY_NAME)];
-        yield 'nameWrongType' => [[ListForArgumentTransformerInterface::KEY_ALTERNATIVES => ['test-nested'], ListForArgumentTransformerInterface::KEY_NAME => 42], sprintf(ListForArgumentTransformerInterface::UNEXPECTED_STRING_SPRINTF, ListForArgumentTransformerInterface::KEY_NAME)];
     }
 }

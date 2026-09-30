@@ -12,7 +12,7 @@ interface ZWaveManufacturerFingerprintInterface
 
     public function getProductId(): ?int;
 
-    public function getProductType(): int;
+    public function getProductType(): ?int;
 
     public function setDeviceIntegrationProfileKey(?DeviceIntegrationProfileKeyInterface $value): self;
 

@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\NumberFieldForArgument;
 use ChristianBrown\SmartThings\Transformer\NumberFieldForArgumentTransformer;
 use ChristianBrown\SmartThings\Transformer\NumberFieldForArgumentTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(NumberFieldForArgument::class)]
 #[CoversClass(NumberFieldForArgumentTransformer::class)]
@@ -37,6 +34,28 @@ final class NumberFieldForArgumentTransformerTest extends TestCase
         self::assertSame('test-argument-type', $actual->getArgumentType());
         self::assertSame(['test-range-key' => 'test-value'], $actual->getRange());
         self::assertSame('test-supported-values', $actual->getSupportedValues());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new NumberFieldForArgumentTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'nameAbsent' => [[], 'getName', null];
+        yield 'nameWrongType' => [[NumberFieldForArgumentTransformerInterface::KEY_NAME => 42], 'getName', null];
     }
 
     /**
@@ -83,27 +102,5 @@ final class NumberFieldForArgumentTransformerTest extends TestCase
         self::assertNull($actual->getArgumentType());
         self::assertNull($actual->getRange());
         self::assertNull($actual->getSupportedValues());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new NumberFieldForArgumentTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'nameAbsent' => [[], sprintf(NumberFieldForArgumentTransformerInterface::UNEXPECTED_STRING_SPRINTF, NumberFieldForArgumentTransformerInterface::KEY_NAME)];
-        yield 'nameWrongType' => [[NumberFieldForArgumentTransformerInterface::KEY_NAME => 42], sprintf(NumberFieldForArgumentTransformerInterface::UNEXPECTED_STRING_SPRINTF, NumberFieldForArgumentTransformerInterface::KEY_NAME)];
     }
 }

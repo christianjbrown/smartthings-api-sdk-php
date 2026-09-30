@@ -16,6 +16,23 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(StepperSerializer::class)]
 final class StepperSerializerTest extends TestCase
 {
+    public function testSerializeNestedAbsent(): void
+    {
+        $stepperWithAvailableSizeCommandSerializer = self::createStub(StepperWithAvailableSizeCommandSerializerInterface::class);
+        $stepperWithAvailableSizeCommandSerializer->method('serialize')->willReturn(['test-serialized-stepper-with-available-size-command']);
+        $model = new Stepper(null, 1.5, ['test-range-key' => 'test-value']);
+
+        $serializer = new StepperSerializer($stepperWithAvailableSizeCommandSerializer);
+
+        self::assertSame(
+            [
+                StepperSerializerInterface::KEY_STEP => 1.5,
+                StepperSerializerInterface::KEY_RANGE => ['test-range-key' => 'test-value'],
+            ],
+            $serializer->serialize($model)
+        );
+    }
+
     public function testSerializeRequiredFieldsOnly(): void
     {
         $stepperWithAvailableSizeCommandModel = self::createStub(StepperWithAvailableSizeCommandInterface::class);

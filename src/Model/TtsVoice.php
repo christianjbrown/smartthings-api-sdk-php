@@ -6,11 +6,11 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class TtsVoice implements TtsVoiceInterface
 {
-    private string $gender;
-    private string $id;
-    private string $languageCode;
-    private string $languageName;
-    private string $name;
+    private ?string $gender;
+    private ?string $id;
+    private ?string $languageCode;
+    private ?string $languageName;
+    private ?string $name;
 
     /**
      * @var null|array<int, string>
@@ -21,9 +21,9 @@ final class TtsVoice implements TtsVoiceInterface
      * @var null|array<int, string>
      */
     private ?array $supportedEngines = null;
-    private string $ttsProvider;
+    private ?string $ttsProvider;
 
-    public function __construct(string $gender, string $id, string $languageCode, string $languageName, string $name, string $ttsProvider)
+    public function __construct(?string $gender, ?string $id, ?string $languageCode, ?string $languageName, ?string $name, ?string $ttsProvider)
     {
         $this->gender = $gender;
         $this->id = $id;
@@ -33,27 +33,27 @@ final class TtsVoice implements TtsVoiceInterface
         $this->ttsProvider = $ttsProvider;
     }
 
-    public function getGender(): string
+    public function getGender(): ?string
     {
         return $this->gender;
     }
 
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function getLanguageCode(): string
+    public function getLanguageCode(): ?string
     {
         return $this->languageCode;
     }
 
-    public function getLanguageName(): string
+    public function getLanguageName(): ?string
     {
         return $this->languageName;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -74,7 +74,7 @@ final class TtsVoice implements TtsVoiceInterface
         return $this->supportedEngines;
     }
 
-    public function getTtsProvider(): string
+    public function getTtsProvider(): ?string
     {
         return $this->ttsProvider;
     }

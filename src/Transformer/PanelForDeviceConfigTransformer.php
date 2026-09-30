@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\PanelForDeviceConfig;
 use ChristianBrown\SmartThings\Model\PanelForDeviceConfigInterface;
 use ChristianBrown\SmartThings\Model\PanelForDeviceConfigItemsItemInterface;
@@ -16,7 +15,6 @@ use function array_values;
 use function is_array;
 use function is_bool;
 use function is_string;
-use function sprintf;
 
 final class PanelForDeviceConfigTransformer implements PanelForDeviceConfigTransformerInterface
 {
@@ -93,10 +91,10 @@ final class PanelForDeviceConfigTransformer implements PanelForDeviceConfigTrans
     private function requireItems(array $data): array
     {
         if (!isset($data[self::KEY_ITEMS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_ITEMS));
+            return [];
         }
         if (!is_array($data[self::KEY_ITEMS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_ITEMS));
+            return [];
         }
 
         return $this->transformListPanelForDeviceConfigItemsItem($data[self::KEY_ITEMS]);

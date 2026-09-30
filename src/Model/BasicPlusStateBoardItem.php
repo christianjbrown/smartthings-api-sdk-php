@@ -10,18 +10,18 @@ final class BasicPlusStateBoardItem implements BasicPlusStateBoardItemInterface
      * @var null|array<int, AlternativeItemInterface>
      */
     private ?array $alternatives = null;
-    private string $capability;
+    private ?string $capability;
 
     /**
      * @var null|array<int, BasicPlusStateBoardColorsInterface>
      */
     private ?array $colors = null;
-    private string $component;
+    private ?string $component;
     private ?string $iconUrl = null;
-    private string $label;
+    private ?string $label;
     private ?string $operator = null;
     private ?string $unit = null;
-    private string $value;
+    private ?string $value;
     private ?string $valueType = null;
     private ?int $version = null;
 
@@ -30,7 +30,7 @@ final class BasicPlusStateBoardItem implements BasicPlusStateBoardItemInterface
      */
     private ?array $visibleConditions = null;
 
-    public function __construct(string $capability, string $component, string $value, string $label)
+    public function __construct(?string $capability, ?string $component, ?string $value, ?string $label)
     {
         $this->capability = $capability;
         $this->component = $component;
@@ -46,7 +46,7 @@ final class BasicPlusStateBoardItem implements BasicPlusStateBoardItemInterface
         return $this->alternatives;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
@@ -59,7 +59,7 @@ final class BasicPlusStateBoardItem implements BasicPlusStateBoardItemInterface
         return $this->colors;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }
@@ -69,7 +69,7 @@ final class BasicPlusStateBoardItem implements BasicPlusStateBoardItemInterface
         return $this->iconUrl;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }
@@ -84,7 +84,7 @@ final class BasicPlusStateBoardItem implements BasicPlusStateBoardItemInterface
         return $this->unit;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

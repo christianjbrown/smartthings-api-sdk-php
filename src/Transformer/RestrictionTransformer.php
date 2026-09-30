@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Restriction;
 use ChristianBrown\SmartThings\Model\RestrictionInterface;
 
 use function is_bool;
 use function is_int;
-use function sprintf;
 
 final class RestrictionTransformer implements RestrictionTransformerInterface
 {
@@ -58,13 +56,13 @@ final class RestrictionTransformer implements RestrictionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireTier(array $data): int
+    private static function requireTier(array $data): ?int
     {
         if (!isset($data[self::KEY_TIER])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_INT_SPRINTF, self::KEY_TIER));
+            return null;
         }
         if (!is_int($data[self::KEY_TIER])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_INT_SPRINTF, self::KEY_TIER));
+            return null;
         }
 
         return $data[self::KEY_TIER];

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusLight;
 use ChristianBrown\SmartThings\Model\BasicPlusLightColorControlInterface;
 use ChristianBrown\SmartThings\Model\SliderForLightInterface;
@@ -15,8 +14,6 @@ use ChristianBrown\SmartThings\Transformer\SliderForLightTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(BasicPlusLight::class)]
 #[CoversClass(BasicPlusLightTransformer::class)]
@@ -80,6 +77,28 @@ final class BasicPlusLightTransformerTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new BasicPlusLightTransformer(self::createStub(SliderForLightTransformerInterface::class), self::createStub(BasicPlusLightColorControlTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'dimmerAbsent' => [[], 'getDimmer', null];
+        yield 'dimmerWrongType' => [[BasicPlusLightTransformerInterface::KEY_DIMMER => 'not-array'], 'getDimmer', null];
+    }
+
+    /**
      * Each optional field in each of its states: absent, present but the wrong type, or valid.
      *
      * @param array<string, mixed> $extra
@@ -119,27 +138,5 @@ final class BasicPlusLightTransformerTest extends TestCase
         self::assertNull($actual->getColorTemperature());
         self::assertNull($actual->getColorControl());
         self::assertNull($actual->getHideDashboardActions());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new BasicPlusLightTransformer(self::createStub(SliderForLightTransformerInterface::class), self::createStub(BasicPlusLightColorControlTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'dimmerAbsent' => [[], sprintf(BasicPlusLightTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, BasicPlusLightTransformerInterface::KEY_DIMMER)];
-        yield 'dimmerWrongType' => [[BasicPlusLightTransformerInterface::KEY_DIMMER => 'not-array'], sprintf(BasicPlusLightTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, BasicPlusLightTransformerInterface::KEY_DIMMER)];
     }
 }

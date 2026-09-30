@@ -18,6 +18,23 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(BasicPlusLightSerializer::class)]
 final class BasicPlusLightSerializerTest extends TestCase
 {
+    public function testSerializeNestedAbsent(): void
+    {
+        $sliderForLightSerializer = self::createStub(SliderForLightSerializerInterface::class);
+        $sliderForLightSerializer->method('serialize')->willReturn(['test-serialized-slider-for-light']);
+        $basicPlusLightColorControlModel = self::createStub(BasicPlusLightColorControlInterface::class);
+        $basicPlusLightColorControlSerializer = self::createStub(BasicPlusLightColorControlSerializerInterface::class);
+        $basicPlusLightColorControlSerializer->method('serialize')->willReturn(['test-serialized-basic-plus-light-color-control']);
+        $model = new BasicPlusLight(null);
+
+        $serializer = new BasicPlusLightSerializer($sliderForLightSerializer, $basicPlusLightColorControlSerializer);
+
+        self::assertSame(
+            [],
+            $serializer->serialize($model)
+        );
+    }
+
     public function testSerializeRequiredFieldsOnly(): void
     {
         $sliderForLightModel = self::createStub(SliderForLightInterface::class);

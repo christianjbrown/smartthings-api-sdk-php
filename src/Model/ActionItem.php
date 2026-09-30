@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class ActionItem implements ActionItemInterface
 {
-    private string $displayType;
+    private ?string $displayType;
     private ?string $group = null;
     private ?PlayPauseInterface $playPause = null;
     private ?PlayStopInterface $playStop = null;
@@ -16,12 +16,12 @@ final class ActionItem implements ActionItemInterface
     private ?SwitchForDashboardInterface $switch = null;
     private ?ToggleSwitchForDashboardInterface $toggleSwitch = null;
 
-    public function __construct(string $displayType)
+    public function __construct(?string $displayType)
     {
         $this->displayType = $displayType;
     }
 
-    public function getDisplayType(): string
+    public function getDisplayType(): ?string
     {
         return $this->displayType;
     }

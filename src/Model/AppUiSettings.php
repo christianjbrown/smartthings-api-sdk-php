@@ -6,18 +6,18 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class AppUiSettings implements AppUiSettingsInterface
 {
-    private bool $dashboardCardsEnabled;
+    private ?bool $dashboardCardsEnabled;
     private ?string $pluginId = null;
     private ?string $pluginUri = null;
-    private bool $preInstallDashboardCardsEnabled;
+    private ?bool $preInstallDashboardCardsEnabled;
 
-    public function __construct(bool $dashboardCardsEnabled, bool $preInstallDashboardCardsEnabled)
+    public function __construct(?bool $dashboardCardsEnabled, ?bool $preInstallDashboardCardsEnabled)
     {
         $this->dashboardCardsEnabled = $dashboardCardsEnabled;
         $this->preInstallDashboardCardsEnabled = $preInstallDashboardCardsEnabled;
     }
 
-    public function getDashboardCardsEnabled(): bool
+    public function getDashboardCardsEnabled(): ?bool
     {
         return $this->dashboardCardsEnabled;
     }
@@ -32,7 +32,7 @@ final class AppUiSettings implements AppUiSettingsInterface
         return $this->pluginUri;
     }
 
-    public function getPreInstallDashboardCardsEnabled(): bool
+    public function getPreInstallDashboardCardsEnabled(): ?bool
     {
         return $this->preInstallDashboardCardsEnabled;
     }

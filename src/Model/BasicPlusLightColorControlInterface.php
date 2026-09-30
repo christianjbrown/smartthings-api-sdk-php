@@ -6,13 +6,13 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface BasicPlusLightColorControlInterface
 {
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getColor(): BasicPlusLightColorControlColorInterface;
+    public function getColor(): ?BasicPlusLightColorControlColorInterface;
 
-    public function getCommand(): string;
+    public function getCommand(): ?string;
 
-    public function getComponent(): string;
+    public function getComponent(): ?string;
 
     public function getValue(): ?string;
 

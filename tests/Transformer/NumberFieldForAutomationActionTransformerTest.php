@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\NumberFieldForAutomationAction;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\NumberFieldForAutomationActionTransfo
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(NumberFieldForAutomationAction::class)]
 #[CoversClass(NumberFieldForAutomationActionTransformer::class)]
@@ -59,6 +56,28 @@ final class NumberFieldForAutomationActionTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getAlternatives());
         self::assertNull($transformer->transform($base + [NumberFieldForAutomationActionTransformerInterface::KEY_ALTERNATIVES => 'test-not-array'])->getAlternatives());
         self::assertSame([$alternativeItemModel], $transformer->transform($base + [NumberFieldForAutomationActionTransformerInterface::KEY_ALTERNATIVES => [['test-nested'], 'test-skipped']])->getAlternatives());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new NumberFieldForAutomationActionTransformer(self::createStub(AlternativeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'commandAbsent' => [[], 'getCommand', null];
+        yield 'commandWrongType' => [[NumberFieldForAutomationActionTransformerInterface::KEY_COMMAND => 42], 'getCommand', null];
     }
 
     /**
@@ -113,27 +132,5 @@ final class NumberFieldForAutomationActionTransformerTest extends TestCase
         self::assertNull($actual->getAlternatives());
         self::assertNull($actual->getSupportedValues());
         self::assertNull($actual->getDescription());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new NumberFieldForAutomationActionTransformer(self::createStub(AlternativeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'commandAbsent' => [[], sprintf(NumberFieldForAutomationActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, NumberFieldForAutomationActionTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[NumberFieldForAutomationActionTransformerInterface::KEY_COMMAND => 42], sprintf(NumberFieldForAutomationActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, NumberFieldForAutomationActionTransformerInterface::KEY_COMMAND)];
     }
 }

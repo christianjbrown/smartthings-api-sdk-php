@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\MultiArgCommand;
 use ChristianBrown\SmartThings\Model\MultiArgCommandArgumentsItemInterface;
 use ChristianBrown\SmartThings\Model\MultiArgCommandInterface;
@@ -14,7 +13,6 @@ use function array_map;
 use function array_values;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class MultiArgCommandTransformer implements MultiArgCommandTransformerInterface
 {
@@ -59,10 +57,10 @@ final class MultiArgCommandTransformer implements MultiArgCommandTransformerInte
     private function requireArguments(array $data): array
     {
         if (!isset($data[self::KEY_ARGUMENTS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_ARGUMENTS));
+            return [];
         }
         if (!is_array($data[self::KEY_ARGUMENTS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_ARGUMENTS));
+            return [];
         }
 
         return $this->transformListMultiArgCommandArgumentsItem($data[self::KEY_ARGUMENTS]);
@@ -71,13 +69,13 @@ final class MultiArgCommandTransformer implements MultiArgCommandTransformerInte
     /**
      * @param mixed[] $data
      */
-    private static function requireCommand(array $data): string
+    private static function requireCommand(array $data): ?string
     {
         if (empty($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
         if (!is_string($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
 
         return $data[self::KEY_COMMAND];

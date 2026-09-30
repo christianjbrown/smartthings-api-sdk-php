@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusLightColorControl;
 use ChristianBrown\SmartThings\Model\BasicPlusLightColorControlColorInterface;
 use ChristianBrown\SmartThings\Model\BasicPlusLightColorControlInterface;
@@ -12,7 +11,6 @@ use ChristianBrown\SmartThings\Model\BasicPlusLightColorControlInterface;
 use function is_array;
 use function is_int;
 use function is_string;
-use function sprintf;
 
 final class BasicPlusLightColorControlTransformer implements BasicPlusLightColorControlTransformerInterface
 {
@@ -67,13 +65,13 @@ final class BasicPlusLightColorControlTransformer implements BasicPlusLightColor
     /**
      * @param mixed[] $data
      */
-    private static function requireCapability(array $data): string
+    private static function requireCapability(array $data): ?string
     {
         if (empty($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
         if (!is_string($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
 
         return $data[self::KEY_CAPABILITY];
@@ -82,13 +80,13 @@ final class BasicPlusLightColorControlTransformer implements BasicPlusLightColor
     /**
      * @param mixed[] $data
      */
-    private function requireColor(array $data): BasicPlusLightColorControlColorInterface
+    private function requireColor(array $data): ?BasicPlusLightColorControlColorInterface
     {
         if (!isset($data[self::KEY_COLOR])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COLOR));
+            return null;
         }
         if (!is_array($data[self::KEY_COLOR])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COLOR));
+            return null;
         }
 
         return $this->basicPlusLightColorControlColorTransformer->transform($data[self::KEY_COLOR]);
@@ -97,13 +95,13 @@ final class BasicPlusLightColorControlTransformer implements BasicPlusLightColor
     /**
      * @param mixed[] $data
      */
-    private static function requireCommand(array $data): string
+    private static function requireCommand(array $data): ?string
     {
         if (empty($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
         if (!is_string($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
 
         return $data[self::KEY_COMMAND];
@@ -112,13 +110,13 @@ final class BasicPlusLightColorControlTransformer implements BasicPlusLightColor
     /**
      * @param mixed[] $data
      */
-    private static function requireComponent(array $data): string
+    private static function requireComponent(array $data): ?string
     {
         if (empty($data[self::KEY_COMPONENT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMPONENT));
+            return null;
         }
         if (!is_string($data[self::KEY_COMPONENT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMPONENT));
+            return null;
         }
 
         return $data[self::KEY_COMPONENT];

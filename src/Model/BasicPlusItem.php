@@ -11,7 +11,7 @@ final class BasicPlusItem implements BasicPlusItemInterface
      */
     private ?array $actions = null;
     private ?BasicPlusCameraInterface $camera = null;
-    private string $displayType;
+    private ?string $displayType;
     private ?BasicPlusLightInterface $light = null;
     private ?PanelForDeviceConfigInterface $panel = null;
 
@@ -26,7 +26,7 @@ final class BasicPlusItem implements BasicPlusItemInterface
     private ?array $stateBoard = null;
     private ?BasicPlusTvInterface $tv = null;
 
-    public function __construct(string $displayType)
+    public function __construct(?string $displayType)
     {
         $this->displayType = $displayType;
     }
@@ -44,7 +44,7 @@ final class BasicPlusItem implements BasicPlusItemInterface
         return $this->camera;
     }
 
-    public function getDisplayType(): string
+    public function getDisplayType(): ?string
     {
         return $this->displayType;
     }

@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusCameraOverlayIconsItem;
 use ChristianBrown\SmartThings\Model\BasicPlusCameraOverlayIconsItemInterface;
 
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class BasicPlusCameraOverlayIconsItemTransformer implements BasicPlusCameraOverlayIconsItemTransformerInterface
 {
@@ -50,13 +48,13 @@ final class BasicPlusCameraOverlayIconsItemTransformer implements BasicPlusCamer
     /**
      * @param mixed[] $data
      */
-    private static function requireIconUrl(array $data): string
+    private static function requireIconUrl(array $data): ?string
     {
         if (empty($data[self::KEY_ICON_URL])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ICON_URL));
+            return null;
         }
         if (!is_string($data[self::KEY_ICON_URL])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ICON_URL));
+            return null;
         }
 
         return $data[self::KEY_ICON_URL];

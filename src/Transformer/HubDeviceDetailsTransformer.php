@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\HubDeviceDetails;
 use ChristianBrown\SmartThings\Model\HubDeviceDetailsHubDataInterface;
 use ChristianBrown\SmartThings\Model\HubDeviceDetailsInterface;
@@ -15,7 +14,6 @@ use function array_map;
 use function array_values;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class HubDeviceDetailsTransformer implements HubDeviceDetailsTransformerInterface
 {
@@ -41,13 +39,13 @@ final class HubDeviceDetailsTransformer implements HubDeviceDetailsTransformerIn
     /**
      * @param mixed[] $data
      */
-    private static function requireDriverId(array $data): string
+    private static function requireDriverId(array $data): ?string
     {
         if (empty($data[self::KEY_DRIVER_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DRIVER_ID));
+            return null;
         }
         if (!is_string($data[self::KEY_DRIVER_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DRIVER_ID));
+            return null;
         }
 
         return $data[self::KEY_DRIVER_ID];
@@ -56,13 +54,13 @@ final class HubDeviceDetailsTransformer implements HubDeviceDetailsTransformerIn
     /**
      * @param mixed[] $data
      */
-    private static function requireFirmwareVersion(array $data): string
+    private static function requireFirmwareVersion(array $data): ?string
     {
         if (empty($data[self::KEY_FIRMWARE_VERSION])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_FIRMWARE_VERSION));
+            return null;
         }
         if (!is_string($data[self::KEY_FIRMWARE_VERSION])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_FIRMWARE_VERSION));
+            return null;
         }
 
         return $data[self::KEY_FIRMWARE_VERSION];
@@ -71,13 +69,13 @@ final class HubDeviceDetailsTransformer implements HubDeviceDetailsTransformerIn
     /**
      * @param mixed[] $data
      */
-    private function requireHubData(array $data): HubDeviceDetailsHubDataInterface
+    private function requireHubData(array $data): ?HubDeviceDetailsHubDataInterface
     {
         if (!isset($data[self::KEY_HUB_DATA])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_HUB_DATA));
+            return null;
         }
         if (!is_array($data[self::KEY_HUB_DATA])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_HUB_DATA));
+            return null;
         }
 
         return $this->hubDeviceDetailsHubDataTransformer->transform($data[self::KEY_HUB_DATA]);
@@ -91,10 +89,10 @@ final class HubDeviceDetailsTransformer implements HubDeviceDetailsTransformerIn
     private function requireHubDrivers(array $data): array
     {
         if (!isset($data[self::KEY_HUB_DRIVERS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_HUB_DRIVERS));
+            return [];
         }
         if (!is_array($data[self::KEY_HUB_DRIVERS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_HUB_DRIVERS));
+            return [];
         }
 
         return $this->transformListHubDriver($data[self::KEY_HUB_DRIVERS]);
@@ -103,13 +101,13 @@ final class HubDeviceDetailsTransformer implements HubDeviceDetailsTransformerIn
     /**
      * @param mixed[] $data
      */
-    private static function requireHubEui(array $data): string
+    private static function requireHubEui(array $data): ?string
     {
         if (empty($data[self::KEY_HUB_EUI])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_HUB_EUI));
+            return null;
         }
         if (!is_string($data[self::KEY_HUB_EUI])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_HUB_EUI));
+            return null;
         }
 
         return $data[self::KEY_HUB_EUI];

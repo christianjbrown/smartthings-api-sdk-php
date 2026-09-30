@@ -6,21 +6,21 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class DeviceConfigurationIconsItemProductKeysItem implements DeviceConfigurationIconsItemProductKeysItemInterface
 {
-    private string $mnId;
-    private string $setupId;
+    private ?string $mnId;
+    private ?string $setupId;
 
-    public function __construct(string $mnId, string $setupId)
+    public function __construct(?string $mnId, ?string $setupId)
     {
         $this->mnId = $mnId;
         $this->setupId = $setupId;
     }
 
-    public function getMnId(): string
+    public function getMnId(): ?string
     {
         return $this->mnId;
     }
 
-    public function getSetupId(): string
+    public function getSetupId(): ?string
     {
         return $this->setupId;
     }

@@ -13,7 +13,7 @@ interface TimeOperandInterface
 
     public function getOffset(): ?IntervalInterface;
 
-    public function getReference(): string;
+    public function getReference(): ?string;
 
     public function getTimeZoneId(): ?string;
 

@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\PlayPause;
 use ChristianBrown\SmartThings\Model\PlayPauseCommandInterface;
 use ChristianBrown\SmartThings\Model\PlayPauseInterface;
 use ChristianBrown\SmartThings\Model\PlayPauseStateInterface;
 
 use function is_array;
-use function sprintf;
 
 final class PlayPauseTransformer implements PlayPauseTransformerInterface
 {
@@ -37,13 +35,13 @@ final class PlayPauseTransformer implements PlayPauseTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private function requireCommand(array $data): PlayPauseCommandInterface
+    private function requireCommand(array $data): ?PlayPauseCommandInterface
     {
         if (!isset($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
         if (!is_array($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
 
         return $this->playPauseCommandTransformer->transform($data[self::KEY_COMMAND]);
@@ -52,13 +50,13 @@ final class PlayPauseTransformer implements PlayPauseTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private function requireState(array $data): PlayPauseStateInterface
+    private function requireState(array $data): ?PlayPauseStateInterface
     {
         if (!isset($data[self::KEY_STATE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_STATE));
+            return null;
         }
         if (!is_array($data[self::KEY_STATE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_STATE));
+            return null;
         }
 
         return $this->playPauseStateTransformer->transform($data[self::KEY_STATE]);

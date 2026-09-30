@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusTvDirectionalPadCommand;
 use ChristianBrown\SmartThings\Model\BasicPlusTvDirectionalPadCommandInterface;
 
 use function is_string;
-use function sprintf;
 
 final class BasicPlusTvDirectionalPadCommandTransformer implements BasicPlusTvDirectionalPadCommandTransformerInterface
 {
@@ -42,13 +40,13 @@ final class BasicPlusTvDirectionalPadCommandTransformer implements BasicPlusTvDi
     /**
      * @param mixed[] $data
      */
-    private static function requireDown(array $data): string
+    private static function requireDown(array $data): ?string
     {
         if (empty($data[self::KEY_DOWN])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DOWN));
+            return null;
         }
         if (!is_string($data[self::KEY_DOWN])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DOWN));
+            return null;
         }
 
         return $data[self::KEY_DOWN];
@@ -57,13 +55,13 @@ final class BasicPlusTvDirectionalPadCommandTransformer implements BasicPlusTvDi
     /**
      * @param mixed[] $data
      */
-    private static function requireLeft(array $data): string
+    private static function requireLeft(array $data): ?string
     {
         if (empty($data[self::KEY_LEFT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LEFT));
+            return null;
         }
         if (!is_string($data[self::KEY_LEFT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LEFT));
+            return null;
         }
 
         return $data[self::KEY_LEFT];
@@ -72,13 +70,13 @@ final class BasicPlusTvDirectionalPadCommandTransformer implements BasicPlusTvDi
     /**
      * @param mixed[] $data
      */
-    private static function requireOk(array $data): string
+    private static function requireOk(array $data): ?string
     {
         if (empty($data[self::KEY_OK])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OK));
+            return null;
         }
         if (!is_string($data[self::KEY_OK])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OK));
+            return null;
         }
 
         return $data[self::KEY_OK];
@@ -87,13 +85,13 @@ final class BasicPlusTvDirectionalPadCommandTransformer implements BasicPlusTvDi
     /**
      * @param mixed[] $data
      */
-    private static function requireRight(array $data): string
+    private static function requireRight(array $data): ?string
     {
         if (empty($data[self::KEY_RIGHT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_RIGHT));
+            return null;
         }
         if (!is_string($data[self::KEY_RIGHT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_RIGHT));
+            return null;
         }
 
         return $data[self::KEY_RIGHT];
@@ -102,13 +100,13 @@ final class BasicPlusTvDirectionalPadCommandTransformer implements BasicPlusTvDi
     /**
      * @param mixed[] $data
      */
-    private static function requireUp(array $data): string
+    private static function requireUp(array $data): ?string
     {
         if (empty($data[self::KEY_UP])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_UP));
+            return null;
         }
         if (!is_string($data[self::KEY_UP])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_UP));
+            return null;
         }
 
         return $data[self::KEY_UP];

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AttributeValueInterface;
 use ChristianBrown\SmartThings\Model\CommandMapping;
 use ChristianBrown\SmartThings\Transformer\AttributeValueTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\CommandMappingTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(CommandMapping::class)]
 #[CoversClass(CommandMappingTransformer::class)]
@@ -45,28 +42,28 @@ final class CommandMappingTransformerTest extends TestCase
     /**
      * @param array<string, mixed> $data
      */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
     {
         $transformer = new CommandMappingTransformer(self::createStub(AttributeValueTransformerInterface::class));
 
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
     }
 
     /**
-     * @return iterable<string, array{array<string, mixed>, string}>
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
      */
-    public static function provideTransformUnexpectedCases(): iterable
+    public static function provideTransformLenientCases(): iterable
     {
-        yield 'capabilityIdAbsent' => [[CommandMappingTransformerInterface::KEY_VERSION => 7, CommandMappingTransformerInterface::KEY_COMMAND => 'test-command', CommandMappingTransformerInterface::KEY_EVENT_VALUES => ['test-nested']], sprintf(CommandMappingTransformerInterface::UNEXPECTED_STRING_SPRINTF, CommandMappingTransformerInterface::KEY_CAPABILITY_ID)];
-        yield 'capabilityIdWrongType' => [[CommandMappingTransformerInterface::KEY_VERSION => 7, CommandMappingTransformerInterface::KEY_COMMAND => 'test-command', CommandMappingTransformerInterface::KEY_EVENT_VALUES => ['test-nested'], CommandMappingTransformerInterface::KEY_CAPABILITY_ID => 42], sprintf(CommandMappingTransformerInterface::UNEXPECTED_STRING_SPRINTF, CommandMappingTransformerInterface::KEY_CAPABILITY_ID)];
-        yield 'versionAbsent' => [[CommandMappingTransformerInterface::KEY_CAPABILITY_ID => 'test-capability-id', CommandMappingTransformerInterface::KEY_COMMAND => 'test-command', CommandMappingTransformerInterface::KEY_EVENT_VALUES => ['test-nested']], sprintf(CommandMappingTransformerInterface::UNEXPECTED_INT_SPRINTF, CommandMappingTransformerInterface::KEY_VERSION)];
-        yield 'versionWrongType' => [[CommandMappingTransformerInterface::KEY_CAPABILITY_ID => 'test-capability-id', CommandMappingTransformerInterface::KEY_COMMAND => 'test-command', CommandMappingTransformerInterface::KEY_EVENT_VALUES => ['test-nested'], CommandMappingTransformerInterface::KEY_VERSION => 'not-int'], sprintf(CommandMappingTransformerInterface::UNEXPECTED_INT_SPRINTF, CommandMappingTransformerInterface::KEY_VERSION)];
-        yield 'commandAbsent' => [[CommandMappingTransformerInterface::KEY_CAPABILITY_ID => 'test-capability-id', CommandMappingTransformerInterface::KEY_VERSION => 7, CommandMappingTransformerInterface::KEY_EVENT_VALUES => ['test-nested']], sprintf(CommandMappingTransformerInterface::UNEXPECTED_STRING_SPRINTF, CommandMappingTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[CommandMappingTransformerInterface::KEY_CAPABILITY_ID => 'test-capability-id', CommandMappingTransformerInterface::KEY_VERSION => 7, CommandMappingTransformerInterface::KEY_EVENT_VALUES => ['test-nested'], CommandMappingTransformerInterface::KEY_COMMAND => 42], sprintf(CommandMappingTransformerInterface::UNEXPECTED_STRING_SPRINTF, CommandMappingTransformerInterface::KEY_COMMAND)];
-        yield 'eventValuesAbsent' => [[CommandMappingTransformerInterface::KEY_CAPABILITY_ID => 'test-capability-id', CommandMappingTransformerInterface::KEY_VERSION => 7, CommandMappingTransformerInterface::KEY_COMMAND => 'test-command'], sprintf(CommandMappingTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, CommandMappingTransformerInterface::KEY_EVENT_VALUES)];
-        yield 'eventValuesWrongType' => [[CommandMappingTransformerInterface::KEY_CAPABILITY_ID => 'test-capability-id', CommandMappingTransformerInterface::KEY_VERSION => 7, CommandMappingTransformerInterface::KEY_COMMAND => 'test-command', CommandMappingTransformerInterface::KEY_EVENT_VALUES => 'not-array'], sprintf(CommandMappingTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, CommandMappingTransformerInterface::KEY_EVENT_VALUES)];
+        yield 'capabilityIdAbsent' => [[CommandMappingTransformerInterface::KEY_VERSION => 7, CommandMappingTransformerInterface::KEY_COMMAND => 'test-command', CommandMappingTransformerInterface::KEY_EVENT_VALUES => ['test-nested']], 'getCapabilityId', null];
+        yield 'capabilityIdWrongType' => [[CommandMappingTransformerInterface::KEY_VERSION => 7, CommandMappingTransformerInterface::KEY_COMMAND => 'test-command', CommandMappingTransformerInterface::KEY_EVENT_VALUES => ['test-nested'], CommandMappingTransformerInterface::KEY_CAPABILITY_ID => 42], 'getCapabilityId', null];
+        yield 'versionAbsent' => [[CommandMappingTransformerInterface::KEY_CAPABILITY_ID => 'test-capability-id', CommandMappingTransformerInterface::KEY_COMMAND => 'test-command', CommandMappingTransformerInterface::KEY_EVENT_VALUES => ['test-nested']], 'getVersion', null];
+        yield 'versionWrongType' => [[CommandMappingTransformerInterface::KEY_CAPABILITY_ID => 'test-capability-id', CommandMappingTransformerInterface::KEY_COMMAND => 'test-command', CommandMappingTransformerInterface::KEY_EVENT_VALUES => ['test-nested'], CommandMappingTransformerInterface::KEY_VERSION => 'not-int'], 'getVersion', null];
+        yield 'commandAbsent' => [[CommandMappingTransformerInterface::KEY_CAPABILITY_ID => 'test-capability-id', CommandMappingTransformerInterface::KEY_VERSION => 7, CommandMappingTransformerInterface::KEY_EVENT_VALUES => ['test-nested']], 'getCommand', null];
+        yield 'commandWrongType' => [[CommandMappingTransformerInterface::KEY_CAPABILITY_ID => 'test-capability-id', CommandMappingTransformerInterface::KEY_VERSION => 7, CommandMappingTransformerInterface::KEY_EVENT_VALUES => ['test-nested'], CommandMappingTransformerInterface::KEY_COMMAND => 42], 'getCommand', null];
+        yield 'eventValuesAbsent' => [[CommandMappingTransformerInterface::KEY_CAPABILITY_ID => 'test-capability-id', CommandMappingTransformerInterface::KEY_VERSION => 7, CommandMappingTransformerInterface::KEY_COMMAND => 'test-command'], 'getEventValues', []];
+        yield 'eventValuesWrongType' => [[CommandMappingTransformerInterface::KEY_CAPABILITY_ID => 'test-capability-id', CommandMappingTransformerInterface::KEY_VERSION => 7, CommandMappingTransformerInterface::KEY_COMMAND => 'test-command', CommandMappingTransformerInterface::KEY_EVENT_VALUES => 'not-array'], 'getEventValues', []];
     }
 }

@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\SceneLifecycleDetail;
 use ChristianBrown\SmartThings\Transformer\SceneLifecycleDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneLifecycleDetailTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(SceneLifecycleDetail::class)]
 #[CoversClass(SceneLifecycleDetailTransformer::class)]
@@ -31,6 +28,28 @@ final class SceneLifecycleDetailTransformerTest extends TestCase
 
         self::assertSame('test-subscription-name', $actual->getSubscriptionName());
         self::assertSame('test-location-id', $actual->getLocationId());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new SceneLifecycleDetailTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'locationIdAbsent' => [[], 'getLocationId', null];
+        yield 'locationIdWrongType' => [[SceneLifecycleDetailTransformerInterface::KEY_LOCATION_ID => 42], 'getLocationId', null];
     }
 
     /**
@@ -65,27 +84,5 @@ final class SceneLifecycleDetailTransformerTest extends TestCase
         $actual = $transformer->transform([SceneLifecycleDetailTransformerInterface::KEY_LOCATION_ID => 'test-location-id']);
 
         self::assertNull($actual->getSubscriptionName());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new SceneLifecycleDetailTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'locationIdAbsent' => [[], sprintf(SceneLifecycleDetailTransformerInterface::UNEXPECTED_STRING_SPRINTF, SceneLifecycleDetailTransformerInterface::KEY_LOCATION_ID)];
-        yield 'locationIdWrongType' => [[SceneLifecycleDetailTransformerInterface::KEY_LOCATION_ID => 42], sprintf(SceneLifecycleDetailTransformerInterface::UNEXPECTED_STRING_SPRINTF, SceneLifecycleDetailTransformerInterface::KEY_LOCATION_ID)];
     }
 }

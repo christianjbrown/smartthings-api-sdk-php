@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface BasicPlusStateBoardColorsInterface
 {
-    public function getColor(): string;
+    public function getColor(): ?string;
 
     public function getOperator(): ?string;
 

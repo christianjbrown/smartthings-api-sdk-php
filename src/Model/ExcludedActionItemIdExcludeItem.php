@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class ExcludedActionItemIdExcludeItem implements ExcludedActionItemIdExcludeItemInterface
 {
-    private string $capability;
+    private ?string $capability;
 
     /**
      * @var null|array<int, ExcludedConditionItemIdExcludeItemAttributesItemInterface>
@@ -15,12 +15,12 @@ final class ExcludedActionItemIdExcludeItem implements ExcludedActionItemIdExclu
     private ?string $component = null;
     private ?int $version = null;
 
-    public function __construct(string $capability)
+    public function __construct(?string $capability)
     {
         $this->capability = $capability;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }

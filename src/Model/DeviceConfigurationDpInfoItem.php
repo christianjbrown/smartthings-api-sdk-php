@@ -10,12 +10,12 @@ final class DeviceConfigurationDpInfoItem implements DeviceConfigurationDpInfoIt
      * @var null|array<int, DeviceConfigurationDpInfoItemArgumentsItemInterface>
      */
     private ?array $arguments = null;
-    private string $dpUri;
+    private ?string $dpUri;
     private ?string $operatingMode = null;
-    private string $os;
+    private ?string $os;
     private ?string $serverDpUri = null;
 
-    public function __construct(string $os, string $dpUri)
+    public function __construct(?string $os, ?string $dpUri)
     {
         $this->os = $os;
         $this->dpUri = $dpUri;
@@ -29,7 +29,7 @@ final class DeviceConfigurationDpInfoItem implements DeviceConfigurationDpInfoIt
         return $this->arguments;
     }
 
-    public function getDpUri(): string
+    public function getDpUri(): ?string
     {
         return $this->dpUri;
     }
@@ -39,7 +39,7 @@ final class DeviceConfigurationDpInfoItem implements DeviceConfigurationDpInfoIt
         return $this->operatingMode;
     }
 
-    public function getOs(): string
+    public function getOs(): ?string
     {
         return $this->os;
     }

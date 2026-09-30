@@ -10,9 +10,9 @@ final class ExcludedConditionItemIdExcludeItemAttributesItem implements Excluded
      * @var null|array<int, string>
      */
     private ?array $excludedValues = null;
-    private string $name;
+    private ?string $name;
 
-    public function __construct(string $name)
+    public function __construct(?string $name)
     {
         $this->name = $name;
     }
@@ -25,7 +25,7 @@ final class ExcludedConditionItemIdExcludeItemAttributesItem implements Excluded
         return $this->excludedValues;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }

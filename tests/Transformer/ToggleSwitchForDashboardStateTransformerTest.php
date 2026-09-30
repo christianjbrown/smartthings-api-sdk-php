@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\ToggleSwitchForDashboardState;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\ToggleSwitchForDashboardStateTransfor
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(ToggleSwitchForDashboardState::class)]
 #[CoversClass(ToggleSwitchForDashboardStateTransformer::class)]
@@ -58,6 +55,30 @@ final class ToggleSwitchForDashboardStateTransformerTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new ToggleSwitchForDashboardStateTransformer(self::createStub(AlternativeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'onAbsent' => [[ToggleSwitchForDashboardStateTransformerInterface::KEY_OFF => 'test-off'], 'getOn', null];
+        yield 'onWrongType' => [[ToggleSwitchForDashboardStateTransformerInterface::KEY_OFF => 'test-off', ToggleSwitchForDashboardStateTransformerInterface::KEY_ON => 42], 'getOn', null];
+        yield 'offAbsent' => [[ToggleSwitchForDashboardStateTransformerInterface::KEY_ON => 'test-on'], 'getOff', null];
+        yield 'offWrongType' => [[ToggleSwitchForDashboardStateTransformerInterface::KEY_ON => 'test-on', ToggleSwitchForDashboardStateTransformerInterface::KEY_OFF => 42], 'getOff', null];
+    }
+
+    /**
      * Each optional field in each of its states: absent, present but the wrong type, or valid.
      *
      * @param array<string, mixed> $extra
@@ -97,29 +118,5 @@ final class ToggleSwitchForDashboardStateTransformerTest extends TestCase
         self::assertNull($actual->getValue());
         self::assertNull($actual->getValueType());
         self::assertNull($actual->getAlternatives());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new ToggleSwitchForDashboardStateTransformer(self::createStub(AlternativeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'onAbsent' => [[ToggleSwitchForDashboardStateTransformerInterface::KEY_OFF => 'test-off'], sprintf(ToggleSwitchForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, ToggleSwitchForDashboardStateTransformerInterface::KEY_ON)];
-        yield 'onWrongType' => [[ToggleSwitchForDashboardStateTransformerInterface::KEY_OFF => 'test-off', ToggleSwitchForDashboardStateTransformerInterface::KEY_ON => 42], sprintf(ToggleSwitchForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, ToggleSwitchForDashboardStateTransformerInterface::KEY_ON)];
-        yield 'offAbsent' => [[ToggleSwitchForDashboardStateTransformerInterface::KEY_ON => 'test-on'], sprintf(ToggleSwitchForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, ToggleSwitchForDashboardStateTransformerInterface::KEY_OFF)];
-        yield 'offWrongType' => [[ToggleSwitchForDashboardStateTransformerInterface::KEY_ON => 'test-on', ToggleSwitchForDashboardStateTransformerInterface::KEY_OFF => 42], sprintf(ToggleSwitchForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, ToggleSwitchForDashboardStateTransformerInterface::KEY_OFF)];
     }
 }

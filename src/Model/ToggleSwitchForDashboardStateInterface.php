@@ -11,9 +11,9 @@ interface ToggleSwitchForDashboardStateInterface
      */
     public function getAlternatives(): ?array;
 
-    public function getOff(): string;
+    public function getOff(): ?string;
 
-    public function getOn(): string;
+    public function getOn(): ?string;
 
     public function getValue(): ?string;
 

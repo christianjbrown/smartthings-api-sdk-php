@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface DescriptionItemInterface
 {
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
     public function getOperator(): ?string;
 

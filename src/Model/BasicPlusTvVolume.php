@@ -6,9 +6,9 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class BasicPlusTvVolume implements BasicPlusTvVolumeInterface
 {
-    private string $capability;
-    private BasicPlusTvVolumeCommandInterface $command;
-    private string $component;
+    private ?string $capability;
+    private ?BasicPlusTvVolumeCommandInterface $command;
+    private ?string $component;
     private ?string $label = null;
 
     /**
@@ -20,24 +20,24 @@ final class BasicPlusTvVolume implements BasicPlusTvVolumeInterface
     private ?string $value = null;
     private ?int $version = null;
 
-    public function __construct(string $capability, string $component, BasicPlusTvVolumeCommandInterface $command)
+    public function __construct(?string $capability, ?string $component, ?BasicPlusTvVolumeCommandInterface $command)
     {
         $this->capability = $capability;
         $this->component = $component;
         $this->command = $command;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getCommand(): BasicPlusTvVolumeCommandInterface
+    public function getCommand(): ?BasicPlusTvVolumeCommandInterface
     {
         return $this->command;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }

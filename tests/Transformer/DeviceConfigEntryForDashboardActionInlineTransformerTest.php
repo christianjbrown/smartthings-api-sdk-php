@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceConfigEntryForDashboardActionInline;
 use ChristianBrown\SmartThings\Model\PlayPauseInterface;
 use ChristianBrown\SmartThings\Model\PlayStopInterface;
@@ -25,8 +24,6 @@ use ChristianBrown\SmartThings\Transformer\ToggleSwitchForDashboardTransformerIn
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(DeviceConfigEntryForDashboardActionInline::class)]
 #[CoversClass(DeviceConfigEntryForDashboardActionInlineTransformer::class)]
@@ -80,6 +77,28 @@ final class DeviceConfigEntryForDashboardActionInlineTransformerTest extends Tes
         self::assertSame($playPauseModel, $actual->getPlayPause());
         self::assertSame($playStopModel, $actual->getPlayStop());
         self::assertSame('test-group', $actual->getGroup());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new DeviceConfigEntryForDashboardActionInlineTransformer(self::createStub(PushButtonTransformerInterface::class), self::createStub(ToggleSwitchForDashboardTransformerInterface::class), self::createStub(SwitchForDashboardTransformerInterface::class), self::createStub(StandbyPowerSwitchForDashboardTransformerInterface::class), self::createStub(StatelessPowerToggleForDashboardTransformerInterface::class), self::createStub(PlayPauseTransformerInterface::class), self::createStub(PlayStopTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'displayTypeAbsent' => [[], 'getDisplayType', null];
+        yield 'displayTypeWrongType' => [[DeviceConfigEntryForDashboardActionInlineTransformerInterface::KEY_DISPLAY_TYPE => 42], 'getDisplayType', null];
     }
 
     /**
@@ -359,27 +378,5 @@ final class DeviceConfigEntryForDashboardActionInlineTransformerTest extends Tes
         self::assertNull($transformer->transform($base)->getToggleSwitch());
         self::assertNull($transformer->transform($base + [DeviceConfigEntryForDashboardActionInlineTransformerInterface::KEY_TOGGLE_SWITCH => 'test-not-array'])->getToggleSwitch());
         self::assertSame($toggleSwitchForDashboardModel, $transformer->transform($base + [DeviceConfigEntryForDashboardActionInlineTransformerInterface::KEY_TOGGLE_SWITCH => ['test-nested']])->getToggleSwitch());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new DeviceConfigEntryForDashboardActionInlineTransformer(self::createStub(PushButtonTransformerInterface::class), self::createStub(ToggleSwitchForDashboardTransformerInterface::class), self::createStub(SwitchForDashboardTransformerInterface::class), self::createStub(StandbyPowerSwitchForDashboardTransformerInterface::class), self::createStub(StatelessPowerToggleForDashboardTransformerInterface::class), self::createStub(PlayPauseTransformerInterface::class), self::createStub(PlayStopTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'displayTypeAbsent' => [[], sprintf(DeviceConfigEntryForDashboardActionInlineTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceConfigEntryForDashboardActionInlineTransformerInterface::KEY_DISPLAY_TYPE)];
-        yield 'displayTypeWrongType' => [[DeviceConfigEntryForDashboardActionInlineTransformerInterface::KEY_DISPLAY_TYPE => 42], sprintf(DeviceConfigEntryForDashboardActionInlineTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceConfigEntryForDashboardActionInlineTransformerInterface::KEY_DISPLAY_TYPE)];
     }
 }

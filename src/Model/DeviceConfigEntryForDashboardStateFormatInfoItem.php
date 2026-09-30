@@ -6,18 +6,18 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class DeviceConfigEntryForDashboardStateFormatInfoItem implements DeviceConfigEntryForDashboardStateFormatInfoItemInterface
 {
-    private string $key;
+    private ?string $key;
     private ?DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeInterface $remainingTime = null;
     private ?DeviceConfigEntryForDashboardStateFormatInfoItemTimeInterface $time = null;
-    private string $type;
+    private ?string $type;
 
-    public function __construct(string $key, string $type)
+    public function __construct(?string $key, ?string $type)
     {
         $this->key = $key;
         $this->type = $type;
     }
 
-    public function getKey(): string
+    public function getKey(): ?string
     {
         return $this->key;
     }
@@ -32,7 +32,7 @@ final class DeviceConfigEntryForDashboardStateFormatInfoItem implements DeviceCo
         return $this->time;
     }
 
-    public function getType(): string
+    public function getType(): ?string
     {
         return $this->type;
     }

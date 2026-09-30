@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ButtonForTv;
 use ChristianBrown\SmartThings\Transformer\ButtonForTvTransformer;
 use ChristianBrown\SmartThings\Transformer\ButtonForTvTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(ButtonForTv::class)]
 #[CoversClass(ButtonForTvTransformer::class)]
@@ -39,6 +36,32 @@ final class ButtonForTvTransformerTest extends TestCase
         self::assertSame('test-command', $actual->getCommand());
         self::assertSame('test-argument', $actual->getArgument());
         self::assertSame('test-icon-url', $actual->getIconUrl());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new ButtonForTvTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'capabilityAbsent' => [[ButtonForTvTransformerInterface::KEY_COMPONENT => 'test-component', ButtonForTvTransformerInterface::KEY_COMMAND => 'test-command'], 'getCapability', null];
+        yield 'capabilityWrongType' => [[ButtonForTvTransformerInterface::KEY_COMPONENT => 'test-component', ButtonForTvTransformerInterface::KEY_COMMAND => 'test-command', ButtonForTvTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
+        yield 'componentAbsent' => [[ButtonForTvTransformerInterface::KEY_CAPABILITY => 'test-capability', ButtonForTvTransformerInterface::KEY_COMMAND => 'test-command'], 'getComponent', null];
+        yield 'componentWrongType' => [[ButtonForTvTransformerInterface::KEY_CAPABILITY => 'test-capability', ButtonForTvTransformerInterface::KEY_COMMAND => 'test-command', ButtonForTvTransformerInterface::KEY_COMPONENT => 42], 'getComponent', null];
+        yield 'commandAbsent' => [[ButtonForTvTransformerInterface::KEY_CAPABILITY => 'test-capability', ButtonForTvTransformerInterface::KEY_COMPONENT => 'test-component'], 'getCommand', null];
+        yield 'commandWrongType' => [[ButtonForTvTransformerInterface::KEY_CAPABILITY => 'test-capability', ButtonForTvTransformerInterface::KEY_COMPONENT => 'test-component', ButtonForTvTransformerInterface::KEY_COMMAND => 42], 'getCommand', null];
     }
 
     /**
@@ -81,31 +104,5 @@ final class ButtonForTvTransformerTest extends TestCase
         self::assertNull($actual->getVersion());
         self::assertNull($actual->getArgument());
         self::assertNull($actual->getIconUrl());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new ButtonForTvTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'capabilityAbsent' => [[ButtonForTvTransformerInterface::KEY_COMPONENT => 'test-component', ButtonForTvTransformerInterface::KEY_COMMAND => 'test-command'], sprintf(ButtonForTvTransformerInterface::UNEXPECTED_STRING_SPRINTF, ButtonForTvTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[ButtonForTvTransformerInterface::KEY_COMPONENT => 'test-component', ButtonForTvTransformerInterface::KEY_COMMAND => 'test-command', ButtonForTvTransformerInterface::KEY_CAPABILITY => 42], sprintf(ButtonForTvTransformerInterface::UNEXPECTED_STRING_SPRINTF, ButtonForTvTransformerInterface::KEY_CAPABILITY)];
-        yield 'componentAbsent' => [[ButtonForTvTransformerInterface::KEY_CAPABILITY => 'test-capability', ButtonForTvTransformerInterface::KEY_COMMAND => 'test-command'], sprintf(ButtonForTvTransformerInterface::UNEXPECTED_STRING_SPRINTF, ButtonForTvTransformerInterface::KEY_COMPONENT)];
-        yield 'componentWrongType' => [[ButtonForTvTransformerInterface::KEY_CAPABILITY => 'test-capability', ButtonForTvTransformerInterface::KEY_COMMAND => 'test-command', ButtonForTvTransformerInterface::KEY_COMPONENT => 42], sprintf(ButtonForTvTransformerInterface::UNEXPECTED_STRING_SPRINTF, ButtonForTvTransformerInterface::KEY_COMPONENT)];
-        yield 'commandAbsent' => [[ButtonForTvTransformerInterface::KEY_CAPABILITY => 'test-capability', ButtonForTvTransformerInterface::KEY_COMPONENT => 'test-component'], sprintf(ButtonForTvTransformerInterface::UNEXPECTED_STRING_SPRINTF, ButtonForTvTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[ButtonForTvTransformerInterface::KEY_CAPABILITY => 'test-capability', ButtonForTvTransformerInterface::KEY_COMPONENT => 'test-component', ButtonForTvTransformerInterface::KEY_COMMAND => 42], sprintf(ButtonForTvTransformerInterface::UNEXPECTED_STRING_SPRINTF, ButtonForTvTransformerInterface::KEY_COMMAND)];
     }
 }

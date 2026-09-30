@@ -15,11 +15,11 @@ final class DateTimeOperand implements DateTimeOperandInterface
     private ?string $locationId = null;
     private ?int $month = null;
     private ?IntervalInterface $offset = null;
-    private string $reference;
+    private ?string $reference;
     private ?string $timeZoneId = null;
     private ?int $year = null;
 
-    public function __construct(string $reference)
+    public function __construct(?string $reference)
     {
         $this->reference = $reference;
     }
@@ -52,7 +52,7 @@ final class DateTimeOperand implements DateTimeOperandInterface
         return $this->offset;
     }
 
-    public function getReference(): string
+    public function getReference(): ?string
     {
         return $this->reference;
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\PlayStopState;
 use ChristianBrown\SmartThings\Model\PlayStopStateInterface;
@@ -14,7 +13,6 @@ use function array_map;
 use function array_values;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class PlayStopStateTransformer implements PlayStopStateTransformerInterface
 {
@@ -69,13 +67,13 @@ final class PlayStopStateTransformer implements PlayStopStateTransformerInterfac
     /**
      * @param mixed[] $data
      */
-    private static function requirePlay(array $data): string
+    private static function requirePlay(array $data): ?string
     {
         if (empty($data[self::KEY_PLAY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_PLAY));
+            return null;
         }
         if (!is_string($data[self::KEY_PLAY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_PLAY));
+            return null;
         }
 
         return $data[self::KEY_PLAY];
@@ -84,13 +82,13 @@ final class PlayStopStateTransformer implements PlayStopStateTransformerInterfac
     /**
      * @param mixed[] $data
      */
-    private static function requireStop(array $data): string
+    private static function requireStop(array $data): ?string
     {
         if (empty($data[self::KEY_STOP])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_STOP));
+            return null;
         }
         if (!is_string($data[self::KEY_STOP])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_STOP));
+            return null;
         }
 
         return $data[self::KEY_STOP];
@@ -99,13 +97,13 @@ final class PlayStopStateTransformer implements PlayStopStateTransformerInterfac
     /**
      * @param mixed[] $data
      */
-    private static function requireValue(array $data): string
+    private static function requireValue(array $data): ?string
     {
         if (empty($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_VALUE));
+            return null;
         }
         if (!is_string($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_VALUE));
+            return null;
         }
 
         return $data[self::KEY_VALUE];

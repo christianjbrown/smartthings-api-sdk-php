@@ -6,30 +6,30 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class VisibleConditionForColorItemReferTo implements VisibleConditionForColorItemReferToInterface
 {
-    private string $capability;
-    private string $component;
-    private string $value;
+    private ?string $capability;
+    private ?string $component;
+    private ?string $value;
     private ?string $valueType = null;
     private ?int $version = null;
 
-    public function __construct(string $component, string $capability, string $value)
+    public function __construct(?string $component, ?string $capability, ?string $value)
     {
         $this->component = $component;
         $this->capability = $capability;
         $this->value = $value;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

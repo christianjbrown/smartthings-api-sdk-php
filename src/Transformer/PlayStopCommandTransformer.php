@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\PlayStopCommand;
 use ChristianBrown\SmartThings\Model\PlayStopCommandInterface;
 
 use function is_string;
-use function sprintf;
 
 final class PlayStopCommandTransformer implements PlayStopCommandTransformerInterface
 {
@@ -57,13 +55,13 @@ final class PlayStopCommandTransformer implements PlayStopCommandTransformerInte
     /**
      * @param mixed[] $data
      */
-    private static function requirePlay(array $data): string
+    private static function requirePlay(array $data): ?string
     {
         if (empty($data[self::KEY_PLAY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_PLAY));
+            return null;
         }
         if (!is_string($data[self::KEY_PLAY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_PLAY));
+            return null;
         }
 
         return $data[self::KEY_PLAY];
@@ -72,13 +70,13 @@ final class PlayStopCommandTransformer implements PlayStopCommandTransformerInte
     /**
      * @param mixed[] $data
      */
-    private static function requireStop(array $data): string
+    private static function requireStop(array $data): ?string
     {
         if (empty($data[self::KEY_STOP])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_STOP));
+            return null;
         }
         if (!is_string($data[self::KEY_STOP])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_STOP));
+            return null;
         }
 
         return $data[self::KEY_STOP];

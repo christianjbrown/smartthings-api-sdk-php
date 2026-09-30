@@ -9,9 +9,9 @@ final class ZWaveManufacturerFingerprint implements ZWaveManufacturerFingerprint
     private ?DeviceIntegrationProfileKeyInterface $deviceIntegrationProfileKey = null;
     private ?int $manufacturerId = null;
     private ?int $productId = null;
-    private int $productType;
+    private ?int $productType;
 
-    public function __construct(int $productType)
+    public function __construct(?int $productType)
     {
         $this->productType = $productType;
     }
@@ -31,7 +31,7 @@ final class ZWaveManufacturerFingerprint implements ZWaveManufacturerFingerprint
         return $this->productId;
     }
 
-    public function getProductType(): int
+    public function getProductType(): ?int
     {
         return $this->productType;
     }

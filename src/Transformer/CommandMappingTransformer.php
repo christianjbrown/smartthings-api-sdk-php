@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AttributeValueInterface;
 use ChristianBrown\SmartThings\Model\CommandMapping;
 use ChristianBrown\SmartThings\Model\CommandMappingInterface;
@@ -15,7 +14,6 @@ use function array_values;
 use function is_array;
 use function is_int;
 use function is_string;
-use function sprintf;
 
 final class CommandMappingTransformer implements CommandMappingTransformerInterface
 {
@@ -39,13 +37,13 @@ final class CommandMappingTransformer implements CommandMappingTransformerInterf
     /**
      * @param mixed[] $data
      */
-    private static function requireCapabilityId(array $data): string
+    private static function requireCapabilityId(array $data): ?string
     {
         if (empty($data[self::KEY_CAPABILITY_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY_ID));
+            return null;
         }
         if (!is_string($data[self::KEY_CAPABILITY_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY_ID));
+            return null;
         }
 
         return $data[self::KEY_CAPABILITY_ID];
@@ -54,13 +52,13 @@ final class CommandMappingTransformer implements CommandMappingTransformerInterf
     /**
      * @param mixed[] $data
      */
-    private static function requireCommand(array $data): string
+    private static function requireCommand(array $data): ?string
     {
         if (empty($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
         if (!is_string($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
 
         return $data[self::KEY_COMMAND];
@@ -74,10 +72,10 @@ final class CommandMappingTransformer implements CommandMappingTransformerInterf
     private function requireEventValues(array $data): array
     {
         if (!isset($data[self::KEY_EVENT_VALUES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_EVENT_VALUES));
+            return [];
         }
         if (!is_array($data[self::KEY_EVENT_VALUES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_EVENT_VALUES));
+            return [];
         }
 
         return $this->transformListAttributeValue($data[self::KEY_EVENT_VALUES]);
@@ -86,13 +84,13 @@ final class CommandMappingTransformer implements CommandMappingTransformerInterf
     /**
      * @param mixed[] $data
      */
-    private static function requireVersion(array $data): int
+    private static function requireVersion(array $data): ?int
     {
         if (!isset($data[self::KEY_VERSION])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_INT_SPRINTF, self::KEY_VERSION));
+            return null;
         }
         if (!is_int($data[self::KEY_VERSION])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_INT_SPRINTF, self::KEY_VERSION));
+            return null;
         }
 
         return $data[self::KEY_VERSION];

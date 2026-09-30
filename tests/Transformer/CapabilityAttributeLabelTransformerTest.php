@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilityAttributeLabel;
 use ChristianBrown\SmartThings\Transformer\CapabilityAttributeLabelTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityAttributeLabelTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(CapabilityAttributeLabel::class)]
 #[CoversClass(CapabilityAttributeLabelTransformer::class)]
@@ -31,6 +28,28 @@ final class CapabilityAttributeLabelTransformerTest extends TestCase
 
         self::assertSame('test-label', $actual->getLabel());
         self::assertSame('test-description', $actual->getDescription());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new CapabilityAttributeLabelTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'labelAbsent' => [[], 'getLabel', null];
+        yield 'labelWrongType' => [[CapabilityAttributeLabelTransformerInterface::KEY_LABEL => 42], 'getLabel', null];
     }
 
     /**
@@ -65,27 +84,5 @@ final class CapabilityAttributeLabelTransformerTest extends TestCase
         $actual = $transformer->transform([CapabilityAttributeLabelTransformerInterface::KEY_LABEL => 'test-label']);
 
         self::assertNull($actual->getDescription());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new CapabilityAttributeLabelTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'labelAbsent' => [[], sprintf(CapabilityAttributeLabelTransformerInterface::UNEXPECTED_STRING_SPRINTF, CapabilityAttributeLabelTransformerInterface::KEY_LABEL)];
-        yield 'labelWrongType' => [[CapabilityAttributeLabelTransformerInterface::KEY_LABEL => 42], sprintf(CapabilityAttributeLabelTransformerInterface::UNEXPECTED_STRING_SPRINTF, CapabilityAttributeLabelTransformerInterface::KEY_LABEL)];
     }
 }

@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class PanelItemForCapability implements PanelItemForCapabilityInterface
 {
-    private string $displayType;
+    private ?string $displayType;
     private ?EmptyWithAvailableSizeInterface $empty = null;
     private ?string $label = null;
     private ?ListWithAvailableSizeInterface $list = null;
@@ -15,12 +15,12 @@ final class PanelItemForCapability implements PanelItemForCapabilityInterface
     private ?StateWithAvailableSizeInterface $state = null;
     private ?StepperWithAvailableSizeInterface $stepper = null;
 
-    public function __construct(string $displayType)
+    public function __construct(?string $displayType)
     {
         $this->displayType = $displayType;
     }
 
-    public function getDisplayType(): string
+    public function getDisplayType(): ?string
     {
         return $this->displayType;
     }

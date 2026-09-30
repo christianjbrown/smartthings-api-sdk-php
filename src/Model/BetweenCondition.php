@@ -8,11 +8,11 @@ final class BetweenCondition implements BetweenConditionInterface
 {
     private ?string $aggregation = null;
     private ?bool $changesOnly = null;
-    private OperandInterface $end;
-    private OperandInterface $start;
-    private OperandInterface $value;
+    private ?OperandInterface $end;
+    private ?OperandInterface $start;
+    private ?OperandInterface $value;
 
-    public function __construct(OperandInterface $value, OperandInterface $start, OperandInterface $end)
+    public function __construct(?OperandInterface $value, ?OperandInterface $start, ?OperandInterface $end)
     {
         $this->value = $value;
         $this->start = $start;
@@ -29,17 +29,17 @@ final class BetweenCondition implements BetweenConditionInterface
         return $this->changesOnly;
     }
 
-    public function getEnd(): OperandInterface
+    public function getEnd(): ?OperandInterface
     {
         return $this->end;
     }
 
-    public function getStart(): OperandInterface
+    public function getStart(): ?OperandInterface
     {
         return $this->start;
     }
 
-    public function getValue(): OperandInterface
+    public function getValue(): ?OperandInterface
     {
         return $this->value;
     }

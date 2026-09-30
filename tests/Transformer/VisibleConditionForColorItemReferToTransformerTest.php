@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\VisibleConditionForColorItemReferTo;
 use ChristianBrown\SmartThings\Transformer\VisibleConditionForColorItemReferToTransformer;
 use ChristianBrown\SmartThings\Transformer\VisibleConditionForColorItemReferToTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(VisibleConditionForColorItemReferTo::class)]
 #[CoversClass(VisibleConditionForColorItemReferToTransformer::class)]
@@ -37,6 +34,32 @@ final class VisibleConditionForColorItemReferToTransformerTest extends TestCase
         self::assertSame(7, $actual->getVersion());
         self::assertSame('test-value', $actual->getValue());
         self::assertSame('test-value-type', $actual->getValueType());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new VisibleConditionForColorItemReferToTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'componentAbsent' => [[VisibleConditionForColorItemReferToTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForColorItemReferToTransformerInterface::KEY_VALUE => 'test-value'], 'getComponent', null];
+        yield 'componentWrongType' => [[VisibleConditionForColorItemReferToTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForColorItemReferToTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForColorItemReferToTransformerInterface::KEY_COMPONENT => 42], 'getComponent', null];
+        yield 'capabilityAbsent' => [[VisibleConditionForColorItemReferToTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForColorItemReferToTransformerInterface::KEY_VALUE => 'test-value'], 'getCapability', null];
+        yield 'capabilityWrongType' => [[VisibleConditionForColorItemReferToTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForColorItemReferToTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForColorItemReferToTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
+        yield 'valueAbsent' => [[VisibleConditionForColorItemReferToTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForColorItemReferToTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getValue', null];
+        yield 'valueWrongType' => [[VisibleConditionForColorItemReferToTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForColorItemReferToTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForColorItemReferToTransformerInterface::KEY_VALUE => 42], 'getValue', null];
     }
 
     /**
@@ -75,31 +98,5 @@ final class VisibleConditionForColorItemReferToTransformerTest extends TestCase
 
         self::assertNull($actual->getVersion());
         self::assertNull($actual->getValueType());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new VisibleConditionForColorItemReferToTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'componentAbsent' => [[VisibleConditionForColorItemReferToTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForColorItemReferToTransformerInterface::KEY_VALUE => 'test-value'], sprintf(VisibleConditionForColorItemReferToTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForColorItemReferToTransformerInterface::KEY_COMPONENT)];
-        yield 'componentWrongType' => [[VisibleConditionForColorItemReferToTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForColorItemReferToTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForColorItemReferToTransformerInterface::KEY_COMPONENT => 42], sprintf(VisibleConditionForColorItemReferToTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForColorItemReferToTransformerInterface::KEY_COMPONENT)];
-        yield 'capabilityAbsent' => [[VisibleConditionForColorItemReferToTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForColorItemReferToTransformerInterface::KEY_VALUE => 'test-value'], sprintf(VisibleConditionForColorItemReferToTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForColorItemReferToTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[VisibleConditionForColorItemReferToTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForColorItemReferToTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForColorItemReferToTransformerInterface::KEY_CAPABILITY => 42], sprintf(VisibleConditionForColorItemReferToTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForColorItemReferToTransformerInterface::KEY_CAPABILITY)];
-        yield 'valueAbsent' => [[VisibleConditionForColorItemReferToTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForColorItemReferToTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(VisibleConditionForColorItemReferToTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForColorItemReferToTransformerInterface::KEY_VALUE)];
-        yield 'valueWrongType' => [[VisibleConditionForColorItemReferToTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForColorItemReferToTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForColorItemReferToTransformerInterface::KEY_VALUE => 42], sprintf(VisibleConditionForColorItemReferToTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForColorItemReferToTransformerInterface::KEY_VALUE)];
     }
 }

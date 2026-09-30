@@ -6,13 +6,13 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class Stepper implements StepperInterface
 {
-    private StepperWithAvailableSizeCommandInterface $command;
+    private ?StepperWithAvailableSizeCommandInterface $command;
 
     /**
      * @var mixed[]
      */
     private array $range;
-    private float $step;
+    private ?float $step;
     private ?string $supportedValues = null;
     private ?string $value = null;
     private ?string $valueType = null;
@@ -20,14 +20,14 @@ final class Stepper implements StepperInterface
     /**
      * @phpstan-param mixed[] $range
      */
-    public function __construct(StepperWithAvailableSizeCommandInterface $command, float $step, array $range)
+    public function __construct(?StepperWithAvailableSizeCommandInterface $command, ?float $step, array $range)
     {
         $this->command = $command;
         $this->step = $step;
         $this->range = $range;
     }
 
-    public function getCommand(): StepperWithAvailableSizeCommandInterface
+    public function getCommand(): ?StepperWithAvailableSizeCommandInterface
     {
         return $this->command;
     }
@@ -40,7 +40,7 @@ final class Stepper implements StepperInterface
         return $this->range;
     }
 
-    public function getStep(): float
+    public function getStep(): ?float
     {
         return $this->step;
     }

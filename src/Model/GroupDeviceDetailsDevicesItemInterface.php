@@ -11,7 +11,7 @@ interface GroupDeviceDetailsDevicesItemInterface
      */
     public function getComponents(): ?array;
 
-    public function getDeviceId(): string;
+    public function getDeviceId(): ?string;
 
     /**
      * @param null|array<int, GroupDeviceDetailsDevicesItemComponentsItemInterface> $value

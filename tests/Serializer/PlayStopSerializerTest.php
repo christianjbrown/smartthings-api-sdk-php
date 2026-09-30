@@ -18,6 +18,22 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(PlayStopSerializer::class)]
 final class PlayStopSerializerTest extends TestCase
 {
+    public function testSerializeNestedAbsent(): void
+    {
+        $playStopCommandSerializer = self::createStub(PlayStopCommandSerializerInterface::class);
+        $playStopCommandSerializer->method('serialize')->willReturn(['test-serialized-play-stop-command']);
+        $playStopStateSerializer = self::createStub(PlayStopStateSerializerInterface::class);
+        $playStopStateSerializer->method('serialize')->willReturn(['test-serialized-play-stop-state']);
+        $model = new PlayStop(null, null);
+
+        $serializer = new PlayStopSerializer($playStopCommandSerializer, $playStopStateSerializer);
+
+        self::assertSame(
+            [],
+            $serializer->serialize($model)
+        );
+    }
+
     public function testSerializeRequiredFieldsOnly(): void
     {
         $playStopCommandModel = self::createStub(PlayStopCommandInterface::class);

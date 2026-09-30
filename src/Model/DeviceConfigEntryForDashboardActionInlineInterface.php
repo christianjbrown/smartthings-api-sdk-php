@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface DeviceConfigEntryForDashboardActionInlineInterface
 {
-    public function getDisplayType(): string;
+    public function getDisplayType(): ?string;
 
     public function getGroup(): ?string;
 

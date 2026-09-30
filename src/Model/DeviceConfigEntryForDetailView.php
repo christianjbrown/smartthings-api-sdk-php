@@ -6,8 +6,8 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class DeviceConfigEntryForDetailView implements DeviceConfigEntryForDetailViewInterface
 {
-    private string $capability;
-    private string $component;
+    private ?string $capability;
+    private ?string $component;
 
     /**
      * @var null|array<int, PatchItemInterface>
@@ -21,18 +21,18 @@ final class DeviceConfigEntryForDetailView implements DeviceConfigEntryForDetail
     private ?int $version = null;
     private ?VisibleConditionForDetailViewInterface $visibleCondition = null;
 
-    public function __construct(string $component, string $capability)
+    public function __construct(?string $component, ?string $capability)
     {
         $this->component = $component;
         $this->capability = $capability;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }

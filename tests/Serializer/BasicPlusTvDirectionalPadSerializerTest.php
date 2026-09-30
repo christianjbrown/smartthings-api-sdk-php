@@ -16,6 +16,23 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(BasicPlusTvDirectionalPadSerializer::class)]
 final class BasicPlusTvDirectionalPadSerializerTest extends TestCase
 {
+    public function testSerializeNestedAbsent(): void
+    {
+        $basicPlusTvDirectionalPadCommandSerializer = self::createStub(BasicPlusTvDirectionalPadCommandSerializerInterface::class);
+        $basicPlusTvDirectionalPadCommandSerializer->method('serialize')->willReturn(['test-serialized-basic-plus-tv-directional-pad-command']);
+        $model = new BasicPlusTvDirectionalPad('test-capability', 'test-component', null);
+
+        $serializer = new BasicPlusTvDirectionalPadSerializer($basicPlusTvDirectionalPadCommandSerializer);
+
+        self::assertSame(
+            [
+                BasicPlusTvDirectionalPadSerializerInterface::KEY_CAPABILITY => 'test-capability',
+                BasicPlusTvDirectionalPadSerializerInterface::KEY_COMPONENT => 'test-component',
+            ],
+            $serializer->serialize($model)
+        );
+    }
+
     public function testSerializeRequiredFieldsOnly(): void
     {
         $basicPlusTvDirectionalPadCommandModel = self::createStub(BasicPlusTvDirectionalPadCommandInterface::class);

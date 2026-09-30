@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusCamera;
 use ChristianBrown\SmartThings\Model\BasicPlusCameraImageInterface;
 use ChristianBrown\SmartThings\Model\BasicPlusCameraOverlayIconsItemInterface;
@@ -15,8 +14,6 @@ use ChristianBrown\SmartThings\Transformer\BasicPlusCameraTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(BasicPlusCamera::class)]
 #[CoversClass(BasicPlusCameraTransformer::class)]
@@ -41,6 +38,28 @@ final class BasicPlusCameraTransformerTest extends TestCase
 
         self::assertSame($basicPlusCameraImageModel, $actual->getImage());
         self::assertSame([$basicPlusCameraOverlayIconsItemModel], $actual->getOverlayIcons());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new BasicPlusCameraTransformer(self::createStub(BasicPlusCameraImageTransformerInterface::class), self::createStub(BasicPlusCameraOverlayIconsItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'imageAbsent' => [[], 'getImage', null];
+        yield 'imageWrongType' => [[BasicPlusCameraTransformerInterface::KEY_IMAGE => 'not-array'], 'getImage', null];
     }
 
     public function testTransformOverlayIcons(): void
@@ -72,27 +91,5 @@ final class BasicPlusCameraTransformerTest extends TestCase
         $actual = $transformer->transform([BasicPlusCameraTransformerInterface::KEY_IMAGE => ['test-nested']]);
 
         self::assertNull($actual->getOverlayIcons());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new BasicPlusCameraTransformer(self::createStub(BasicPlusCameraImageTransformerInterface::class), self::createStub(BasicPlusCameraOverlayIconsItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'imageAbsent' => [[], sprintf(BasicPlusCameraTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, BasicPlusCameraTransformerInterface::KEY_IMAGE)];
-        yield 'imageWrongType' => [[BasicPlusCameraTransformerInterface::KEY_IMAGE => 'not-array'], sprintf(BasicPlusCameraTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, BasicPlusCameraTransformerInterface::KEY_IMAGE)];
     }
 }

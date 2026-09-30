@@ -8,13 +8,13 @@ interface AutomationForCapabilityActionsItemInterface
 {
     public function getDescription(): ?string;
 
-    public function getDisplayType(): string;
+    public function getDisplayType(): ?string;
 
     public function getDynamicList(): ?DynamicListForAutomationActionInterface;
 
     public function getEmphasis(): ?bool;
 
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
     public function getList(): ?ListForAutomationActionInterface;
 

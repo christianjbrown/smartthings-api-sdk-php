@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\TextFieldForArgument;
 use ChristianBrown\SmartThings\Transformer\TextFieldForArgumentTransformer;
 use ChristianBrown\SmartThings\Transformer\TextFieldForArgumentTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(TextFieldForArgument::class)]
 #[CoversClass(TextFieldForArgumentTransformer::class)]
@@ -33,6 +30,28 @@ final class TextFieldForArgumentTransformerTest extends TestCase
         self::assertSame('test-name', $actual->getName());
         self::assertSame('test-argument-type', $actual->getArgumentType());
         self::assertSame(['test-range-key' => 'test-value'], $actual->getRange());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new TextFieldForArgumentTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'nameAbsent' => [[], 'getName', null];
+        yield 'nameWrongType' => [[TextFieldForArgumentTransformerInterface::KEY_NAME => 42], 'getName', null];
     }
 
     /**
@@ -71,27 +90,5 @@ final class TextFieldForArgumentTransformerTest extends TestCase
 
         self::assertNull($actual->getArgumentType());
         self::assertNull($actual->getRange());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new TextFieldForArgumentTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'nameAbsent' => [[], sprintf(TextFieldForArgumentTransformerInterface::UNEXPECTED_STRING_SPRINTF, TextFieldForArgumentTransformerInterface::KEY_NAME)];
-        yield 'nameWrongType' => [[TextFieldForArgumentTransformerInterface::KEY_NAME => 42], sprintf(TextFieldForArgumentTransformerInterface::UNEXPECTED_STRING_SPRINTF, TextFieldForArgumentTransformerInterface::KEY_NAME)];
     }
 }

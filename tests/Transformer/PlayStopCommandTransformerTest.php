@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\PlayStopCommand;
 use ChristianBrown\SmartThings\Transformer\PlayStopCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayStopCommandTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(PlayStopCommand::class)]
 #[CoversClass(PlayStopCommandTransformer::class)]
@@ -35,6 +32,30 @@ final class PlayStopCommandTransformerTest extends TestCase
         self::assertSame('test-play', $actual->getPlay());
         self::assertSame('test-stop', $actual->getStop());
         self::assertSame('test-argument-type', $actual->getArgumentType());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new PlayStopCommandTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'playAbsent' => [[PlayStopCommandTransformerInterface::KEY_STOP => 'test-stop'], 'getPlay', null];
+        yield 'playWrongType' => [[PlayStopCommandTransformerInterface::KEY_STOP => 'test-stop', PlayStopCommandTransformerInterface::KEY_PLAY => 42], 'getPlay', null];
+        yield 'stopAbsent' => [[PlayStopCommandTransformerInterface::KEY_PLAY => 'test-play'], 'getStop', null];
+        yield 'stopWrongType' => [[PlayStopCommandTransformerInterface::KEY_PLAY => 'test-play', PlayStopCommandTransformerInterface::KEY_STOP => 42], 'getStop', null];
     }
 
     /**
@@ -73,29 +94,5 @@ final class PlayStopCommandTransformerTest extends TestCase
 
         self::assertNull($actual->getName());
         self::assertNull($actual->getArgumentType());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new PlayStopCommandTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'playAbsent' => [[PlayStopCommandTransformerInterface::KEY_STOP => 'test-stop'], sprintf(PlayStopCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, PlayStopCommandTransformerInterface::KEY_PLAY)];
-        yield 'playWrongType' => [[PlayStopCommandTransformerInterface::KEY_STOP => 'test-stop', PlayStopCommandTransformerInterface::KEY_PLAY => 42], sprintf(PlayStopCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, PlayStopCommandTransformerInterface::KEY_PLAY)];
-        yield 'stopAbsent' => [[PlayStopCommandTransformerInterface::KEY_PLAY => 'test-play'], sprintf(PlayStopCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, PlayStopCommandTransformerInterface::KEY_STOP)];
-        yield 'stopWrongType' => [[PlayStopCommandTransformerInterface::KEY_PLAY => 'test-play', PlayStopCommandTransformerInterface::KEY_STOP => 42], sprintf(PlayStopCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, PlayStopCommandTransformerInterface::KEY_STOP)];
     }
 }

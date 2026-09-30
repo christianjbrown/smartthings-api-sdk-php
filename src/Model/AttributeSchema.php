@@ -7,7 +7,7 @@ namespace ChristianBrown\SmartThings\Model;
 final class AttributeSchema implements AttributeSchemaInterface
 {
     private ?bool $additionalProperties = null;
-    private AttributePropertiesInterface $properties;
+    private ?AttributePropertiesInterface $properties;
 
     /**
      * @var null|array<int, string>
@@ -17,7 +17,7 @@ final class AttributeSchema implements AttributeSchemaInterface
     private ?string $title = null;
     private ?string $type = null;
 
-    public function __construct(AttributePropertiesInterface $properties)
+    public function __construct(?AttributePropertiesInterface $properties)
     {
         $this->properties = $properties;
     }
@@ -27,7 +27,7 @@ final class AttributeSchema implements AttributeSchemaInterface
         return $this->additionalProperties;
     }
 
-    public function getProperties(): AttributePropertiesInterface
+    public function getProperties(): ?AttributePropertiesInterface
     {
         return $this->properties;
     }

@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface SupportedValuesForDynamicListInterface
 {
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function getValueMap(): ?SupportedValuesForDynamicListValueMapInterface;
 

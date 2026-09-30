@@ -6,30 +6,30 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class BasicPlusProgressBarsBarItem implements BasicPlusProgressBarsBarItemInterface
 {
-    private string $capability;
-    private string $component;
+    private ?string $capability;
+    private ?string $component;
 
     /**
      * @var null|mixed[]
      */
     private ?array $range = null;
-    private string $value;
+    private ?string $value;
     private ?string $valueType = null;
     private ?int $version = null;
 
-    public function __construct(string $capability, string $component, string $value)
+    public function __construct(?string $capability, ?string $component, ?string $value)
     {
         $this->capability = $capability;
         $this->component = $component;
         $this->value = $value;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }
@@ -42,7 +42,7 @@ final class BasicPlusProgressBarsBarItem implements BasicPlusProgressBarsBarItem
         return $this->range;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

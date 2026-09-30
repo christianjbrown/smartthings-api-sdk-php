@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\HubDriver;
 use ChristianBrown\SmartThings\Transformer\HubDriverTransformer;
 use ChristianBrown\SmartThings\Transformer\HubDriverTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(HubDriver::class)]
 #[CoversClass(HubDriverTransformer::class)]
@@ -33,6 +30,28 @@ final class HubDriverTransformerTest extends TestCase
         self::assertSame('test-driver-version', $actual->getDriverVersion());
         self::assertSame('test-driver-id', $actual->getDriverId());
         self::assertSame('test-channel-id', $actual->getChannelId());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new HubDriverTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'driverIdAbsent' => [[], 'getDriverId', null];
+        yield 'driverIdWrongType' => [[HubDriverTransformerInterface::KEY_DRIVER_ID => 42], 'getDriverId', null];
     }
 
     /**
@@ -71,27 +90,5 @@ final class HubDriverTransformerTest extends TestCase
 
         self::assertNull($actual->getDriverVersion());
         self::assertNull($actual->getChannelId());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new HubDriverTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'driverIdAbsent' => [[], sprintf(HubDriverTransformerInterface::UNEXPECTED_STRING_SPRINTF, HubDriverTransformerInterface::KEY_DRIVER_ID)];
-        yield 'driverIdWrongType' => [[HubDriverTransformerInterface::KEY_DRIVER_ID => 42], sprintf(HubDriverTransformerInterface::UNEXPECTED_STRING_SPRINTF, HubDriverTransformerInterface::KEY_DRIVER_ID)];
     }
 }

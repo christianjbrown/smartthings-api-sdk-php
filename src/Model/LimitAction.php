@@ -10,14 +10,14 @@ final class LimitAction implements LimitActionInterface
      * @var array<int, ActionInterface>
      */
     private array $actions;
-    private int $count;
-    private string $period;
+    private ?int $count;
+    private ?string $period;
     private ?ActionSequenceInterface $sequence = null;
 
     /**
      * @phpstan-param array<int, ActionInterface> $actions
      */
-    public function __construct(int $count, string $period, array $actions)
+    public function __construct(?int $count, ?string $period, array $actions)
     {
         $this->count = $count;
         $this->period = $period;
@@ -32,12 +32,12 @@ final class LimitAction implements LimitActionInterface
         return $this->actions;
     }
 
-    public function getCount(): int
+    public function getCount(): ?int
     {
         return $this->count;
     }
 
-    public function getPeriod(): string
+    public function getPeriod(): ?string
     {
         return $this->period;
     }

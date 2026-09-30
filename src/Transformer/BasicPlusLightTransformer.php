@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusLight;
 use ChristianBrown\SmartThings\Model\BasicPlusLightInterface;
 use ChristianBrown\SmartThings\Model\SliderForLightInterface;
 
 use function is_array;
 use function is_bool;
-use function sprintf;
 
 final class BasicPlusLightTransformer implements BasicPlusLightTransformerInterface
 {
@@ -83,13 +81,13 @@ final class BasicPlusLightTransformer implements BasicPlusLightTransformerInterf
     /**
      * @param mixed[] $data
      */
-    private function requireDimmer(array $data): SliderForLightInterface
+    private function requireDimmer(array $data): ?SliderForLightInterface
     {
         if (!isset($data[self::KEY_DIMMER])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DIMMER));
+            return null;
         }
         if (!is_array($data[self::KEY_DIMMER])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DIMMER));
+            return null;
         }
 
         return $this->sliderForLightTransformer->transform($data[self::KEY_DIMMER]);

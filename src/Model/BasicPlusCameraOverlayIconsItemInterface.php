@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface BasicPlusCameraOverlayIconsItemInterface
 {
-    public function getIconUrl(): string;
+    public function getIconUrl(): ?string;
 
     public function getVisibleCondition(): ?VisibleConditionInterface;
 

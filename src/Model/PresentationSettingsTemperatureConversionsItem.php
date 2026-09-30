@@ -7,9 +7,9 @@ namespace ChristianBrown\SmartThings\Model;
 final class PresentationSettingsTemperatureConversionsItem implements PresentationSettingsTemperatureConversionsItemInterface
 {
     private ?string $unit = null;
-    private string $value;
+    private ?string $value;
 
-    public function __construct(string $value)
+    public function __construct(?string $value)
     {
         $this->value = $value;
     }
@@ -19,7 +19,7 @@ final class PresentationSettingsTemperatureConversionsItem implements Presentati
         return $this->unit;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

@@ -7,8 +7,8 @@ namespace ChristianBrown\SmartThings\Model;
 final class CapabilitySubscriptionDetail implements CapabilitySubscriptionDetailInterface
 {
     private ?string $attribute = null;
-    private string $capability;
-    private string $locationId;
+    private ?string $capability;
+    private ?string $locationId;
 
     /**
      * @var null|array<int, string>
@@ -18,7 +18,7 @@ final class CapabilitySubscriptionDetail implements CapabilitySubscriptionDetail
     private ?string $subscriptionName = null;
     private mixed $value = null;
 
-    public function __construct(string $locationId, string $capability)
+    public function __construct(?string $locationId, ?string $capability)
     {
         $this->locationId = $locationId;
         $this->capability = $capability;
@@ -29,12 +29,12 @@ final class CapabilitySubscriptionDetail implements CapabilitySubscriptionDetail
         return $this->attribute;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getLocationId(): string
+    public function getLocationId(): ?string
     {
         return $this->locationId;
     }

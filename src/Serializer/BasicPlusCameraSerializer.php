@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Serializer;
 
+use ChristianBrown\SmartThings\Model\BasicPlusCameraImageInterface;
 use ChristianBrown\SmartThings\Model\BasicPlusCameraInterface;
 use ChristianBrown\SmartThings\Model\BasicPlusCameraOverlayIconsItemInterface;
 
@@ -27,12 +28,24 @@ final class BasicPlusCameraSerializer implements BasicPlusCameraSerializerInterf
     public function serialize(BasicPlusCameraInterface $model): array
     {
         $serialized = [
-            self::KEY_IMAGE => $this->basicPlusCameraImageSerializer->serialize($model->getImage()),
+            self::KEY_IMAGE => $this->serializeOptionalBasicPlusCameraImage($model->getImage()),
             self::KEY_OVERLAY_ICONS => $this->serializeOverlayIcons($model->getOverlayIcons()),
         ];
 
         // Omit null optionals rather than sending them as explicit nulls.
         return array_filter($serialized, static fn (mixed $value): bool => null !== $value);
+    }
+
+    /**
+     * @return null|mixed[]
+     */
+    private function serializeOptionalBasicPlusCameraImage(?BasicPlusCameraImageInterface $value): ?array
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->basicPlusCameraImageSerializer->serialize($value);
     }
 
     /**

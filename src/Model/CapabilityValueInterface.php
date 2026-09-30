@@ -16,7 +16,7 @@ interface CapabilityValueInterface
      */
     public function getEnabledValues(): ?array;
 
-    public function getKey(): string;
+    public function getKey(): ?string;
 
     public function getLabel(): ?string;
 

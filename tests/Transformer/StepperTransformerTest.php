@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Stepper;
 use ChristianBrown\SmartThings\Model\StepperWithAvailableSizeCommandInterface;
 use ChristianBrown\SmartThings\Transformer\StepperTransformer;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\StepperWithAvailableSizeCommandTransf
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(Stepper::class)]
 #[CoversClass(StepperTransformer::class)]
@@ -44,6 +41,32 @@ final class StepperTransformerTest extends TestCase
         self::assertSame('test-supported-values', $actual->getSupportedValues());
         self::assertSame('test-value', $actual->getValue());
         self::assertSame('test-value-type', $actual->getValueType());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new StepperTransformer(self::createStub(StepperWithAvailableSizeCommandTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'commandAbsent' => [[StepperTransformerInterface::KEY_STEP => 1.5, StepperTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value']], 'getCommand', null];
+        yield 'commandWrongType' => [[StepperTransformerInterface::KEY_STEP => 1.5, StepperTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], StepperTransformerInterface::KEY_COMMAND => 'not-array'], 'getCommand', null];
+        yield 'stepAbsent' => [[StepperTransformerInterface::KEY_COMMAND => ['test-nested'], StepperTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value']], 'getStep', null];
+        yield 'stepWrongType' => [[StepperTransformerInterface::KEY_COMMAND => ['test-nested'], StepperTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], StepperTransformerInterface::KEY_STEP => 'not-number'], 'getStep', null];
+        yield 'rangeAbsent' => [[StepperTransformerInterface::KEY_COMMAND => ['test-nested'], StepperTransformerInterface::KEY_STEP => 1.5], 'getRange', []];
+        yield 'rangeWrongType' => [[StepperTransformerInterface::KEY_COMMAND => ['test-nested'], StepperTransformerInterface::KEY_STEP => 1.5, StepperTransformerInterface::KEY_RANGE => 'not-array'], 'getRange', []];
     }
 
     /**
@@ -89,31 +112,5 @@ final class StepperTransformerTest extends TestCase
         self::assertNull($actual->getSupportedValues());
         self::assertNull($actual->getValue());
         self::assertNull($actual->getValueType());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new StepperTransformer(self::createStub(StepperWithAvailableSizeCommandTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'commandAbsent' => [[StepperTransformerInterface::KEY_STEP => 1.5, StepperTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value']], sprintf(StepperTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, StepperTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[StepperTransformerInterface::KEY_STEP => 1.5, StepperTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], StepperTransformerInterface::KEY_COMMAND => 'not-array'], sprintf(StepperTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, StepperTransformerInterface::KEY_COMMAND)];
-        yield 'stepAbsent' => [[StepperTransformerInterface::KEY_COMMAND => ['test-nested'], StepperTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value']], sprintf(StepperTransformerInterface::UNEXPECTED_NUMBER_SPRINTF, StepperTransformerInterface::KEY_STEP)];
-        yield 'stepWrongType' => [[StepperTransformerInterface::KEY_COMMAND => ['test-nested'], StepperTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], StepperTransformerInterface::KEY_STEP => 'not-number'], sprintf(StepperTransformerInterface::UNEXPECTED_NUMBER_SPRINTF, StepperTransformerInterface::KEY_STEP)];
-        yield 'rangeAbsent' => [[StepperTransformerInterface::KEY_COMMAND => ['test-nested'], StepperTransformerInterface::KEY_STEP => 1.5], sprintf(StepperTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, StepperTransformerInterface::KEY_RANGE)];
-        yield 'rangeWrongType' => [[StepperTransformerInterface::KEY_COMMAND => ['test-nested'], StepperTransformerInterface::KEY_STEP => 1.5, StepperTransformerInterface::KEY_RANGE => 'not-array'], sprintf(StepperTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, StepperTransformerInterface::KEY_RANGE)];
     }
 }

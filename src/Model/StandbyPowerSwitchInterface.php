@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface StandbyPowerSwitchInterface
 {
-    public function getCommand(): ToggleSwitchForDashboardCommandInterface;
+    public function getCommand(): ?ToggleSwitchForDashboardCommandInterface;
 
     public function getState(): ?StandbyPowerSwitchForDashboardStateInterface;
 

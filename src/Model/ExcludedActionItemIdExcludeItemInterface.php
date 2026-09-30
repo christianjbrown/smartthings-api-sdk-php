@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface ExcludedActionItemIdExcludeItemInterface
 {
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
     /**
      * @return null|array<int, ExcludedConditionItemIdExcludeItemAttributesItemInterface>

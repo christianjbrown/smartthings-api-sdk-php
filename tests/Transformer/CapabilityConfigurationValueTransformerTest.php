@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilityConfigurationValue;
 use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationValueTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationValueTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(CapabilityConfigurationValue::class)]
 #[CoversClass(CapabilityConfigurationValueTransformer::class)]
@@ -35,6 +32,28 @@ final class CapabilityConfigurationValueTransformerTest extends TestCase
         self::assertSame(['test-range-key' => 'test-value'], $actual->getRange());
         self::assertSame(['test-enabled-values-1', 'test-enabled-values-2'], $actual->getEnabledValues());
         self::assertSame(1.5, $actual->getStep());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new CapabilityConfigurationValueTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'keyAbsent' => [[], 'getKey', null];
+        yield 'keyWrongType' => [[CapabilityConfigurationValueTransformerInterface::KEY_KEY => 42], 'getKey', null];
     }
 
     /**
@@ -77,27 +96,5 @@ final class CapabilityConfigurationValueTransformerTest extends TestCase
         self::assertNull($actual->getRange());
         self::assertNull($actual->getEnabledValues());
         self::assertNull($actual->getStep());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new CapabilityConfigurationValueTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'keyAbsent' => [[], sprintf(CapabilityConfigurationValueTransformerInterface::UNEXPECTED_STRING_SPRINTF, CapabilityConfigurationValueTransformerInterface::KEY_KEY)];
-        yield 'keyWrongType' => [[CapabilityConfigurationValueTransformerInterface::KEY_KEY => 42], sprintf(CapabilityConfigurationValueTransformerInterface::UNEXPECTED_STRING_SPRINTF, CapabilityConfigurationValueTransformerInterface::KEY_KEY)];
     }
 }

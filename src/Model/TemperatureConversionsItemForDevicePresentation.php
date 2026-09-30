@@ -6,18 +6,18 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class TemperatureConversionsItemForDevicePresentation implements TemperatureConversionsItemForDevicePresentationInterface
 {
-    private string $capability;
+    private ?string $capability;
     private ?string $unit = null;
-    private string $value;
+    private ?string $value;
     private ?int $version = null;
 
-    public function __construct(string $capability, string $value)
+    public function __construct(?string $capability, ?string $value)
     {
         $this->capability = $capability;
         $this->value = $value;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
@@ -27,7 +27,7 @@ final class TemperatureConversionsItemForDevicePresentation implements Temperatu
         return $this->unit;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

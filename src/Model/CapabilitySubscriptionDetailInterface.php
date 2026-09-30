@@ -8,9 +8,9 @@ interface CapabilitySubscriptionDetailInterface
 {
     public function getAttribute(): ?string;
 
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getLocationId(): string;
+    public function getLocationId(): ?string;
 
     /**
      * @return null|array<int, string>

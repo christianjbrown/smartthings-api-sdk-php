@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface PoCodesInterface
 {
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
-    public function getPo(): string;
+    public function getPo(): ?string;
 }

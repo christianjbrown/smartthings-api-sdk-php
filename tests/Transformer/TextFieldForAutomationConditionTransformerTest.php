@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\TextFieldForAutomationCondition;
 use ChristianBrown\SmartThings\Transformer\TextFieldForAutomationConditionTransformer;
 use ChristianBrown\SmartThings\Transformer\TextFieldForAutomationConditionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(TextFieldForAutomationCondition::class)]
 #[CoversClass(TextFieldForAutomationConditionTransformer::class)]
@@ -33,6 +30,28 @@ final class TextFieldForAutomationConditionTransformerTest extends TestCase
         self::assertSame('test-value', $actual->getValue());
         self::assertSame('test-value-type', $actual->getValueType());
         self::assertSame(['test-range-key' => 'test-value'], $actual->getRange());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new TextFieldForAutomationConditionTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'valueAbsent' => [[], 'getValue', null];
+        yield 'valueWrongType' => [[TextFieldForAutomationConditionTransformerInterface::KEY_VALUE => 42], 'getValue', null];
     }
 
     /**
@@ -71,27 +90,5 @@ final class TextFieldForAutomationConditionTransformerTest extends TestCase
 
         self::assertNull($actual->getValueType());
         self::assertNull($actual->getRange());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new TextFieldForAutomationConditionTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'valueAbsent' => [[], sprintf(TextFieldForAutomationConditionTransformerInterface::UNEXPECTED_STRING_SPRINTF, TextFieldForAutomationConditionTransformerInterface::KEY_VALUE)];
-        yield 'valueWrongType' => [[TextFieldForAutomationConditionTransformerInterface::KEY_VALUE => 42], sprintf(TextFieldForAutomationConditionTransformerInterface::UNEXPECTED_STRING_SPRINTF, TextFieldForAutomationConditionTransformerInterface::KEY_VALUE)];
     }
 }

@@ -6,9 +6,9 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class ActionsArrayItem implements ActionsArrayItemInterface
 {
-    private string $capability;
+    private ?string $capability;
     private ?string $component = null;
-    private string $displayType;
+    private ?string $displayType;
     private ?string $group = null;
     private ?PlayPauseInterface $playPause = null;
     private ?PlayStopInterface $playStop = null;
@@ -20,13 +20,13 @@ final class ActionsArrayItem implements ActionsArrayItemInterface
     private ?int $version = null;
     private ?VisibleConditionInterface $visibleCondition = null;
 
-    public function __construct(string $displayType, string $capability)
+    public function __construct(?string $displayType, ?string $capability)
     {
         $this->displayType = $displayType;
         $this->capability = $capability;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
@@ -36,7 +36,7 @@ final class ActionsArrayItem implements ActionsArrayItemInterface
         return $this->component;
     }
 
-    public function getDisplayType(): string
+    public function getDisplayType(): ?string
     {
         return $this->displayType;
     }

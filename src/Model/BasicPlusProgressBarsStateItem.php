@@ -10,19 +10,19 @@ final class BasicPlusProgressBarsStateItem implements BasicPlusProgressBarsState
      * @var null|array<int, AlternativeItemInterface>
      */
     private ?array $alternatives = null;
-    private string $capability;
-    private string $component;
+    private ?string $capability;
+    private ?string $component;
 
     /**
      * @var null|array<int, DeviceConfigEntryForDashboardStateFormatInfoItemInterface>
      */
     private ?array $formatInfo = null;
     private ?string $iconUrl = null;
-    private string $label;
+    private ?string $label;
     private ?string $placement = null;
     private ?int $version = null;
 
-    public function __construct(string $label, string $capability, string $component)
+    public function __construct(?string $label, ?string $capability, ?string $component)
     {
         $this->label = $label;
         $this->capability = $capability;
@@ -37,12 +37,12 @@ final class BasicPlusProgressBarsStateItem implements BasicPlusProgressBarsState
         return $this->alternatives;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }
@@ -60,7 +60,7 @@ final class BasicPlusProgressBarsStateItem implements BasicPlusProgressBarsState
         return $this->iconUrl;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }

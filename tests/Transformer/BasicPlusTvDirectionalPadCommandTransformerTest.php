@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusTvDirectionalPadCommand;
 use ChristianBrown\SmartThings\Transformer\BasicPlusTvDirectionalPadCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\BasicPlusTvDirectionalPadCommandTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(BasicPlusTvDirectionalPadCommand::class)]
 #[CoversClass(BasicPlusTvDirectionalPadCommandTransformer::class)]
@@ -39,6 +36,36 @@ final class BasicPlusTvDirectionalPadCommandTransformerTest extends TestCase
         self::assertSame('test-left', $actual->getLeft());
         self::assertSame('test-right', $actual->getRight());
         self::assertSame('test-ok', $actual->getOk());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new BasicPlusTvDirectionalPadCommandTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'upAbsent' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok'], 'getUp', null];
+        yield 'upWrongType' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 42], 'getUp', null];
+        yield 'downAbsent' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok'], 'getDown', null];
+        yield 'downWrongType' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 42], 'getDown', null];
+        yield 'leftAbsent' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok'], 'getLeft', null];
+        yield 'leftWrongType' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 42], 'getLeft', null];
+        yield 'rightAbsent' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok'], 'getRight', null];
+        yield 'rightWrongType' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 42], 'getRight', null];
+        yield 'okAbsent' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right'], 'getOk', null];
+        yield 'okWrongType' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 42], 'getOk', null];
     }
 
     /**
@@ -73,35 +100,5 @@ final class BasicPlusTvDirectionalPadCommandTransformerTest extends TestCase
         $actual = $transformer->transform([BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok']);
 
         self::assertNull($actual->getName());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new BasicPlusTvDirectionalPadCommandTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'upAbsent' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok'], sprintf(BasicPlusTvDirectionalPadCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP)];
-        yield 'upWrongType' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 42], sprintf(BasicPlusTvDirectionalPadCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP)];
-        yield 'downAbsent' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok'], sprintf(BasicPlusTvDirectionalPadCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN)];
-        yield 'downWrongType' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 42], sprintf(BasicPlusTvDirectionalPadCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN)];
-        yield 'leftAbsent' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok'], sprintf(BasicPlusTvDirectionalPadCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT)];
-        yield 'leftWrongType' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 42], sprintf(BasicPlusTvDirectionalPadCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT)];
-        yield 'rightAbsent' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok'], sprintf(BasicPlusTvDirectionalPadCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT)];
-        yield 'rightWrongType' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 'test-ok', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 42], sprintf(BasicPlusTvDirectionalPadCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT)];
-        yield 'okAbsent' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right'], sprintf(BasicPlusTvDirectionalPadCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK)];
-        yield 'okWrongType' => [[BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_UP => 'test-up', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_DOWN => 'test-down', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_LEFT => 'test-left', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_RIGHT => 'test-right', BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK => 42], sprintf(BasicPlusTvDirectionalPadCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvDirectionalPadCommandTransformerInterface::KEY_OK)];
     }
 }

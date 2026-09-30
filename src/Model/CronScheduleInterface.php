@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface CronScheduleInterface
 {
-    public function getExpression(): string;
+    public function getExpression(): ?string;
 
-    public function getTimezone(): string;
+    public function getTimezone(): ?string;
 }

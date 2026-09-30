@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ToggleSwitchForDashboardCommand;
 use ChristianBrown\SmartThings\Transformer\ToggleSwitchForDashboardCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\ToggleSwitchForDashboardCommandTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(ToggleSwitchForDashboardCommand::class)]
 #[CoversClass(ToggleSwitchForDashboardCommandTransformer::class)]
@@ -35,6 +32,30 @@ final class ToggleSwitchForDashboardCommandTransformerTest extends TestCase
         self::assertSame('test-on', $actual->getOn());
         self::assertSame('test-off', $actual->getOff());
         self::assertSame('test-argument-type', $actual->getArgumentType());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new ToggleSwitchForDashboardCommandTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'onAbsent' => [[ToggleSwitchForDashboardCommandTransformerInterface::KEY_OFF => 'test-off'], 'getOn', null];
+        yield 'onWrongType' => [[ToggleSwitchForDashboardCommandTransformerInterface::KEY_OFF => 'test-off', ToggleSwitchForDashboardCommandTransformerInterface::KEY_ON => 42], 'getOn', null];
+        yield 'offAbsent' => [[ToggleSwitchForDashboardCommandTransformerInterface::KEY_ON => 'test-on'], 'getOff', null];
+        yield 'offWrongType' => [[ToggleSwitchForDashboardCommandTransformerInterface::KEY_ON => 'test-on', ToggleSwitchForDashboardCommandTransformerInterface::KEY_OFF => 42], 'getOff', null];
     }
 
     /**
@@ -73,29 +94,5 @@ final class ToggleSwitchForDashboardCommandTransformerTest extends TestCase
 
         self::assertNull($actual->getName());
         self::assertNull($actual->getArgumentType());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new ToggleSwitchForDashboardCommandTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'onAbsent' => [[ToggleSwitchForDashboardCommandTransformerInterface::KEY_OFF => 'test-off'], sprintf(ToggleSwitchForDashboardCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, ToggleSwitchForDashboardCommandTransformerInterface::KEY_ON)];
-        yield 'onWrongType' => [[ToggleSwitchForDashboardCommandTransformerInterface::KEY_OFF => 'test-off', ToggleSwitchForDashboardCommandTransformerInterface::KEY_ON => 42], sprintf(ToggleSwitchForDashboardCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, ToggleSwitchForDashboardCommandTransformerInterface::KEY_ON)];
-        yield 'offAbsent' => [[ToggleSwitchForDashboardCommandTransformerInterface::KEY_ON => 'test-on'], sprintf(ToggleSwitchForDashboardCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, ToggleSwitchForDashboardCommandTransformerInterface::KEY_OFF)];
-        yield 'offWrongType' => [[ToggleSwitchForDashboardCommandTransformerInterface::KEY_ON => 'test-on', ToggleSwitchForDashboardCommandTransformerInterface::KEY_OFF => 42], sprintf(ToggleSwitchForDashboardCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, ToggleSwitchForDashboardCommandTransformerInterface::KEY_OFF)];
     }
 }

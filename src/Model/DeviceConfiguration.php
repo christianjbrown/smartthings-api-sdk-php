@@ -31,13 +31,13 @@ final class DeviceConfiguration implements DeviceConfigurationInterface
     private ?array $icons = null;
     private ?string $iconUrl = null;
     private ?string $manufacturerName = null;
-    private string $mnmn;
+    private ?string $mnmn;
     private ?string $presentationId = null;
     private ?string $type = null;
     private ?string $version = null;
-    private string $vid;
+    private ?string $vid;
 
-    public function __construct(string $mnmn, string $vid)
+    public function __construct(?string $mnmn, ?string $vid)
     {
         $this->mnmn = $mnmn;
         $this->vid = $vid;
@@ -100,7 +100,7 @@ final class DeviceConfiguration implements DeviceConfigurationInterface
         return $this->manufacturerName;
     }
 
-    public function getMnmn(): string
+    public function getMnmn(): ?string
     {
         return $this->mnmn;
     }
@@ -120,7 +120,7 @@ final class DeviceConfiguration implements DeviceConfigurationInterface
         return $this->version;
     }
 
-    public function getVid(): string
+    public function getVid(): ?string
     {
         return $this->vid;
     }

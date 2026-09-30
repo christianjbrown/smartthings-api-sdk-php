@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusItemActionsItem;
 use ChristianBrown\SmartThings\Model\BasicPlusItemActionsItemInterface;
 use ChristianBrown\SmartThings\Model\VisibleConditionInterface;
@@ -15,7 +14,6 @@ use function array_values;
 use function is_array;
 use function is_int;
 use function is_string;
-use function sprintf;
 
 final class BasicPlusItemActionsItemTransformer implements BasicPlusItemActionsItemTransformerInterface
 {
@@ -130,13 +128,13 @@ final class BasicPlusItemActionsItemTransformer implements BasicPlusItemActionsI
     /**
      * @param mixed[] $data
      */
-    private static function requireCapability(array $data): string
+    private static function requireCapability(array $data): ?string
     {
         if (empty($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
         if (!is_string($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
 
         return $data[self::KEY_CAPABILITY];
@@ -145,13 +143,13 @@ final class BasicPlusItemActionsItemTransformer implements BasicPlusItemActionsI
     /**
      * @param mixed[] $data
      */
-    private static function requireCommand(array $data): string
+    private static function requireCommand(array $data): ?string
     {
         if (empty($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
         if (!is_string($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
 
         return $data[self::KEY_COMMAND];
@@ -160,13 +158,13 @@ final class BasicPlusItemActionsItemTransformer implements BasicPlusItemActionsI
     /**
      * @param mixed[] $data
      */
-    private static function requireComponent(array $data): string
+    private static function requireComponent(array $data): ?string
     {
         if (empty($data[self::KEY_COMPONENT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMPONENT));
+            return null;
         }
         if (!is_string($data[self::KEY_COMPONENT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMPONENT));
+            return null;
         }
 
         return $data[self::KEY_COMPONENT];

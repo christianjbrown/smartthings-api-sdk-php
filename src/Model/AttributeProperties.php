@@ -8,9 +8,9 @@ final class AttributeProperties implements AttributePropertiesInterface
 {
     private ?AttributeDataSchemaInterface $data = null;
     private ?AttributeUnitSchemaInterface $unit = null;
-    private AttributeValueSchemaInterface $value;
+    private ?AttributeValueSchemaInterface $value;
 
-    public function __construct(AttributeValueSchemaInterface $value)
+    public function __construct(?AttributeValueSchemaInterface $value)
     {
         $this->value = $value;
     }
@@ -25,7 +25,7 @@ final class AttributeProperties implements AttributePropertiesInterface
         return $this->unit;
     }
 
-    public function getValue(): AttributeValueSchemaInterface
+    public function getValue(): ?AttributeValueSchemaInterface
     {
         return $this->value;
     }

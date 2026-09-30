@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\EdgeDriverSupportedEndpointApps;
 use ChristianBrown\SmartThings\Model\EdgeDriverSupportedEndpointAppsAppsItemInterface;
 use ChristianBrown\SmartThings\Transformer\EdgeDriverSupportedEndpointAppsAppsItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\EdgeDriverSupportedEndpointAppsTransf
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(EdgeDriverSupportedEndpointApps::class)]
 #[CoversClass(EdgeDriverSupportedEndpointAppsTransformer::class)]
@@ -39,22 +36,22 @@ final class EdgeDriverSupportedEndpointAppsTransformerTest extends TestCase
     /**
      * @param array<string, mixed> $data
      */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
     {
         $transformer = new EdgeDriverSupportedEndpointAppsTransformer(self::createStub(EdgeDriverSupportedEndpointAppsAppsItemTransformerInterface::class));
 
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
     }
 
     /**
-     * @return iterable<string, array{array<string, mixed>, string}>
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
      */
-    public static function provideTransformUnexpectedCases(): iterable
+    public static function provideTransformLenientCases(): iterable
     {
-        yield 'appsAbsent' => [[], sprintf(EdgeDriverSupportedEndpointAppsTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, EdgeDriverSupportedEndpointAppsTransformerInterface::KEY_APPS)];
-        yield 'appsWrongType' => [[EdgeDriverSupportedEndpointAppsTransformerInterface::KEY_APPS => 'not-array'], sprintf(EdgeDriverSupportedEndpointAppsTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, EdgeDriverSupportedEndpointAppsTransformerInterface::KEY_APPS)];
+        yield 'appsAbsent' => [[], 'getApps', []];
+        yield 'appsWrongType' => [[EdgeDriverSupportedEndpointAppsTransformerInterface::KEY_APPS => 'not-array'], 'getApps', []];
     }
 }

@@ -6,14 +6,14 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class SceneSleepRequest implements SceneSleepRequestInterface
 {
-    private int $seconds;
+    private ?int $seconds;
 
-    public function __construct(int $seconds)
+    public function __construct(?int $seconds)
     {
         $this->seconds = $seconds;
     }
 
-    public function getSeconds(): int
+    public function getSeconds(): ?int
     {
         return $this->seconds;
     }

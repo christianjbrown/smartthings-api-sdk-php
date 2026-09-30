@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\EdgeDriverSupportedEndpointAppsInterface;
 use ChristianBrown\SmartThings\Model\HubDeviceDetailsHubData;
 use ChristianBrown\SmartThings\Model\HubDeviceDetailsHubDataHub2hubSupportMatrixInterface;
@@ -15,8 +14,6 @@ use ChristianBrown\SmartThings\Transformer\HubDeviceDetailsHubDataTransformerInt
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(HubDeviceDetailsHubData::class)]
 #[CoversClass(HubDeviceDetailsHubDataTransformer::class)]
@@ -177,6 +174,34 @@ final class HubDeviceDetailsHubDataTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getHub2hubSupportMatrix());
         self::assertNull($transformer->transform($base + [HubDeviceDetailsHubDataTransformerInterface::KEY_HUB2HUB_SUPPORT_MATRIX => 'test-not-array'])->getHub2hubSupportMatrix());
         self::assertSame($hubDeviceDetailsHubDataHub2hubSupportMatrixModel, $transformer->transform($base + [HubDeviceDetailsHubDataTransformerInterface::KEY_HUB2HUB_SUPPORT_MATRIX => ['test-nested']])->getHub2hubSupportMatrix());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new HubDeviceDetailsHubDataTransformer(self::createStub(EdgeDriverSupportedEndpointAppsTransformerInterface::class), self::createStub(HubDeviceDetailsHubDataHub2hubSupportMatrixTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'zwaveS2Absent' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE => 'test-hardware-type', HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN => true], 'getZwaveS2', null];
+        yield 'zwaveS2WrongType' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE => 'test-hardware-type', HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2 => 'not-bool'], 'getZwaveS2', null];
+        yield 'hardwareTypeAbsent' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN => true], 'getHardwareType', null];
+        yield 'hardwareTypeWrongType' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN => true, HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE => 42], 'getHardwareType', null];
+        yield 'zigbee3Absent' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE => 'test-hardware-type', HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN => true], 'getZigbee3', null];
+        yield 'zigbee3WrongType' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE => 'test-hardware-type', HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3 => 'not-bool'], 'getZigbee3', null];
+        yield 'zigbeeUnsecureRejoinAbsent' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE => 'test-hardware-type', HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3 => true], 'getZigbeeUnsecureRejoin', null];
+        yield 'zigbeeUnsecureRejoinWrongType' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE => 'test-hardware-type', HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN => 'not-bool'], 'getZigbeeUnsecureRejoin', null];
     }
 
     /**
@@ -407,33 +432,5 @@ final class HubDeviceDetailsHubDataTransformerTest extends TestCase
         self::assertNull($actual->getZigbeeRadioDetected());
         self::assertNull($actual->getZwaveRadioDetected());
         self::assertNull($actual->getEnrollmentChannel());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new HubDeviceDetailsHubDataTransformer(self::createStub(EdgeDriverSupportedEndpointAppsTransformerInterface::class), self::createStub(HubDeviceDetailsHubDataHub2hubSupportMatrixTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'zwaveS2Absent' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE => 'test-hardware-type', HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN => true], sprintf(HubDeviceDetailsHubDataTransformerInterface::UNEXPECTED_BOOL_SPRINTF, HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2)];
-        yield 'zwaveS2WrongType' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE => 'test-hardware-type', HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2 => 'not-bool'], sprintf(HubDeviceDetailsHubDataTransformerInterface::UNEXPECTED_BOOL_SPRINTF, HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2)];
-        yield 'hardwareTypeAbsent' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN => true], sprintf(HubDeviceDetailsHubDataTransformerInterface::UNEXPECTED_STRING_SPRINTF, HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE)];
-        yield 'hardwareTypeWrongType' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN => true, HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE => 42], sprintf(HubDeviceDetailsHubDataTransformerInterface::UNEXPECTED_STRING_SPRINTF, HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE)];
-        yield 'zigbee3Absent' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE => 'test-hardware-type', HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN => true], sprintf(HubDeviceDetailsHubDataTransformerInterface::UNEXPECTED_BOOL_SPRINTF, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3)];
-        yield 'zigbee3WrongType' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE => 'test-hardware-type', HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3 => 'not-bool'], sprintf(HubDeviceDetailsHubDataTransformerInterface::UNEXPECTED_BOOL_SPRINTF, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3)];
-        yield 'zigbeeUnsecureRejoinAbsent' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE => 'test-hardware-type', HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3 => true], sprintf(HubDeviceDetailsHubDataTransformerInterface::UNEXPECTED_BOOL_SPRINTF, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN)];
-        yield 'zigbeeUnsecureRejoinWrongType' => [[HubDeviceDetailsHubDataTransformerInterface::KEY_ZWAVE_S2 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_HARDWARE_TYPE => 'test-hardware-type', HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE3 => true, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN => 'not-bool'], sprintf(HubDeviceDetailsHubDataTransformerInterface::UNEXPECTED_BOOL_SPRINTF, HubDeviceDetailsHubDataTransformerInterface::KEY_ZIGBEE_UNSECURE_REJOIN)];
     }
 }

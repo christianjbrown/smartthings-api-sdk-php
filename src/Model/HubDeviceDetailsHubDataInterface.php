@@ -18,7 +18,7 @@ interface HubDeviceDetailsHubDataInterface
 
     public function getHardwareId(): ?string;
 
-    public function getHardwareType(): string;
+    public function getHardwareType(): ?string;
 
     public function getHedgeTlsCertificate(): ?string;
 
@@ -62,7 +62,7 @@ interface HubDeviceDetailsHubDataInterface
 
     public function getWifiSsid(): ?string;
 
-    public function getZigbee3(): bool;
+    public function getZigbee3(): ?bool;
 
     public function getZigbeeAvailability(): ?string;
 
@@ -90,7 +90,7 @@ interface HubDeviceDetailsHubDataInterface
 
     public function getZigbeeRequiresExternalHardware(): ?bool;
 
-    public function getZigbeeUnsecureRejoin(): bool;
+    public function getZigbeeUnsecureRejoin(): ?bool;
 
     public function getZwaveAvailability(): ?string;
 
@@ -106,7 +106,7 @@ interface HubDeviceDetailsHubDataInterface
 
     public function getZwaveRegion(): ?string;
 
-    public function getZwaveS2(): bool;
+    public function getZwaveS2(): ?bool;
 
     public function getZwaveStaticDsk(): ?string;
 

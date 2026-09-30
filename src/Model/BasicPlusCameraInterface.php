@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface BasicPlusCameraInterface
 {
-    public function getImage(): BasicPlusCameraImageInterface;
+    public function getImage(): ?BasicPlusCameraImageInterface;
 
     /**
      * @return null|array<int, BasicPlusCameraOverlayIconsItemInterface>

@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface SecurityArmStateDetailInterface
 {
-    public function getLocationId(): string;
+    public function getLocationId(): ?string;
 
     public function getSubscriptionName(): ?string;
 

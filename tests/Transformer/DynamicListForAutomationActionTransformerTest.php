@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\DynamicListForAutomationAction;
 use ChristianBrown\SmartThings\Model\SupportedValuesForDynamicListInterface;
@@ -15,8 +14,6 @@ use ChristianBrown\SmartThings\Transformer\SupportedValuesForDynamicListTransfor
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(DynamicListForAutomationAction::class)]
 #[CoversClass(DynamicListForAutomationActionTransformer::class)]
@@ -64,6 +61,28 @@ final class DynamicListForAutomationActionTransformerTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new DynamicListForAutomationActionTransformer(self::createStub(SupportedValuesForDynamicListTransformerInterface::class), self::createStub(AlternativeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'supportedValuesAbsent' => [[], 'getSupportedValues', null];
+        yield 'supportedValuesWrongType' => [[DynamicListForAutomationActionTransformerInterface::KEY_SUPPORTED_VALUES => 'not-array'], 'getSupportedValues', null];
+    }
+
+    /**
      * Each optional field in each of its states: absent, present but the wrong type, or valid.
      *
      * @param array<string, mixed> $extra
@@ -106,27 +125,5 @@ final class DynamicListForAutomationActionTransformerTest extends TestCase
         self::assertNull($actual->getCommand());
         self::assertNull($actual->getArgumentType());
         self::assertNull($actual->getAlternatives());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new DynamicListForAutomationActionTransformer(self::createStub(SupportedValuesForDynamicListTransformerInterface::class), self::createStub(AlternativeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'supportedValuesAbsent' => [[], sprintf(DynamicListForAutomationActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, DynamicListForAutomationActionTransformerInterface::KEY_SUPPORTED_VALUES)];
-        yield 'supportedValuesWrongType' => [[DynamicListForAutomationActionTransformerInterface::KEY_SUPPORTED_VALUES => 'not-array'], sprintf(DynamicListForAutomationActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, DynamicListForAutomationActionTransformerInterface::KEY_SUPPORTED_VALUES)];
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AutomationInterface;
 use ChristianBrown\SmartThings\Model\DashboardInterface;
 use ChristianBrown\SmartThings\Model\DetailViewListItemInterface;
@@ -27,8 +26,6 @@ use ChristianBrown\SmartThings\Transformer\PresentationSettingsForDevicePresenta
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(DevicePresentation::class)]
 #[CoversClass(DevicePresentationTransformer::class)]
@@ -338,6 +335,30 @@ final class DevicePresentationTransformerTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new DevicePresentationTransformer(self::createStub(DeviceConfigurationIconsItemTransformerInterface::class), self::createStub(DashboardTransformerInterface::class), self::createStub(DetailViewListItemTransformerInterface::class), self::createStub(AutomationTransformerInterface::class), self::createStub(DeviceConfigurationDpInfoItemTransformerInterface::class), self::createStub(DeviceConfigurationDpInfosItemTransformerInterface::class), self::createStub(LanguageItemTransformerInterface::class), self::createStub(PresentationSettingsForDevicePresentationTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'mnmnAbsent' => [[DevicePresentationTransformerInterface::KEY_VID => 'test-vid'], 'getMnmn', null];
+        yield 'mnmnWrongType' => [[DevicePresentationTransformerInterface::KEY_VID => 'test-vid', DevicePresentationTransformerInterface::KEY_MNMN => 42], 'getMnmn', null];
+        yield 'vidAbsent' => [[DevicePresentationTransformerInterface::KEY_MNMN => 'test-mnmn'], 'getVid', null];
+        yield 'vidWrongType' => [[DevicePresentationTransformerInterface::KEY_MNMN => 'test-mnmn', DevicePresentationTransformerInterface::KEY_VID => 42], 'getVid', null];
+    }
+
+    /**
      * Each optional field in each of its states: absent, present but the wrong type, or valid.
      *
      * @param array<string, mixed> $extra
@@ -451,29 +472,5 @@ final class DevicePresentationTransformerTest extends TestCase
         self::assertNull($actual->getDpInfos());
         self::assertNull($actual->getLanguage());
         self::assertNull($actual->getPresentationSettings());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new DevicePresentationTransformer(self::createStub(DeviceConfigurationIconsItemTransformerInterface::class), self::createStub(DashboardTransformerInterface::class), self::createStub(DetailViewListItemTransformerInterface::class), self::createStub(AutomationTransformerInterface::class), self::createStub(DeviceConfigurationDpInfoItemTransformerInterface::class), self::createStub(DeviceConfigurationDpInfosItemTransformerInterface::class), self::createStub(LanguageItemTransformerInterface::class), self::createStub(PresentationSettingsForDevicePresentationTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'mnmnAbsent' => [[DevicePresentationTransformerInterface::KEY_VID => 'test-vid'], sprintf(DevicePresentationTransformerInterface::UNEXPECTED_STRING_SPRINTF, DevicePresentationTransformerInterface::KEY_MNMN)];
-        yield 'mnmnWrongType' => [[DevicePresentationTransformerInterface::KEY_VID => 'test-vid', DevicePresentationTransformerInterface::KEY_MNMN => 42], sprintf(DevicePresentationTransformerInterface::UNEXPECTED_STRING_SPRINTF, DevicePresentationTransformerInterface::KEY_MNMN)];
-        yield 'vidAbsent' => [[DevicePresentationTransformerInterface::KEY_MNMN => 'test-mnmn'], sprintf(DevicePresentationTransformerInterface::UNEXPECTED_STRING_SPRINTF, DevicePresentationTransformerInterface::KEY_VID)];
-        yield 'vidWrongType' => [[DevicePresentationTransformerInterface::KEY_MNMN => 'test-mnmn', DevicePresentationTransformerInterface::KEY_VID => 42], sprintf(DevicePresentationTransformerInterface::UNEXPECTED_STRING_SPRINTF, DevicePresentationTransformerInterface::KEY_VID)];
     }
 }

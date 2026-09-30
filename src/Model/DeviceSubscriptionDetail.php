@@ -9,7 +9,7 @@ final class DeviceSubscriptionDetail implements DeviceSubscriptionDetailInterfac
     private ?string $attribute = null;
     private ?string $capability = null;
     private ?string $componentId = null;
-    private string $deviceId;
+    private ?string $deviceId;
 
     /**
      * @var null|array<int, string>
@@ -19,7 +19,7 @@ final class DeviceSubscriptionDetail implements DeviceSubscriptionDetailInterfac
     private ?string $subscriptionName = null;
     private mixed $value = null;
 
-    public function __construct(string $deviceId)
+    public function __construct(?string $deviceId)
     {
         $this->deviceId = $deviceId;
     }
@@ -39,7 +39,7 @@ final class DeviceSubscriptionDetail implements DeviceSubscriptionDetailInterfac
         return $this->componentId;
     }
 
-    public function getDeviceId(): string
+    public function getDeviceId(): ?string
     {
         return $this->deviceId;
     }

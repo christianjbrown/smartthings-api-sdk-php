@@ -18,7 +18,7 @@ interface AttributeDataSchemaInterface
      */
     public function getRequired(): ?array;
 
-    public function getType(): string;
+    public function getType(): ?string;
 
     public function setAdditionalProperties(?bool $value): self;
 

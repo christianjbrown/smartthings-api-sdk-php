@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilitySubscriptionDetail;
 use ChristianBrown\SmartThings\Model\CapabilitySubscriptionDetailInterface;
 
@@ -13,7 +12,6 @@ use function array_values;
 use function is_array;
 use function is_bool;
 use function is_string;
-use function sprintf;
 
 final class CapabilitySubscriptionDetailTransformer implements CapabilitySubscriptionDetailTransformerInterface
 {
@@ -106,13 +104,13 @@ final class CapabilitySubscriptionDetailTransformer implements CapabilitySubscri
     /**
      * @param mixed[] $data
      */
-    private static function requireCapability(array $data): string
+    private static function requireCapability(array $data): ?string
     {
         if (empty($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
         if (!is_string($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
 
         return $data[self::KEY_CAPABILITY];
@@ -121,13 +119,13 @@ final class CapabilitySubscriptionDetailTransformer implements CapabilitySubscri
     /**
      * @param mixed[] $data
      */
-    private static function requireLocationId(array $data): string
+    private static function requireLocationId(array $data): ?string
     {
         if (empty($data[self::KEY_LOCATION_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LOCATION_ID));
+            return null;
         }
         if (!is_string($data[self::KEY_LOCATION_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LOCATION_ID));
+            return null;
         }
 
         return $data[self::KEY_LOCATION_ID];

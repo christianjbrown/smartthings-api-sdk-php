@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceCapabilityReferenceInterface;
 use ChristianBrown\SmartThings\Model\DeviceCategoryInterface;
 use ChristianBrown\SmartThings\Model\DeviceProfileComponent;
@@ -16,7 +15,6 @@ use function array_values;
 use function is_array;
 use function is_bool;
 use function is_string;
-use function sprintf;
 
 final class DeviceProfileComponentTransformer implements DeviceProfileComponentTransformerInterface
 {
@@ -95,10 +93,10 @@ final class DeviceProfileComponentTransformer implements DeviceProfileComponentT
     private function requireCapabilities(array $data): array
     {
         if (!isset($data[self::KEY_CAPABILITIES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_CAPABILITIES));
+            return [];
         }
         if (!is_array($data[self::KEY_CAPABILITIES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_CAPABILITIES));
+            return [];
         }
 
         return $this->transformListDeviceCapabilityReference($data[self::KEY_CAPABILITIES]);
@@ -112,10 +110,10 @@ final class DeviceProfileComponentTransformer implements DeviceProfileComponentT
     private function requireCategories(array $data): array
     {
         if (!isset($data[self::KEY_CATEGORIES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_CATEGORIES));
+            return [];
         }
         if (!is_array($data[self::KEY_CATEGORIES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_CATEGORIES));
+            return [];
         }
 
         return $this->transformListDeviceCategory($data[self::KEY_CATEGORIES]);
@@ -124,13 +122,13 @@ final class DeviceProfileComponentTransformer implements DeviceProfileComponentT
     /**
      * @param mixed[] $data
      */
-    private static function requireId(array $data): string
+    private static function requireId(array $data): ?string
     {
         if (empty($data[self::KEY_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ID));
+            return null;
         }
         if (!is_string($data[self::KEY_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ID));
+            return null;
         }
 
         return $data[self::KEY_ID];

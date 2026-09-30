@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AutomationForCapabilityConditionsItem;
 use ChristianBrown\SmartThings\Model\DynamicListForAutomationConditionInterface;
 use ChristianBrown\SmartThings\Model\EnumSliderForAutomationConditionInterface;
@@ -25,8 +24,6 @@ use ChristianBrown\SmartThings\Transformer\VisibleConditionBaseTransformerInterf
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(AutomationForCapabilityConditionsItem::class)]
 #[CoversClass(AutomationForCapabilityConditionsItemTransformer::class)]
@@ -146,6 +143,30 @@ final class AutomationForCapabilityConditionsItemTransformerTest extends TestCas
         self::assertNull($transformer->transform($base)->getEnumSlider());
         self::assertNull($transformer->transform($base + [AutomationForCapabilityConditionsItemTransformerInterface::KEY_ENUM_SLIDER => 'test-not-array'])->getEnumSlider());
         self::assertSame($enumSliderForAutomationConditionModel, $transformer->transform($base + [AutomationForCapabilityConditionsItemTransformerInterface::KEY_ENUM_SLIDER => ['test-nested']])->getEnumSlider());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new AutomationForCapabilityConditionsItemTransformer(self::createStub(SliderForAutomationConditionTransformerInterface::class), self::createStub(ListForAutomationConditionTransformerInterface::class), self::createStub(DynamicListForAutomationConditionTransformerInterface::class), self::createStub(NumberFieldForAutomationConditionTransformerInterface::class), self::createStub(TextFieldForAutomationConditionTransformerInterface::class), self::createStub(EnumSliderForAutomationConditionTransformerInterface::class), self::createStub(VisibleConditionBaseTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'labelAbsent' => [[AutomationForCapabilityConditionsItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type'], 'getLabel', null];
+        yield 'labelWrongType' => [[AutomationForCapabilityConditionsItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type', AutomationForCapabilityConditionsItemTransformerInterface::KEY_LABEL => 42], 'getLabel', null];
+        yield 'displayTypeAbsent' => [[AutomationForCapabilityConditionsItemTransformerInterface::KEY_LABEL => 'test-label'], 'getDisplayType', null];
+        yield 'displayTypeWrongType' => [[AutomationForCapabilityConditionsItemTransformerInterface::KEY_LABEL => 'test-label', AutomationForCapabilityConditionsItemTransformerInterface::KEY_DISPLAY_TYPE => 42], 'getDisplayType', null];
     }
 
     public function testTransformList(): void
@@ -336,30 +357,6 @@ final class AutomationForCapabilityConditionsItemTransformerTest extends TestCas
         self::assertNull($transformer->transform($base)->getTextField());
         self::assertNull($transformer->transform($base + [AutomationForCapabilityConditionsItemTransformerInterface::KEY_TEXT_FIELD => 'test-not-array'])->getTextField());
         self::assertSame($textFieldForAutomationConditionModel, $transformer->transform($base + [AutomationForCapabilityConditionsItemTransformerInterface::KEY_TEXT_FIELD => ['test-nested']])->getTextField());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new AutomationForCapabilityConditionsItemTransformer(self::createStub(SliderForAutomationConditionTransformerInterface::class), self::createStub(ListForAutomationConditionTransformerInterface::class), self::createStub(DynamicListForAutomationConditionTransformerInterface::class), self::createStub(NumberFieldForAutomationConditionTransformerInterface::class), self::createStub(TextFieldForAutomationConditionTransformerInterface::class), self::createStub(EnumSliderForAutomationConditionTransformerInterface::class), self::createStub(VisibleConditionBaseTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'labelAbsent' => [[AutomationForCapabilityConditionsItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type'], sprintf(AutomationForCapabilityConditionsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, AutomationForCapabilityConditionsItemTransformerInterface::KEY_LABEL)];
-        yield 'labelWrongType' => [[AutomationForCapabilityConditionsItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type', AutomationForCapabilityConditionsItemTransformerInterface::KEY_LABEL => 42], sprintf(AutomationForCapabilityConditionsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, AutomationForCapabilityConditionsItemTransformerInterface::KEY_LABEL)];
-        yield 'displayTypeAbsent' => [[AutomationForCapabilityConditionsItemTransformerInterface::KEY_LABEL => 'test-label'], sprintf(AutomationForCapabilityConditionsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, AutomationForCapabilityConditionsItemTransformerInterface::KEY_DISPLAY_TYPE)];
-        yield 'displayTypeWrongType' => [[AutomationForCapabilityConditionsItemTransformerInterface::KEY_LABEL => 'test-label', AutomationForCapabilityConditionsItemTransformerInterface::KEY_DISPLAY_TYPE => 42], sprintf(AutomationForCapabilityConditionsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, AutomationForCapabilityConditionsItemTransformerInterface::KEY_DISPLAY_TYPE)];
     }
 
     public function testTransformVisibleCondition(): void

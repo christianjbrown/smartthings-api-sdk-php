@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ServiceSubscriptionReceipt;
 use ChristianBrown\SmartThings\Transformer\ServiceSubscriptionReceiptTransformer;
 use ChristianBrown\SmartThings\Transformer\ServiceSubscriptionReceiptTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(ServiceSubscriptionReceipt::class)]
 #[CoversClass(ServiceSubscriptionReceiptTransformer::class)]
@@ -37,18 +34,14 @@ final class ServiceSubscriptionReceiptTransformerTest extends TestCase
     {
         $transformer = new ServiceSubscriptionReceiptTransformer();
 
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage(sprintf(ServiceSubscriptionReceiptTransformerInterface::UNEXPECTED_STRING_SPRINTF, ServiceSubscriptionReceiptTransformerInterface::KEY_LOCATION_ID));
-        $transformer->transform([]);
+        self::assertNull($transformer->transform([])->getLocationId());
     }
 
     public function testTransformLocationIdWrongType(): void
     {
         $transformer = new ServiceSubscriptionReceiptTransformer();
 
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage(sprintf(ServiceSubscriptionReceiptTransformerInterface::UNEXPECTED_STRING_SPRINTF, ServiceSubscriptionReceiptTransformerInterface::KEY_LOCATION_ID));
-        $transformer->transform([ServiceSubscriptionReceiptTransformerInterface::KEY_LOCATION_ID => 42]);
+        self::assertNull($transformer->transform([ServiceSubscriptionReceiptTransformerInterface::KEY_LOCATION_ID => 42])->getLocationId());
     }
 
     /**

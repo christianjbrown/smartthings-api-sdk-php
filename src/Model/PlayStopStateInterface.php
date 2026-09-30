@@ -11,11 +11,11 @@ interface PlayStopStateInterface
      */
     public function getAlternatives(): ?array;
 
-    public function getPlay(): string;
+    public function getPlay(): ?string;
 
-    public function getStop(): string;
+    public function getStop(): ?string;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function getValueType(): ?string;
 

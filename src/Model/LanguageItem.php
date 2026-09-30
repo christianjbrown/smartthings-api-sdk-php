@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class LanguageItem implements LanguageItemInterface
 {
-    private string $locale;
+    private ?string $locale;
 
     /**
      * @var array<int, PoCodesInterface>
@@ -16,13 +16,13 @@ final class LanguageItem implements LanguageItemInterface
     /**
      * @phpstan-param array<int, PoCodesInterface> $poCodes
      */
-    public function __construct(string $locale, array $poCodes)
+    public function __construct(?string $locale, array $poCodes)
     {
         $this->locale = $locale;
         $this->poCodes = $poCodes;
     }
 
-    public function getLocale(): string
+    public function getLocale(): ?string
     {
         return $this->locale;
     }

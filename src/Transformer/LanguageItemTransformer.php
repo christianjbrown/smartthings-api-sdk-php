@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\LanguageItem;
 use ChristianBrown\SmartThings\Model\LanguageItemInterface;
 use ChristianBrown\SmartThings\Model\PoCodesInterface;
@@ -14,7 +13,6 @@ use function array_map;
 use function array_values;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class LanguageItemTransformer implements LanguageItemTransformerInterface
 {
@@ -38,13 +36,13 @@ final class LanguageItemTransformer implements LanguageItemTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireLocale(array $data): string
+    private static function requireLocale(array $data): ?string
     {
         if (empty($data[self::KEY_LOCALE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LOCALE));
+            return null;
         }
         if (!is_string($data[self::KEY_LOCALE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LOCALE));
+            return null;
         }
 
         return $data[self::KEY_LOCALE];
@@ -58,10 +56,10 @@ final class LanguageItemTransformer implements LanguageItemTransformerInterface
     private function requirePoCodes(array $data): array
     {
         if (!isset($data[self::KEY_PO_CODES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_PO_CODES));
+            return [];
         }
         if (!is_array($data[self::KEY_PO_CODES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_PO_CODES));
+            return [];
         }
 
         return $this->transformListPoCodes($data[self::KEY_PO_CODES]);

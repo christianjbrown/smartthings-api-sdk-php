@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceConfigEntryForDashboardStateFormatInfoItem;
 use ChristianBrown\SmartThings\Model\DeviceConfigEntryForDashboardStateFormatInfoItemInterface;
 
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class DeviceConfigEntryForDashboardStateFormatInfoItemTransformer implements DeviceConfigEntryForDashboardStateFormatInfoItemTransformerInterface
 {
@@ -67,13 +65,13 @@ final class DeviceConfigEntryForDashboardStateFormatInfoItemTransformer implemen
     /**
      * @param mixed[] $data
      */
-    private static function requireKey(array $data): string
+    private static function requireKey(array $data): ?string
     {
         if (empty($data[self::KEY_KEY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_KEY));
+            return null;
         }
         if (!is_string($data[self::KEY_KEY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_KEY));
+            return null;
         }
 
         return $data[self::KEY_KEY];
@@ -82,13 +80,13 @@ final class DeviceConfigEntryForDashboardStateFormatInfoItemTransformer implemen
     /**
      * @param mixed[] $data
      */
-    private static function requireType(array $data): string
+    private static function requireType(array $data): ?string
     {
         if (empty($data[self::KEY_TYPE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_TYPE));
+            return null;
         }
         if (!is_string($data[self::KEY_TYPE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_TYPE));
+            return null;
         }
 
         return $data[self::KEY_TYPE];

@@ -18,10 +18,10 @@ final class NumberFieldForAutomationCondition implements NumberFieldForAutomatio
     private ?array $range = null;
     private ?string $supportedValues = null;
     private ?string $unit = null;
-    private string $value;
+    private ?string $value;
     private ?string $valueType = null;
 
-    public function __construct(string $value)
+    public function __construct(?string $value)
     {
         $this->value = $value;
     }
@@ -57,7 +57,7 @@ final class NumberFieldForAutomationCondition implements NumberFieldForAutomatio
         return $this->unit;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

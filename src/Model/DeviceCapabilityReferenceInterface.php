@@ -10,7 +10,7 @@ interface DeviceCapabilityReferenceInterface
 
     public function getEphemeral(): ?bool;
 
-    public function getId(): string;
+    public function getId(): ?string;
 
     public function getOptional(): ?bool;
 

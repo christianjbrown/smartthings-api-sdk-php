@@ -6,8 +6,8 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class CreateCapabilityPresentationRequestDetailViewItem implements CreateCapabilityPresentationRequestDetailViewItemInterface
 {
-    private string $displayType;
-    private string $label;
+    private ?string $displayType;
+    private ?string $label;
     private ?ListForDetailViewInterface $list = null;
     private ?NumberFieldInterface $numberField = null;
     private ?PlayPauseInterface $playPause = null;
@@ -23,18 +23,18 @@ final class CreateCapabilityPresentationRequestDetailViewItem implements CreateC
     private ?ToggleSwitchInterface $toggleSwitch = null;
     private ?VisibleConditionBaseInterface $visibleCondition = null;
 
-    public function __construct(string $label, string $displayType)
+    public function __construct(?string $label, ?string $displayType)
     {
         $this->label = $label;
         $this->displayType = $displayType;
     }
 
-    public function getDisplayType(): string
+    public function getDisplayType(): ?string
     {
         return $this->displayType;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }

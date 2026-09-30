@@ -10,11 +10,11 @@ interface PushButtonForPanelItemInterface
 
     public function getArgumentType(): ?string;
 
-    public function getCommand(): string;
+    public function getCommand(): ?string;
 
     public function getIconUrl(): ?string;
 
-    public function getSize(): string;
+    public function getSize(): ?string;
 
     public function setArgument(?string $value): self;
 

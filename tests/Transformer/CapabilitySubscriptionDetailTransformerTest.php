@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilitySubscriptionDetail;
 use ChristianBrown\SmartThings\Transformer\CapabilitySubscriptionDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitySubscriptionDetailTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(CapabilitySubscriptionDetail::class)]
 #[CoversClass(CapabilitySubscriptionDetailTransformer::class)]
@@ -41,6 +38,30 @@ final class CapabilitySubscriptionDetailTransformerTest extends TestCase
         self::assertTrue($actual->getStateChangeOnly());
         self::assertSame('test-subscription-name', $actual->getSubscriptionName());
         self::assertSame(['test-modes-1', 'test-modes-2'], $actual->getModes());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new CapabilitySubscriptionDetailTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'locationIdAbsent' => [[CapabilitySubscriptionDetailTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getLocationId', null];
+        yield 'locationIdWrongType' => [[CapabilitySubscriptionDetailTransformerInterface::KEY_CAPABILITY => 'test-capability', CapabilitySubscriptionDetailTransformerInterface::KEY_LOCATION_ID => 42], 'getLocationId', null];
+        yield 'capabilityAbsent' => [[CapabilitySubscriptionDetailTransformerInterface::KEY_LOCATION_ID => 'test-location-id'], 'getCapability', null];
+        yield 'capabilityWrongType' => [[CapabilitySubscriptionDetailTransformerInterface::KEY_LOCATION_ID => 'test-location-id', CapabilitySubscriptionDetailTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
     }
 
     /**
@@ -91,29 +112,5 @@ final class CapabilitySubscriptionDetailTransformerTest extends TestCase
         self::assertNull($actual->getStateChangeOnly());
         self::assertNull($actual->getSubscriptionName());
         self::assertNull($actual->getModes());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new CapabilitySubscriptionDetailTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'locationIdAbsent' => [[CapabilitySubscriptionDetailTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(CapabilitySubscriptionDetailTransformerInterface::UNEXPECTED_STRING_SPRINTF, CapabilitySubscriptionDetailTransformerInterface::KEY_LOCATION_ID)];
-        yield 'locationIdWrongType' => [[CapabilitySubscriptionDetailTransformerInterface::KEY_CAPABILITY => 'test-capability', CapabilitySubscriptionDetailTransformerInterface::KEY_LOCATION_ID => 42], sprintf(CapabilitySubscriptionDetailTransformerInterface::UNEXPECTED_STRING_SPRINTF, CapabilitySubscriptionDetailTransformerInterface::KEY_LOCATION_ID)];
-        yield 'capabilityAbsent' => [[CapabilitySubscriptionDetailTransformerInterface::KEY_LOCATION_ID => 'test-location-id'], sprintf(CapabilitySubscriptionDetailTransformerInterface::UNEXPECTED_STRING_SPRINTF, CapabilitySubscriptionDetailTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[CapabilitySubscriptionDetailTransformerInterface::KEY_LOCATION_ID => 'test-location-id', CapabilitySubscriptionDetailTransformerInterface::KEY_CAPABILITY => 42], sprintf(CapabilitySubscriptionDetailTransformerInterface::UNEXPECTED_STRING_SPRINTF, CapabilitySubscriptionDetailTransformerInterface::KEY_CAPABILITY)];
     }
 }

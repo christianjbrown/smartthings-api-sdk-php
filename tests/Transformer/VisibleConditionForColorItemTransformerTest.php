@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\VisibleConditionForColorItem;
 use ChristianBrown\SmartThings\Model\VisibleConditionForColorItemReferToInterface;
 use ChristianBrown\SmartThings\Transformer\VisibleConditionForColorItemReferToTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\VisibleConditionForColorItemTransform
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(VisibleConditionForColorItem::class)]
 #[CoversClass(VisibleConditionForColorItemTransformer::class)]
@@ -40,6 +37,30 @@ final class VisibleConditionForColorItemTransformerTest extends TestCase
         self::assertSame('test-operand', $actual->getOperand());
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new VisibleConditionForColorItemTransformer(self::createStub(VisibleConditionForColorItemReferToTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'operatorAbsent' => [[VisibleConditionForColorItemTransformerInterface::KEY_OPERAND => 'test-operand'], 'getOperator', null];
+        yield 'operatorWrongType' => [[VisibleConditionForColorItemTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForColorItemTransformerInterface::KEY_OPERATOR => 42], 'getOperator', null];
+        yield 'operandAbsent' => [[VisibleConditionForColorItemTransformerInterface::KEY_OPERATOR => 'test-operator'], 'getOperand', null];
+        yield 'operandWrongType' => [[VisibleConditionForColorItemTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForColorItemTransformerInterface::KEY_OPERAND => 42], 'getOperand', null];
+    }
+
     public function testTransformReferTo(): void
     {
         $visibleConditionForColorItemReferToModel = self::createStub(VisibleConditionForColorItemReferToInterface::class);
@@ -63,29 +84,5 @@ final class VisibleConditionForColorItemTransformerTest extends TestCase
         $actual = $transformer->transform([VisibleConditionForColorItemTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForColorItemTransformerInterface::KEY_OPERAND => 'test-operand']);
 
         self::assertNull($actual->getReferTo());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new VisibleConditionForColorItemTransformer(self::createStub(VisibleConditionForColorItemReferToTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'operatorAbsent' => [[VisibleConditionForColorItemTransformerInterface::KEY_OPERAND => 'test-operand'], sprintf(VisibleConditionForColorItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForColorItemTransformerInterface::KEY_OPERATOR)];
-        yield 'operatorWrongType' => [[VisibleConditionForColorItemTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForColorItemTransformerInterface::KEY_OPERATOR => 42], sprintf(VisibleConditionForColorItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForColorItemTransformerInterface::KEY_OPERATOR)];
-        yield 'operandAbsent' => [[VisibleConditionForColorItemTransformerInterface::KEY_OPERATOR => 'test-operator'], sprintf(VisibleConditionForColorItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForColorItemTransformerInterface::KEY_OPERAND)];
-        yield 'operandWrongType' => [[VisibleConditionForColorItemTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForColorItemTransformerInterface::KEY_OPERAND => 42], sprintf(VisibleConditionForColorItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForColorItemTransformerInterface::KEY_OPERAND)];
     }
 }

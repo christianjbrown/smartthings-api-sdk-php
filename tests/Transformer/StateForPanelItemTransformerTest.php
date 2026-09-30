@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\StateForPanelItem;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\StateForPanelItemTransformerInterface
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(StateForPanelItem::class)]
 #[CoversClass(StateForPanelItemTransformer::class)]
@@ -56,6 +53,30 @@ final class StateForPanelItemTransformerTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new StateForPanelItemTransformer(self::createStub(AlternativeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'labelAbsent' => [[StateForPanelItemTransformerInterface::KEY_SIZE => 'test-size'], 'getLabel', null];
+        yield 'labelWrongType' => [[StateForPanelItemTransformerInterface::KEY_SIZE => 'test-size', StateForPanelItemTransformerInterface::KEY_LABEL => 42], 'getLabel', null];
+        yield 'sizeAbsent' => [[StateForPanelItemTransformerInterface::KEY_LABEL => 'test-label'], 'getSize', null];
+        yield 'sizeWrongType' => [[StateForPanelItemTransformerInterface::KEY_LABEL => 'test-label', StateForPanelItemTransformerInterface::KEY_SIZE => 42], 'getSize', null];
+    }
+
+    /**
      * Each optional field in each of its states: absent, present but the wrong type, or valid.
      *
      * @param array<string, mixed> $extra
@@ -91,29 +112,5 @@ final class StateForPanelItemTransformerTest extends TestCase
 
         self::assertNull($actual->getUnit());
         self::assertNull($actual->getAlternatives());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new StateForPanelItemTransformer(self::createStub(AlternativeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'labelAbsent' => [[StateForPanelItemTransformerInterface::KEY_SIZE => 'test-size'], sprintf(StateForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, StateForPanelItemTransformerInterface::KEY_LABEL)];
-        yield 'labelWrongType' => [[StateForPanelItemTransformerInterface::KEY_SIZE => 'test-size', StateForPanelItemTransformerInterface::KEY_LABEL => 42], sprintf(StateForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, StateForPanelItemTransformerInterface::KEY_LABEL)];
-        yield 'sizeAbsent' => [[StateForPanelItemTransformerInterface::KEY_LABEL => 'test-label'], sprintf(StateForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, StateForPanelItemTransformerInterface::KEY_SIZE)];
-        yield 'sizeWrongType' => [[StateForPanelItemTransformerInterface::KEY_LABEL => 'test-label', StateForPanelItemTransformerInterface::KEY_SIZE => 42], sprintf(StateForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, StateForPanelItemTransformerInterface::KEY_SIZE)];
     }
 }

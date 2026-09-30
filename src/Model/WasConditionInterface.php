@@ -13,7 +13,7 @@ interface WasConditionInterface
 
     public function getBetween(): ?BetweenConditionInterface;
 
-    public function getDuration(): IntervalInterface;
+    public function getDuration(): ?IntervalInterface;
 
     public function getEquals(): ?EqualsConditionInterface;
 
@@ -21,7 +21,7 @@ interface WasConditionInterface
 
     public function getGreaterThanOrEquals(): ?GreaterThanOrEqualsConditionInterface;
 
-    public function getId(): string;
+    public function getId(): ?string;
 
     public function getLessThan(): ?LessThanConditionInterface;
 

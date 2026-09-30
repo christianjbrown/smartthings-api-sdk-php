@@ -10,10 +10,10 @@ final class ListWithAvailableSize implements ListWithAvailableSizeInterface
      * @var null|array<int, string>
      */
     private ?array $availableSizes = null;
-    private ListWithAvailableSizeCommandInterface $command;
+    private ?ListWithAvailableSizeCommandInterface $command;
     private ?ListWithAvailableSizeStateInterface $state = null;
 
-    public function __construct(ListWithAvailableSizeCommandInterface $command)
+    public function __construct(?ListWithAvailableSizeCommandInterface $command)
     {
         $this->command = $command;
     }
@@ -26,7 +26,7 @@ final class ListWithAvailableSize implements ListWithAvailableSizeInterface
         return $this->availableSizes;
     }
 
-    public function getCommand(): ListWithAvailableSizeCommandInterface
+    public function getCommand(): ?ListWithAvailableSizeCommandInterface
     {
         return $this->command;
     }

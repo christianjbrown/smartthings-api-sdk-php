@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceSubscriptionDetail;
 use ChristianBrown\SmartThings\Model\DeviceSubscriptionDetailInterface;
 
@@ -13,7 +12,6 @@ use function array_values;
 use function is_array;
 use function is_bool;
 use function is_string;
-use function sprintf;
 
 final class DeviceSubscriptionDetailTransformer implements DeviceSubscriptionDetailTransformerInterface
 {
@@ -136,13 +134,13 @@ final class DeviceSubscriptionDetailTransformer implements DeviceSubscriptionDet
     /**
      * @param mixed[] $data
      */
-    private static function requireDeviceId(array $data): string
+    private static function requireDeviceId(array $data): ?string
     {
         if (empty($data[self::KEY_DEVICE_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DEVICE_ID));
+            return null;
         }
         if (!is_string($data[self::KEY_DEVICE_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DEVICE_ID));
+            return null;
         }
 
         return $data[self::KEY_DEVICE_ID];

@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\NumberField;
 use ChristianBrown\SmartThings\Transformer\NumberFieldTransformer;
 use ChristianBrown\SmartThings\Transformer\NumberFieldTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(NumberField::class)]
 #[CoversClass(NumberFieldTransformer::class)]
@@ -41,6 +38,28 @@ final class NumberFieldTransformerTest extends TestCase
         self::assertSame('test-argument-type', $actual->getArgumentType());
         self::assertSame(['test-range-key' => 'test-value'], $actual->getRange());
         self::assertSame('test-supported-values', $actual->getSupportedValues());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new NumberFieldTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'commandAbsent' => [[], 'getCommand', null];
+        yield 'commandWrongType' => [[NumberFieldTransformerInterface::KEY_COMMAND => 42], 'getCommand', null];
     }
 
     /**
@@ -95,27 +114,5 @@ final class NumberFieldTransformerTest extends TestCase
         self::assertNull($actual->getArgumentType());
         self::assertNull($actual->getRange());
         self::assertNull($actual->getSupportedValues());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new NumberFieldTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'commandAbsent' => [[], sprintf(NumberFieldTransformerInterface::UNEXPECTED_STRING_SPRINTF, NumberFieldTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[NumberFieldTransformerInterface::KEY_COMMAND => 42], sprintf(NumberFieldTransformerInterface::UNEXPECTED_STRING_SPRINTF, NumberFieldTransformerInterface::KEY_COMMAND)];
     }
 }

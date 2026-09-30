@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\CapabilityValue;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\CapabilityValueTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(CapabilityValue::class)]
 #[CoversClass(CapabilityValueTransformer::class)]
@@ -57,6 +54,28 @@ final class CapabilityValueTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getAlternatives());
         self::assertNull($transformer->transform($base + [CapabilityValueTransformerInterface::KEY_ALTERNATIVES => 'test-not-array'])->getAlternatives());
         self::assertSame([$alternativeItemModel], $transformer->transform($base + [CapabilityValueTransformerInterface::KEY_ALTERNATIVES => [['test-nested'], 'test-skipped']])->getAlternatives());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new CapabilityValueTransformer(self::createStub(AlternativeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'keyAbsent' => [[], 'getKey', null];
+        yield 'keyWrongType' => [[CapabilityValueTransformerInterface::KEY_KEY => 42], 'getKey', null];
     }
 
     /**
@@ -107,27 +126,5 @@ final class CapabilityValueTransformerTest extends TestCase
         self::assertNull($actual->getAlternatives());
         self::assertNull($actual->getRange());
         self::assertNull($actual->getStep());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new CapabilityValueTransformer(self::createStub(AlternativeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'keyAbsent' => [[], sprintf(CapabilityValueTransformerInterface::UNEXPECTED_STRING_SPRINTF, CapabilityValueTransformerInterface::KEY_KEY)];
-        yield 'keyWrongType' => [[CapabilityValueTransformerInterface::KEY_KEY => 42], sprintf(CapabilityValueTransformerInterface::UNEXPECTED_STRING_SPRINTF, CapabilityValueTransformerInterface::KEY_KEY)];
     }
 }

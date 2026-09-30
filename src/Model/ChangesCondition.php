@@ -14,7 +14,7 @@ final class ChangesCondition implements ChangesConditionInterface
     private ?EqualsConditionInterface $equals = null;
     private ?GreaterThanConditionInterface $greaterThan = null;
     private ?GreaterThanOrEqualsConditionInterface $greaterThanOrEquals = null;
-    private string $id;
+    private ?string $id;
     private ?LessThanConditionInterface $lessThan = null;
     private ?LessThanOrEqualsConditionInterface $lessThanOrEquals = null;
     private ?ConditionInterface $not = null;
@@ -25,7 +25,7 @@ final class ChangesCondition implements ChangesConditionInterface
      */
     private ?array $or = null;
 
-    public function __construct(string $id)
+    public function __construct(?string $id)
     {
         $this->id = $id;
     }
@@ -58,7 +58,7 @@ final class ChangesCondition implements ChangesConditionInterface
         return $this->greaterThanOrEquals;
     }
 
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }

@@ -6,22 +6,22 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class ListForPanelItem implements ListForPanelItemInterface
 {
-    private ListForPanelItemCommandInterface $command;
-    private string $size;
+    private ?ListForPanelItemCommandInterface $command;
+    private ?string $size;
     private ?ListForPanelItemStateInterface $state = null;
 
-    public function __construct(ListForPanelItemCommandInterface $command, string $size)
+    public function __construct(?ListForPanelItemCommandInterface $command, ?string $size)
     {
         $this->command = $command;
         $this->size = $size;
     }
 
-    public function getCommand(): ListForPanelItemCommandInterface
+    public function getCommand(): ?ListForPanelItemCommandInterface
     {
         return $this->command;
     }
 
-    public function getSize(): string
+    public function getSize(): ?string
     {
         return $this->size;
     }

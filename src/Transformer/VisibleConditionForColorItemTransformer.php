@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\VisibleConditionForColorItem;
 use ChristianBrown\SmartThings\Model\VisibleConditionForColorItemInterface;
 
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class VisibleConditionForColorItemTransformer implements VisibleConditionForColorItemTransformerInterface
 {
@@ -50,13 +48,13 @@ final class VisibleConditionForColorItemTransformer implements VisibleConditionF
     /**
      * @param mixed[] $data
      */
-    private static function requireOperand(array $data): string
+    private static function requireOperand(array $data): ?string
     {
         if (empty($data[self::KEY_OPERAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OPERAND));
+            return null;
         }
         if (!is_string($data[self::KEY_OPERAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OPERAND));
+            return null;
         }
 
         return $data[self::KEY_OPERAND];
@@ -65,13 +63,13 @@ final class VisibleConditionForColorItemTransformer implements VisibleConditionF
     /**
      * @param mixed[] $data
      */
-    private static function requireOperator(array $data): string
+    private static function requireOperator(array $data): ?string
     {
         if (empty($data[self::KEY_OPERATOR])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OPERATOR));
+            return null;
         }
         if (!is_string($data[self::KEY_OPERATOR])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OPERATOR));
+            return null;
         }
 
         return $data[self::KEY_OPERATOR];

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\HubDeviceDetailsHubDataHub2hubSupportMatrix;
 use ChristianBrown\SmartThings\Model\HubDeviceDetailsHubDataHub2hubSupportMatrixCapabilitiesItemInterface;
 use ChristianBrown\SmartThings\Model\HubDeviceDetailsHubDataHub2hubSupportMatrixInterface;
@@ -13,7 +12,6 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use function is_array;
-use function sprintf;
 
 final class HubDeviceDetailsHubDataHub2hubSupportMatrixTransformer implements HubDeviceDetailsHubDataHub2hubSupportMatrixTransformerInterface
 {
@@ -42,10 +40,10 @@ final class HubDeviceDetailsHubDataHub2hubSupportMatrixTransformer implements Hu
     private function requireCapabilities(array $data): array
     {
         if (!isset($data[self::KEY_CAPABILITIES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_CAPABILITIES));
+            return [];
         }
         if (!is_array($data[self::KEY_CAPABILITIES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_CAPABILITIES));
+            return [];
         }
 
         return $this->transformListHubDeviceDetailsHubDataHub2hubSupportMatrixCapabilitiesItem($data[self::KEY_CAPABILITIES]);

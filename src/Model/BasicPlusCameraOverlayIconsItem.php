@@ -6,15 +6,15 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class BasicPlusCameraOverlayIconsItem implements BasicPlusCameraOverlayIconsItemInterface
 {
-    private string $iconUrl;
+    private ?string $iconUrl;
     private ?VisibleConditionInterface $visibleCondition = null;
 
-    public function __construct(string $iconUrl)
+    public function __construct(?string $iconUrl)
     {
         $this->iconUrl = $iconUrl;
     }
 
-    public function getIconUrl(): string
+    public function getIconUrl(): ?string
     {
         return $this->iconUrl;
     }

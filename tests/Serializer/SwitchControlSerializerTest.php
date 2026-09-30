@@ -18,6 +18,23 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SwitchControlSerializer::class)]
 final class SwitchControlSerializerTest extends TestCase
 {
+    public function testSerializeNestedAbsent(): void
+    {
+        $toggleSwitchForDashboardCommandSerializer = self::createStub(ToggleSwitchForDashboardCommandSerializerInterface::class);
+        $toggleSwitchForDashboardCommandSerializer->method('serialize')->willReturn(['test-serialized-toggle-switch-for-dashboard-command']);
+        $standbyPowerSwitchForDashboardStateModel = self::createStub(StandbyPowerSwitchForDashboardStateInterface::class);
+        $standbyPowerSwitchForDashboardStateSerializer = self::createStub(StandbyPowerSwitchForDashboardStateSerializerInterface::class);
+        $standbyPowerSwitchForDashboardStateSerializer->method('serialize')->willReturn(['test-serialized-standby-power-switch-for-dashboard-state']);
+        $model = new SwitchControl(null);
+
+        $serializer = new SwitchControlSerializer($toggleSwitchForDashboardCommandSerializer, $standbyPowerSwitchForDashboardStateSerializer);
+
+        self::assertSame(
+            [],
+            $serializer->serialize($model)
+        );
+    }
+
     public function testSerializeRequiredFieldsOnly(): void
     {
         $toggleSwitchForDashboardCommandModel = self::createStub(ToggleSwitchForDashboardCommandInterface::class);

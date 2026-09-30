@@ -8,7 +8,7 @@ interface DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeInterface
 {
     public function getFrequency(): ?int;
 
-    public function getTimeFormat(): string;
+    public function getTimeFormat(): ?string;
 
     public function setFrequency(?int $value): self;
 }

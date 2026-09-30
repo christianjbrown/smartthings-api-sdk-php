@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusCameraInterface;
 use ChristianBrown\SmartThings\Model\BasicPlusItemActionsItemInterface;
 use ChristianBrown\SmartThings\Model\BasicPlusItemForPresentation;
@@ -25,8 +24,6 @@ use ChristianBrown\SmartThings\Transformer\PanelForDevicePresentationTransformer
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(BasicPlusItemForPresentation::class)]
 #[CoversClass(BasicPlusItemForPresentationTransformer::class)]
@@ -140,6 +137,28 @@ final class BasicPlusItemForPresentationTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getCamera());
         self::assertNull($transformer->transform($base + [BasicPlusItemForPresentationTransformerInterface::KEY_CAMERA => 'test-not-array'])->getCamera());
         self::assertSame($basicPlusCameraModel, $transformer->transform($base + [BasicPlusItemForPresentationTransformerInterface::KEY_CAMERA => ['test-nested']])->getCamera());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new BasicPlusItemForPresentationTransformer(self::createStub(BasicPlusCameraTransformerInterface::class), self::createStub(BasicPlusTvTransformerInterface::class), self::createStub(BasicPlusLightTransformerInterface::class), self::createStub(BasicPlusItemActionsItemTransformerInterface::class), self::createStub(BasicPlusStateBoardItemTransformerInterface::class), self::createStub(BasicPlusItemProgressBarsItemTransformerInterface::class), self::createStub(PanelForDevicePresentationTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'displayTypeAbsent' => [[], 'getDisplayType', null];
+        yield 'displayTypeWrongType' => [[BasicPlusItemForPresentationTransformerInterface::KEY_DISPLAY_TYPE => 42], 'getDisplayType', null];
     }
 
     public function testTransformLight(): void
@@ -331,27 +350,5 @@ final class BasicPlusItemForPresentationTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getTv());
         self::assertNull($transformer->transform($base + [BasicPlusItemForPresentationTransformerInterface::KEY_TV => 'test-not-array'])->getTv());
         self::assertSame($basicPlusTvModel, $transformer->transform($base + [BasicPlusItemForPresentationTransformerInterface::KEY_TV => ['test-nested']])->getTv());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new BasicPlusItemForPresentationTransformer(self::createStub(BasicPlusCameraTransformerInterface::class), self::createStub(BasicPlusTvTransformerInterface::class), self::createStub(BasicPlusLightTransformerInterface::class), self::createStub(BasicPlusItemActionsItemTransformerInterface::class), self::createStub(BasicPlusStateBoardItemTransformerInterface::class), self::createStub(BasicPlusItemProgressBarsItemTransformerInterface::class), self::createStub(PanelForDevicePresentationTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'displayTypeAbsent' => [[], sprintf(BasicPlusItemForPresentationTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusItemForPresentationTransformerInterface::KEY_DISPLAY_TYPE)];
-        yield 'displayTypeWrongType' => [[BasicPlusItemForPresentationTransformerInterface::KEY_DISPLAY_TYPE => 42], sprintf(BasicPlusItemForPresentationTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusItemForPresentationTransformerInterface::KEY_DISPLAY_TYPE)];
     }
 }

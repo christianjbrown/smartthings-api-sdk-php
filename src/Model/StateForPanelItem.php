@@ -10,11 +10,11 @@ final class StateForPanelItem implements StateForPanelItemInterface
      * @var null|array<int, AlternativeItemInterface>
      */
     private ?array $alternatives = null;
-    private string $label;
-    private string $size;
+    private ?string $label;
+    private ?string $size;
     private ?string $unit = null;
 
-    public function __construct(string $label, string $size)
+    public function __construct(?string $label, ?string $size)
     {
         $this->label = $label;
         $this->size = $size;
@@ -28,12 +28,12 @@ final class StateForPanelItem implements StateForPanelItemInterface
         return $this->alternatives;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }
 
-    public function getSize(): string
+    public function getSize(): ?string
     {
         return $this->size;
     }

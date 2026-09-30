@@ -13,10 +13,10 @@ final class PushButtonWithAvailableSize implements PushButtonWithAvailableSizeIn
      * @var null|array<int, string>
      */
     private ?array $availableSizes = null;
-    private string $command;
+    private ?string $command;
     private ?string $iconUrl = null;
 
-    public function __construct(string $command)
+    public function __construct(?string $command)
     {
         $this->command = $command;
     }
@@ -39,7 +39,7 @@ final class PushButtonWithAvailableSize implements PushButtonWithAvailableSizeIn
         return $this->availableSizes;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }

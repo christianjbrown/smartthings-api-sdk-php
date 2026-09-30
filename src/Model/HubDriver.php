@@ -7,10 +7,10 @@ namespace ChristianBrown\SmartThings\Model;
 final class HubDriver implements HubDriverInterface
 {
     private ?string $channelId = null;
-    private string $driverId;
+    private ?string $driverId;
     private ?string $driverVersion = null;
 
-    public function __construct(string $driverId)
+    public function __construct(?string $driverId)
     {
         $this->driverId = $driverId;
     }
@@ -20,7 +20,7 @@ final class HubDriver implements HubDriverInterface
         return $this->channelId;
     }
 
-    public function getDriverId(): string
+    public function getDriverId(): ?string
     {
         return $this->driverId;
     }

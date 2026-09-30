@@ -6,5 +6,5 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface SceneSleepRequestInterface
 {
-    public function getSeconds(): int;
+    public function getSeconds(): ?int;
 }

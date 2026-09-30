@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\TtsVoice;
 use ChristianBrown\SmartThings\Model\TtsVoiceInterface;
 
@@ -12,7 +11,6 @@ use function array_filter;
 use function array_values;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class TtsVoiceTransformer implements TtsVoiceTransformerInterface
 {
@@ -60,13 +58,13 @@ final class TtsVoiceTransformer implements TtsVoiceTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireGender(array $data): string
+    private static function requireGender(array $data): ?string
     {
         if (empty($data[self::KEY_GENDER])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_GENDER));
+            return null;
         }
         if (!is_string($data[self::KEY_GENDER])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_GENDER));
+            return null;
         }
 
         return $data[self::KEY_GENDER];
@@ -75,13 +73,13 @@ final class TtsVoiceTransformer implements TtsVoiceTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireId(array $data): string
+    private static function requireId(array $data): ?string
     {
         if (empty($data[self::KEY_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ID));
+            return null;
         }
         if (!is_string($data[self::KEY_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ID));
+            return null;
         }
 
         return $data[self::KEY_ID];
@@ -90,13 +88,13 @@ final class TtsVoiceTransformer implements TtsVoiceTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireLanguageCode(array $data): string
+    private static function requireLanguageCode(array $data): ?string
     {
         if (empty($data[self::KEY_LANGUAGE_CODE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LANGUAGE_CODE));
+            return null;
         }
         if (!is_string($data[self::KEY_LANGUAGE_CODE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LANGUAGE_CODE));
+            return null;
         }
 
         return $data[self::KEY_LANGUAGE_CODE];
@@ -105,13 +103,13 @@ final class TtsVoiceTransformer implements TtsVoiceTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireLanguageName(array $data): string
+    private static function requireLanguageName(array $data): ?string
     {
         if (empty($data[self::KEY_LANGUAGE_NAME])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LANGUAGE_NAME));
+            return null;
         }
         if (!is_string($data[self::KEY_LANGUAGE_NAME])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LANGUAGE_NAME));
+            return null;
         }
 
         return $data[self::KEY_LANGUAGE_NAME];
@@ -120,13 +118,13 @@ final class TtsVoiceTransformer implements TtsVoiceTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireName(array $data): string
+    private static function requireName(array $data): ?string
     {
         if (empty($data[self::KEY_NAME])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_NAME));
+            return null;
         }
         if (!is_string($data[self::KEY_NAME])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_NAME));
+            return null;
         }
 
         return $data[self::KEY_NAME];
@@ -135,13 +133,13 @@ final class TtsVoiceTransformer implements TtsVoiceTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireTtsProvider(array $data): string
+    private static function requireTtsProvider(array $data): ?string
     {
         if (empty($data[self::KEY_TTSPROVIDER])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_TTSPROVIDER));
+            return null;
         }
         if (!is_string($data[self::KEY_TTSPROVIDER])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_TTSPROVIDER));
+            return null;
         }
 
         return $data[self::KEY_TTSPROVIDER];

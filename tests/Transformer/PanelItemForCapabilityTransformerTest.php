@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\EmptyWithAvailableSizeInterface;
 use ChristianBrown\SmartThings\Model\ListWithAvailableSizeInterface;
 use ChristianBrown\SmartThings\Model\PanelItemForCapability;
@@ -23,8 +22,6 @@ use ChristianBrown\SmartThings\Transformer\StepperWithAvailableSizeTransformerIn
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(PanelItemForCapability::class)]
 #[CoversClass(PanelItemForCapabilityTransformer::class)]
@@ -101,6 +98,28 @@ final class PanelItemForCapabilityTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getEmpty());
         self::assertNull($transformer->transform($base + [PanelItemForCapabilityTransformerInterface::KEY_EMPTY => 'test-not-array'])->getEmpty());
         self::assertSame($emptyWithAvailableSizeModel, $transformer->transform($base + [PanelItemForCapabilityTransformerInterface::KEY_EMPTY => ['test-nested']])->getEmpty());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new PanelItemForCapabilityTransformer(self::createStub(StepperWithAvailableSizeTransformerInterface::class), self::createStub(ListWithAvailableSizeTransformerInterface::class), self::createStub(PushButtonWithAvailableSizeTransformerInterface::class), self::createStub(StateWithAvailableSizeTransformerInterface::class), self::createStub(SliderWithAvailableSizeTransformerInterface::class), self::createStub(EmptyWithAvailableSizeTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'displayTypeAbsent' => [[], 'getDisplayType', null];
+        yield 'displayTypeWrongType' => [[PanelItemForCapabilityTransformerInterface::KEY_DISPLAY_TYPE => 42], 'getDisplayType', null];
     }
 
     public function testTransformList(): void
@@ -299,27 +318,5 @@ final class PanelItemForCapabilityTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getStepper());
         self::assertNull($transformer->transform($base + [PanelItemForCapabilityTransformerInterface::KEY_STEPPER => 'test-not-array'])->getStepper());
         self::assertSame($stepperWithAvailableSizeModel, $transformer->transform($base + [PanelItemForCapabilityTransformerInterface::KEY_STEPPER => ['test-nested']])->getStepper());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new PanelItemForCapabilityTransformer(self::createStub(StepperWithAvailableSizeTransformerInterface::class), self::createStub(ListWithAvailableSizeTransformerInterface::class), self::createStub(PushButtonWithAvailableSizeTransformerInterface::class), self::createStub(StateWithAvailableSizeTransformerInterface::class), self::createStub(SliderWithAvailableSizeTransformerInterface::class), self::createStub(EmptyWithAvailableSizeTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'displayTypeAbsent' => [[], sprintf(PanelItemForCapabilityTransformerInterface::UNEXPECTED_STRING_SPRINTF, PanelItemForCapabilityTransformerInterface::KEY_DISPLAY_TYPE)];
-        yield 'displayTypeWrongType' => [[PanelItemForCapabilityTransformerInterface::KEY_DISPLAY_TYPE => 42], sprintf(PanelItemForCapabilityTransformerInterface::UNEXPECTED_STRING_SPRINTF, PanelItemForCapabilityTransformerInterface::KEY_DISPLAY_TYPE)];
     }
 }

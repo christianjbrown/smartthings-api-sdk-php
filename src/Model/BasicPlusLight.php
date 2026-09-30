@@ -8,10 +8,10 @@ final class BasicPlusLight implements BasicPlusLightInterface
 {
     private ?BasicPlusLightColorControlInterface $colorControl = null;
     private ?SliderForLightInterface $colorTemperature = null;
-    private SliderForLightInterface $dimmer;
+    private ?SliderForLightInterface $dimmer;
     private ?bool $hideDashboardActions = null;
 
-    public function __construct(SliderForLightInterface $dimmer)
+    public function __construct(?SliderForLightInterface $dimmer)
     {
         $this->dimmer = $dimmer;
     }
@@ -26,7 +26,7 @@ final class BasicPlusLight implements BasicPlusLightInterface
         return $this->colorTemperature;
     }
 
-    public function getDimmer(): SliderForLightInterface
+    public function getDimmer(): ?SliderForLightInterface
     {
         return $this->dimmer;
     }

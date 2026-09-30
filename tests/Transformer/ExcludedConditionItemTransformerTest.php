@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ExcludedConditionItem;
 use ChristianBrown\SmartThings\Model\ExcludedConditionItemIdExcludeItemInterface;
 use ChristianBrown\SmartThings\Transformer\ExcludedConditionItemIdExcludeItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\ExcludedConditionItemTransformerInter
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(ExcludedConditionItem::class)]
 #[CoversClass(ExcludedConditionItemTransformer::class)]
@@ -36,6 +33,28 @@ final class ExcludedConditionItemTransformerTest extends TestCase
 
         self::assertSame(['test-value-key' => 'test-value'], $actual->getValue());
         self::assertSame([$excludedConditionItemIdExcludeItemModel], $actual->getExclude());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new ExcludedConditionItemTransformer(self::createStub(ExcludedConditionItemIdExcludeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'excludeAbsent' => [[], 'getExclude', []];
+        yield 'excludeWrongType' => [[ExcludedConditionItemTransformerInterface::KEY_EXCLUDE => 'not-array'], 'getExclude', []];
     }
 
     /**
@@ -73,27 +92,5 @@ final class ExcludedConditionItemTransformerTest extends TestCase
         $actual = $transformer->transform([ExcludedConditionItemTransformerInterface::KEY_EXCLUDE => ['test-nested']]);
 
         self::assertNull($actual->getValue());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new ExcludedConditionItemTransformer(self::createStub(ExcludedConditionItemIdExcludeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'excludeAbsent' => [[], sprintf(ExcludedConditionItemTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ExcludedConditionItemTransformerInterface::KEY_EXCLUDE)];
-        yield 'excludeWrongType' => [[ExcludedConditionItemTransformerInterface::KEY_EXCLUDE => 'not-array'], sprintf(ExcludedConditionItemTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ExcludedConditionItemTransformerInterface::KEY_EXCLUDE)];
     }
 }

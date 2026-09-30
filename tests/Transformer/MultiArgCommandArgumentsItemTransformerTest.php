@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ListForArgumentInterface;
 use ChristianBrown\SmartThings\Model\MultiArgCommandArgumentsItem;
 use ChristianBrown\SmartThings\Model\NumberFieldForArgumentInterface;
@@ -19,8 +18,6 @@ use ChristianBrown\SmartThings\Transformer\TextFieldForArgumentTransformerInterf
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(MultiArgCommandArgumentsItem::class)]
 #[CoversClass(MultiArgCommandArgumentsItemTransformer::class)]
@@ -59,6 +56,30 @@ final class MultiArgCommandArgumentsItemTransformerTest extends TestCase
         self::assertSame($listForArgumentModel, $actual->getList());
         self::assertSame($textFieldForArgumentModel, $actual->getTextField());
         self::assertSame($numberFieldForArgumentModel, $actual->getNumberField());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new MultiArgCommandArgumentsItemTransformer(self::createStub(SliderForArgumentTransformerInterface::class), self::createStub(ListForArgumentTransformerInterface::class), self::createStub(TextFieldForArgumentTransformerInterface::class), self::createStub(NumberFieldForArgumentTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'labelAbsent' => [[MultiArgCommandArgumentsItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type'], 'getLabel', null];
+        yield 'labelWrongType' => [[MultiArgCommandArgumentsItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type', MultiArgCommandArgumentsItemTransformerInterface::KEY_LABEL => 42], 'getLabel', null];
+        yield 'displayTypeAbsent' => [[MultiArgCommandArgumentsItemTransformerInterface::KEY_LABEL => 'test-label'], 'getDisplayType', null];
+        yield 'displayTypeWrongType' => [[MultiArgCommandArgumentsItemTransformerInterface::KEY_LABEL => 'test-label', MultiArgCommandArgumentsItemTransformerInterface::KEY_DISPLAY_TYPE => 42], 'getDisplayType', null];
     }
 
     public function testTransformList(): void
@@ -171,29 +192,5 @@ final class MultiArgCommandArgumentsItemTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getTextField());
         self::assertNull($transformer->transform($base + [MultiArgCommandArgumentsItemTransformerInterface::KEY_TEXT_FIELD => 'test-not-array'])->getTextField());
         self::assertSame($textFieldForArgumentModel, $transformer->transform($base + [MultiArgCommandArgumentsItemTransformerInterface::KEY_TEXT_FIELD => ['test-nested']])->getTextField());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new MultiArgCommandArgumentsItemTransformer(self::createStub(SliderForArgumentTransformerInterface::class), self::createStub(ListForArgumentTransformerInterface::class), self::createStub(TextFieldForArgumentTransformerInterface::class), self::createStub(NumberFieldForArgumentTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'labelAbsent' => [[MultiArgCommandArgumentsItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type'], sprintf(MultiArgCommandArgumentsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, MultiArgCommandArgumentsItemTransformerInterface::KEY_LABEL)];
-        yield 'labelWrongType' => [[MultiArgCommandArgumentsItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type', MultiArgCommandArgumentsItemTransformerInterface::KEY_LABEL => 42], sprintf(MultiArgCommandArgumentsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, MultiArgCommandArgumentsItemTransformerInterface::KEY_LABEL)];
-        yield 'displayTypeAbsent' => [[MultiArgCommandArgumentsItemTransformerInterface::KEY_LABEL => 'test-label'], sprintf(MultiArgCommandArgumentsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, MultiArgCommandArgumentsItemTransformerInterface::KEY_DISPLAY_TYPE)];
-        yield 'displayTypeWrongType' => [[MultiArgCommandArgumentsItemTransformerInterface::KEY_LABEL => 'test-label', MultiArgCommandArgumentsItemTransformerInterface::KEY_DISPLAY_TYPE => 42], sprintf(MultiArgCommandArgumentsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, MultiArgCommandArgumentsItemTransformerInterface::KEY_DISPLAY_TYPE)];
     }
 }

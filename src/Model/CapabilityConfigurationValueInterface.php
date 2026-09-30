@@ -11,7 +11,7 @@ interface CapabilityConfigurationValueInterface
      */
     public function getEnabledValues(): ?array;
 
-    public function getKey(): string;
+    public function getKey(): ?string;
 
     /**
      * @return null|mixed[]

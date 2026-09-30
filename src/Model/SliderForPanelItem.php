@@ -11,13 +11,13 @@ final class SliderForPanelItem implements SliderForPanelItemInterface
      */
     private ?array $alternatives = null;
     private ?string $argumentType = null;
-    private string $command;
+    private ?string $command;
 
     /**
      * @var mixed[]
      */
     private array $range;
-    private string $size;
+    private ?string $size;
     private ?float $step = null;
     private ?string $supportedValues = null;
     private ?string $unit = null;
@@ -27,7 +27,7 @@ final class SliderForPanelItem implements SliderForPanelItemInterface
     /**
      * @phpstan-param mixed[] $range
      */
-    public function __construct(array $range, string $command, string $size)
+    public function __construct(array $range, ?string $command, ?string $size)
     {
         $this->range = $range;
         $this->command = $command;
@@ -47,7 +47,7 @@ final class SliderForPanelItem implements SliderForPanelItemInterface
         return $this->argumentType;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }
@@ -60,7 +60,7 @@ final class SliderForPanelItem implements SliderForPanelItemInterface
         return $this->range;
     }
 
-    public function getSize(): string
+    public function getSize(): ?string
     {
         return $this->size;
     }

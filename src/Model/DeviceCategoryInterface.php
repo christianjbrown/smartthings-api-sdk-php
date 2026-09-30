@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface DeviceCategoryInterface
 {
-    public function getCategoryType(): string;
+    public function getCategoryType(): ?string;
 
-    public function getName(): string;
+    public function getName(): ?string;
 }

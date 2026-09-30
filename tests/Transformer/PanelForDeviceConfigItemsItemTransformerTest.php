@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilityValueForPanelInterface;
 use ChristianBrown\SmartThings\Model\PanelForDeviceConfigItemsItem;
 use ChristianBrown\SmartThings\Model\VisibleConditionInterface;
@@ -15,8 +14,6 @@ use ChristianBrown\SmartThings\Transformer\VisibleConditionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(PanelForDeviceConfigItemsItem::class)]
 #[CoversClass(PanelForDeviceConfigItemsItemTransformer::class)]
@@ -55,6 +52,32 @@ final class PanelForDeviceConfigItemsItemTransformerTest extends TestCase
         self::assertSame('test-operator', $actual->getOperator());
         self::assertSame([$visibleConditionModel], $actual->getVisibleConditions());
         self::assertTrue($actual->getHideOnUnmatch());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new PanelForDeviceConfigItemsItemTransformer(self::createStub(CapabilityValueForPanelTransformerInterface::class), self::createStub(VisibleConditionTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'componentAbsent' => [[PanelForDeviceConfigItemsItemTransformerInterface::KEY_CAPABILITY => 'test-capability', PanelForDeviceConfigItemsItemTransformerInterface::KEY_SIZE => 'test-size'], 'getComponent', null];
+        yield 'componentWrongType' => [[PanelForDeviceConfigItemsItemTransformerInterface::KEY_CAPABILITY => 'test-capability', PanelForDeviceConfigItemsItemTransformerInterface::KEY_SIZE => 'test-size', PanelForDeviceConfigItemsItemTransformerInterface::KEY_COMPONENT => 42], 'getComponent', null];
+        yield 'capabilityAbsent' => [[PanelForDeviceConfigItemsItemTransformerInterface::KEY_COMPONENT => 'test-component', PanelForDeviceConfigItemsItemTransformerInterface::KEY_SIZE => 'test-size'], 'getCapability', null];
+        yield 'capabilityWrongType' => [[PanelForDeviceConfigItemsItemTransformerInterface::KEY_COMPONENT => 'test-component', PanelForDeviceConfigItemsItemTransformerInterface::KEY_SIZE => 'test-size', PanelForDeviceConfigItemsItemTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
+        yield 'sizeAbsent' => [[PanelForDeviceConfigItemsItemTransformerInterface::KEY_COMPONENT => 'test-component', PanelForDeviceConfigItemsItemTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getSize', null];
+        yield 'sizeWrongType' => [[PanelForDeviceConfigItemsItemTransformerInterface::KEY_COMPONENT => 'test-component', PanelForDeviceConfigItemsItemTransformerInterface::KEY_CAPABILITY => 'test-capability', PanelForDeviceConfigItemsItemTransformerInterface::KEY_SIZE => 42], 'getSize', null];
     }
 
     /**
@@ -109,32 +132,6 @@ final class PanelForDeviceConfigItemsItemTransformerTest extends TestCase
         self::assertNull($actual->getOperator());
         self::assertNull($actual->getVisibleConditions());
         self::assertNull($actual->getHideOnUnmatch());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new PanelForDeviceConfigItemsItemTransformer(self::createStub(CapabilityValueForPanelTransformerInterface::class), self::createStub(VisibleConditionTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'componentAbsent' => [[PanelForDeviceConfigItemsItemTransformerInterface::KEY_CAPABILITY => 'test-capability', PanelForDeviceConfigItemsItemTransformerInterface::KEY_SIZE => 'test-size'], sprintf(PanelForDeviceConfigItemsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, PanelForDeviceConfigItemsItemTransformerInterface::KEY_COMPONENT)];
-        yield 'componentWrongType' => [[PanelForDeviceConfigItemsItemTransformerInterface::KEY_CAPABILITY => 'test-capability', PanelForDeviceConfigItemsItemTransformerInterface::KEY_SIZE => 'test-size', PanelForDeviceConfigItemsItemTransformerInterface::KEY_COMPONENT => 42], sprintf(PanelForDeviceConfigItemsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, PanelForDeviceConfigItemsItemTransformerInterface::KEY_COMPONENT)];
-        yield 'capabilityAbsent' => [[PanelForDeviceConfigItemsItemTransformerInterface::KEY_COMPONENT => 'test-component', PanelForDeviceConfigItemsItemTransformerInterface::KEY_SIZE => 'test-size'], sprintf(PanelForDeviceConfigItemsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, PanelForDeviceConfigItemsItemTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[PanelForDeviceConfigItemsItemTransformerInterface::KEY_COMPONENT => 'test-component', PanelForDeviceConfigItemsItemTransformerInterface::KEY_SIZE => 'test-size', PanelForDeviceConfigItemsItemTransformerInterface::KEY_CAPABILITY => 42], sprintf(PanelForDeviceConfigItemsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, PanelForDeviceConfigItemsItemTransformerInterface::KEY_CAPABILITY)];
-        yield 'sizeAbsent' => [[PanelForDeviceConfigItemsItemTransformerInterface::KEY_COMPONENT => 'test-component', PanelForDeviceConfigItemsItemTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(PanelForDeviceConfigItemsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, PanelForDeviceConfigItemsItemTransformerInterface::KEY_SIZE)];
-        yield 'sizeWrongType' => [[PanelForDeviceConfigItemsItemTransformerInterface::KEY_COMPONENT => 'test-component', PanelForDeviceConfigItemsItemTransformerInterface::KEY_CAPABILITY => 'test-capability', PanelForDeviceConfigItemsItemTransformerInterface::KEY_SIZE => 42], sprintf(PanelForDeviceConfigItemsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, PanelForDeviceConfigItemsItemTransformerInterface::KEY_SIZE)];
     }
 
     public function testTransformValues(): void

@@ -6,21 +6,21 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class DeviceConfigurationDpInfoItemArgumentsItem implements DeviceConfigurationDpInfoItemArgumentsItemInterface
 {
-    private string $key;
-    private string $value;
+    private ?string $key;
+    private ?string $value;
 
-    public function __construct(string $key, string $value)
+    public function __construct(?string $key, ?string $value)
     {
         $this->key = $key;
         $this->value = $value;
     }
 
-    public function getKey(): string
+    public function getKey(): ?string
     {
         return $this->key;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

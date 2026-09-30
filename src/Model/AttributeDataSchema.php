@@ -17,9 +17,9 @@ final class AttributeDataSchema implements AttributeDataSchemaInterface
      * @var null|array<int, string>
      */
     private ?array $required = null;
-    private string $type;
+    private ?string $type;
 
-    public function __construct(string $type)
+    public function __construct(?string $type)
     {
         $this->type = $type;
     }
@@ -45,7 +45,7 @@ final class AttributeDataSchema implements AttributeDataSchemaInterface
         return $this->required;
     }
 
-    public function getType(): string
+    public function getType(): ?string
     {
         return $this->type;
     }

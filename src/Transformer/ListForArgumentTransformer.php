@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\ListForArgument;
 use ChristianBrown\SmartThings\Model\ListForArgumentInterface;
@@ -14,7 +13,6 @@ use function array_map;
 use function array_values;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class ListForArgumentTransformer implements ListForArgumentTransformerInterface
 {
@@ -74,10 +72,10 @@ final class ListForArgumentTransformer implements ListForArgumentTransformerInte
     private function requireAlternatives(array $data): array
     {
         if (!isset($data[self::KEY_ALTERNATIVES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_ALTERNATIVES));
+            return [];
         }
         if (!is_array($data[self::KEY_ALTERNATIVES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_ALTERNATIVES));
+            return [];
         }
 
         return $this->transformListAlternativeItem($data[self::KEY_ALTERNATIVES]);
@@ -86,13 +84,13 @@ final class ListForArgumentTransformer implements ListForArgumentTransformerInte
     /**
      * @param mixed[] $data
      */
-    private static function requireName(array $data): string
+    private static function requireName(array $data): ?string
     {
         if (empty($data[self::KEY_NAME])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_NAME));
+            return null;
         }
         if (!is_string($data[self::KEY_NAME])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_NAME));
+            return null;
         }
 
         return $data[self::KEY_NAME];

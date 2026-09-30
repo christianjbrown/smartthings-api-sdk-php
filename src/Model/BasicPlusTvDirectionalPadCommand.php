@@ -6,14 +6,14 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class BasicPlusTvDirectionalPadCommand implements BasicPlusTvDirectionalPadCommandInterface
 {
-    private string $down;
-    private string $left;
+    private ?string $down;
+    private ?string $left;
     private ?string $name = null;
-    private string $ok;
-    private string $right;
-    private string $up;
+    private ?string $ok;
+    private ?string $right;
+    private ?string $up;
 
-    public function __construct(string $up, string $down, string $left, string $right, string $ok)
+    public function __construct(?string $up, ?string $down, ?string $left, ?string $right, ?string $ok)
     {
         $this->up = $up;
         $this->down = $down;
@@ -22,12 +22,12 @@ final class BasicPlusTvDirectionalPadCommand implements BasicPlusTvDirectionalPa
         $this->ok = $ok;
     }
 
-    public function getDown(): string
+    public function getDown(): ?string
     {
         return $this->down;
     }
 
-    public function getLeft(): string
+    public function getLeft(): ?string
     {
         return $this->left;
     }
@@ -37,17 +37,17 @@ final class BasicPlusTvDirectionalPadCommand implements BasicPlusTvDirectionalPa
         return $this->name;
     }
 
-    public function getOk(): string
+    public function getOk(): ?string
     {
         return $this->ok;
     }
 
-    public function getRight(): string
+    public function getRight(): ?string
     {
         return $this->right;
     }
 
-    public function getUp(): string
+    public function getUp(): ?string
     {
         return $this->up;
     }

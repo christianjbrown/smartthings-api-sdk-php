@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ListWithAvailableSize;
 use ChristianBrown\SmartThings\Model\ListWithAvailableSizeCommandInterface;
 use ChristianBrown\SmartThings\Model\ListWithAvailableSizeStateInterface;
@@ -15,8 +14,6 @@ use ChristianBrown\SmartThings\Transformer\ListWithAvailableSizeTransformerInter
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(ListWithAvailableSize::class)]
 #[CoversClass(ListWithAvailableSizeTransformer::class)]
@@ -43,6 +40,28 @@ final class ListWithAvailableSizeTransformerTest extends TestCase
         self::assertSame($listWithAvailableSizeCommandModel, $actual->getCommand());
         self::assertSame($listWithAvailableSizeStateModel, $actual->getState());
         self::assertSame(['test-available-sizes-1', 'test-available-sizes-2'], $actual->getAvailableSizes());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new ListWithAvailableSizeTransformer(self::createStub(ListWithAvailableSizeCommandTransformerInterface::class), self::createStub(ListWithAvailableSizeStateTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'commandAbsent' => [[], 'getCommand', null];
+        yield 'commandWrongType' => [[ListWithAvailableSizeTransformerInterface::KEY_COMMAND => 'not-array'], 'getCommand', null];
     }
 
     /**
@@ -100,27 +119,5 @@ final class ListWithAvailableSizeTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getState());
         self::assertNull($transformer->transform($base + [ListWithAvailableSizeTransformerInterface::KEY_STATE => 'test-not-array'])->getState());
         self::assertSame($listWithAvailableSizeStateModel, $transformer->transform($base + [ListWithAvailableSizeTransformerInterface::KEY_STATE => ['test-nested']])->getState());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new ListWithAvailableSizeTransformer(self::createStub(ListWithAvailableSizeCommandTransformerInterface::class), self::createStub(ListWithAvailableSizeStateTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'commandAbsent' => [[], sprintf(ListWithAvailableSizeTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ListWithAvailableSizeTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[ListWithAvailableSizeTransformerInterface::KEY_COMMAND => 'not-array'], sprintf(ListWithAvailableSizeTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ListWithAvailableSizeTransformerInterface::KEY_COMMAND)];
     }
 }

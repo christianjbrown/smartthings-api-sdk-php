@@ -10,12 +10,12 @@ final class DriverPermission implements DriverPermissionInterface
      * @var mixed[]
      */
     private array $attributes;
-    private string $name;
+    private ?string $name;
 
     /**
      * @phpstan-param mixed[] $attributes
      */
-    public function __construct(string $name, array $attributes)
+    public function __construct(?string $name, array $attributes)
     {
         $this->name = $name;
         $this->attributes = $attributes;
@@ -29,7 +29,7 @@ final class DriverPermission implements DriverPermissionInterface
         return $this->attributes;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }

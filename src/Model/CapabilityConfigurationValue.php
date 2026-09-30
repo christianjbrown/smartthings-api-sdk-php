@@ -10,7 +10,7 @@ final class CapabilityConfigurationValue implements CapabilityConfigurationValue
      * @var null|array<int, string>
      */
     private ?array $enabledValues = null;
-    private string $key;
+    private ?string $key;
 
     /**
      * @var null|mixed[]
@@ -18,7 +18,7 @@ final class CapabilityConfigurationValue implements CapabilityConfigurationValue
     private ?array $range = null;
     private ?float $step = null;
 
-    public function __construct(string $key)
+    public function __construct(?string $key)
     {
         $this->key = $key;
     }
@@ -31,7 +31,7 @@ final class CapabilityConfigurationValue implements CapabilityConfigurationValue
         return $this->enabledValues;
     }
 
-    public function getKey(): string
+    public function getKey(): ?string
     {
         return $this->key;
     }

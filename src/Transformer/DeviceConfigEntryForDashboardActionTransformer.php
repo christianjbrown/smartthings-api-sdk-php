@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceConfigEntryForDashboardAction;
 use ChristianBrown\SmartThings\Model\DeviceConfigEntryForDashboardActionInterface;
 
 use function is_array;
 use function is_int;
 use function is_string;
-use function sprintf;
 
 final class DeviceConfigEntryForDashboardActionTransformer implements DeviceConfigEntryForDashboardActionTransformerInterface
 {
@@ -113,13 +111,13 @@ final class DeviceConfigEntryForDashboardActionTransformer implements DeviceConf
     /**
      * @param mixed[] $data
      */
-    private static function requireCapability(array $data): string
+    private static function requireCapability(array $data): ?string
     {
         if (empty($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
         if (!is_string($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
 
         return $data[self::KEY_CAPABILITY];
@@ -128,13 +126,13 @@ final class DeviceConfigEntryForDashboardActionTransformer implements DeviceConf
     /**
      * @param mixed[] $data
      */
-    private static function requireComponent(array $data): string
+    private static function requireComponent(array $data): ?string
     {
         if (empty($data[self::KEY_COMPONENT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMPONENT));
+            return null;
         }
         if (!is_string($data[self::KEY_COMPONENT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMPONENT));
+            return null;
         }
 
         return $data[self::KEY_COMPONENT];

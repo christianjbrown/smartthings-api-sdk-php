@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AttributeStateInterface;
 use ChristianBrown\SmartThings\Model\DeviceCapabilityReference;
 use ChristianBrown\SmartThings\Model\DeviceCapabilityReferenceInterface;
@@ -15,7 +14,6 @@ use function is_array;
 use function is_bool;
 use function is_int;
 use function is_string;
-use function sprintf;
 
 final class DeviceCapabilityReferenceTransformer implements DeviceCapabilityReferenceTransformerInterface
 {
@@ -134,13 +132,13 @@ final class DeviceCapabilityReferenceTransformer implements DeviceCapabilityRefe
     /**
      * @param mixed[] $data
      */
-    private static function requireId(array $data): string
+    private static function requireId(array $data): ?string
     {
         if (empty($data[self::KEY_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ID));
+            return null;
         }
         if (!is_string($data[self::KEY_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ID));
+            return null;
         }
 
         return $data[self::KEY_ID];

@@ -6,19 +6,19 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class DeviceConfigurationIconsItemBadgeItem implements DeviceConfigurationIconsItemBadgeItemInterface
 {
-    private string $iconUrl;
+    private ?string $iconUrl;
 
     /**
      * @var null|array<int, VisibleConditionInterface>
      */
     private ?array $visibleConditions = null;
 
-    public function __construct(string $iconUrl)
+    public function __construct(?string $iconUrl)
     {
         $this->iconUrl = $iconUrl;
     }
 
-    public function getIconUrl(): string
+    public function getIconUrl(): ?string
     {
         return $this->iconUrl;
     }

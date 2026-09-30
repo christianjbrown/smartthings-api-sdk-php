@@ -12,10 +12,10 @@ final class StepperForPanelItemState implements StepperForPanelItemStateInterfac
     private ?array $alternatives = null;
     private ?string $label = null;
     private ?string $unit = null;
-    private string $value;
+    private ?string $value;
     private ?string $valueType = null;
 
-    public function __construct(string $value)
+    public function __construct(?string $value)
     {
         $this->value = $value;
     }
@@ -38,7 +38,7 @@ final class StepperForPanelItemState implements StepperForPanelItemStateInterfac
         return $this->unit;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

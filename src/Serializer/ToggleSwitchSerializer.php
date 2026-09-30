@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Serializer;
 
 use ChristianBrown\SmartThings\Model\StandbyPowerSwitchForDashboardStateInterface;
+use ChristianBrown\SmartThings\Model\ToggleSwitchForDashboardCommandInterface;
 use ChristianBrown\SmartThings\Model\ToggleSwitchInterface;
 
 use function array_filter;
@@ -26,7 +27,7 @@ final class ToggleSwitchSerializer implements ToggleSwitchSerializerInterface
     public function serialize(ToggleSwitchInterface $model): array
     {
         $serialized = [
-            self::KEY_COMMAND => $this->toggleSwitchForDashboardCommandSerializer->serialize($model->getCommand()),
+            self::KEY_COMMAND => $this->serializeOptionalToggleSwitchForDashboardCommand($model->getCommand()),
             self::KEY_STATE => $this->serializeOptionalState($model->getState()),
         ];
 
@@ -44,5 +45,17 @@ final class ToggleSwitchSerializer implements ToggleSwitchSerializerInterface
         }
 
         return $this->standbyPowerSwitchForDashboardStateSerializer->serialize($value);
+    }
+
+    /**
+     * @return null|mixed[]
+     */
+    private function serializeOptionalToggleSwitchForDashboardCommand(?ToggleSwitchForDashboardCommandInterface $value): ?array
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->toggleSwitchForDashboardCommandSerializer->serialize($value);
     }
 }

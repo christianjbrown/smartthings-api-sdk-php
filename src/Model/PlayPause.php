@@ -6,21 +6,21 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class PlayPause implements PlayPauseInterface
 {
-    private PlayPauseCommandInterface $command;
-    private PlayPauseStateInterface $state;
+    private ?PlayPauseCommandInterface $command;
+    private ?PlayPauseStateInterface $state;
 
-    public function __construct(PlayPauseCommandInterface $command, PlayPauseStateInterface $state)
+    public function __construct(?PlayPauseCommandInterface $command, ?PlayPauseStateInterface $state)
     {
         $this->command = $command;
         $this->state = $state;
     }
 
-    public function getCommand(): PlayPauseCommandInterface
+    public function getCommand(): ?PlayPauseCommandInterface
     {
         return $this->command;
     }
 
-    public function getState(): PlayPauseStateInterface
+    public function getState(): ?PlayPauseStateInterface
     {
         return $this->state;
     }
