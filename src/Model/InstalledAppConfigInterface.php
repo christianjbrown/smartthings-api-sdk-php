@@ -11,6 +11,11 @@ interface InstalledAppConfigInterface
      */
     public function getConfig(): array;
 
+    /**
+     * @return array<array-key, array<int, ConfigEntryInterface>>
+     */
+    public function getConfigEntries(): array;
+
     public function getConfigurationId(): string;
 
     public function getConfigurationStatus(): ?string;
@@ -25,6 +30,11 @@ interface InstalledAppConfigInterface
      * @param mixed[] $value
      */
     public function setConfig(array $value): self;
+
+    /**
+     * @param array<array-key, array<int, ConfigEntryInterface>> $value
+     */
+    public function setConfigEntries(array $value): self;
 
     public function setConfigurationId(string $value): self;
 

@@ -64,4 +64,14 @@ final class ValueReader implements ValueReaderInterface
 
         return is_string($value) ? $value : null;
     }
+
+    /**
+     * @param array<array-key, mixed> $data
+     *
+     * @return array<int, string>
+     */
+    public function strings(array $data, string $key): array
+    {
+        return array_values(array_filter($this->record($data, $key) ?? [], is_string(...)));
+    }
 }

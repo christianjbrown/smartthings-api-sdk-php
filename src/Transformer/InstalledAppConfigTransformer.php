@@ -14,6 +14,15 @@ use function sprintf;
 
 final class InstalledAppConfigTransformer implements InstalledAppConfigTransformerInterface
 {
+    private ConfigEntriesTransformerInterface $configEntriesTransformer;
+    private ValueReaderInterface $valueReader;
+
+    public function __construct(ConfigEntriesTransformerInterface $configEntriesTransformer, ValueReaderInterface $valueReader)
+    {
+        $this->configEntriesTransformer = $configEntriesTransformer;
+        $this->valueReader = $valueReader;
+    }
+
     /**
      * @param mixed[] $data
      */
@@ -31,6 +40,7 @@ final class InstalledAppConfigTransformer implements InstalledAppConfigTransform
         self::applyInstalledAppId($config, $data);
 
         self::applyConfig($config, $data);
+        $config->setConfigEntries($this->configEntriesTransformer->transform($this->valueReader->record($data, self::KEY_CONFIG) ?? []));
         self::applyCreatedDate($config, $data);
         self::applyLastUpdatedDate($config, $data);
 

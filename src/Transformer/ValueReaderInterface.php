@@ -44,4 +44,13 @@ interface ValueReaderInterface
      * @param array<array-key, mixed> $data
      */
     public function string(array $data, string $key): ?string;
+
+    /**
+     * The string entries of the list under the key; anything else in it is skipped.
+     *
+     * @param array<array-key, mixed> $data
+     *
+     * @return array<int, string>
+     */
+    public function strings(array $data, string $key): array;
 }

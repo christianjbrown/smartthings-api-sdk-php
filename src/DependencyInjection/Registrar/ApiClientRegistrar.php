@@ -175,6 +175,9 @@ final class ApiClientRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_PAGING_JSON_API_REQUEST_SENDER),
                     $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_STATUS_TRANSFORMER),
                     $this->token,
+                    $container->getDefinition(SmartThingsInterface::SERVICE_DEVICE_STATUS_REPORT_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_COMPONENT_STATUS_TRANSFORMER),
+                    $container->getDefinition(SmartThingsInterface::SERVICE_CAPABILITY_STATUS_TRANSFORMER),
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_DRIVER_API, DriverApi::class)

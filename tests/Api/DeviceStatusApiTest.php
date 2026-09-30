@@ -14,6 +14,9 @@ use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceInterface;
 use ChristianBrown\SmartThings\Model\DeviceStatusInterface;
+use ChristianBrown\SmartThings\Transformer\CapabilityStatusTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\ComponentStatusTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\DeviceStatusReportTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -57,7 +60,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
 
         // Second call for the same deviceId is served from the cache without hitting the API.
         self::assertSame($deviceStatus, $deviceApi->getOneByDevice($device));
@@ -90,7 +93,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with(['test-capability-id' => $data])
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
         $actual = $deviceApi->getOneByCapability('test-device-id', 'test-component-id', 'test-capability-id');
 
         self::assertSame($deviceStatus, $actual);
@@ -117,7 +120,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with(['test-capability-id' => $data])
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
 
         // Second call for the same ids is served from the cache without hitting the API.
         self::assertSame($deviceStatus, $deviceApi->getOneByCapability('test-device-id', 'test-component-id', 'test-capability-id'));
@@ -152,7 +155,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with([$capabilityId => $data])
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
         $actual = $deviceApi->getOneByCapability($deviceId, $componentId, $capabilityId);
 
         self::assertSame($deviceStatus, $actual);
@@ -178,7 +181,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with(['test-capability-id' => $data])
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($deviceStatus, $deviceApi->getOneByCapability('test-device-id', 'test-component-id', 'test-capability-id'));
@@ -206,7 +209,7 @@ final class DeviceStatusApiTest extends TestCase
 
         $deviceStatusTransformer = self::createStub(DeviceStatusTransformerInterface::class);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DeviceStatusApiInterface::UNEXPECTED_RESPONSE);
@@ -239,7 +242,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with($data)
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
         $actual = $deviceApi->getOneByComponent('test-device-id', 'test-component-id');
 
         self::assertSame($deviceStatus, $actual);
@@ -266,7 +269,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with($data)
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
 
         // Second call for the same ids is served from the cache without hitting the API.
         self::assertSame($deviceStatus, $deviceApi->getOneByComponent('test-device-id', 'test-component-id'));
@@ -301,7 +304,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with($data)
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
         $actual = $deviceApi->getOneByComponent($deviceId, $componentId);
 
         self::assertSame($deviceStatus, $actual);
@@ -327,7 +330,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with($data)
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($deviceStatus, $deviceApi->getOneByComponent('test-device-id', 'test-component-id'));
@@ -355,7 +358,7 @@ final class DeviceStatusApiTest extends TestCase
 
         $deviceStatusTransformer = self::createStub(DeviceStatusTransformerInterface::class);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(DeviceStatusApiInterface::UNEXPECTED_RESPONSE);
@@ -396,7 +399,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
         $actual = $deviceApi->getOneByDevice($device);
 
         self::assertSame($deviceStatus, $actual);
@@ -432,7 +435,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
         $actual = $deviceApi->getOneById('test-device-id');
 
         self::assertSame($deviceStatus, $actual);
@@ -470,7 +473,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
         $actual = $deviceApi->getOneById($deviceId);
 
         self::assertSame($deviceStatus, $actual);
@@ -504,7 +507,7 @@ final class DeviceStatusApiTest extends TestCase
             ->with($data[DeviceStatusApiInterface::KEY_COMPONENTS][DeviceStatusApiInterface::KEY_COMPONENTS_MAIN])
             ->willReturn($deviceStatus);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
 
         // First call populates the cache; the second bypasses it and hits the API again.
         self::assertSame($deviceStatus, $deviceApi->getOneByDevice($device));
@@ -544,7 +547,7 @@ final class DeviceStatusApiTest extends TestCase
 
         $deviceStatusTransformer = self::createStub(DeviceStatusTransformerInterface::class);
 
-        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'));
+        $deviceApi = new DeviceStatusApi($requestSender, $deviceStatusTransformer, new Token('test-api-token'), self::createStub(DeviceStatusReportTransformerInterface::class), self::createStub(ComponentStatusTransformerInterface::class), self::createStub(CapabilityStatusTransformerInterface::class));
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(DeviceStatusApiInterface::UNEXPECTED_RESPONSE_SPRINTF, $exceptionString));

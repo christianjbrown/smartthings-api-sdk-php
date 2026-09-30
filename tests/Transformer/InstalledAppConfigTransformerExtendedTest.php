@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
 use ChristianBrown\SmartThings\Model\InstalledAppConfig;
+use ChristianBrown\SmartThings\Transformer\ConfigEntriesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\InstalledAppConfigTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\ValueReader;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(InstalledAppConfig::class)]
 #[CoversClass(InstalledAppConfigTransformer::class)]
+#[CoversClass(ValueReader::class)]
 final class InstalledAppConfigTransformerExtendedTest extends TestCase
 {
     /**
@@ -23,7 +26,7 @@ final class InstalledAppConfigTransformerExtendedTest extends TestCase
     #[DataProvider('provideTransformExtendedFieldsCases')]
     public function testTransformExtendedFields(array $extra, string $getter, mixed $expected): void
     {
-        $transformer = new InstalledAppConfigTransformer();
+        $transformer = new InstalledAppConfigTransformer(self::createStub(ConfigEntriesTransformerInterface::class), new ValueReader());
 
         $actual = $transformer->transform([InstalledAppConfigTransformerInterface::KEY_CONFIGURATION_ID => 'test-configuration-id'] + $extra);
 
