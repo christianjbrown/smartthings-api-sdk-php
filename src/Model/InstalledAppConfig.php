@@ -10,6 +10,11 @@ final class InstalledAppConfig implements InstalledAppConfigInterface
      * @var mixed[]
      */
     private array $config = [];
+
+    /**
+     * @var array<array-key, array<int, ConfigEntryInterface>>
+     */
+    private array $configEntries = [];
     private string $configurationId;
     private ?string $configurationStatus = null;
     private ?string $createdDate = null;
@@ -27,6 +32,14 @@ final class InstalledAppConfig implements InstalledAppConfigInterface
     public function getConfig(): array
     {
         return $this->config;
+    }
+
+    /**
+     * @return array<array-key, array<int, ConfigEntryInterface>>
+     */
+    public function getConfigEntries(): array
+    {
+        return $this->configEntries;
     }
 
     public function getConfigurationId(): string
@@ -60,6 +73,16 @@ final class InstalledAppConfig implements InstalledAppConfigInterface
     public function setConfig(array $value): InstalledAppConfigInterface
     {
         $this->config = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param array<array-key, array<int, ConfigEntryInterface>> $value
+     */
+    public function setConfigEntries(array $value): InstalledAppConfigInterface
+    {
+        $this->configEntries = $value;
 
         return $this;
     }

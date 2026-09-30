@@ -56,4 +56,13 @@ final class ValueReaderTest extends TestCase
         self::assertSame([], $reader->records(['k' => 'x'], 'k'));
         self::assertSame([], $reader->records([], 'k'));
     }
+
+    public function testReadsTheStringEntriesOfAList(): void
+    {
+        $reader = new ValueReader();
+
+        self::assertSame(['a', 'b'], $reader->strings(['k' => ['a', 1, 3 => 'b']], 'k'));
+        self::assertSame([], $reader->strings(['k' => 'x'], 'k'));
+        self::assertSame([], $reader->strings([], 'k'));
+    }
 }

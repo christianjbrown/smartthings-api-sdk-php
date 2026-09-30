@@ -209,6 +209,21 @@ $ruleResult = $ruleApi->execute('a-rule-id'); // RuleExecutionResultInterface
 echo $ruleResult->getResult() ?? 'unknown', "\n"; // e.g. "Success"
 ```
 
+### Reading everything a device reports
+
+`DeviceStatusApi::getReportById()` returns every component, capability and attribute of a device with its
+health state; `getComponentReport()` and `getCapabilityReport()` narrow it. Attribute values are `AttributeStateInterface`
+objects (value, unit, data, timestamp), keyed by capability and attribute name:
+
+```php
+$report = $deviceStatusApi->getReportById('a-device-id');
+$switch = $report->getComponents()['main']->getCapabilities()['switch']->getAttributes()['switch'];
+echo $switch->getValue()['value'] ?? '', "\n";
+```
+
+Installed app configuration entries are typed too: `InstalledAppConfigInterface::getConfigEntries()` returns the
+entries of each configuration name (string, device, permission, mode, scene, message and room configs).
+
 ### Filtering and query parameters
 
 List and get calls take the API's optional query parameters. The busier lists take a small query

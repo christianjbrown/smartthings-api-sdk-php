@@ -296,6 +296,7 @@ use ChristianBrown\SmartThings\Transformer\CapabilityNamespacesTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityNamespaceTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityPresentationTransformer;
+use ChristianBrown\SmartThings\Transformer\CapabilityStatusTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilitySubscriptionDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\CapabilityValueForDashboardStateTransformer;
@@ -310,6 +311,9 @@ use ChristianBrown\SmartThings\Transformer\CommandArgumentTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandClassesTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandMappingsTransformer;
 use ChristianBrown\SmartThings\Transformer\CommandMappingTransformer;
+use ChristianBrown\SmartThings\Transformer\ComponentStatusTransformer;
+use ChristianBrown\SmartThings\Transformer\ConfigEntriesTransformer;
+use ChristianBrown\SmartThings\Transformer\ConfigEntryTransformer;
 use ChristianBrown\SmartThings\Transformer\ConvertedTtsTransformer;
 use ChristianBrown\SmartThings\Transformer\CreateAppResponseTransformer;
 use ChristianBrown\SmartThings\Transformer\CreateCapabilityPresentationRequestDetailViewItemTransformer;
@@ -335,6 +339,7 @@ use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardStateFor
 use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardStateFormatInfoItemTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDashboardStateTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceConfigEntryForDetailViewTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceConfigurationAutomationTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceConfigurationDashboardTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceConfigurationDpInfoItemArgumentsItemTransformer;
@@ -369,6 +374,7 @@ use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryBatteryTransformer
 use ChristianBrown\SmartThings\Transformer\DeviceStatusBatteryTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasurementHumidityTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusRelativeHumidityMeasurementTransformer;
+use ChristianBrown\SmartThings\Transformer\DeviceStatusReportTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTemperatureTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTemperatureMeasurementTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceStatusTransformer;
@@ -460,6 +466,8 @@ use ChristianBrown\SmartThings\Transformer\MatterDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\MatterEndpointDeviceTypeTransformer;
 use ChristianBrown\SmartThings\Transformer\MatterEndpointTransformer;
 use ChristianBrown\SmartThings\Transformer\MatterVersionTransformer;
+use ChristianBrown\SmartThings\Transformer\MessageConfigTransformer;
+use ChristianBrown\SmartThings\Transformer\ModeConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\ModesTransformer;
 use ChristianBrown\SmartThings\Transformer\ModeSubscriptionDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\ModeTransformer;
@@ -483,6 +491,7 @@ use ChristianBrown\SmartThings\Transformer\PanelForDevicePresentationItemsItemTr
 use ChristianBrown\SmartThings\Transformer\PanelForDevicePresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\PanelItemForCapabilityTransformer;
 use ChristianBrown\SmartThings\Transformer\PatchItemTransformer;
+use ChristianBrown\SmartThings\Transformer\PermissionConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayedTextTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayPauseCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\PlayPauseStateTransformer;
@@ -500,9 +509,11 @@ use ChristianBrown\SmartThings\Transformer\PushButtonForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\PushButtonTransformer;
 use ChristianBrown\SmartThings\Transformer\PushButtonWithAvailableSizeTransformer;
 use ChristianBrown\SmartThings\Transformer\RestrictionTransformer;
+use ChristianBrown\SmartThings\Transformer\RoomConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\RoomIndoorMapTransformer;
 use ChristianBrown\SmartThings\Transformer\RulesTransformer;
 use ChristianBrown\SmartThings\Transformer\RuleTransformer;
+use ChristianBrown\SmartThings\Transformer\SceneConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneLifecycleDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\ScenesTransformer;
 use ChristianBrown\SmartThings\Transformer\SceneTransformer;
@@ -555,6 +566,7 @@ use ChristianBrown\SmartThings\Transformer\StepperTransformer;
 use ChristianBrown\SmartThings\Transformer\StepperWithAvailableSizeCommandTransformer;
 use ChristianBrown\SmartThings\Transformer\StepperWithAvailableSizeStateTransformer;
 use ChristianBrown\SmartThings\Transformer\StepperWithAvailableSizeTransformer;
+use ChristianBrown\SmartThings\Transformer\StringConfigTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionsTransformer;
 use ChristianBrown\SmartThings\Transformer\SubscriptionTransformer;
@@ -651,6 +663,18 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ScheduleApi::class)]
 #[UsesClass(SchemaConnectorApi::class)]
 #[UsesClass(PagingJsonApiRequestSender::class)]
+#[UsesClass(RoomConfigTransformer::class)]
+#[UsesClass(MessageConfigTransformer::class)]
+#[UsesClass(SceneConfigTransformer::class)]
+#[UsesClass(ModeConfigTransformer::class)]
+#[UsesClass(PermissionConfigTransformer::class)]
+#[UsesClass(DeviceConfigTransformer::class)]
+#[UsesClass(StringConfigTransformer::class)]
+#[UsesClass(ConfigEntriesTransformer::class)]
+#[UsesClass(ConfigEntryTransformer::class)]
+#[UsesClass(DeviceStatusReportTransformer::class)]
+#[UsesClass(ComponentStatusTransformer::class)]
+#[UsesClass(CapabilityStatusTransformer::class)]
 #[UsesClass(ValueReader::class)]
 #[UsesClass(LocationParentSerializer::class)]
 #[UsesClass(CreateLocationRequestSerializer::class)]

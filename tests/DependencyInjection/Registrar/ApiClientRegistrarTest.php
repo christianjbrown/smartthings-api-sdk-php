@@ -134,6 +134,9 @@ final class ApiClientRegistrarTest extends TestCase
         $container->register(SmartThingsInterface::SERVICE_DEVICE_PROFILE_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_PROFILE_UPDATE_REQUEST_SERIALIZER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_STATUS_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_DEVICE_STATUS_REPORT_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_COMPONENT_STATUS_TRANSFORMER, stdClass::class);
+        $container->register(SmartThingsInterface::SERVICE_CAPABILITY_STATUS_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DEVICE_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DRIVERS_TRANSFORMER, stdClass::class);
         $container->register(SmartThingsInterface::SERVICE_DRIVER_TRANSFORMER, stdClass::class);
