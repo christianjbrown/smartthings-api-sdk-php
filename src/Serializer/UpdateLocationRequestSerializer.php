@@ -23,6 +23,7 @@ final class UpdateLocationRequestSerializer implements UpdateLocationRequestSeri
             self::KEY_TEMPERATURE_SCALE => $request->getTemperatureScale(),
             self::KEY_TIME_ZONE_ID => $request->getTimeZoneId(),
             self::KEY_LOCALE => $request->getLocale(),
+            self::KEY_ADDITIONAL_PROPERTIES => $request->getAdditionalProperties(),
         ];
 
         // Omit null optionals rather than sending them as explicit nulls.

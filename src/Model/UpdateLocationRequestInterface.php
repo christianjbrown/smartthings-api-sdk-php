@@ -6,6 +6,11 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface UpdateLocationRequestInterface
 {
+    /**
+     * @return null|array<string, string>
+     */
+    public function getAdditionalProperties(): ?array;
+
     public function getLatitude(): ?float;
 
     public function getLocale(): ?string;
@@ -19,6 +24,11 @@ interface UpdateLocationRequestInterface
     public function getTemperatureScale(): ?string;
 
     public function getTimeZoneId(): ?string;
+
+    /**
+     * @param null|array<string, string> $value
+     */
+    public function setAdditionalProperties(?array $value): self;
 
     public function setLatitude(?float $value): self;
 

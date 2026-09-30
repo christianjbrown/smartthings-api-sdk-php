@@ -8,6 +8,7 @@ use ChristianBrown\SmartThings\Model\UpdateLocationRequestInterface;
 
 interface UpdateLocationRequestSerializerInterface
 {
+    public const string KEY_ADDITIONAL_PROPERTIES = 'additionalProperties';
     public const string KEY_LATITUDE = 'latitude';
     public const string KEY_LOCALE = 'locale';
     public const string KEY_LONGITUDE = 'longitude';

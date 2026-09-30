@@ -8,6 +8,7 @@ use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\HubEnrolledChannel;
 use ChristianBrown\SmartThings\Transformer\HubEnrolledChannelTransformer;
 use ChristianBrown\SmartThings\Transformer\HubEnrolledChannelTransformerInterface;
+use ChristianBrown\SmartThings\Transformer\ValueReader;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
@@ -17,6 +18,7 @@ use function sprintf;
 
 #[CoversClass(HubEnrolledChannel::class)]
 #[CoversClass(HubEnrolledChannelTransformer::class)]
+#[CoversClass(ValueReader::class)]
 final class HubEnrolledChannelTransformerTest extends TestCase
 {
     public function testTransform(): void
@@ -28,7 +30,7 @@ final class HubEnrolledChannelTransformerTest extends TestCase
             HubEnrolledChannelTransformerInterface::KEY_SUBSCRIPTION_URL => 'https://example.com/subscribe',
         ];
 
-        $transformer = new HubEnrolledChannelTransformer();
+        $transformer = new HubEnrolledChannelTransformer(new ValueReader());
 
         $actual = $transformer->transform($data);
 
@@ -36,6 +38,15 @@ final class HubEnrolledChannelTransformerTest extends TestCase
         self::assertSame('Test description', $actual->getDescription());
         self::assertSame('Test Channel', $actual->getName());
         self::assertSame('https://example.com/subscribe', $actual->getSubscriptionUrl());
+    }
+
+    public function testTransformLeavesTheChannelDatesUnsetWhenAbsent(): void
+    {
+        $actual = (new HubEnrolledChannelTransformer(new ValueReader()))->transform([HubEnrolledChannelTransformerInterface::KEY_CHANNEL_ID => 'test-channel-id']);
+
+        self::assertNull($actual->getCreatedDate());
+        self::assertNull($actual->getLastModifiedDate());
+        self::assertNull($actual->getIsWWST());
     }
 
     /**
@@ -46,7 +57,7 @@ final class HubEnrolledChannelTransformerTest extends TestCase
     #[DataProvider('provideTransformOptionalFieldsCases')]
     public function testTransformOptionalFields(array $data, ?string $expectedDescription, ?string $expectedName, ?string $expectedSubscriptionUrl): void
     {
-        $transformer = new HubEnrolledChannelTransformer();
+        $transformer = new HubEnrolledChannelTransformer(new ValueReader());
 
         $actual = $transformer->transform($data);
 
@@ -73,6 +84,20 @@ final class HubEnrolledChannelTransformerTest extends TestCase
         yield 'subscriptionUrlWrongType' => [[$id => 'test-channel-id', $url => 42], null, null, null];
     }
 
+    public function testTransformReadsTheChannelDates(): void
+    {
+        $actual = (new HubEnrolledChannelTransformer(new ValueReader()))->transform([
+            HubEnrolledChannelTransformerInterface::KEY_CHANNEL_ID => 'test-channel-id',
+            HubEnrolledChannelTransformerInterface::KEY_CREATED_DATE => '2026-01-01T00:00:00Z',
+            HubEnrolledChannelTransformerInterface::KEY_LAST_MODIFIED_DATE => '2026-01-02T00:00:00Z',
+            HubEnrolledChannelTransformerInterface::KEY_IS_WWST => false,
+        ]);
+
+        self::assertSame('2026-01-01T00:00:00Z', $actual->getCreatedDate());
+        self::assertSame('2026-01-02T00:00:00Z', $actual->getLastModifiedDate());
+        self::assertFalse($actual->getIsWWST());
+    }
+
     /**
      * @param mixed[] $data
      */
@@ -80,7 +105,7 @@ final class HubEnrolledChannelTransformerTest extends TestCase
     #[TestWith([[HubEnrolledChannelTransformerInterface::KEY_CHANNEL_ID => 42]])]
     public function testTransformUnexpectedData(array $data): void
     {
-        $transformer = new HubEnrolledChannelTransformer();
+        $transformer = new HubEnrolledChannelTransformer(new ValueReader());
 
         $this->expectException(UnexpectedResponseException::class);
         $this->expectExceptionMessage(sprintf(HubEnrolledChannelTransformerInterface::UNEXPECTED_STRING_SPRINTF, HubEnrolledChannelTransformerInterface::KEY_CHANNEL_ID));

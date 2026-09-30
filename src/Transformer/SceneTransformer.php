@@ -13,6 +13,13 @@ use function sprintf;
 
 final class SceneTransformer implements SceneTransformerInterface
 {
+    private ValueReaderInterface $valueReader;
+
+    public function __construct(ValueReaderInterface $valueReader)
+    {
+        $this->valueReader = $valueReader;
+    }
+
     /**
      * @param mixed[] $data
      */
@@ -28,8 +35,24 @@ final class SceneTransformer implements SceneTransformerInterface
 
         self::applyLocationId($scene, $data);
         self::applySceneName($scene, $data);
+        $this->applyDetails($scene, $data);
 
         return $scene;
+    }
+
+    /**
+     * @phpstan-param mixed[] $data
+     */
+    private function applyDetails(SceneInterface $scene, array $data): void
+    {
+        $scene->setSceneIcon($this->valueReader->string($data, self::KEY_SCENE_ICON));
+        $scene->setSceneColor($this->valueReader->string($data, self::KEY_SCENE_COLOR));
+        $scene->setCreatedBy($this->valueReader->string($data, self::KEY_CREATED_BY));
+        $scene->setCreatedDate($this->valueReader->string($data, self::KEY_CREATED_DATE));
+        $scene->setLastUpdatedDate($this->valueReader->string($data, self::KEY_LAST_UPDATED_DATE));
+        $scene->setLastExecutedDate($this->valueReader->string($data, self::KEY_LAST_EXECUTED_DATE));
+        $scene->setEditable($this->valueReader->bool($data, self::KEY_EDITABLE));
+        $scene->setApiVersion($this->valueReader->string($data, self::KEY_API_VERSION));
     }
 
     /**

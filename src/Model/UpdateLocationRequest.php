@@ -6,6 +6,10 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class UpdateLocationRequest implements UpdateLocationRequestInterface
 {
+    /**
+     * @var null|array<string, string>
+     */
+    private ?array $additionalProperties = null;
     private ?float $latitude = null;
     private ?string $locale = null;
     private ?float $longitude = null;
@@ -17,6 +21,14 @@ final class UpdateLocationRequest implements UpdateLocationRequestInterface
     public function __construct(string $name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return null|array<string, string>
+     */
+    public function getAdditionalProperties(): ?array
+    {
+        return $this->additionalProperties;
     }
 
     public function getLatitude(): ?float
@@ -52,6 +64,16 @@ final class UpdateLocationRequest implements UpdateLocationRequestInterface
     public function getTimeZoneId(): ?string
     {
         return $this->timeZoneId;
+    }
+
+    /**
+     * @param null|array<string, string> $value
+     */
+    public function setAdditionalProperties(?array $value): UpdateLocationRequestInterface
+    {
+        $this->additionalProperties = $value;
+
+        return $this;
     }
 
     public function setLatitude(?float $value): UpdateLocationRequestInterface

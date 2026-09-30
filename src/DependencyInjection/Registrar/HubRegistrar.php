@@ -15,6 +15,7 @@ use ChristianBrown\SmartThings\Transformer\HubInstalledDriversTransformer;
 use ChristianBrown\SmartThings\Transformer\HubInstalledDriverTransformer;
 use ChristianBrown\SmartThings\Transformer\HubTransformer;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 final class HubRegistrar implements ServiceRegistrarInterface
 {
@@ -31,7 +32,8 @@ final class HubRegistrar implements ServiceRegistrarInterface
                     $container->getDefinition(SmartThingsInterface::SERVICE_HUB_INSTALLED_DRIVER_TRANSFORMER),
                 ]
             );
-        $container->register(SmartThingsInterface::SERVICE_HUB_ENROLLED_CHANNEL_TRANSFORMER, HubEnrolledChannelTransformer::class);
+        $container->register(SmartThingsInterface::SERVICE_HUB_ENROLLED_CHANNEL_TRANSFORMER, HubEnrolledChannelTransformer::class)
+            ->setArguments([new Reference(SmartThingsInterface::SERVICE_VALUE_READER)]);
         $container->register(SmartThingsInterface::SERVICE_HUB_ENROLLED_CHANNELS_TRANSFORMER, HubEnrolledChannelsTransformer::class)
             ->setArguments(
                 [

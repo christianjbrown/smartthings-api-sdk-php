@@ -7,7 +7,10 @@ namespace ChristianBrown\SmartThings\Model;
 final class HubEnrolledChannel implements HubEnrolledChannelInterface
 {
     private string $channelId;
+    private ?string $createdDate = null;
     private ?string $description = null;
+    private ?bool $isWWST = null;
+    private ?string $lastModifiedDate = null;
     private ?string $name = null;
     private ?string $subscriptionUrl = null;
 
@@ -21,9 +24,24 @@ final class HubEnrolledChannel implements HubEnrolledChannelInterface
         return $this->channelId;
     }
 
+    public function getCreatedDate(): ?string
+    {
+        return $this->createdDate;
+    }
+
     public function getDescription(): ?string
     {
         return $this->description;
+    }
+
+    public function getIsWWST(): ?bool
+    {
+        return $this->isWWST;
+    }
+
+    public function getLastModifiedDate(): ?string
+    {
+        return $this->lastModifiedDate;
     }
 
     public function getName(): ?string
@@ -43,9 +61,30 @@ final class HubEnrolledChannel implements HubEnrolledChannelInterface
         return $this;
     }
 
+    public function setCreatedDate(?string $value): HubEnrolledChannelInterface
+    {
+        $this->createdDate = $value;
+
+        return $this;
+    }
+
     public function setDescription(?string $value): HubEnrolledChannelInterface
     {
         $this->description = $value;
+
+        return $this;
+    }
+
+    public function setIsWWST(?bool $value): HubEnrolledChannelInterface
+    {
+        $this->isWWST = $value;
+
+        return $this;
+    }
+
+    public function setLastModifiedDate(?string $value): HubEnrolledChannelInterface
+    {
+        $this->lastModifiedDate = $value;
 
         return $this;
     }
