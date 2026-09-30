@@ -6,11 +6,16 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class CreateLocationRequest implements CreateLocationRequestInterface
 {
+    /**
+     * @var null|array<string, string>
+     */
+    private ?array $additionalProperties = null;
     private string $countryCode;
     private ?float $latitude = null;
     private ?string $locale = null;
     private ?float $longitude = null;
     private string $name;
+    private ?LocationParentInterface $parent = null;
     private ?int $regionRadius = null;
     private ?string $temperatureScale = null;
     private ?string $timeZoneId = null;
@@ -19,6 +24,14 @@ final class CreateLocationRequest implements CreateLocationRequestInterface
     {
         $this->name = $name;
         $this->countryCode = $countryCode;
+    }
+
+    /**
+     * @return null|array<string, string>
+     */
+    public function getAdditionalProperties(): ?array
+    {
+        return $this->additionalProperties;
     }
 
     public function getCountryCode(): string
@@ -46,6 +59,11 @@ final class CreateLocationRequest implements CreateLocationRequestInterface
         return $this->name;
     }
 
+    public function getParent(): ?LocationParentInterface
+    {
+        return $this->parent;
+    }
+
     public function getRegionRadius(): ?int
     {
         return $this->regionRadius;
@@ -59,6 +77,16 @@ final class CreateLocationRequest implements CreateLocationRequestInterface
     public function getTimeZoneId(): ?string
     {
         return $this->timeZoneId;
+    }
+
+    /**
+     * @param null|array<string, string> $value
+     */
+    public function setAdditionalProperties(?array $value): CreateLocationRequestInterface
+    {
+        $this->additionalProperties = $value;
+
+        return $this;
     }
 
     public function setLatitude(?float $value): CreateLocationRequestInterface
@@ -78,6 +106,13 @@ final class CreateLocationRequest implements CreateLocationRequestInterface
     public function setLongitude(?float $value): CreateLocationRequestInterface
     {
         $this->longitude = $value;
+
+        return $this;
+    }
+
+    public function setParent(?LocationParentInterface $value): CreateLocationRequestInterface
+    {
+        $this->parent = $value;
 
         return $this;
     }

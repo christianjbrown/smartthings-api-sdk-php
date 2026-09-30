@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\DependencyInjection\Registrar;
 
 use ChristianBrown\SmartThings\DependencyInjection\ServiceRegistrarInterface;
 use ChristianBrown\SmartThings\Serializer\CreateLocationRequestSerializer;
+use ChristianBrown\SmartThings\Serializer\LocationParentSerializer;
 use ChristianBrown\SmartThings\Serializer\PatchLocationRequestSerializer;
 use ChristianBrown\SmartThings\Serializer\UpdateLocationRequestSerializer;
 use ChristianBrown\SmartThings\SmartThingsInterface;
@@ -26,7 +27,9 @@ final class LocationRegistrar implements ServiceRegistrarInterface
                     new Reference(SmartThingsInterface::SERVICE_LOCATION_DETAILS_TRANSFORMER),
                 ]
             );
-        $container->register(SmartThingsInterface::SERVICE_LOCATION_CREATE_REQUEST_SERIALIZER, CreateLocationRequestSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_LOCATION_PARENT_SERIALIZER, LocationParentSerializer::class);
+        $container->register(SmartThingsInterface::SERVICE_LOCATION_CREATE_REQUEST_SERIALIZER, CreateLocationRequestSerializer::class)
+            ->setArguments([new Reference(SmartThingsInterface::SERVICE_LOCATION_PARENT_SERIALIZER)]);
         $container->register(SmartThingsInterface::SERVICE_LOCATION_UPDATE_REQUEST_SERIALIZER, UpdateLocationRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_LOCATION_PATCH_REQUEST_SERIALIZER, PatchLocationRequestSerializer::class);
         $container->register(SmartThingsInterface::SERVICE_LOCATIONS_TRANSFORMER, LocationsTransformer::class)

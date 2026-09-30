@@ -28,6 +28,19 @@ final class UpdateLocationRequestSerializerTest extends TestCase
         );
     }
 
+    public function testSerializeWithAdditionalProperties(): void
+    {
+        $request = (new UpdateLocationRequest('Home'))->setAdditionalProperties(['floors' => '2']);
+
+        self::assertSame(
+            [
+                UpdateLocationRequestSerializerInterface::KEY_NAME => 'Home',
+                UpdateLocationRequestSerializerInterface::KEY_ADDITIONAL_PROPERTIES => ['floors' => '2'],
+            ],
+            (new UpdateLocationRequestSerializer())->serialize($request)
+        );
+    }
+
     public function testSerializeWithAllFieldsSet(): void
     {
         $request = (new UpdateLocationRequest('Home'))
