@@ -10,7 +10,7 @@ interface PushButtonInterface
 
     public function getArgumentType(): ?string;
 
-    public function getCommand(): string;
+    public function getCommand(): ?string;
 
     public function setArgument(?string $value): self;
 

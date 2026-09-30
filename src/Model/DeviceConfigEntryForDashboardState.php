@@ -6,8 +6,8 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class DeviceConfigEntryForDashboardState implements DeviceConfigEntryForDashboardStateInterface
 {
-    private string $capability;
-    private string $component;
+    private ?string $capability;
+    private ?string $component;
     private ?bool $composite = null;
 
     /**
@@ -24,18 +24,18 @@ final class DeviceConfigEntryForDashboardState implements DeviceConfigEntryForDa
     private ?int $version = null;
     private ?VisibleConditionForDashboardStateInterface $visibleCondition = null;
 
-    public function __construct(string $component, string $capability)
+    public function __construct(?string $component, ?string $capability)
     {
         $this->component = $component;
         $this->capability = $capability;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }

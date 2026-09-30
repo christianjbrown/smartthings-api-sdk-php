@@ -8,11 +8,11 @@ final class PushButtonForPanelItem implements PushButtonForPanelItemInterface
 {
     private ?string $argument = null;
     private ?string $argumentType = null;
-    private string $command;
+    private ?string $command;
     private ?string $iconUrl = null;
-    private string $size;
+    private ?string $size;
 
-    public function __construct(string $command, string $size)
+    public function __construct(?string $command, ?string $size)
     {
         $this->command = $command;
         $this->size = $size;
@@ -28,7 +28,7 @@ final class PushButtonForPanelItem implements PushButtonForPanelItemInterface
         return $this->argumentType;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }
@@ -38,7 +38,7 @@ final class PushButtonForPanelItem implements PushButtonForPanelItemInterface
         return $this->iconUrl;
     }
 
-    public function getSize(): string
+    public function getSize(): ?string
     {
         return $this->size;
     }

@@ -15,7 +15,7 @@ interface DynamicListForAutomationActionInterface
 
     public function getCommand(): ?string;
 
-    public function getSupportedValues(): SupportedValuesForDynamicListInterface;
+    public function getSupportedValues(): ?SupportedValuesForDynamicListInterface;
 
     /**
      * @param null|array<int, AlternativeItemInterface> $value

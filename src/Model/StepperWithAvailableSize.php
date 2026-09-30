@@ -10,20 +10,20 @@ final class StepperWithAvailableSize implements StepperWithAvailableSizeInterfac
      * @var null|array<int, string>
      */
     private ?array $availableSizes = null;
-    private StepperWithAvailableSizeCommandInterface $command;
+    private ?StepperWithAvailableSizeCommandInterface $command;
 
     /**
      * @var mixed[]
      */
     private array $range;
-    private StepperWithAvailableSizeStateInterface $state;
-    private float $step;
+    private ?StepperWithAvailableSizeStateInterface $state;
+    private ?float $step;
     private ?string $supportedValues = null;
 
     /**
      * @phpstan-param mixed[] $range
      */
-    public function __construct(StepperWithAvailableSizeCommandInterface $command, float $step, array $range, StepperWithAvailableSizeStateInterface $state)
+    public function __construct(?StepperWithAvailableSizeCommandInterface $command, ?float $step, array $range, ?StepperWithAvailableSizeStateInterface $state)
     {
         $this->command = $command;
         $this->step = $step;
@@ -39,7 +39,7 @@ final class StepperWithAvailableSize implements StepperWithAvailableSizeInterfac
         return $this->availableSizes;
     }
 
-    public function getCommand(): StepperWithAvailableSizeCommandInterface
+    public function getCommand(): ?StepperWithAvailableSizeCommandInterface
     {
         return $this->command;
     }
@@ -52,12 +52,12 @@ final class StepperWithAvailableSize implements StepperWithAvailableSizeInterfac
         return $this->range;
     }
 
-    public function getState(): StepperWithAvailableSizeStateInterface
+    public function getState(): ?StepperWithAvailableSizeStateInterface
     {
         return $this->state;
     }
 
-    public function getStep(): float
+    public function getStep(): ?float
     {
         return $this->step;
     }

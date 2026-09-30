@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\State;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\StateTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(State::class)]
 #[CoversClass(StateTransformer::class)]
@@ -54,6 +51,28 @@ final class StateTransformerTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new StateTransformer(self::createStub(AlternativeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'labelAbsent' => [[], 'getLabel', null];
+        yield 'labelWrongType' => [[StateTransformerInterface::KEY_LABEL => 42], 'getLabel', null];
+    }
+
+    /**
      * Each optional field in each of its states: absent, present but the wrong type, or valid.
      *
      * @param array<string, mixed> $extra
@@ -89,27 +108,5 @@ final class StateTransformerTest extends TestCase
 
         self::assertNull($actual->getUnit());
         self::assertNull($actual->getAlternatives());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new StateTransformer(self::createStub(AlternativeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'labelAbsent' => [[], sprintf(StateTransformerInterface::UNEXPECTED_STRING_SPRINTF, StateTransformerInterface::KEY_LABEL)];
-        yield 'labelWrongType' => [[StateTransformerInterface::KEY_LABEL => 42], sprintf(StateTransformerInterface::UNEXPECTED_STRING_SPRINTF, StateTransformerInterface::KEY_LABEL)];
     }
 }

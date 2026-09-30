@@ -13,9 +13,9 @@ interface DynamicListForAutomationConditionInterface
 
     public function getMultiSelectable(): ?bool;
 
-    public function getSupportedValues(): SupportedValuesForDynamicListInterface;
+    public function getSupportedValues(): ?SupportedValuesForDynamicListInterface;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function getValueType(): ?string;
 

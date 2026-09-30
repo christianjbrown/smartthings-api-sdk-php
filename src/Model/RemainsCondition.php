@@ -11,11 +11,11 @@ final class RemainsCondition implements RemainsConditionInterface
      */
     private ?array $and = null;
     private ?BetweenConditionInterface $between = null;
-    private IntervalInterface $duration;
+    private ?IntervalInterface $duration;
     private ?EqualsConditionInterface $equals = null;
     private ?GreaterThanConditionInterface $greaterThan = null;
     private ?GreaterThanOrEqualsConditionInterface $greaterThanOrEquals = null;
-    private string $id;
+    private ?string $id;
     private ?bool $latching = null;
     private ?LessThanConditionInterface $lessThan = null;
     private ?LessThanOrEqualsConditionInterface $lessThanOrEquals = null;
@@ -27,7 +27,7 @@ final class RemainsCondition implements RemainsConditionInterface
      */
     private ?array $or = null;
 
-    public function __construct(string $id, IntervalInterface $duration)
+    public function __construct(?string $id, ?IntervalInterface $duration)
     {
         $this->id = $id;
         $this->duration = $duration;
@@ -46,7 +46,7 @@ final class RemainsCondition implements RemainsConditionInterface
         return $this->between;
     }
 
-    public function getDuration(): IntervalInterface
+    public function getDuration(): ?IntervalInterface
     {
         return $this->duration;
     }
@@ -66,7 +66,7 @@ final class RemainsCondition implements RemainsConditionInterface
         return $this->greaterThanOrEquals;
     }
 
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }

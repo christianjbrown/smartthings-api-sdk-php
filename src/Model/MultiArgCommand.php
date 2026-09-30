@@ -10,13 +10,13 @@ final class MultiArgCommand implements MultiArgCommandInterface
      * @var array<int, MultiArgCommandArgumentsItemInterface>
      */
     private array $arguments;
-    private string $command;
+    private ?string $command;
     private ?string $supportedValues = null;
 
     /**
      * @phpstan-param array<int, MultiArgCommandArgumentsItemInterface> $arguments
      */
-    public function __construct(string $command, array $arguments)
+    public function __construct(?string $command, array $arguments)
     {
         $this->command = $command;
         $this->arguments = $arguments;
@@ -30,7 +30,7 @@ final class MultiArgCommand implements MultiArgCommandInterface
         return $this->arguments;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }

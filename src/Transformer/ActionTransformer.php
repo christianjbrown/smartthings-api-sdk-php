@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Action;
 use ChristianBrown\SmartThings\Model\ActionInterface;
 use ChristianBrown\SmartThings\Model\ActionSequence;
@@ -92,7 +91,6 @@ use function is_bool;
 use function is_int;
 use function is_numeric;
 use function is_string;
-use function sprintf;
 
 final class ActionTransformer implements ActionTransformerInterface
 {
@@ -2218,10 +2216,10 @@ final class ActionTransformer implements ActionTransformerInterface
     private static function requireArrayOperandOperands(array $data): array
     {
         if (!isset($data[self::KEY_OPERANDS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_OPERANDS));
+            return [];
         }
         if (!is_array($data[self::KEY_OPERANDS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_OPERANDS));
+            return [];
         }
 
         return self::toOperandList($data[self::KEY_OPERANDS]);
@@ -2230,13 +2228,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireBetweenConditionEnd(array $data): OperandInterface
+    private static function requireBetweenConditionEnd(array $data): ?OperandInterface
     {
         if (!isset($data[self::KEY_END])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_END));
+            return null;
         }
         if (!is_array($data[self::KEY_END])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_END));
+            return null;
         }
 
         return self::toOperand($data[self::KEY_END]);
@@ -2245,13 +2243,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireBetweenConditionStart(array $data): OperandInterface
+    private static function requireBetweenConditionStart(array $data): ?OperandInterface
     {
         if (!isset($data[self::KEY_START])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_START));
+            return null;
         }
         if (!is_array($data[self::KEY_START])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_START));
+            return null;
         }
 
         return self::toOperand($data[self::KEY_START]);
@@ -2260,13 +2258,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireBetweenConditionValue(array $data): OperandInterface
+    private static function requireBetweenConditionValue(array $data): ?OperandInterface
     {
         if (!isset($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_VALUE));
+            return null;
         }
         if (!is_array($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_VALUE));
+            return null;
         }
 
         return self::toOperand($data[self::KEY_VALUE]);
@@ -2275,13 +2273,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireChangesConditionId(array $data): string
+    private static function requireChangesConditionId(array $data): ?string
     {
         if (empty($data[self::KEY_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ID));
+            return null;
         }
         if (!is_string($data[self::KEY_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ID));
+            return null;
         }
 
         return $data[self::KEY_ID];
@@ -2295,10 +2293,10 @@ final class ActionTransformer implements ActionTransformerInterface
     private static function requireCommandActionCommands(array $data): array
     {
         if (!isset($data[self::KEY_COMMANDS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COMMANDS));
+            return [];
         }
         if (!is_array($data[self::KEY_COMMANDS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COMMANDS));
+            return [];
         }
 
         return self::toRuleDeviceCommandList($data[self::KEY_COMMANDS]);
@@ -2312,10 +2310,10 @@ final class ActionTransformer implements ActionTransformerInterface
     private static function requireCommandActionDevices(array $data): array
     {
         if (!isset($data[self::KEY_DEVICES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DEVICES));
+            return [];
         }
         if (!is_array($data[self::KEY_DEVICES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DEVICES));
+            return [];
         }
 
         return array_values(array_filter($data[self::KEY_DEVICES], is_string(...)));
@@ -2324,13 +2322,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireDateTimeOperandReference(array $data): string
+    private static function requireDateTimeOperandReference(array $data): ?string
     {
         if (empty($data[self::KEY_REFERENCE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_REFERENCE));
+            return null;
         }
         if (!is_string($data[self::KEY_REFERENCE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_REFERENCE));
+            return null;
         }
 
         return $data[self::KEY_REFERENCE];
@@ -2339,13 +2337,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireDeviceOperandAttribute(array $data): string
+    private static function requireDeviceOperandAttribute(array $data): ?string
     {
         if (empty($data[self::KEY_ATTRIBUTE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ATTRIBUTE));
+            return null;
         }
         if (!is_string($data[self::KEY_ATTRIBUTE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ATTRIBUTE));
+            return null;
         }
 
         return $data[self::KEY_ATTRIBUTE];
@@ -2354,13 +2352,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireDeviceOperandCapability(array $data): string
+    private static function requireDeviceOperandCapability(array $data): ?string
     {
         if (empty($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
         if (!is_string($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
 
         return $data[self::KEY_CAPABILITY];
@@ -2369,13 +2367,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireDeviceOperandComponent(array $data): string
+    private static function requireDeviceOperandComponent(array $data): ?string
     {
         if (empty($data[self::KEY_COMPONENT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMPONENT));
+            return null;
         }
         if (!is_string($data[self::KEY_COMPONENT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMPONENT));
+            return null;
         }
 
         return $data[self::KEY_COMPONENT];
@@ -2389,10 +2387,10 @@ final class ActionTransformer implements ActionTransformerInterface
     private static function requireDeviceOperandDevices(array $data): array
     {
         if (!isset($data[self::KEY_DEVICES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DEVICES));
+            return [];
         }
         if (!is_array($data[self::KEY_DEVICES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DEVICES));
+            return [];
         }
 
         return array_values(array_filter($data[self::KEY_DEVICES], is_string(...)));
@@ -2401,13 +2399,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireEqualsConditionLeft(array $data): OperandInterface
+    private static function requireEqualsConditionLeft(array $data): ?OperandInterface
     {
         if (!isset($data[self::KEY_LEFT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_LEFT));
+            return null;
         }
         if (!is_array($data[self::KEY_LEFT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_LEFT));
+            return null;
         }
 
         return self::toOperand($data[self::KEY_LEFT]);
@@ -2416,13 +2414,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireEqualsConditionRight(array $data): OperandInterface
+    private static function requireEqualsConditionRight(array $data): ?OperandInterface
     {
         if (!isset($data[self::KEY_RIGHT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RIGHT));
+            return null;
         }
         if (!is_array($data[self::KEY_RIGHT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RIGHT));
+            return null;
         }
 
         return self::toOperand($data[self::KEY_RIGHT]);
@@ -2436,10 +2434,10 @@ final class ActionTransformer implements ActionTransformerInterface
     private static function requireEveryActionActions(array $data): array
     {
         if (!isset($data[self::KEY_ACTIONS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_ACTIONS));
+            return [];
         }
         if (!is_array($data[self::KEY_ACTIONS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_ACTIONS));
+            return [];
         }
 
         return self::toActionList($data[self::KEY_ACTIONS]);
@@ -2448,13 +2446,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireGreaterThanConditionLeft(array $data): OperandInterface
+    private static function requireGreaterThanConditionLeft(array $data): ?OperandInterface
     {
         if (!isset($data[self::KEY_LEFT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_LEFT));
+            return null;
         }
         if (!is_array($data[self::KEY_LEFT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_LEFT));
+            return null;
         }
 
         return self::toOperand($data[self::KEY_LEFT]);
@@ -2463,13 +2461,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireGreaterThanConditionRight(array $data): OperandInterface
+    private static function requireGreaterThanConditionRight(array $data): ?OperandInterface
     {
         if (!isset($data[self::KEY_RIGHT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RIGHT));
+            return null;
         }
         if (!is_array($data[self::KEY_RIGHT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RIGHT));
+            return null;
         }
 
         return self::toOperand($data[self::KEY_RIGHT]);
@@ -2478,13 +2476,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireGreaterThanOrEqualsConditionLeft(array $data): OperandInterface
+    private static function requireGreaterThanOrEqualsConditionLeft(array $data): ?OperandInterface
     {
         if (!isset($data[self::KEY_LEFT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_LEFT));
+            return null;
         }
         if (!is_array($data[self::KEY_LEFT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_LEFT));
+            return null;
         }
 
         return self::toOperand($data[self::KEY_LEFT]);
@@ -2493,13 +2491,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireGreaterThanOrEqualsConditionRight(array $data): OperandInterface
+    private static function requireGreaterThanOrEqualsConditionRight(array $data): ?OperandInterface
     {
         if (!isset($data[self::KEY_RIGHT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RIGHT));
+            return null;
         }
         if (!is_array($data[self::KEY_RIGHT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RIGHT));
+            return null;
         }
 
         return self::toOperand($data[self::KEY_RIGHT]);
@@ -2508,13 +2506,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireIntervalUnit(array $data): string
+    private static function requireIntervalUnit(array $data): ?string
     {
         if (empty($data[self::KEY_UNIT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_UNIT));
+            return null;
         }
         if (!is_string($data[self::KEY_UNIT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_UNIT));
+            return null;
         }
 
         return $data[self::KEY_UNIT];
@@ -2523,13 +2521,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireIntervalValue(array $data): OperandInterface
+    private static function requireIntervalValue(array $data): ?OperandInterface
     {
         if (!isset($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_VALUE));
+            return null;
         }
         if (!is_array($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_VALUE));
+            return null;
         }
 
         return self::toOperand($data[self::KEY_VALUE]);
@@ -2538,13 +2536,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireLessThanConditionLeft(array $data): OperandInterface
+    private static function requireLessThanConditionLeft(array $data): ?OperandInterface
     {
         if (!isset($data[self::KEY_LEFT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_LEFT));
+            return null;
         }
         if (!is_array($data[self::KEY_LEFT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_LEFT));
+            return null;
         }
 
         return self::toOperand($data[self::KEY_LEFT]);
@@ -2553,13 +2551,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireLessThanConditionRight(array $data): OperandInterface
+    private static function requireLessThanConditionRight(array $data): ?OperandInterface
     {
         if (!isset($data[self::KEY_RIGHT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RIGHT));
+            return null;
         }
         if (!is_array($data[self::KEY_RIGHT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RIGHT));
+            return null;
         }
 
         return self::toOperand($data[self::KEY_RIGHT]);
@@ -2568,13 +2566,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireLessThanOrEqualsConditionLeft(array $data): OperandInterface
+    private static function requireLessThanOrEqualsConditionLeft(array $data): ?OperandInterface
     {
         if (!isset($data[self::KEY_LEFT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_LEFT));
+            return null;
         }
         if (!is_array($data[self::KEY_LEFT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_LEFT));
+            return null;
         }
 
         return self::toOperand($data[self::KEY_LEFT]);
@@ -2583,13 +2581,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireLessThanOrEqualsConditionRight(array $data): OperandInterface
+    private static function requireLessThanOrEqualsConditionRight(array $data): ?OperandInterface
     {
         if (!isset($data[self::KEY_RIGHT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RIGHT));
+            return null;
         }
         if (!is_array($data[self::KEY_RIGHT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RIGHT));
+            return null;
         }
 
         return self::toOperand($data[self::KEY_RIGHT]);
@@ -2603,10 +2601,10 @@ final class ActionTransformer implements ActionTransformerInterface
     private static function requireLimitActionActions(array $data): array
     {
         if (!isset($data[self::KEY_ACTIONS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_ACTIONS));
+            return [];
         }
         if (!is_array($data[self::KEY_ACTIONS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_ACTIONS));
+            return [];
         }
 
         return self::toActionList($data[self::KEY_ACTIONS]);
@@ -2615,13 +2613,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireLimitActionCount(array $data): int
+    private static function requireLimitActionCount(array $data): ?int
     {
         if (!isset($data[self::KEY_COUNT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_INT_SPRINTF, self::KEY_COUNT));
+            return null;
         }
         if (!is_int($data[self::KEY_COUNT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_INT_SPRINTF, self::KEY_COUNT));
+            return null;
         }
 
         return $data[self::KEY_COUNT];
@@ -2630,13 +2628,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireLimitActionPeriod(array $data): string
+    private static function requireLimitActionPeriod(array $data): ?string
     {
         if (empty($data[self::KEY_PERIOD])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_PERIOD));
+            return null;
         }
         if (!is_string($data[self::KEY_PERIOD])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_PERIOD));
+            return null;
         }
 
         return $data[self::KEY_PERIOD];
@@ -2645,13 +2643,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireLocationOperandAttribute(array $data): string
+    private static function requireLocationOperandAttribute(array $data): ?string
     {
         if (empty($data[self::KEY_ATTRIBUTE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ATTRIBUTE));
+            return null;
         }
         if (!is_string($data[self::KEY_ATTRIBUTE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ATTRIBUTE));
+            return null;
         }
 
         return $data[self::KEY_ATTRIBUTE];
@@ -2660,13 +2658,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireRemainsConditionDuration(array $data): IntervalInterface
+    private static function requireRemainsConditionDuration(array $data): ?IntervalInterface
     {
         if (!isset($data[self::KEY_DURATION])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DURATION));
+            return null;
         }
         if (!is_array($data[self::KEY_DURATION])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DURATION));
+            return null;
         }
 
         return self::toInterval($data[self::KEY_DURATION]);
@@ -2675,13 +2673,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireRemainsConditionId(array $data): string
+    private static function requireRemainsConditionId(array $data): ?string
     {
         if (empty($data[self::KEY_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ID));
+            return null;
         }
         if (!is_string($data[self::KEY_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ID));
+            return null;
         }
 
         return $data[self::KEY_ID];
@@ -2690,13 +2688,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireRuleDeviceCommandCapability(array $data): string
+    private static function requireRuleDeviceCommandCapability(array $data): ?string
     {
         if (empty($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
         if (!is_string($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
 
         return $data[self::KEY_CAPABILITY];
@@ -2705,13 +2703,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireRuleDeviceCommandCommand(array $data): string
+    private static function requireRuleDeviceCommandCommand(array $data): ?string
     {
         if (empty($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
         if (!is_string($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
 
         return $data[self::KEY_COMMAND];
@@ -2720,13 +2718,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireSceneDeviceGroupRequestDeviceGroupId(array $data): string
+    private static function requireSceneDeviceGroupRequestDeviceGroupId(array $data): ?string
     {
         if (empty($data[self::KEY_DEVICE_GROUP_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DEVICE_GROUP_ID));
+            return null;
         }
         if (!is_string($data[self::KEY_DEVICE_GROUP_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DEVICE_GROUP_ID));
+            return null;
         }
 
         return $data[self::KEY_DEVICE_GROUP_ID];
@@ -2735,13 +2733,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireSceneModeRequestModeId(array $data): string
+    private static function requireSceneModeRequestModeId(array $data): ?string
     {
         if (empty($data[self::KEY_MODE_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_MODE_ID));
+            return null;
         }
         if (!is_string($data[self::KEY_MODE_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_MODE_ID));
+            return null;
         }
 
         return $data[self::KEY_MODE_ID];
@@ -2750,13 +2748,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireSceneSleepRequestSeconds(array $data): int
+    private static function requireSceneSleepRequestSeconds(array $data): ?int
     {
         if (!isset($data[self::KEY_SECONDS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_INT_SPRINTF, self::KEY_SECONDS));
+            return null;
         }
         if (!is_int($data[self::KEY_SECONDS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_INT_SPRINTF, self::KEY_SECONDS));
+            return null;
         }
 
         return $data[self::KEY_SECONDS];
@@ -2765,13 +2763,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireSleepActionDuration(array $data): IntervalInterface
+    private static function requireSleepActionDuration(array $data): ?IntervalInterface
     {
         if (!isset($data[self::KEY_DURATION])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DURATION));
+            return null;
         }
         if (!is_array($data[self::KEY_DURATION])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DURATION));
+            return null;
         }
 
         return self::toInterval($data[self::KEY_DURATION]);
@@ -2780,13 +2778,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireTimeOperandReference(array $data): string
+    private static function requireTimeOperandReference(array $data): ?string
     {
         if (empty($data[self::KEY_REFERENCE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_REFERENCE));
+            return null;
         }
         if (!is_string($data[self::KEY_REFERENCE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_REFERENCE));
+            return null;
         }
 
         return $data[self::KEY_REFERENCE];
@@ -2795,13 +2793,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireToggleActionAttribute(array $data): string
+    private static function requireToggleActionAttribute(array $data): ?string
     {
         if (empty($data[self::KEY_ATTRIBUTE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ATTRIBUTE));
+            return null;
         }
         if (!is_string($data[self::KEY_ATTRIBUTE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ATTRIBUTE));
+            return null;
         }
 
         return $data[self::KEY_ATTRIBUTE];
@@ -2810,13 +2808,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireToggleActionCapability(array $data): string
+    private static function requireToggleActionCapability(array $data): ?string
     {
         if (empty($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
         if (!is_string($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
 
         return $data[self::KEY_CAPABILITY];
@@ -2825,13 +2823,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireToggleActionComponent(array $data): string
+    private static function requireToggleActionComponent(array $data): ?string
     {
         if (empty($data[self::KEY_COMPONENT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMPONENT));
+            return null;
         }
         if (!is_string($data[self::KEY_COMPONENT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMPONENT));
+            return null;
         }
 
         return $data[self::KEY_COMPONENT];
@@ -2845,10 +2843,10 @@ final class ActionTransformer implements ActionTransformerInterface
     private static function requireToggleActionDevices(array $data): array
     {
         if (!isset($data[self::KEY_DEVICES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DEVICES));
+            return [];
         }
         if (!is_array($data[self::KEY_DEVICES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DEVICES));
+            return [];
         }
 
         return array_values(array_filter($data[self::KEY_DEVICES], is_string(...)));
@@ -2857,13 +2855,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireWasConditionDuration(array $data): IntervalInterface
+    private static function requireWasConditionDuration(array $data): ?IntervalInterface
     {
         if (!isset($data[self::KEY_DURATION])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DURATION));
+            return null;
         }
         if (!is_array($data[self::KEY_DURATION])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DURATION));
+            return null;
         }
 
         return self::toInterval($data[self::KEY_DURATION]);
@@ -2872,13 +2870,13 @@ final class ActionTransformer implements ActionTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireWasConditionId(array $data): string
+    private static function requireWasConditionId(array $data): ?string
     {
         if (empty($data[self::KEY_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ID));
+            return null;
         }
         if (!is_string($data[self::KEY_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ID));
+            return null;
         }
 
         return $data[self::KEY_ID];

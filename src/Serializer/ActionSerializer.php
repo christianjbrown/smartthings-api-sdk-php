@@ -136,9 +136,9 @@ final class ActionSerializer implements ActionSerializerInterface
     private static function serializeBetweenCondition(BetweenConditionInterface $value): array
     {
         return self::filter([
-            self::KEY_VALUE => self::serializeOperand($value->getValue()),
-            self::KEY_START => self::serializeOperand($value->getStart()),
-            self::KEY_END => self::serializeOperand($value->getEnd()),
+            self::KEY_VALUE => self::serializeOptionalOperand($value->getValue()),
+            self::KEY_START => self::serializeOptionalOperand($value->getStart()),
+            self::KEY_END => self::serializeOptionalOperand($value->getEnd()),
             self::KEY_AGGREGATION => $value->getAggregation(),
             self::KEY_CHANGES_ONLY => $value->getChangesOnly(),
         ]);
@@ -276,8 +276,8 @@ final class ActionSerializer implements ActionSerializerInterface
     private static function serializeEqualsCondition(EqualsConditionInterface $value): array
     {
         return self::filter([
-            self::KEY_LEFT => self::serializeOperand($value->getLeft()),
-            self::KEY_RIGHT => self::serializeOperand($value->getRight()),
+            self::KEY_LEFT => self::serializeOptionalOperand($value->getLeft()),
+            self::KEY_RIGHT => self::serializeOptionalOperand($value->getRight()),
             self::KEY_AGGREGATION => $value->getAggregation(),
             self::KEY_CHANGES_ONLY => $value->getChangesOnly(),
         ]);
@@ -302,8 +302,8 @@ final class ActionSerializer implements ActionSerializerInterface
     private static function serializeGreaterThanCondition(GreaterThanConditionInterface $value): array
     {
         return self::filter([
-            self::KEY_LEFT => self::serializeOperand($value->getLeft()),
-            self::KEY_RIGHT => self::serializeOperand($value->getRight()),
+            self::KEY_LEFT => self::serializeOptionalOperand($value->getLeft()),
+            self::KEY_RIGHT => self::serializeOptionalOperand($value->getRight()),
             self::KEY_AGGREGATION => $value->getAggregation(),
             self::KEY_CHANGES_ONLY => $value->getChangesOnly(),
         ]);
@@ -315,8 +315,8 @@ final class ActionSerializer implements ActionSerializerInterface
     private static function serializeGreaterThanOrEqualsCondition(GreaterThanOrEqualsConditionInterface $value): array
     {
         return self::filter([
-            self::KEY_LEFT => self::serializeOperand($value->getLeft()),
-            self::KEY_RIGHT => self::serializeOperand($value->getRight()),
+            self::KEY_LEFT => self::serializeOptionalOperand($value->getLeft()),
+            self::KEY_RIGHT => self::serializeOptionalOperand($value->getRight()),
             self::KEY_AGGREGATION => $value->getAggregation(),
             self::KEY_CHANGES_ONLY => $value->getChangesOnly(),
         ]);
@@ -363,7 +363,7 @@ final class ActionSerializer implements ActionSerializerInterface
     private static function serializeInterval(IntervalInterface $value): array
     {
         return self::filter([
-            self::KEY_VALUE => self::serializeOperand($value->getValue()),
+            self::KEY_VALUE => self::serializeOptionalOperand($value->getValue()),
             self::KEY_UNIT => $value->getUnit(),
         ]);
     }
@@ -374,8 +374,8 @@ final class ActionSerializer implements ActionSerializerInterface
     private static function serializeLessThanCondition(LessThanConditionInterface $value): array
     {
         return self::filter([
-            self::KEY_LEFT => self::serializeOperand($value->getLeft()),
-            self::KEY_RIGHT => self::serializeOperand($value->getRight()),
+            self::KEY_LEFT => self::serializeOptionalOperand($value->getLeft()),
+            self::KEY_RIGHT => self::serializeOptionalOperand($value->getRight()),
             self::KEY_AGGREGATION => $value->getAggregation(),
             self::KEY_CHANGES_ONLY => $value->getChangesOnly(),
         ]);
@@ -387,8 +387,8 @@ final class ActionSerializer implements ActionSerializerInterface
     private static function serializeLessThanOrEqualsCondition(LessThanOrEqualsConditionInterface $value): array
     {
         return self::filter([
-            self::KEY_LEFT => self::serializeOperand($value->getLeft()),
-            self::KEY_RIGHT => self::serializeOperand($value->getRight()),
+            self::KEY_LEFT => self::serializeOptionalOperand($value->getLeft()),
+            self::KEY_RIGHT => self::serializeOptionalOperand($value->getRight()),
             self::KEY_AGGREGATION => $value->getAggregation(),
             self::KEY_CHANGES_ONLY => $value->getChangesOnly(),
         ]);
@@ -890,7 +890,7 @@ final class ActionSerializer implements ActionSerializerInterface
             self::KEY_BETWEEN => self::serializeOptionalBetweenCondition($value->getBetween()),
             self::KEY_ID => $value->getId(),
             self::KEY_OPERAND => self::serializeOptionalOperand($value->getOperand()),
-            self::KEY_DURATION => self::serializeInterval($value->getDuration()),
+            self::KEY_DURATION => self::serializeOptionalInterval($value->getDuration()),
             self::KEY_LATCHING => $value->getLatching(),
         ]);
     }
@@ -1105,7 +1105,7 @@ final class ActionSerializer implements ActionSerializerInterface
     private static function serializeSleepAction(SleepActionInterface $value): array
     {
         return self::filter([
-            self::KEY_DURATION => self::serializeInterval($value->getDuration()),
+            self::KEY_DURATION => self::serializeOptionalInterval($value->getDuration()),
         ]);
     }
 
@@ -1151,7 +1151,7 @@ final class ActionSerializer implements ActionSerializerInterface
             self::KEY_LESS_THAN_OR_EQUALS => self::serializeOptionalLessThanOrEqualsCondition($value->getLessThanOrEquals()),
             self::KEY_BETWEEN => self::serializeOptionalBetweenCondition($value->getBetween()),
             self::KEY_ID => $value->getId(),
-            self::KEY_DURATION => self::serializeInterval($value->getDuration()),
+            self::KEY_DURATION => self::serializeOptionalInterval($value->getDuration()),
             self::KEY_OPERAND => self::serializeOptionalOperand($value->getOperand()),
         ]);
     }

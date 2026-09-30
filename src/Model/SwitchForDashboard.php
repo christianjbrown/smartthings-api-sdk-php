@@ -6,15 +6,15 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class SwitchForDashboard implements SwitchForDashboardInterface
 {
-    private ToggleSwitchForDashboardCommandInterface $command;
+    private ?ToggleSwitchForDashboardCommandInterface $command;
     private ?ToggleSwitchForDashboardStateInterface $state = null;
 
-    public function __construct(ToggleSwitchForDashboardCommandInterface $command)
+    public function __construct(?ToggleSwitchForDashboardCommandInterface $command)
     {
         $this->command = $command;
     }
 
-    public function getCommand(): ToggleSwitchForDashboardCommandInterface
+    public function getCommand(): ?ToggleSwitchForDashboardCommandInterface
     {
         return $this->command;
     }

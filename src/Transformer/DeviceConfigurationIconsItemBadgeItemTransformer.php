@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationIconsItemBadgeItem;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationIconsItemBadgeItemInterface;
 use ChristianBrown\SmartThings\Model\VisibleConditionInterface;
@@ -14,7 +13,6 @@ use function array_map;
 use function array_values;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class DeviceConfigurationIconsItemBadgeItemTransformer implements DeviceConfigurationIconsItemBadgeItemTransformerInterface
 {
@@ -54,13 +52,13 @@ final class DeviceConfigurationIconsItemBadgeItemTransformer implements DeviceCo
     /**
      * @param mixed[] $data
      */
-    private static function requireIconUrl(array $data): string
+    private static function requireIconUrl(array $data): ?string
     {
         if (empty($data[self::KEY_ICON_URL])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ICON_URL));
+            return null;
         }
         if (!is_string($data[self::KEY_ICON_URL])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ICON_URL));
+            return null;
         }
 
         return $data[self::KEY_ICON_URL];

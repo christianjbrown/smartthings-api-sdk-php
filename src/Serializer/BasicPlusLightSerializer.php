@@ -27,7 +27,7 @@ final class BasicPlusLightSerializer implements BasicPlusLightSerializerInterfac
     public function serialize(BasicPlusLightInterface $model): array
     {
         $serialized = [
-            self::KEY_DIMMER => $this->sliderForLightSerializer->serialize($model->getDimmer()),
+            self::KEY_DIMMER => $this->serializeOptionalSliderForLight($model->getDimmer()),
             self::KEY_COLOR_TEMPERATURE => $this->serializeOptionalColorTemperature($model->getColorTemperature()),
             self::KEY_COLOR_CONTROL => $this->serializeOptionalColorControl($model->getColorControl()),
             self::KEY_HIDE_DASHBOARD_ACTIONS => $model->getHideDashboardActions(),
@@ -53,6 +53,18 @@ final class BasicPlusLightSerializer implements BasicPlusLightSerializerInterfac
      * @return null|mixed[]
      */
     private function serializeOptionalColorTemperature(?SliderForLightInterface $value): ?array
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->sliderForLightSerializer->serialize($value);
+    }
+
+    /**
+     * @return null|mixed[]
+     */
+    private function serializeOptionalSliderForLight(?SliderForLightInterface $value): ?array
     {
         if (null === $value) {
             return null;

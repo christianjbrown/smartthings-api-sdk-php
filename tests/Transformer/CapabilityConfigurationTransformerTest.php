@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilityConfiguration;
 use ChristianBrown\SmartThings\Model\CapabilityConfigurationValueInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationTransformer;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\CapabilityConfigurationValueTransform
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(CapabilityConfiguration::class)]
 #[CoversClass(CapabilityConfigurationTransformer::class)]
@@ -39,22 +36,22 @@ final class CapabilityConfigurationTransformerTest extends TestCase
     /**
      * @param array<string, mixed> $data
      */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
     {
         $transformer = new CapabilityConfigurationTransformer(self::createStub(CapabilityConfigurationValueTransformerInterface::class));
 
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
     }
 
     /**
-     * @return iterable<string, array{array<string, mixed>, string}>
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
      */
-    public static function provideTransformUnexpectedCases(): iterable
+    public static function provideTransformLenientCases(): iterable
     {
-        yield 'valuesAbsent' => [[], sprintf(CapabilityConfigurationTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, CapabilityConfigurationTransformerInterface::KEY_VALUES)];
-        yield 'valuesWrongType' => [[CapabilityConfigurationTransformerInterface::KEY_VALUES => 'not-array'], sprintf(CapabilityConfigurationTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, CapabilityConfigurationTransformerInterface::KEY_VALUES)];
+        yield 'valuesAbsent' => [[], 'getValues', []];
+        yield 'valuesWrongType' => [[CapabilityConfigurationTransformerInterface::KEY_VALUES => 'not-array'], 'getValues', []];
     }
 }

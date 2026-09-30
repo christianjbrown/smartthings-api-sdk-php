@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\DynamicListForAutomationCondition;
 use ChristianBrown\SmartThings\Model\DynamicListForAutomationConditionInterface;
@@ -16,7 +15,6 @@ use function array_values;
 use function is_array;
 use function is_bool;
 use function is_string;
-use function sprintf;
 
 final class DynamicListForAutomationConditionTransformer implements DynamicListForAutomationConditionTransformerInterface
 {
@@ -88,13 +86,13 @@ final class DynamicListForAutomationConditionTransformer implements DynamicListF
     /**
      * @param mixed[] $data
      */
-    private function requireSupportedValues(array $data): SupportedValuesForDynamicListInterface
+    private function requireSupportedValues(array $data): ?SupportedValuesForDynamicListInterface
     {
         if (!isset($data[self::KEY_SUPPORTED_VALUES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_SUPPORTED_VALUES));
+            return null;
         }
         if (!is_array($data[self::KEY_SUPPORTED_VALUES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_SUPPORTED_VALUES));
+            return null;
         }
 
         return $this->supportedValuesForDynamicListTransformer->transform($data[self::KEY_SUPPORTED_VALUES]);
@@ -103,13 +101,13 @@ final class DynamicListForAutomationConditionTransformer implements DynamicListF
     /**
      * @param mixed[] $data
      */
-    private static function requireValue(array $data): string
+    private static function requireValue(array $data): ?string
     {
         if (empty($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_VALUE));
+            return null;
         }
         if (!is_string($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_VALUE));
+            return null;
         }
 
         return $data[self::KEY_VALUE];

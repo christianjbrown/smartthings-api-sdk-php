@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class BasicPlusStateBoardColors implements BasicPlusStateBoardColorsInterface
 {
-    private string $color;
+    private ?string $color;
     private ?string $operator = null;
 
     /**
@@ -14,12 +14,12 @@ final class BasicPlusStateBoardColors implements BasicPlusStateBoardColorsInterf
      */
     private ?array $visibleConditions = null;
 
-    public function __construct(string $color)
+    public function __construct(?string $color)
     {
         $this->color = $color;
     }
 
-    public function getColor(): string
+    public function getColor(): ?string
     {
         return $this->color;
     }

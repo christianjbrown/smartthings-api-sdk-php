@@ -16,7 +16,7 @@ final class SliderWithAvailableSize implements SliderWithAvailableSizeInterface
      * @var null|array<int, string>
      */
     private ?array $availableSizes = null;
-    private string $command;
+    private ?string $command;
 
     /**
      * @var mixed[]
@@ -31,7 +31,7 @@ final class SliderWithAvailableSize implements SliderWithAvailableSizeInterface
     /**
      * @phpstan-param mixed[] $range
      */
-    public function __construct(array $range, string $command)
+    public function __construct(array $range, ?string $command)
     {
         $this->range = $range;
         $this->command = $command;
@@ -58,7 +58,7 @@ final class SliderWithAvailableSize implements SliderWithAvailableSizeInterface
         return $this->availableSizes;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }

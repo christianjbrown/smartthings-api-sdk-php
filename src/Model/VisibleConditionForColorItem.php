@@ -6,22 +6,22 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class VisibleConditionForColorItem implements VisibleConditionForColorItemInterface
 {
-    private string $operand;
-    private string $operator;
+    private ?string $operand;
+    private ?string $operator;
     private ?VisibleConditionForColorItemReferToInterface $referTo = null;
 
-    public function __construct(string $operator, string $operand)
+    public function __construct(?string $operator, ?string $operand)
     {
         $this->operator = $operator;
         $this->operand = $operand;
     }
 
-    public function getOperand(): string
+    public function getOperand(): ?string
     {
         return $this->operand;
     }
 
-    public function getOperator(): string
+    public function getOperator(): ?string
     {
         return $this->operator;
     }

@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AppUiSettings;
 use ChristianBrown\SmartThings\Transformer\AppUiSettingsTransformer;
 use ChristianBrown\SmartThings\Transformer\AppUiSettingsTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(AppUiSettings::class)]
 #[CoversClass(AppUiSettingsTransformer::class)]
@@ -35,6 +32,30 @@ final class AppUiSettingsTransformerTest extends TestCase
         self::assertSame('test-plugin-uri', $actual->getPluginUri());
         self::assertTrue($actual->getDashboardCardsEnabled());
         self::assertTrue($actual->getPreInstallDashboardCardsEnabled());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new AppUiSettingsTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'dashboardCardsEnabledAbsent' => [[AppUiSettingsTransformerInterface::KEY_PRE_INSTALL_DASHBOARD_CARDS_ENABLED => true], 'getDashboardCardsEnabled', null];
+        yield 'dashboardCardsEnabledWrongType' => [[AppUiSettingsTransformerInterface::KEY_PRE_INSTALL_DASHBOARD_CARDS_ENABLED => true, AppUiSettingsTransformerInterface::KEY_DASHBOARD_CARDS_ENABLED => 'not-bool'], 'getDashboardCardsEnabled', null];
+        yield 'preInstallDashboardCardsEnabledAbsent' => [[AppUiSettingsTransformerInterface::KEY_DASHBOARD_CARDS_ENABLED => true], 'getPreInstallDashboardCardsEnabled', null];
+        yield 'preInstallDashboardCardsEnabledWrongType' => [[AppUiSettingsTransformerInterface::KEY_DASHBOARD_CARDS_ENABLED => true, AppUiSettingsTransformerInterface::KEY_PRE_INSTALL_DASHBOARD_CARDS_ENABLED => 'not-bool'], 'getPreInstallDashboardCardsEnabled', null];
     }
 
     /**
@@ -73,29 +94,5 @@ final class AppUiSettingsTransformerTest extends TestCase
 
         self::assertNull($actual->getPluginId());
         self::assertNull($actual->getPluginUri());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new AppUiSettingsTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'dashboardCardsEnabledAbsent' => [[AppUiSettingsTransformerInterface::KEY_PRE_INSTALL_DASHBOARD_CARDS_ENABLED => true], sprintf(AppUiSettingsTransformerInterface::UNEXPECTED_BOOL_SPRINTF, AppUiSettingsTransformerInterface::KEY_DASHBOARD_CARDS_ENABLED)];
-        yield 'dashboardCardsEnabledWrongType' => [[AppUiSettingsTransformerInterface::KEY_PRE_INSTALL_DASHBOARD_CARDS_ENABLED => true, AppUiSettingsTransformerInterface::KEY_DASHBOARD_CARDS_ENABLED => 'not-bool'], sprintf(AppUiSettingsTransformerInterface::UNEXPECTED_BOOL_SPRINTF, AppUiSettingsTransformerInterface::KEY_DASHBOARD_CARDS_ENABLED)];
-        yield 'preInstallDashboardCardsEnabledAbsent' => [[AppUiSettingsTransformerInterface::KEY_DASHBOARD_CARDS_ENABLED => true], sprintf(AppUiSettingsTransformerInterface::UNEXPECTED_BOOL_SPRINTF, AppUiSettingsTransformerInterface::KEY_PRE_INSTALL_DASHBOARD_CARDS_ENABLED)];
-        yield 'preInstallDashboardCardsEnabledWrongType' => [[AppUiSettingsTransformerInterface::KEY_DASHBOARD_CARDS_ENABLED => true, AppUiSettingsTransformerInterface::KEY_PRE_INSTALL_DASHBOARD_CARDS_ENABLED => 'not-bool'], sprintf(AppUiSettingsTransformerInterface::UNEXPECTED_BOOL_SPRINTF, AppUiSettingsTransformerInterface::KEY_PRE_INSTALL_DASHBOARD_CARDS_ENABLED)];
     }
 }

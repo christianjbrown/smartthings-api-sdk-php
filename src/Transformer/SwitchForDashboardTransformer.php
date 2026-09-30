@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\SwitchForDashboard;
 use ChristianBrown\SmartThings\Model\SwitchForDashboardInterface;
 use ChristianBrown\SmartThings\Model\ToggleSwitchForDashboardCommandInterface;
 
 use function is_array;
-use function sprintf;
 
 final class SwitchForDashboardTransformer implements SwitchForDashboardTransformerInterface
 {
@@ -52,13 +50,13 @@ final class SwitchForDashboardTransformer implements SwitchForDashboardTransform
     /**
      * @param mixed[] $data
      */
-    private function requireCommand(array $data): ToggleSwitchForDashboardCommandInterface
+    private function requireCommand(array $data): ?ToggleSwitchForDashboardCommandInterface
     {
         if (!isset($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
         if (!is_array($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
 
         return $this->toggleSwitchForDashboardCommandTransformer->transform($data[self::KEY_COMMAND]);

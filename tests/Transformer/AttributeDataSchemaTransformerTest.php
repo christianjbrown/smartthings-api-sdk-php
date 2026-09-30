@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AttributeDataSchema;
 use ChristianBrown\SmartThings\Transformer\AttributeDataSchemaTransformer;
 use ChristianBrown\SmartThings\Transformer\AttributeDataSchemaTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(AttributeDataSchema::class)]
 #[CoversClass(AttributeDataSchemaTransformer::class)]
@@ -35,6 +32,28 @@ final class AttributeDataSchemaTransformerTest extends TestCase
         self::assertTrue($actual->getAdditionalProperties());
         self::assertSame(['test-required-1', 'test-required-2'], $actual->getRequired());
         self::assertSame(['test-properties-key' => 'test-value'], $actual->getProperties());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new AttributeDataSchemaTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'typeAbsent' => [[], 'getType', null];
+        yield 'typeWrongType' => [[AttributeDataSchemaTransformerInterface::KEY_TYPE => 42], 'getType', null];
     }
 
     /**
@@ -77,27 +96,5 @@ final class AttributeDataSchemaTransformerTest extends TestCase
         self::assertNull($actual->getAdditionalProperties());
         self::assertNull($actual->getRequired());
         self::assertNull($actual->getProperties());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new AttributeDataSchemaTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'typeAbsent' => [[], sprintf(AttributeDataSchemaTransformerInterface::UNEXPECTED_STRING_SPRINTF, AttributeDataSchemaTransformerInterface::KEY_TYPE)];
-        yield 'typeWrongType' => [[AttributeDataSchemaTransformerInterface::KEY_TYPE => 42], sprintf(AttributeDataSchemaTransformerInterface::UNEXPECTED_STRING_SPRINTF, AttributeDataSchemaTransformerInterface::KEY_TYPE)];
     }
 }

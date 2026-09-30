@@ -10,7 +10,7 @@ interface BasicPlusLightInterface
 
     public function getColorTemperature(): ?SliderForLightInterface;
 
-    public function getDimmer(): SliderForLightInterface;
+    public function getDimmer(): ?SliderForLightInterface;
 
     public function getHideDashboardActions(): ?bool;
 

@@ -22,7 +22,7 @@ interface SliderForAutomationConditionInterface
 
     public function getUnit(): ?string;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function getValueType(): ?string;
 

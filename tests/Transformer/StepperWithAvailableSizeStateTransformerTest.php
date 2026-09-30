@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\StepperWithAvailableSizeState;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\StepperWithAvailableSizeStateTransfor
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(StepperWithAvailableSizeState::class)]
 #[CoversClass(StepperWithAvailableSizeStateTransformer::class)]
@@ -55,6 +52,28 @@ final class StepperWithAvailableSizeStateTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getAlternatives());
         self::assertNull($transformer->transform($base + [StepperWithAvailableSizeStateTransformerInterface::KEY_ALTERNATIVES => 'test-not-array'])->getAlternatives());
         self::assertSame([$alternativeItemModel], $transformer->transform($base + [StepperWithAvailableSizeStateTransformerInterface::KEY_ALTERNATIVES => [['test-nested'], 'test-skipped']])->getAlternatives());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new StepperWithAvailableSizeStateTransformer(self::createStub(AlternativeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'valueAbsent' => [[], 'getValue', null];
+        yield 'valueWrongType' => [[StepperWithAvailableSizeStateTransformerInterface::KEY_VALUE => 42], 'getValue', null];
     }
 
     /**
@@ -101,27 +120,5 @@ final class StepperWithAvailableSizeStateTransformerTest extends TestCase
         self::assertNull($actual->getValueType());
         self::assertNull($actual->getLabel());
         self::assertNull($actual->getAlternatives());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new StepperWithAvailableSizeStateTransformer(self::createStub(AlternativeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'valueAbsent' => [[], sprintf(StepperWithAvailableSizeStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, StepperWithAvailableSizeStateTransformerInterface::KEY_VALUE)];
-        yield 'valueWrongType' => [[StepperWithAvailableSizeStateTransformerInterface::KEY_VALUE => 42], sprintf(StepperWithAvailableSizeStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, StepperWithAvailableSizeStateTransformerInterface::KEY_VALUE)];
     }
 }

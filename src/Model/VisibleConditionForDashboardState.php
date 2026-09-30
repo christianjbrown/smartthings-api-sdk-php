@@ -6,16 +6,16 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class VisibleConditionForDashboardState implements VisibleConditionForDashboardStateInterface
 {
-    private string $capability;
-    private string $component;
+    private ?string $capability;
+    private ?string $component;
     private ?bool $isOffline = null;
-    private string $operand;
-    private string $operator;
-    private string $value;
+    private ?string $operand;
+    private ?string $operator;
+    private ?string $value;
     private ?string $valueType = null;
     private ?int $version = null;
 
-    public function __construct(string $value, string $operator, string $operand, string $component, string $capability)
+    public function __construct(?string $value, ?string $operator, ?string $operand, ?string $component, ?string $capability)
     {
         $this->value = $value;
         $this->operator = $operator;
@@ -24,12 +24,12 @@ final class VisibleConditionForDashboardState implements VisibleConditionForDash
         $this->capability = $capability;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }
@@ -39,17 +39,17 @@ final class VisibleConditionForDashboardState implements VisibleConditionForDash
         return $this->isOffline;
     }
 
-    public function getOperand(): string
+    public function getOperand(): ?string
     {
         return $this->operand;
     }
 
-    public function getOperator(): string
+    public function getOperator(): ?string
     {
         return $this->operator;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

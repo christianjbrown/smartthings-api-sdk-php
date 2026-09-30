@@ -13,7 +13,7 @@ interface SliderForAutomationActionInterface
 
     public function getArgumentType(): ?string;
 
-    public function getCommand(): string;
+    public function getCommand(): ?string;
 
     /**
      * @return mixed[]

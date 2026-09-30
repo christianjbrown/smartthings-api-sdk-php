@@ -11,7 +11,7 @@ interface ListForPanelItemStateInterface
      */
     public function getAlternatives(): array;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function getValueType(): ?string;
 

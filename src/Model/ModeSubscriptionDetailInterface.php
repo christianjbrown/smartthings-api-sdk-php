@@ -6,5 +6,5 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface ModeSubscriptionDetailInterface
 {
-    public function getLocationId(): string;
+    public function getLocationId(): ?string;
 }

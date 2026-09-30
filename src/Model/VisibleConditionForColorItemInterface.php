@@ -6,9 +6,9 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface VisibleConditionForColorItemInterface
 {
-    public function getOperand(): string;
+    public function getOperand(): ?string;
 
-    public function getOperator(): string;
+    public function getOperator(): ?string;
 
     public function getReferTo(): ?VisibleConditionForColorItemReferToInterface;
 

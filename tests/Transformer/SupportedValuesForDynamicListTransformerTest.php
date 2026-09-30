@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\SupportedValuesForDynamicList;
 use ChristianBrown\SmartThings\Model\SupportedValuesForDynamicListValueMapInterface;
 use ChristianBrown\SmartThings\Transformer\SupportedValuesForDynamicListTransformer;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\SupportedValuesForDynamicListValueMap
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(SupportedValuesForDynamicList::class)]
 #[CoversClass(SupportedValuesForDynamicListTransformer::class)]
@@ -38,6 +35,28 @@ final class SupportedValuesForDynamicListTransformerTest extends TestCase
         self::assertSame($supportedValuesForDynamicListValueMapModel, $actual->getValueMap());
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new SupportedValuesForDynamicListTransformer(self::createStub(SupportedValuesForDynamicListValueMapTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'valueAbsent' => [[], 'getValue', null];
+        yield 'valueWrongType' => [[SupportedValuesForDynamicListTransformerInterface::KEY_VALUE => 42], 'getValue', null];
+    }
+
     public function testTransformRequiredFieldsOnly(): void
     {
         $supportedValuesForDynamicListValueMapModel = self::createStub(SupportedValuesForDynamicListValueMapInterface::class);
@@ -48,28 +67,6 @@ final class SupportedValuesForDynamicListTransformerTest extends TestCase
         $actual = $transformer->transform([SupportedValuesForDynamicListTransformerInterface::KEY_VALUE => 'test-value']);
 
         self::assertNull($actual->getValueMap());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new SupportedValuesForDynamicListTransformer(self::createStub(SupportedValuesForDynamicListValueMapTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'valueAbsent' => [[], sprintf(SupportedValuesForDynamicListTransformerInterface::UNEXPECTED_STRING_SPRINTF, SupportedValuesForDynamicListTransformerInterface::KEY_VALUE)];
-        yield 'valueWrongType' => [[SupportedValuesForDynamicListTransformerInterface::KEY_VALUE => 42], sprintf(SupportedValuesForDynamicListTransformerInterface::UNEXPECTED_STRING_SPRINTF, SupportedValuesForDynamicListTransformerInterface::KEY_VALUE)];
     }
 
     public function testTransformValueMap(): void

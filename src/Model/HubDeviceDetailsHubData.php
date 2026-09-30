@@ -12,7 +12,7 @@ final class HubDeviceDetailsHubData implements HubDeviceDetailsHubDataInterface
     private ?string $enrollmentChannel = null;
     private ?string $failoverAvailability = null;
     private ?string $hardwareId = null;
-    private string $hardwareType;
+    private ?string $hardwareType;
     private ?string $hedgeTlsCertificate = null;
     private ?HubDeviceDetailsHubDataHub2hubSupportMatrixInterface $hub2hubSupportMatrix = null;
     private ?string $hubLocalApiAvailability = null;
@@ -34,7 +34,7 @@ final class HubDeviceDetailsHubData implements HubDeviceDetailsHubDataInterface
     private ?string $threadAvailability = null;
     private ?bool $threadRequiresExternalHardware = null;
     private ?string $wifiSsid = null;
-    private bool $zigbee3;
+    private ?bool $zigbee3;
     private ?string $zigbeeAvailability = null;
     private ?string $zigbeeChannel = null;
     private ?string $zigbeeDeviceDiagnosticsAvailability = null;
@@ -48,7 +48,7 @@ final class HubDeviceDetailsHubData implements HubDeviceDetailsHubDataInterface
     private ?bool $zigbeeRadioEnabled = null;
     private ?bool $zigbeeRadioFunctional = null;
     private ?bool $zigbeeRequiresExternalHardware = null;
-    private bool $zigbeeUnsecureRejoin;
+    private ?bool $zigbeeUnsecureRejoin;
     private ?string $zwaveAvailability = null;
     private ?string $zwaveHomeID = null;
     private ?string $zwaveNodeID = null;
@@ -56,12 +56,12 @@ final class HubDeviceDetailsHubData implements HubDeviceDetailsHubDataInterface
     private ?bool $zwaveRadioEnabled = null;
     private ?bool $zwaveRadioFunctional = null;
     private ?string $zwaveRegion = null;
-    private bool $zwaveS2;
+    private ?bool $zwaveS2;
     private ?string $zwaveStaticDsk = null;
     private ?string $zwaveSucID = null;
     private ?string $zwaveVersion = null;
 
-    public function __construct(bool $zwaveS2, string $hardwareType, bool $zigbee3, bool $zigbeeUnsecureRejoin)
+    public function __construct(?bool $zwaveS2, ?string $hardwareType, ?bool $zigbee3, ?bool $zigbeeUnsecureRejoin)
     {
         $this->zwaveS2 = $zwaveS2;
         $this->hardwareType = $hardwareType;
@@ -99,7 +99,7 @@ final class HubDeviceDetailsHubData implements HubDeviceDetailsHubDataInterface
         return $this->hardwareId;
     }
 
-    public function getHardwareType(): string
+    public function getHardwareType(): ?string
     {
         return $this->hardwareType;
     }
@@ -209,7 +209,7 @@ final class HubDeviceDetailsHubData implements HubDeviceDetailsHubDataInterface
         return $this->wifiSsid;
     }
 
-    public function getZigbee3(): bool
+    public function getZigbee3(): ?bool
     {
         return $this->zigbee3;
     }
@@ -279,7 +279,7 @@ final class HubDeviceDetailsHubData implements HubDeviceDetailsHubDataInterface
         return $this->zigbeeRequiresExternalHardware;
     }
 
-    public function getZigbeeUnsecureRejoin(): bool
+    public function getZigbeeUnsecureRejoin(): ?bool
     {
         return $this->zigbeeUnsecureRejoin;
     }
@@ -319,7 +319,7 @@ final class HubDeviceDetailsHubData implements HubDeviceDetailsHubDataInterface
         return $this->zwaveRegion;
     }
 
-    public function getZwaveS2(): bool
+    public function getZwaveS2(): ?bool
     {
         return $this->zwaveS2;
     }

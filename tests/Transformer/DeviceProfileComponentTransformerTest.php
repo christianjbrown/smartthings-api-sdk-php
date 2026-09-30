@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceCapabilityReferenceInterface;
 use ChristianBrown\SmartThings\Model\DeviceCategoryInterface;
 use ChristianBrown\SmartThings\Model\DeviceProfileComponent;
@@ -17,8 +16,6 @@ use ChristianBrown\SmartThings\Transformer\RestrictionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(DeviceProfileComponent::class)]
 #[CoversClass(DeviceProfileComponentTransformer::class)]
@@ -54,6 +51,32 @@ final class DeviceProfileComponentTransformerTest extends TestCase
         self::assertSame([$deviceCategoryModel], $actual->getCategories());
         self::assertSame($restrictionModel, $actual->getRestrictions());
         self::assertTrue($actual->getOptional());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new DeviceProfileComponentTransformer(self::createStub(DeviceCapabilityReferenceTransformerInterface::class), self::createStub(DeviceCategoryTransformerInterface::class), self::createStub(RestrictionTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'idAbsent' => [[DeviceProfileComponentTransformerInterface::KEY_CAPABILITIES => ['test-nested'], DeviceProfileComponentTransformerInterface::KEY_CATEGORIES => ['test-nested']], 'getId', null];
+        yield 'idWrongType' => [[DeviceProfileComponentTransformerInterface::KEY_CAPABILITIES => ['test-nested'], DeviceProfileComponentTransformerInterface::KEY_CATEGORIES => ['test-nested'], DeviceProfileComponentTransformerInterface::KEY_ID => 42], 'getId', null];
+        yield 'capabilitiesAbsent' => [[DeviceProfileComponentTransformerInterface::KEY_ID => 'test-id', DeviceProfileComponentTransformerInterface::KEY_CATEGORIES => ['test-nested']], 'getCapabilities', []];
+        yield 'capabilitiesWrongType' => [[DeviceProfileComponentTransformerInterface::KEY_ID => 'test-id', DeviceProfileComponentTransformerInterface::KEY_CATEGORIES => ['test-nested'], DeviceProfileComponentTransformerInterface::KEY_CAPABILITIES => 'not-array'], 'getCapabilities', []];
+        yield 'categoriesAbsent' => [[DeviceProfileComponentTransformerInterface::KEY_ID => 'test-id', DeviceProfileComponentTransformerInterface::KEY_CAPABILITIES => ['test-nested']], 'getCategories', []];
+        yield 'categoriesWrongType' => [[DeviceProfileComponentTransformerInterface::KEY_ID => 'test-id', DeviceProfileComponentTransformerInterface::KEY_CAPABILITIES => ['test-nested'], DeviceProfileComponentTransformerInterface::KEY_CATEGORIES => 'not-array'], 'getCategories', []];
     }
 
     /**
@@ -121,31 +144,5 @@ final class DeviceProfileComponentTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getRestrictions());
         self::assertNull($transformer->transform($base + [DeviceProfileComponentTransformerInterface::KEY_RESTRICTIONS => 'test-not-array'])->getRestrictions());
         self::assertSame($restrictionModel, $transformer->transform($base + [DeviceProfileComponentTransformerInterface::KEY_RESTRICTIONS => ['test-nested']])->getRestrictions());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new DeviceProfileComponentTransformer(self::createStub(DeviceCapabilityReferenceTransformerInterface::class), self::createStub(DeviceCategoryTransformerInterface::class), self::createStub(RestrictionTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'idAbsent' => [[DeviceProfileComponentTransformerInterface::KEY_CAPABILITIES => ['test-nested'], DeviceProfileComponentTransformerInterface::KEY_CATEGORIES => ['test-nested']], sprintf(DeviceProfileComponentTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceProfileComponentTransformerInterface::KEY_ID)];
-        yield 'idWrongType' => [[DeviceProfileComponentTransformerInterface::KEY_CAPABILITIES => ['test-nested'], DeviceProfileComponentTransformerInterface::KEY_CATEGORIES => ['test-nested'], DeviceProfileComponentTransformerInterface::KEY_ID => 42], sprintf(DeviceProfileComponentTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceProfileComponentTransformerInterface::KEY_ID)];
-        yield 'capabilitiesAbsent' => [[DeviceProfileComponentTransformerInterface::KEY_ID => 'test-id', DeviceProfileComponentTransformerInterface::KEY_CATEGORIES => ['test-nested']], sprintf(DeviceProfileComponentTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, DeviceProfileComponentTransformerInterface::KEY_CAPABILITIES)];
-        yield 'capabilitiesWrongType' => [[DeviceProfileComponentTransformerInterface::KEY_ID => 'test-id', DeviceProfileComponentTransformerInterface::KEY_CATEGORIES => ['test-nested'], DeviceProfileComponentTransformerInterface::KEY_CAPABILITIES => 'not-array'], sprintf(DeviceProfileComponentTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, DeviceProfileComponentTransformerInterface::KEY_CAPABILITIES)];
-        yield 'categoriesAbsent' => [[DeviceProfileComponentTransformerInterface::KEY_ID => 'test-id', DeviceProfileComponentTransformerInterface::KEY_CAPABILITIES => ['test-nested']], sprintf(DeviceProfileComponentTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, DeviceProfileComponentTransformerInterface::KEY_CATEGORIES)];
-        yield 'categoriesWrongType' => [[DeviceProfileComponentTransformerInterface::KEY_ID => 'test-id', DeviceProfileComponentTransformerInterface::KEY_CAPABILITIES => ['test-nested'], DeviceProfileComponentTransformerInterface::KEY_CATEGORIES => 'not-array'], sprintf(DeviceProfileComponentTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, DeviceProfileComponentTransformerInterface::KEY_CATEGORIES)];
     }
 }

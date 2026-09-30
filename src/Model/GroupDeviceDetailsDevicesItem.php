@@ -10,9 +10,9 @@ final class GroupDeviceDetailsDevicesItem implements GroupDeviceDetailsDevicesIt
      * @var null|array<int, GroupDeviceDetailsDevicesItemComponentsItemInterface>
      */
     private ?array $components = null;
-    private string $deviceId;
+    private ?string $deviceId;
 
-    public function __construct(string $deviceId)
+    public function __construct(?string $deviceId)
     {
         $this->deviceId = $deviceId;
     }
@@ -25,7 +25,7 @@ final class GroupDeviceDetailsDevicesItem implements GroupDeviceDetailsDevicesIt
         return $this->components;
     }
 
-    public function getDeviceId(): string
+    public function getDeviceId(): ?string
     {
         return $this->deviceId;
     }

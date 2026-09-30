@@ -7,9 +7,9 @@ namespace ChristianBrown\SmartThings\Model;
 final class DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTime implements DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeInterface
 {
     private ?int $frequency = null;
-    private string $timeFormat;
+    private ?string $timeFormat;
 
-    public function __construct(string $timeFormat)
+    public function __construct(?string $timeFormat)
     {
         $this->timeFormat = $timeFormat;
     }
@@ -19,7 +19,7 @@ final class DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTime implem
         return $this->frequency;
     }
 
-    public function getTimeFormat(): string
+    public function getTimeFormat(): ?string
     {
         return $this->timeFormat;
     }

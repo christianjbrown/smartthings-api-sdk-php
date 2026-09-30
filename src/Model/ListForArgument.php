@@ -11,13 +11,13 @@ final class ListForArgument implements ListForArgumentInterface
      */
     private array $alternatives;
     private ?string $argumentType = null;
-    private string $name;
+    private ?string $name;
     private ?string $supportedValues = null;
 
     /**
      * @phpstan-param array<int, AlternativeItemInterface> $alternatives
      */
-    public function __construct(array $alternatives, string $name)
+    public function __construct(array $alternatives, ?string $name)
     {
         $this->alternatives = $alternatives;
         $this->name = $name;
@@ -36,7 +36,7 @@ final class ListForArgument implements ListForArgumentInterface
         return $this->argumentType;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }

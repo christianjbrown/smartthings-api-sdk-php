@@ -11,11 +11,11 @@ interface DeviceConfigurationDpInfoItemInterface
      */
     public function getArguments(): ?array;
 
-    public function getDpUri(): string;
+    public function getDpUri(): ?string;
 
     public function getOperatingMode(): ?string;
 
-    public function getOs(): string;
+    public function getOs(): ?string;
 
     public function getServerDpUri(): ?string;
 

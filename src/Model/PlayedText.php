@@ -6,14 +6,14 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class PlayedText implements PlayedTextInterface
 {
-    private string $message;
+    private ?string $message;
 
-    public function __construct(string $message)
+    public function __construct(?string $message)
     {
         $this->message = $message;
     }
 
-    public function getMessage(): string
+    public function getMessage(): ?string
     {
         return $this->message;
     }

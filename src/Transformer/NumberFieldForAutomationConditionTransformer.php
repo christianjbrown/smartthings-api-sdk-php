@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\NumberFieldForAutomationCondition;
 use ChristianBrown\SmartThings\Model\NumberFieldForAutomationConditionInterface;
@@ -14,7 +13,6 @@ use function array_map;
 use function array_values;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class NumberFieldForAutomationConditionTransformer implements NumberFieldForAutomationConditionTransformerInterface
 {
@@ -129,13 +127,13 @@ final class NumberFieldForAutomationConditionTransformer implements NumberFieldF
     /**
      * @param mixed[] $data
      */
-    private static function requireValue(array $data): string
+    private static function requireValue(array $data): ?string
     {
         if (empty($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_VALUE));
+            return null;
         }
         if (!is_string($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_VALUE));
+            return null;
         }
 
         return $data[self::KEY_VALUE];

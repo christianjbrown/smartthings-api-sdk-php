@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DetailViewListItemInterface;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationDpInfoItemInterface;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationDpInfosItemInterface;
@@ -18,7 +17,6 @@ use function array_map;
 use function array_values;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class DevicePresentationTransformer implements DevicePresentationTransformerInterface
 {
@@ -252,13 +250,13 @@ final class DevicePresentationTransformer implements DevicePresentationTransform
     /**
      * @param mixed[] $data
      */
-    private static function requireMnmn(array $data): string
+    private static function requireMnmn(array $data): ?string
     {
         if (empty($data[self::KEY_MNMN])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_MNMN));
+            return null;
         }
         if (!is_string($data[self::KEY_MNMN])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_MNMN));
+            return null;
         }
 
         return $data[self::KEY_MNMN];
@@ -267,13 +265,13 @@ final class DevicePresentationTransformer implements DevicePresentationTransform
     /**
      * @param mixed[] $data
      */
-    private static function requireVid(array $data): string
+    private static function requireVid(array $data): ?string
     {
         if (empty($data[self::KEY_VID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_VID));
+            return null;
         }
         if (!is_string($data[self::KEY_VID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_VID));
+            return null;
         }
 
         return $data[self::KEY_VID];

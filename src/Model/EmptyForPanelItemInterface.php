@@ -6,5 +6,5 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface EmptyForPanelItemInterface
 {
-    public function getSize(): string;
+    public function getSize(): ?string;
 }

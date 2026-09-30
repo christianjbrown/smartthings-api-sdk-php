@@ -6,16 +6,16 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface BasicPlusProgressBarsBarItemInterface
 {
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getComponent(): string;
+    public function getComponent(): ?string;
 
     /**
      * @return null|mixed[]
      */
     public function getRange(): ?array;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function getValueType(): ?string;
 

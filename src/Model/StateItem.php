@@ -10,9 +10,9 @@ final class StateItem implements StateItemInterface
      * @var null|array<int, AlternativeItemInterface>
      */
     private ?array $alternatives = null;
-    private string $label;
+    private ?string $label;
 
-    public function __construct(string $label)
+    public function __construct(?string $label)
     {
         $this->label = $label;
     }
@@ -25,7 +25,7 @@ final class StateItem implements StateItemInterface
         return $this->alternatives;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }

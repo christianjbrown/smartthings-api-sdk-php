@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\InstalledAppUi;
 use ChristianBrown\SmartThings\Model\InstalledAppUiInterface;
 
 use function is_bool;
 use function is_string;
-use function sprintf;
 
 final class InstalledAppUiTransformer implements InstalledAppUiTransformerInterface
 {
@@ -58,13 +56,13 @@ final class InstalledAppUiTransformer implements InstalledAppUiTransformerInterf
     /**
      * @param mixed[] $data
      */
-    private static function requireDashboardCardsEnabled(array $data): bool
+    private static function requireDashboardCardsEnabled(array $data): ?bool
     {
         if (!isset($data[self::KEY_DASHBOARD_CARDS_ENABLED])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_BOOL_SPRINTF, self::KEY_DASHBOARD_CARDS_ENABLED));
+            return null;
         }
         if (!is_bool($data[self::KEY_DASHBOARD_CARDS_ENABLED])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_BOOL_SPRINTF, self::KEY_DASHBOARD_CARDS_ENABLED));
+            return null;
         }
 
         return $data[self::KEY_DASHBOARD_CARDS_ENABLED];
@@ -73,13 +71,13 @@ final class InstalledAppUiTransformer implements InstalledAppUiTransformerInterf
     /**
      * @param mixed[] $data
      */
-    private static function requirePreInstallDashboardCardsEnabled(array $data): bool
+    private static function requirePreInstallDashboardCardsEnabled(array $data): ?bool
     {
         if (!isset($data[self::KEY_PRE_INSTALL_DASHBOARD_CARDS_ENABLED])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_BOOL_SPRINTF, self::KEY_PRE_INSTALL_DASHBOARD_CARDS_ENABLED));
+            return null;
         }
         if (!is_bool($data[self::KEY_PRE_INSTALL_DASHBOARD_CARDS_ENABLED])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_BOOL_SPRINTF, self::KEY_PRE_INSTALL_DASHBOARD_CARDS_ENABLED));
+            return null;
         }
 
         return $data[self::KEY_PRE_INSTALL_DASHBOARD_CARDS_ENABLED];

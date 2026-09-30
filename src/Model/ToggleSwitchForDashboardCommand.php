@@ -8,10 +8,10 @@ final class ToggleSwitchForDashboardCommand implements ToggleSwitchForDashboardC
 {
     private ?string $argumentType = null;
     private ?string $name = null;
-    private string $off;
-    private string $on;
+    private ?string $off;
+    private ?string $on;
 
-    public function __construct(string $on, string $off)
+    public function __construct(?string $on, ?string $off)
     {
         $this->on = $on;
         $this->off = $off;
@@ -27,12 +27,12 @@ final class ToggleSwitchForDashboardCommand implements ToggleSwitchForDashboardC
         return $this->name;
     }
 
-    public function getOff(): string
+    public function getOff(): ?string
     {
         return $this->off;
     }
 
-    public function getOn(): string
+    public function getOn(): ?string
     {
         return $this->on;
     }

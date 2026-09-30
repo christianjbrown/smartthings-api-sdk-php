@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\PlayPauseState;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\PlayPauseStateTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(PlayPauseState::class)]
 #[CoversClass(PlayPauseStateTransformer::class)]
@@ -58,6 +55,32 @@ final class PlayPauseStateTransformerTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new PlayPauseStateTransformer(self::createStub(AlternativeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'valueAbsent' => [[PlayPauseStateTransformerInterface::KEY_PLAY => 'test-play', PlayPauseStateTransformerInterface::KEY_PAUSE => 'test-pause'], 'getValue', null];
+        yield 'valueWrongType' => [[PlayPauseStateTransformerInterface::KEY_PLAY => 'test-play', PlayPauseStateTransformerInterface::KEY_PAUSE => 'test-pause', PlayPauseStateTransformerInterface::KEY_VALUE => 42], 'getValue', null];
+        yield 'playAbsent' => [[PlayPauseStateTransformerInterface::KEY_VALUE => 'test-value', PlayPauseStateTransformerInterface::KEY_PAUSE => 'test-pause'], 'getPlay', null];
+        yield 'playWrongType' => [[PlayPauseStateTransformerInterface::KEY_VALUE => 'test-value', PlayPauseStateTransformerInterface::KEY_PAUSE => 'test-pause', PlayPauseStateTransformerInterface::KEY_PLAY => 42], 'getPlay', null];
+        yield 'pauseAbsent' => [[PlayPauseStateTransformerInterface::KEY_VALUE => 'test-value', PlayPauseStateTransformerInterface::KEY_PLAY => 'test-play'], 'getPause', null];
+        yield 'pauseWrongType' => [[PlayPauseStateTransformerInterface::KEY_VALUE => 'test-value', PlayPauseStateTransformerInterface::KEY_PLAY => 'test-play', PlayPauseStateTransformerInterface::KEY_PAUSE => 42], 'getPause', null];
+    }
+
+    /**
      * Each optional field in each of its states: absent, present but the wrong type, or valid.
      *
      * @param array<string, mixed> $extra
@@ -93,31 +116,5 @@ final class PlayPauseStateTransformerTest extends TestCase
 
         self::assertNull($actual->getValueType());
         self::assertNull($actual->getAlternatives());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new PlayPauseStateTransformer(self::createStub(AlternativeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'valueAbsent' => [[PlayPauseStateTransformerInterface::KEY_PLAY => 'test-play', PlayPauseStateTransformerInterface::KEY_PAUSE => 'test-pause'], sprintf(PlayPauseStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, PlayPauseStateTransformerInterface::KEY_VALUE)];
-        yield 'valueWrongType' => [[PlayPauseStateTransformerInterface::KEY_PLAY => 'test-play', PlayPauseStateTransformerInterface::KEY_PAUSE => 'test-pause', PlayPauseStateTransformerInterface::KEY_VALUE => 42], sprintf(PlayPauseStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, PlayPauseStateTransformerInterface::KEY_VALUE)];
-        yield 'playAbsent' => [[PlayPauseStateTransformerInterface::KEY_VALUE => 'test-value', PlayPauseStateTransformerInterface::KEY_PAUSE => 'test-pause'], sprintf(PlayPauseStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, PlayPauseStateTransformerInterface::KEY_PLAY)];
-        yield 'playWrongType' => [[PlayPauseStateTransformerInterface::KEY_VALUE => 'test-value', PlayPauseStateTransformerInterface::KEY_PAUSE => 'test-pause', PlayPauseStateTransformerInterface::KEY_PLAY => 42], sprintf(PlayPauseStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, PlayPauseStateTransformerInterface::KEY_PLAY)];
-        yield 'pauseAbsent' => [[PlayPauseStateTransformerInterface::KEY_VALUE => 'test-value', PlayPauseStateTransformerInterface::KEY_PLAY => 'test-play'], sprintf(PlayPauseStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, PlayPauseStateTransformerInterface::KEY_PAUSE)];
-        yield 'pauseWrongType' => [[PlayPauseStateTransformerInterface::KEY_VALUE => 'test-value', PlayPauseStateTransformerInterface::KEY_PLAY => 'test-play', PlayPauseStateTransformerInterface::KEY_PAUSE => 42], sprintf(PlayPauseStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, PlayPauseStateTransformerInterface::KEY_PAUSE)];
     }
 }

@@ -8,11 +8,11 @@ interface DeviceOperandInterface
 {
     public function getAggregation(): ?string;
 
-    public function getAttribute(): string;
+    public function getAttribute(): ?string;
 
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getComponent(): string;
+    public function getComponent(): ?string;
 
     /**
      * @return array<int, string>

@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\PanelItemForCapability;
 use ChristianBrown\SmartThings\Model\PanelItemForCapabilityInterface;
 
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class PanelItemForCapabilityTransformer implements PanelItemForCapabilityTransformerInterface
 {
@@ -150,13 +148,13 @@ final class PanelItemForCapabilityTransformer implements PanelItemForCapabilityT
     /**
      * @param mixed[] $data
      */
-    private static function requireDisplayType(array $data): string
+    private static function requireDisplayType(array $data): ?string
     {
         if (empty($data[self::KEY_DISPLAY_TYPE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DISPLAY_TYPE));
+            return null;
         }
         if (!is_string($data[self::KEY_DISPLAY_TYPE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DISPLAY_TYPE));
+            return null;
         }
 
         return $data[self::KEY_DISPLAY_TYPE];

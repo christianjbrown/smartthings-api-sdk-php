@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\TemperatureConversionsItemForDevicePresentation;
 use ChristianBrown\SmartThings\Transformer\TemperatureConversionsItemForDevicePresentationTransformer;
 use ChristianBrown\SmartThings\Transformer\TemperatureConversionsItemForDevicePresentationTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(TemperatureConversionsItemForDevicePresentation::class)]
 #[CoversClass(TemperatureConversionsItemForDevicePresentationTransformer::class)]
@@ -35,6 +32,30 @@ final class TemperatureConversionsItemForDevicePresentationTransformerTest exten
         self::assertSame(7, $actual->getVersion());
         self::assertSame('test-value', $actual->getValue());
         self::assertSame('test-unit', $actual->getUnit());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new TemperatureConversionsItemForDevicePresentationTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'capabilityAbsent' => [[TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_VALUE => 'test-value'], 'getCapability', null];
+        yield 'capabilityWrongType' => [[TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_VALUE => 'test-value', TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
+        yield 'valueAbsent' => [[TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getValue', null];
+        yield 'valueWrongType' => [[TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_CAPABILITY => 'test-capability', TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_VALUE => 42], 'getValue', null];
     }
 
     /**
@@ -73,29 +94,5 @@ final class TemperatureConversionsItemForDevicePresentationTransformerTest exten
 
         self::assertNull($actual->getVersion());
         self::assertNull($actual->getUnit());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new TemperatureConversionsItemForDevicePresentationTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'capabilityAbsent' => [[TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_VALUE => 'test-value'], sprintf(TemperatureConversionsItemForDevicePresentationTransformerInterface::UNEXPECTED_STRING_SPRINTF, TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_VALUE => 'test-value', TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_CAPABILITY => 42], sprintf(TemperatureConversionsItemForDevicePresentationTransformerInterface::UNEXPECTED_STRING_SPRINTF, TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_CAPABILITY)];
-        yield 'valueAbsent' => [[TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(TemperatureConversionsItemForDevicePresentationTransformerInterface::UNEXPECTED_STRING_SPRINTF, TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_VALUE)];
-        yield 'valueWrongType' => [[TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_CAPABILITY => 'test-capability', TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_VALUE => 42], sprintf(TemperatureConversionsItemForDevicePresentationTransformerInterface::UNEXPECTED_STRING_SPRINTF, TemperatureConversionsItemForDevicePresentationTransformerInterface::KEY_VALUE)];
     }
 }

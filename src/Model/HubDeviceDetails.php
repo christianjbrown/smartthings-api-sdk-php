@@ -6,20 +6,20 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class HubDeviceDetails implements HubDeviceDetailsInterface
 {
-    private string $driverId;
-    private string $firmwareVersion;
-    private HubDeviceDetailsHubDataInterface $hubData;
+    private ?string $driverId;
+    private ?string $firmwareVersion;
+    private ?HubDeviceDetailsHubDataInterface $hubData;
 
     /**
      * @var array<int, HubDriverInterface>
      */
     private array $hubDrivers;
-    private string $hubEui;
+    private ?string $hubEui;
 
     /**
      * @phpstan-param array<int, HubDriverInterface> $hubDrivers
      */
-    public function __construct(string $hubEui, string $firmwareVersion, array $hubDrivers, HubDeviceDetailsHubDataInterface $hubData, string $driverId)
+    public function __construct(?string $hubEui, ?string $firmwareVersion, array $hubDrivers, ?HubDeviceDetailsHubDataInterface $hubData, ?string $driverId)
     {
         $this->hubEui = $hubEui;
         $this->firmwareVersion = $firmwareVersion;
@@ -28,17 +28,17 @@ final class HubDeviceDetails implements HubDeviceDetailsInterface
         $this->driverId = $driverId;
     }
 
-    public function getDriverId(): string
+    public function getDriverId(): ?string
     {
         return $this->driverId;
     }
 
-    public function getFirmwareVersion(): string
+    public function getFirmwareVersion(): ?string
     {
         return $this->firmwareVersion;
     }
 
-    public function getHubData(): HubDeviceDetailsHubDataInterface
+    public function getHubData(): ?HubDeviceDetailsHubDataInterface
     {
         return $this->hubData;
     }
@@ -51,7 +51,7 @@ final class HubDeviceDetails implements HubDeviceDetailsInterface
         return $this->hubDrivers;
     }
 
-    public function getHubEui(): string
+    public function getHubEui(): ?string
     {
         return $this->hubEui;
     }

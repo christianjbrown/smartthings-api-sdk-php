@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ExcludedConditionItemId;
 use ChristianBrown\SmartThings\Model\ExcludedConditionItemIdExcludeItemInterface;
 use ChristianBrown\SmartThings\Model\ExcludedConditionItemIdInterface;
@@ -14,7 +13,6 @@ use function array_map;
 use function array_values;
 use function is_array;
 use function is_int;
-use function sprintf;
 
 final class ExcludedConditionItemIdTransformer implements ExcludedConditionItemIdTransformerInterface
 {
@@ -74,10 +72,10 @@ final class ExcludedConditionItemIdTransformer implements ExcludedConditionItemI
     private function requireExclude(array $data): array
     {
         if (!isset($data[self::KEY_EXCLUDE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_EXCLUDE));
+            return [];
         }
         if (!is_array($data[self::KEY_EXCLUDE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_EXCLUDE));
+            return [];
         }
 
         return $this->transformListExcludedConditionItemIdExcludeItem($data[self::KEY_EXCLUDE]);

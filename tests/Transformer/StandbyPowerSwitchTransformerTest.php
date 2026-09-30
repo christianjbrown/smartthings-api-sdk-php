@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\StandbyPowerSwitch;
 use ChristianBrown\SmartThings\Model\StandbyPowerSwitchForDashboardStateInterface;
 use ChristianBrown\SmartThings\Model\ToggleSwitchForDashboardCommandInterface;
@@ -15,8 +14,6 @@ use ChristianBrown\SmartThings\Transformer\ToggleSwitchForDashboardCommandTransf
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(StandbyPowerSwitch::class)]
 #[CoversClass(StandbyPowerSwitchTransformer::class)]
@@ -41,6 +38,28 @@ final class StandbyPowerSwitchTransformerTest extends TestCase
 
         self::assertSame($toggleSwitchForDashboardCommandModel, $actual->getCommand());
         self::assertSame($standbyPowerSwitchForDashboardStateModel, $actual->getState());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new StandbyPowerSwitchTransformer(self::createStub(ToggleSwitchForDashboardCommandTransformerInterface::class), self::createStub(StandbyPowerSwitchForDashboardStateTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'commandAbsent' => [[], 'getCommand', null];
+        yield 'commandWrongType' => [[StandbyPowerSwitchTransformerInterface::KEY_COMMAND => 'not-array'], 'getCommand', null];
     }
 
     public function testTransformRequiredFieldsOnly(): void
@@ -72,27 +91,5 @@ final class StandbyPowerSwitchTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getState());
         self::assertNull($transformer->transform($base + [StandbyPowerSwitchTransformerInterface::KEY_STATE => 'test-not-array'])->getState());
         self::assertSame($standbyPowerSwitchForDashboardStateModel, $transformer->transform($base + [StandbyPowerSwitchTransformerInterface::KEY_STATE => ['test-nested']])->getState());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new StandbyPowerSwitchTransformer(self::createStub(ToggleSwitchForDashboardCommandTransformerInterface::class), self::createStub(StandbyPowerSwitchForDashboardStateTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'commandAbsent' => [[], sprintf(StandbyPowerSwitchTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, StandbyPowerSwitchTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[StandbyPowerSwitchTransformerInterface::KEY_COMMAND => 'not-array'], sprintf(StandbyPowerSwitchTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, StandbyPowerSwitchTransformerInterface::KEY_COMMAND)];
     }
 }

@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\TextButtonButtonsItem;
 use ChristianBrown\SmartThings\Model\TextButtonButtonsItemInterface;
 
 use function is_string;
-use function sprintf;
 
 final class TextButtonButtonsItemTransformer implements TextButtonButtonsItemTransformerInterface
 {
@@ -42,13 +40,13 @@ final class TextButtonButtonsItemTransformer implements TextButtonButtonsItemTra
     /**
      * @param mixed[] $data
      */
-    private static function requireKey(array $data): string
+    private static function requireKey(array $data): ?string
     {
         if (empty($data[self::KEY_KEY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_KEY));
+            return null;
         }
         if (!is_string($data[self::KEY_KEY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_KEY));
+            return null;
         }
 
         return $data[self::KEY_KEY];
@@ -57,13 +55,13 @@ final class TextButtonButtonsItemTransformer implements TextButtonButtonsItemTra
     /**
      * @param mixed[] $data
      */
-    private static function requireLabel(array $data): string
+    private static function requireLabel(array $data): ?string
     {
         if (empty($data[self::KEY_LABEL])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LABEL));
+            return null;
         }
         if (!is_string($data[self::KEY_LABEL])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LABEL));
+            return null;
         }
 
         return $data[self::KEY_LABEL];

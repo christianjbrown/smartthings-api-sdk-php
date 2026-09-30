@@ -11,7 +11,7 @@ interface StateItemInterface
      */
     public function getAlternatives(): ?array;
 
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
     /**
      * @param null|array<int, AlternativeItemInterface> $value

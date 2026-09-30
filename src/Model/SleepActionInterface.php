@@ -6,5 +6,5 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface SleepActionInterface
 {
-    public function getDuration(): IntervalInterface;
+    public function getDuration(): ?IntervalInterface;
 }

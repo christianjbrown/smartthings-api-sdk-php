@@ -6,15 +6,15 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class SupportedValuesForDynamicList implements SupportedValuesForDynamicListInterface
 {
-    private string $value;
+    private ?string $value;
     private ?SupportedValuesForDynamicListValueMapInterface $valueMap = null;
 
-    public function __construct(string $value)
+    public function __construct(?string $value)
     {
         $this->value = $value;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

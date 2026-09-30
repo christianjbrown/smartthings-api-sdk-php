@@ -10,9 +10,9 @@ interface ToggleSwitchForDashboardCommandInterface
 
     public function getName(): ?string;
 
-    public function getOff(): string;
+    public function getOff(): ?string;
 
-    public function getOn(): string;
+    public function getOn(): ?string;
 
     public function setArgumentType(?string $value): self;
 

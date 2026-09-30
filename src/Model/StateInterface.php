@@ -11,7 +11,7 @@ interface StateInterface
      */
     public function getAlternatives(): ?array;
 
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
     public function getUnit(): ?string;
 

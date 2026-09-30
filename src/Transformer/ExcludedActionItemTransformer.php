@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ExcludedActionItem;
 use ChristianBrown\SmartThings\Model\ExcludedActionItemIdExcludeItemInterface;
 use ChristianBrown\SmartThings\Model\ExcludedActionItemInterface;
@@ -13,7 +12,6 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use function is_array;
-use function sprintf;
 
 final class ExcludedActionItemTransformer implements ExcludedActionItemTransformerInterface
 {
@@ -58,10 +56,10 @@ final class ExcludedActionItemTransformer implements ExcludedActionItemTransform
     private function requireExclude(array $data): array
     {
         if (!isset($data[self::KEY_EXCLUDE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_EXCLUDE));
+            return [];
         }
         if (!is_array($data[self::KEY_EXCLUDE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_EXCLUDE));
+            return [];
         }
 
         return $this->transformListExcludedActionItemIdExcludeItem($data[self::KEY_EXCLUDE]);

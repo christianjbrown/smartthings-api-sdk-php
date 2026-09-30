@@ -12,9 +12,9 @@ final class DynamicListForAutomationAction implements DynamicListForAutomationAc
     private ?array $alternatives = null;
     private ?string $argumentType = null;
     private ?string $command = null;
-    private SupportedValuesForDynamicListInterface $supportedValues;
+    private ?SupportedValuesForDynamicListInterface $supportedValues;
 
-    public function __construct(SupportedValuesForDynamicListInterface $supportedValues)
+    public function __construct(?SupportedValuesForDynamicListInterface $supportedValues)
     {
         $this->supportedValues = $supportedValues;
     }
@@ -37,7 +37,7 @@ final class DynamicListForAutomationAction implements DynamicListForAutomationAc
         return $this->command;
     }
 
-    public function getSupportedValues(): SupportedValuesForDynamicListInterface
+    public function getSupportedValues(): ?SupportedValuesForDynamicListInterface
     {
         return $this->supportedValues;
     }

@@ -6,11 +6,11 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface BasicPlusTvChannelInterface
 {
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getCommand(): BasicPlusTvVolumeCommandInterface;
+    public function getCommand(): ?BasicPlusTvVolumeCommandInterface;
 
-    public function getComponent(): string;
+    public function getComponent(): ?string;
 
     public function getLabel(): ?string;
 

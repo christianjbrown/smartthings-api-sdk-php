@@ -36,7 +36,7 @@ interface DeviceConfigurationInterface
 
     public function getManufacturerName(): ?string;
 
-    public function getMnmn(): string;
+    public function getMnmn(): ?string;
 
     public function getPresentationId(): ?string;
 
@@ -44,7 +44,7 @@ interface DeviceConfigurationInterface
 
     public function getVersion(): ?string;
 
-    public function getVid(): string;
+    public function getVid(): ?string;
 
     public function setAutomation(?DeviceConfigurationAutomationInterface $value): self;
 

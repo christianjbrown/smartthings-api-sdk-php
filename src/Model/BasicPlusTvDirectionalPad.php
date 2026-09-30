@@ -6,29 +6,29 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class BasicPlusTvDirectionalPad implements BasicPlusTvDirectionalPadInterface
 {
-    private string $capability;
-    private BasicPlusTvDirectionalPadCommandInterface $command;
-    private string $component;
+    private ?string $capability;
+    private ?BasicPlusTvDirectionalPadCommandInterface $command;
+    private ?string $component;
     private ?int $version = null;
 
-    public function __construct(string $capability, string $component, BasicPlusTvDirectionalPadCommandInterface $command)
+    public function __construct(?string $capability, ?string $component, ?BasicPlusTvDirectionalPadCommandInterface $command)
     {
         $this->capability = $capability;
         $this->component = $component;
         $this->command = $command;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getCommand(): BasicPlusTvDirectionalPadCommandInterface
+    public function getCommand(): ?BasicPlusTvDirectionalPadCommandInterface
     {
         return $this->command;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }

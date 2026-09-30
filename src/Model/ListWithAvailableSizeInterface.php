@@ -11,7 +11,7 @@ interface ListWithAvailableSizeInterface
      */
     public function getAvailableSizes(): ?array;
 
-    public function getCommand(): ListWithAvailableSizeCommandInterface;
+    public function getCommand(): ?ListWithAvailableSizeCommandInterface;
 
     public function getState(): ?ListWithAvailableSizeStateInterface;
 

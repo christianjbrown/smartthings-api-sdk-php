@@ -18,6 +18,23 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(BasicPlusCameraSerializer::class)]
 final class BasicPlusCameraSerializerTest extends TestCase
 {
+    public function testSerializeNestedAbsent(): void
+    {
+        $basicPlusCameraImageSerializer = self::createStub(BasicPlusCameraImageSerializerInterface::class);
+        $basicPlusCameraImageSerializer->method('serialize')->willReturn(['test-serialized-basic-plus-camera-image']);
+        $basicPlusCameraOverlayIconsItemModel = self::createStub(BasicPlusCameraOverlayIconsItemInterface::class);
+        $basicPlusCameraOverlayIconsItemSerializer = self::createStub(BasicPlusCameraOverlayIconsItemSerializerInterface::class);
+        $basicPlusCameraOverlayIconsItemSerializer->method('serialize')->willReturn(['test-serialized-basic-plus-camera-overlay-icons-item']);
+        $model = new BasicPlusCamera(null);
+
+        $serializer = new BasicPlusCameraSerializer($basicPlusCameraImageSerializer, $basicPlusCameraOverlayIconsItemSerializer);
+
+        self::assertSame(
+            [],
+            $serializer->serialize($model)
+        );
+    }
+
     public function testSerializeRequiredFieldsOnly(): void
     {
         $basicPlusCameraImageModel = self::createStub(BasicPlusCameraImageInterface::class);

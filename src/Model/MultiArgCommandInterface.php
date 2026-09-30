@@ -11,7 +11,7 @@ interface MultiArgCommandInterface
      */
     public function getArguments(): array;
 
-    public function getCommand(): string;
+    public function getCommand(): ?string;
 
     public function getSupportedValues(): ?string;
 

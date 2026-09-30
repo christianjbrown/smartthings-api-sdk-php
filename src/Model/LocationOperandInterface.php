@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface LocationOperandInterface
 {
-    public function getAttribute(): string;
+    public function getAttribute(): ?string;
 
     public function getLocationId(): ?string;
 

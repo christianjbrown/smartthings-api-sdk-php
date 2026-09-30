@@ -6,22 +6,22 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class TextButtonButtonsItem implements TextButtonButtonsItemInterface
 {
-    private string $key;
-    private string $label;
+    private ?string $key;
+    private ?string $label;
     private ?string $state = null;
 
-    public function __construct(string $key, string $label)
+    public function __construct(?string $key, ?string $label)
     {
         $this->key = $key;
         $this->label = $label;
     }
 
-    public function getKey(): string
+    public function getKey(): ?string
     {
         return $this->key;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }

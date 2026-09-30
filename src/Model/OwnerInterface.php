@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface OwnerInterface
 {
-    public function getOwnerId(): string;
+    public function getOwnerId(): ?string;
 
-    public function getOwnerType(): string;
+    public function getOwnerType(): ?string;
 }

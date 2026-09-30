@@ -11,7 +11,7 @@ interface ExcludedConditionItemIdExcludeItemInterface
      */
     public function getAttributes(): ?array;
 
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
     public function getComponent(): ?string;
 

@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DriverPermission;
 use ChristianBrown\SmartThings\Transformer\DriverPermissionTransformer;
 use ChristianBrown\SmartThings\Transformer\DriverPermissionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(DriverPermission::class)]
 #[CoversClass(DriverPermissionTransformer::class)]
@@ -36,24 +33,24 @@ final class DriverPermissionTransformerTest extends TestCase
     /**
      * @param array<string, mixed> $data
      */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
     {
         $transformer = new DriverPermissionTransformer();
 
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
     }
 
     /**
-     * @return iterable<string, array{array<string, mixed>, string}>
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
      */
-    public static function provideTransformUnexpectedCases(): iterable
+    public static function provideTransformLenientCases(): iterable
     {
-        yield 'nameAbsent' => [[DriverPermissionTransformerInterface::KEY_ATTRIBUTES => ['test-attributes-key' => 'test-value']], sprintf(DriverPermissionTransformerInterface::UNEXPECTED_STRING_SPRINTF, DriverPermissionTransformerInterface::KEY_NAME)];
-        yield 'nameWrongType' => [[DriverPermissionTransformerInterface::KEY_ATTRIBUTES => ['test-attributes-key' => 'test-value'], DriverPermissionTransformerInterface::KEY_NAME => 42], sprintf(DriverPermissionTransformerInterface::UNEXPECTED_STRING_SPRINTF, DriverPermissionTransformerInterface::KEY_NAME)];
-        yield 'attributesAbsent' => [[DriverPermissionTransformerInterface::KEY_NAME => 'test-name'], sprintf(DriverPermissionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, DriverPermissionTransformerInterface::KEY_ATTRIBUTES)];
-        yield 'attributesWrongType' => [[DriverPermissionTransformerInterface::KEY_NAME => 'test-name', DriverPermissionTransformerInterface::KEY_ATTRIBUTES => 'not-array'], sprintf(DriverPermissionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, DriverPermissionTransformerInterface::KEY_ATTRIBUTES)];
+        yield 'nameAbsent' => [[DriverPermissionTransformerInterface::KEY_ATTRIBUTES => ['test-attributes-key' => 'test-value']], 'getName', null];
+        yield 'nameWrongType' => [[DriverPermissionTransformerInterface::KEY_ATTRIBUTES => ['test-attributes-key' => 'test-value'], DriverPermissionTransformerInterface::KEY_NAME => 42], 'getName', null];
+        yield 'attributesAbsent' => [[DriverPermissionTransformerInterface::KEY_NAME => 'test-name'], 'getAttributes', []];
+        yield 'attributesWrongType' => [[DriverPermissionTransformerInterface::KEY_NAME => 'test-name', DriverPermissionTransformerInterface::KEY_ATTRIBUTES => 'not-array'], 'getAttributes', []];
     }
 }

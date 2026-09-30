@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\StepperWithAvailableSize;
 use ChristianBrown\SmartThings\Model\StepperWithAvailableSizeCommandInterface;
 use ChristianBrown\SmartThings\Model\StepperWithAvailableSizeStateInterface;
@@ -15,8 +14,6 @@ use ChristianBrown\SmartThings\Transformer\StepperWithAvailableSizeTransformerIn
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(StepperWithAvailableSize::class)]
 #[CoversClass(StepperWithAvailableSizeTransformer::class)]
@@ -49,6 +46,34 @@ final class StepperWithAvailableSizeTransformerTest extends TestCase
         self::assertSame('test-supported-values', $actual->getSupportedValues());
         self::assertSame($stepperWithAvailableSizeStateModel, $actual->getState());
         self::assertSame(['test-available-sizes-1', 'test-available-sizes-2'], $actual->getAvailableSizes());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new StepperWithAvailableSizeTransformer(self::createStub(StepperWithAvailableSizeCommandTransformerInterface::class), self::createStub(StepperWithAvailableSizeStateTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'commandAbsent' => [[StepperWithAvailableSizeTransformerInterface::KEY_STEP => 1.5, StepperWithAvailableSizeTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], StepperWithAvailableSizeTransformerInterface::KEY_STATE => ['test-nested']], 'getCommand', null];
+        yield 'commandWrongType' => [[StepperWithAvailableSizeTransformerInterface::KEY_STEP => 1.5, StepperWithAvailableSizeTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], StepperWithAvailableSizeTransformerInterface::KEY_STATE => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_COMMAND => 'not-array'], 'getCommand', null];
+        yield 'stepAbsent' => [[StepperWithAvailableSizeTransformerInterface::KEY_COMMAND => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], StepperWithAvailableSizeTransformerInterface::KEY_STATE => ['test-nested']], 'getStep', null];
+        yield 'stepWrongType' => [[StepperWithAvailableSizeTransformerInterface::KEY_COMMAND => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], StepperWithAvailableSizeTransformerInterface::KEY_STATE => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_STEP => 'not-number'], 'getStep', null];
+        yield 'rangeAbsent' => [[StepperWithAvailableSizeTransformerInterface::KEY_COMMAND => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_STEP => 1.5, StepperWithAvailableSizeTransformerInterface::KEY_STATE => ['test-nested']], 'getRange', []];
+        yield 'rangeWrongType' => [[StepperWithAvailableSizeTransformerInterface::KEY_COMMAND => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_STEP => 1.5, StepperWithAvailableSizeTransformerInterface::KEY_STATE => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_RANGE => 'not-array'], 'getRange', []];
+        yield 'stateAbsent' => [[StepperWithAvailableSizeTransformerInterface::KEY_COMMAND => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_STEP => 1.5, StepperWithAvailableSizeTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value']], 'getState', null];
+        yield 'stateWrongType' => [[StepperWithAvailableSizeTransformerInterface::KEY_COMMAND => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_STEP => 1.5, StepperWithAvailableSizeTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], StepperWithAvailableSizeTransformerInterface::KEY_STATE => 'not-array'], 'getState', null];
     }
 
     /**
@@ -93,33 +118,5 @@ final class StepperWithAvailableSizeTransformerTest extends TestCase
 
         self::assertNull($actual->getSupportedValues());
         self::assertNull($actual->getAvailableSizes());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new StepperWithAvailableSizeTransformer(self::createStub(StepperWithAvailableSizeCommandTransformerInterface::class), self::createStub(StepperWithAvailableSizeStateTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'commandAbsent' => [[StepperWithAvailableSizeTransformerInterface::KEY_STEP => 1.5, StepperWithAvailableSizeTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], StepperWithAvailableSizeTransformerInterface::KEY_STATE => ['test-nested']], sprintf(StepperWithAvailableSizeTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, StepperWithAvailableSizeTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[StepperWithAvailableSizeTransformerInterface::KEY_STEP => 1.5, StepperWithAvailableSizeTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], StepperWithAvailableSizeTransformerInterface::KEY_STATE => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_COMMAND => 'not-array'], sprintf(StepperWithAvailableSizeTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, StepperWithAvailableSizeTransformerInterface::KEY_COMMAND)];
-        yield 'stepAbsent' => [[StepperWithAvailableSizeTransformerInterface::KEY_COMMAND => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], StepperWithAvailableSizeTransformerInterface::KEY_STATE => ['test-nested']], sprintf(StepperWithAvailableSizeTransformerInterface::UNEXPECTED_NUMBER_SPRINTF, StepperWithAvailableSizeTransformerInterface::KEY_STEP)];
-        yield 'stepWrongType' => [[StepperWithAvailableSizeTransformerInterface::KEY_COMMAND => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], StepperWithAvailableSizeTransformerInterface::KEY_STATE => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_STEP => 'not-number'], sprintf(StepperWithAvailableSizeTransformerInterface::UNEXPECTED_NUMBER_SPRINTF, StepperWithAvailableSizeTransformerInterface::KEY_STEP)];
-        yield 'rangeAbsent' => [[StepperWithAvailableSizeTransformerInterface::KEY_COMMAND => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_STEP => 1.5, StepperWithAvailableSizeTransformerInterface::KEY_STATE => ['test-nested']], sprintf(StepperWithAvailableSizeTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, StepperWithAvailableSizeTransformerInterface::KEY_RANGE)];
-        yield 'rangeWrongType' => [[StepperWithAvailableSizeTransformerInterface::KEY_COMMAND => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_STEP => 1.5, StepperWithAvailableSizeTransformerInterface::KEY_STATE => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_RANGE => 'not-array'], sprintf(StepperWithAvailableSizeTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, StepperWithAvailableSizeTransformerInterface::KEY_RANGE)];
-        yield 'stateAbsent' => [[StepperWithAvailableSizeTransformerInterface::KEY_COMMAND => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_STEP => 1.5, StepperWithAvailableSizeTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value']], sprintf(StepperWithAvailableSizeTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, StepperWithAvailableSizeTransformerInterface::KEY_STATE)];
-        yield 'stateWrongType' => [[StepperWithAvailableSizeTransformerInterface::KEY_COMMAND => ['test-nested'], StepperWithAvailableSizeTransformerInterface::KEY_STEP => 1.5, StepperWithAvailableSizeTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], StepperWithAvailableSizeTransformerInterface::KEY_STATE => 'not-array'], sprintf(StepperWithAvailableSizeTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, StepperWithAvailableSizeTransformerInterface::KEY_STATE)];
     }
 }

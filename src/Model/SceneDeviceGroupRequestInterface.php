@@ -10,7 +10,7 @@ interface SceneDeviceGroupRequestInterface
 
     public function getCapability(): ?SceneCapabilityInterface;
 
-    public function getDeviceGroupId(): string;
+    public function getDeviceGroupId(): ?string;
 
     public function setActionId(?string $value): self;
 

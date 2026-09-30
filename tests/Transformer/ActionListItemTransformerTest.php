@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ActionListItem;
 use ChristianBrown\SmartThings\Model\DynamicListForAutomationActionInterface;
 use ChristianBrown\SmartThings\Model\ExcludedActionItemInterface;
@@ -27,8 +26,6 @@ use ChristianBrown\SmartThings\Transformer\VisibleConditionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(ActionListItem::class)]
 #[CoversClass(ActionListItemTransformer::class)]
@@ -165,6 +162,32 @@ final class ActionListItemTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getExclusion());
         self::assertNull($transformer->transform($base + [ActionListItemTransformerInterface::KEY_EXCLUSION => 'test-not-array'])->getExclusion());
         self::assertSame([$excludedActionItemModel], $transformer->transform($base + [ActionListItemTransformerInterface::KEY_EXCLUSION => [['test-nested'], 'test-skipped']])->getExclusion());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new ActionListItemTransformer(self::createStub(SliderForAutomationActionTransformerInterface::class), self::createStub(ListForAutomationActionTransformerInterface::class), self::createStub(DynamicListForAutomationActionTransformerInterface::class), self::createStub(TextFieldForAutomationActionTransformerInterface::class), self::createStub(NumberFieldForAutomationActionTransformerInterface::class), self::createStub(MultiArgCommandTransformerInterface::class), self::createStub(VisibleConditionTransformerInterface::class), self::createStub(ExcludedActionItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'capabilityAbsent' => [[ActionListItemTransformerInterface::KEY_LABEL => 'test-label', ActionListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type'], 'getCapability', null];
+        yield 'capabilityWrongType' => [[ActionListItemTransformerInterface::KEY_LABEL => 'test-label', ActionListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type', ActionListItemTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
+        yield 'labelAbsent' => [[ActionListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', ActionListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type'], 'getLabel', null];
+        yield 'labelWrongType' => [[ActionListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', ActionListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type', ActionListItemTransformerInterface::KEY_LABEL => 42], 'getLabel', null];
+        yield 'displayTypeAbsent' => [[ActionListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', ActionListItemTransformerInterface::KEY_LABEL => 'test-label'], 'getDisplayType', null];
+        yield 'displayTypeWrongType' => [[ActionListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', ActionListItemTransformerInterface::KEY_LABEL => 'test-label', ActionListItemTransformerInterface::KEY_DISPLAY_TYPE => 42], 'getDisplayType', null];
     }
 
     public function testTransformList(): void
@@ -413,32 +436,6 @@ final class ActionListItemTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getTextField());
         self::assertNull($transformer->transform($base + [ActionListItemTransformerInterface::KEY_TEXT_FIELD => 'test-not-array'])->getTextField());
         self::assertSame($textFieldForAutomationActionModel, $transformer->transform($base + [ActionListItemTransformerInterface::KEY_TEXT_FIELD => ['test-nested']])->getTextField());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new ActionListItemTransformer(self::createStub(SliderForAutomationActionTransformerInterface::class), self::createStub(ListForAutomationActionTransformerInterface::class), self::createStub(DynamicListForAutomationActionTransformerInterface::class), self::createStub(TextFieldForAutomationActionTransformerInterface::class), self::createStub(NumberFieldForAutomationActionTransformerInterface::class), self::createStub(MultiArgCommandTransformerInterface::class), self::createStub(VisibleConditionTransformerInterface::class), self::createStub(ExcludedActionItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'capabilityAbsent' => [[ActionListItemTransformerInterface::KEY_LABEL => 'test-label', ActionListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type'], sprintf(ActionListItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionListItemTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[ActionListItemTransformerInterface::KEY_LABEL => 'test-label', ActionListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type', ActionListItemTransformerInterface::KEY_CAPABILITY => 42], sprintf(ActionListItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionListItemTransformerInterface::KEY_CAPABILITY)];
-        yield 'labelAbsent' => [[ActionListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', ActionListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type'], sprintf(ActionListItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionListItemTransformerInterface::KEY_LABEL)];
-        yield 'labelWrongType' => [[ActionListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', ActionListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type', ActionListItemTransformerInterface::KEY_LABEL => 42], sprintf(ActionListItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionListItemTransformerInterface::KEY_LABEL)];
-        yield 'displayTypeAbsent' => [[ActionListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', ActionListItemTransformerInterface::KEY_LABEL => 'test-label'], sprintf(ActionListItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionListItemTransformerInterface::KEY_DISPLAY_TYPE)];
-        yield 'displayTypeWrongType' => [[ActionListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', ActionListItemTransformerInterface::KEY_LABEL => 'test-label', ActionListItemTransformerInterface::KEY_DISPLAY_TYPE => 42], sprintf(ActionListItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionListItemTransformerInterface::KEY_DISPLAY_TYPE)];
     }
 
     public function testTransformVisibleCondition(): void

@@ -6,9 +6,9 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface CreateCapabilityPresentationRequestDetailViewItemInterface
 {
-    public function getDisplayType(): string;
+    public function getDisplayType(): ?string;
 
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
     public function getList(): ?ListForDetailViewInterface;
 

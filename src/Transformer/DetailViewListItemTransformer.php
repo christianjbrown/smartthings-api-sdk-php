@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DetailViewListItem;
 use ChristianBrown\SmartThings\Model\DetailViewListItemInterface;
 
 use function is_array;
 use function is_int;
 use function is_string;
-use function sprintf;
 
 final class DetailViewListItemTransformer implements DetailViewListItemTransformerInterface
 {
@@ -319,13 +317,13 @@ final class DetailViewListItemTransformer implements DetailViewListItemTransform
     /**
      * @param mixed[] $data
      */
-    private static function requireCapability(array $data): string
+    private static function requireCapability(array $data): ?string
     {
         if (empty($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
         if (!is_string($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
 
         return $data[self::KEY_CAPABILITY];
@@ -334,13 +332,13 @@ final class DetailViewListItemTransformer implements DetailViewListItemTransform
     /**
      * @param mixed[] $data
      */
-    private static function requireDisplayType(array $data): string
+    private static function requireDisplayType(array $data): ?string
     {
         if (empty($data[self::KEY_DISPLAY_TYPE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DISPLAY_TYPE));
+            return null;
         }
         if (!is_string($data[self::KEY_DISPLAY_TYPE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DISPLAY_TYPE));
+            return null;
         }
 
         return $data[self::KEY_DISPLAY_TYPE];
@@ -349,13 +347,13 @@ final class DetailViewListItemTransformer implements DetailViewListItemTransform
     /**
      * @param mixed[] $data
      */
-    private static function requireLabel(array $data): string
+    private static function requireLabel(array $data): ?string
     {
         if (empty($data[self::KEY_LABEL])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LABEL));
+            return null;
         }
         if (!is_string($data[self::KEY_LABEL])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LABEL));
+            return null;
         }
 
         return $data[self::KEY_LABEL];

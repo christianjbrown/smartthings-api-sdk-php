@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceConfigEntryForDashboardAction;
 use ChristianBrown\SmartThings\Model\DeviceConfigEntryForDashboardActionInlineInterface;
 use ChristianBrown\SmartThings\Model\VisibleConditionInterface;
@@ -15,8 +14,6 @@ use ChristianBrown\SmartThings\Transformer\VisibleConditionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(DeviceConfigEntryForDashboardAction::class)]
 #[CoversClass(DeviceConfigEntryForDashboardActionTransformer::class)]
@@ -70,6 +67,30 @@ final class DeviceConfigEntryForDashboardActionTransformerTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new DeviceConfigEntryForDashboardActionTransformer(self::createStub(DeviceConfigEntryForDashboardActionInlineTransformerInterface::class), self::createStub(VisibleConditionTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'componentAbsent' => [[DeviceConfigEntryForDashboardActionTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getComponent', null];
+        yield 'componentWrongType' => [[DeviceConfigEntryForDashboardActionTransformerInterface::KEY_CAPABILITY => 'test-capability', DeviceConfigEntryForDashboardActionTransformerInterface::KEY_COMPONENT => 42], 'getComponent', null];
+        yield 'capabilityAbsent' => [[DeviceConfigEntryForDashboardActionTransformerInterface::KEY_COMPONENT => 'test-component'], 'getCapability', null];
+        yield 'capabilityWrongType' => [[DeviceConfigEntryForDashboardActionTransformerInterface::KEY_COMPONENT => 'test-component', DeviceConfigEntryForDashboardActionTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
+    }
+
+    /**
      * Each optional field in each of its states: absent, present but the wrong type, or valid.
      *
      * @param array<string, mixed> $extra
@@ -117,30 +138,6 @@ final class DeviceConfigEntryForDashboardActionTransformerTest extends TestCase
         self::assertNull($actual->getGroup());
         self::assertNull($actual->getInline());
         self::assertNull($actual->getVisibleCondition());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new DeviceConfigEntryForDashboardActionTransformer(self::createStub(DeviceConfigEntryForDashboardActionInlineTransformerInterface::class), self::createStub(VisibleConditionTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'componentAbsent' => [[DeviceConfigEntryForDashboardActionTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(DeviceConfigEntryForDashboardActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceConfigEntryForDashboardActionTransformerInterface::KEY_COMPONENT)];
-        yield 'componentWrongType' => [[DeviceConfigEntryForDashboardActionTransformerInterface::KEY_CAPABILITY => 'test-capability', DeviceConfigEntryForDashboardActionTransformerInterface::KEY_COMPONENT => 42], sprintf(DeviceConfigEntryForDashboardActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceConfigEntryForDashboardActionTransformerInterface::KEY_COMPONENT)];
-        yield 'capabilityAbsent' => [[DeviceConfigEntryForDashboardActionTransformerInterface::KEY_COMPONENT => 'test-component'], sprintf(DeviceConfigEntryForDashboardActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceConfigEntryForDashboardActionTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[DeviceConfigEntryForDashboardActionTransformerInterface::KEY_COMPONENT => 'test-component', DeviceConfigEntryForDashboardActionTransformerInterface::KEY_CAPABILITY => 42], sprintf(DeviceConfigEntryForDashboardActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceConfigEntryForDashboardActionTransformerInterface::KEY_CAPABILITY)];
     }
 
     public function testTransformVisibleCondition(): void

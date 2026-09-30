@@ -8,7 +8,7 @@ final class DeviceCapabilityReference implements DeviceCapabilityReferenceInterf
 {
     private ?CapabilityConfigurationInterface $config = null;
     private ?bool $ephemeral = null;
-    private string $id;
+    private ?string $id;
     private ?bool $optional = null;
     private ?RestrictionInterface $restrictions = null;
 
@@ -18,7 +18,7 @@ final class DeviceCapabilityReference implements DeviceCapabilityReferenceInterf
     private ?array $status = null;
     private ?int $version = null;
 
-    public function __construct(string $id)
+    public function __construct(?string $id)
     {
         $this->id = $id;
     }
@@ -33,7 +33,7 @@ final class DeviceCapabilityReference implements DeviceCapabilityReferenceInterf
         return $this->ephemeral;
     }
 
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }

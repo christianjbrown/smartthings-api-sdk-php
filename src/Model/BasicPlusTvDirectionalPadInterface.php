@@ -6,11 +6,11 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface BasicPlusTvDirectionalPadInterface
 {
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getCommand(): BasicPlusTvDirectionalPadCommandInterface;
+    public function getCommand(): ?BasicPlusTvDirectionalPadCommandInterface;
 
-    public function getComponent(): string;
+    public function getComponent(): ?string;
 
     public function getVersion(): ?int;
 

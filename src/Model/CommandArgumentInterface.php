@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface CommandArgumentInterface
 {
-    public function getName(): string;
+    public function getName(): ?string;
 
     public function getOptional(): ?bool;
 

@@ -6,12 +6,12 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class PanelForDeviceConfigItemsItem implements PanelForDeviceConfigItemsItemInterface
 {
-    private string $capability;
-    private string $component;
+    private ?string $capability;
+    private ?string $component;
     private ?bool $hideOnUnmatch = null;
     private ?int $idx = null;
     private ?string $operator = null;
-    private string $size;
+    private ?string $size;
 
     /**
      * @var null|array<int, CapabilityValueForPanelInterface>
@@ -24,19 +24,19 @@ final class PanelForDeviceConfigItemsItem implements PanelForDeviceConfigItemsIt
      */
     private ?array $visibleConditions = null;
 
-    public function __construct(string $component, string $capability, string $size)
+    public function __construct(?string $component, ?string $capability, ?string $size)
     {
         $this->component = $component;
         $this->capability = $capability;
         $this->size = $size;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }
@@ -56,7 +56,7 @@ final class PanelForDeviceConfigItemsItem implements PanelForDeviceConfigItemsIt
         return $this->operator;
     }
 
-    public function getSize(): string
+    public function getSize(): ?string
     {
         return $this->size;
     }

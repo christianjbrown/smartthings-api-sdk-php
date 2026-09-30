@@ -6,10 +6,10 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class DetailViewListItem implements DetailViewListItemInterface
 {
-    private string $capability;
+    private ?string $capability;
     private ?string $component = null;
-    private string $displayType;
-    private string $label;
+    private ?string $displayType;
+    private ?string $label;
     private ?ListForDetailViewInterface $list = null;
     private ?MultiArgCommandInterface $multiArgCommand = null;
     private ?NumberFieldInterface $numberField = null;
@@ -27,14 +27,14 @@ final class DetailViewListItem implements DetailViewListItemInterface
     private ?int $version = null;
     private ?VisibleConditionForDetailViewInterface $visibleCondition = null;
 
-    public function __construct(string $capability, string $label, string $displayType)
+    public function __construct(?string $capability, ?string $label, ?string $displayType)
     {
         $this->capability = $capability;
         $this->label = $label;
         $this->displayType = $displayType;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
@@ -44,12 +44,12 @@ final class DetailViewListItem implements DetailViewListItemInterface
         return $this->component;
     }
 
-    public function getDisplayType(): string
+    public function getDisplayType(): ?string
     {
         return $this->displayType;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }

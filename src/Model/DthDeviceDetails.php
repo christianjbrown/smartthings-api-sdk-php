@@ -6,10 +6,10 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class DthDeviceDetails implements DthDeviceDetailsInterface
 {
-    private bool $completedSetup;
+    private ?bool $completedSetup;
     private ?string $deviceNetworkType = null;
-    private string $deviceTypeId;
-    private string $deviceTypeName;
+    private ?string $deviceTypeId;
+    private ?string $deviceTypeName;
     private ?bool $executingLocally = null;
     private ?string $fingerprintId = null;
     private ?string $fingerprintType = null;
@@ -18,14 +18,14 @@ final class DthDeviceDetails implements DthDeviceDetailsInterface
     private ?string $networkId = null;
     private ?string $networkSecurityLevel = null;
 
-    public function __construct(bool $completedSetup, string $deviceTypeId, string $deviceTypeName)
+    public function __construct(?bool $completedSetup, ?string $deviceTypeId, ?string $deviceTypeName)
     {
         $this->completedSetup = $completedSetup;
         $this->deviceTypeId = $deviceTypeId;
         $this->deviceTypeName = $deviceTypeName;
     }
 
-    public function getCompletedSetup(): bool
+    public function getCompletedSetup(): ?bool
     {
         return $this->completedSetup;
     }
@@ -35,12 +35,12 @@ final class DthDeviceDetails implements DthDeviceDetailsInterface
         return $this->deviceNetworkType;
     }
 
-    public function getDeviceTypeId(): string
+    public function getDeviceTypeId(): ?string
     {
         return $this->deviceTypeId;
     }
 
-    public function getDeviceTypeName(): string
+    public function getDeviceTypeName(): ?string
     {
         return $this->deviceTypeName;
     }

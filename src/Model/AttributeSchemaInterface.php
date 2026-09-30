@@ -8,7 +8,7 @@ interface AttributeSchemaInterface
 {
     public function getAdditionalProperties(): ?bool;
 
-    public function getProperties(): AttributePropertiesInterface;
+    public function getProperties(): ?AttributePropertiesInterface;
 
     /**
      * @return null|array<int, string>

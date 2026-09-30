@@ -8,9 +8,9 @@ final class StatelessPowerToggleForDashboard implements StatelessPowerToggleForD
 {
     private ?string $argument = null;
     private ?string $argumentType = null;
-    private string $command;
+    private ?string $command;
 
-    public function __construct(string $command)
+    public function __construct(?string $command)
     {
         $this->command = $command;
     }
@@ -25,7 +25,7 @@ final class StatelessPowerToggleForDashboard implements StatelessPowerToggleForD
         return $this->argumentType;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }

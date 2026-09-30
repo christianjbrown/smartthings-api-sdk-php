@@ -41,7 +41,7 @@ interface DevicePresentationInterface
 
     public function getManufacturerName(): ?string;
 
-    public function getMnmn(): string;
+    public function getMnmn(): ?string;
 
     public function getPresentationId(): ?string;
 
@@ -49,7 +49,7 @@ interface DevicePresentationInterface
 
     public function getVersion(): ?string;
 
-    public function getVid(): string;
+    public function getVid(): ?string;
 
     public function setAutomation(?AutomationInterface $value): self;
 

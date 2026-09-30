@@ -16,7 +16,7 @@ interface DeviceProfileComponentInterface
      */
     public function getCategories(): array;
 
-    public function getId(): string;
+    public function getId(): ?string;
 
     public function getLabel(): ?string;
 

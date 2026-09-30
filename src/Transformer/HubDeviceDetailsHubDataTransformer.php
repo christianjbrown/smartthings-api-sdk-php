@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\HubDeviceDetailsHubData;
 use ChristianBrown\SmartThings\Model\HubDeviceDetailsHubDataInterface;
 
 use function is_array;
 use function is_bool;
 use function is_string;
-use function sprintf;
 
 final class HubDeviceDetailsHubDataTransformer implements HubDeviceDetailsHubDataTransformerInterface
 {
@@ -788,13 +786,13 @@ final class HubDeviceDetailsHubDataTransformer implements HubDeviceDetailsHubDat
     /**
      * @param mixed[] $data
      */
-    private static function requireHardwareType(array $data): string
+    private static function requireHardwareType(array $data): ?string
     {
         if (empty($data[self::KEY_HARDWARE_TYPE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_HARDWARE_TYPE));
+            return null;
         }
         if (!is_string($data[self::KEY_HARDWARE_TYPE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_HARDWARE_TYPE));
+            return null;
         }
 
         return $data[self::KEY_HARDWARE_TYPE];
@@ -803,13 +801,13 @@ final class HubDeviceDetailsHubDataTransformer implements HubDeviceDetailsHubDat
     /**
      * @param mixed[] $data
      */
-    private static function requireZigbee3(array $data): bool
+    private static function requireZigbee3(array $data): ?bool
     {
         if (!isset($data[self::KEY_ZIGBEE3])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_BOOL_SPRINTF, self::KEY_ZIGBEE3));
+            return null;
         }
         if (!is_bool($data[self::KEY_ZIGBEE3])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_BOOL_SPRINTF, self::KEY_ZIGBEE3));
+            return null;
         }
 
         return $data[self::KEY_ZIGBEE3];
@@ -818,13 +816,13 @@ final class HubDeviceDetailsHubDataTransformer implements HubDeviceDetailsHubDat
     /**
      * @param mixed[] $data
      */
-    private static function requireZigbeeUnsecureRejoin(array $data): bool
+    private static function requireZigbeeUnsecureRejoin(array $data): ?bool
     {
         if (!isset($data[self::KEY_ZIGBEE_UNSECURE_REJOIN])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_BOOL_SPRINTF, self::KEY_ZIGBEE_UNSECURE_REJOIN));
+            return null;
         }
         if (!is_bool($data[self::KEY_ZIGBEE_UNSECURE_REJOIN])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_BOOL_SPRINTF, self::KEY_ZIGBEE_UNSECURE_REJOIN));
+            return null;
         }
 
         return $data[self::KEY_ZIGBEE_UNSECURE_REJOIN];
@@ -833,13 +831,13 @@ final class HubDeviceDetailsHubDataTransformer implements HubDeviceDetailsHubDat
     /**
      * @param mixed[] $data
      */
-    private static function requireZwaveS2(array $data): bool
+    private static function requireZwaveS2(array $data): ?bool
     {
         if (!isset($data[self::KEY_ZWAVE_S2])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_BOOL_SPRINTF, self::KEY_ZWAVE_S2));
+            return null;
         }
         if (!is_bool($data[self::KEY_ZWAVE_S2])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_BOOL_SPRINTF, self::KEY_ZWAVE_S2));
+            return null;
         }
 
         return $data[self::KEY_ZWAVE_S2];

@@ -11,7 +11,7 @@ final class NumberFieldForAutomationAction implements NumberFieldForAutomationAc
      */
     private ?array $alternatives = null;
     private ?string $argumentType = null;
-    private string $command;
+    private ?string $command;
     private ?string $description = null;
 
     /**
@@ -21,7 +21,7 @@ final class NumberFieldForAutomationAction implements NumberFieldForAutomationAc
     private ?string $supportedValues = null;
     private ?string $unit = null;
 
-    public function __construct(string $command)
+    public function __construct(?string $command)
     {
         $this->command = $command;
     }
@@ -39,7 +39,7 @@ final class NumberFieldForAutomationAction implements NumberFieldForAutomationAc
         return $this->argumentType;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }

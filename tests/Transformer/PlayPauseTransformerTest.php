@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\PlayPause;
 use ChristianBrown\SmartThings\Model\PlayPauseCommandInterface;
 use ChristianBrown\SmartThings\Model\PlayPauseStateInterface;
@@ -15,8 +14,6 @@ use ChristianBrown\SmartThings\Transformer\PlayPauseTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(PlayPause::class)]
 #[CoversClass(PlayPauseTransformer::class)]
@@ -46,24 +43,24 @@ final class PlayPauseTransformerTest extends TestCase
     /**
      * @param array<string, mixed> $data
      */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
     {
         $transformer = new PlayPauseTransformer(self::createStub(PlayPauseCommandTransformerInterface::class), self::createStub(PlayPauseStateTransformerInterface::class));
 
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
     }
 
     /**
-     * @return iterable<string, array{array<string, mixed>, string}>
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
      */
-    public static function provideTransformUnexpectedCases(): iterable
+    public static function provideTransformLenientCases(): iterable
     {
-        yield 'commandAbsent' => [[PlayPauseTransformerInterface::KEY_STATE => ['test-nested']], sprintf(PlayPauseTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, PlayPauseTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[PlayPauseTransformerInterface::KEY_STATE => ['test-nested'], PlayPauseTransformerInterface::KEY_COMMAND => 'not-array'], sprintf(PlayPauseTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, PlayPauseTransformerInterface::KEY_COMMAND)];
-        yield 'stateAbsent' => [[PlayPauseTransformerInterface::KEY_COMMAND => ['test-nested']], sprintf(PlayPauseTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, PlayPauseTransformerInterface::KEY_STATE)];
-        yield 'stateWrongType' => [[PlayPauseTransformerInterface::KEY_COMMAND => ['test-nested'], PlayPauseTransformerInterface::KEY_STATE => 'not-array'], sprintf(PlayPauseTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, PlayPauseTransformerInterface::KEY_STATE)];
+        yield 'commandAbsent' => [[PlayPauseTransformerInterface::KEY_STATE => ['test-nested']], 'getCommand', null];
+        yield 'commandWrongType' => [[PlayPauseTransformerInterface::KEY_STATE => ['test-nested'], PlayPauseTransformerInterface::KEY_COMMAND => 'not-array'], 'getCommand', null];
+        yield 'stateAbsent' => [[PlayPauseTransformerInterface::KEY_COMMAND => ['test-nested']], 'getState', null];
+        yield 'stateWrongType' => [[PlayPauseTransformerInterface::KEY_COMMAND => ['test-nested'], PlayPauseTransformerInterface::KEY_STATE => 'not-array'], 'getState', null];
     }
 }

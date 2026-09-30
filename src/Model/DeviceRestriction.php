@@ -7,10 +7,10 @@ namespace ChristianBrown\SmartThings\Model;
 final class DeviceRestriction implements DeviceRestrictionInterface
 {
     private ?int $historyRetentionTTLDays = null;
-    private int $tier;
+    private ?int $tier;
     private ?bool $visibleWhenRestricted = null;
 
-    public function __construct(int $tier)
+    public function __construct(?int $tier)
     {
         $this->tier = $tier;
     }
@@ -20,7 +20,7 @@ final class DeviceRestriction implements DeviceRestrictionInterface
         return $this->historyRetentionTTLDays;
     }
 
-    public function getTier(): int
+    public function getTier(): ?int
     {
         return $this->tier;
     }

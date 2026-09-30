@@ -11,9 +11,9 @@ interface StatesArrayItemInterface
      */
     public function getAlternatives(): ?array;
 
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getComponent(): string;
+    public function getComponent(): ?string;
 
     public function getComposite(): ?bool;
 
@@ -24,7 +24,7 @@ interface StatesArrayItemInterface
 
     public function getGroup(): ?string;
 
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
     public function getTransient(): ?bool;
 

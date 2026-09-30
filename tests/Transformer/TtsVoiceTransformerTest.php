@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\TtsVoice;
 use ChristianBrown\SmartThings\Transformer\TtsVoiceTransformer;
 use ChristianBrown\SmartThings\Transformer\TtsVoiceTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(TtsVoice::class)]
 #[CoversClass(TtsVoiceTransformer::class)]
@@ -43,6 +40,38 @@ final class TtsVoiceTransformerTest extends TestCase
         self::assertSame(['test-supported-engines-1', 'test-supported-engines-2'], $actual->getSupportedEngines());
         self::assertSame('test-ttsprovider', $actual->getTtsProvider());
         self::assertSame(['test-speaking-style-1', 'test-speaking-style-2'], $actual->getSpeakingStyle());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new TtsVoiceTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'genderAbsent' => [[TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider'], 'getGender', null];
+        yield 'genderWrongType' => [[TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider', TtsVoiceTransformerInterface::KEY_GENDER => 42], 'getGender', null];
+        yield 'idAbsent' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider'], 'getId', null];
+        yield 'idWrongType' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider', TtsVoiceTransformerInterface::KEY_ID => 42], 'getId', null];
+        yield 'languageCodeAbsent' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider'], 'getLanguageCode', null];
+        yield 'languageCodeWrongType' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 42], 'getLanguageCode', null];
+        yield 'languageNameAbsent' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider'], 'getLanguageName', null];
+        yield 'languageNameWrongType' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 42], 'getLanguageName', null];
+        yield 'nameAbsent' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider'], 'getName', null];
+        yield 'nameWrongType' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider', TtsVoiceTransformerInterface::KEY_NAME => 42], 'getName', null];
+        yield 'ttsProviderAbsent' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name'], 'getTtsProvider', null];
+        yield 'ttsProviderWrongType' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 42], 'getTtsProvider', null];
     }
 
     /**
@@ -81,37 +110,5 @@ final class TtsVoiceTransformerTest extends TestCase
 
         self::assertNull($actual->getSupportedEngines());
         self::assertNull($actual->getSpeakingStyle());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new TtsVoiceTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'genderAbsent' => [[TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider'], sprintf(TtsVoiceTransformerInterface::UNEXPECTED_STRING_SPRINTF, TtsVoiceTransformerInterface::KEY_GENDER)];
-        yield 'genderWrongType' => [[TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider', TtsVoiceTransformerInterface::KEY_GENDER => 42], sprintf(TtsVoiceTransformerInterface::UNEXPECTED_STRING_SPRINTF, TtsVoiceTransformerInterface::KEY_GENDER)];
-        yield 'idAbsent' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider'], sprintf(TtsVoiceTransformerInterface::UNEXPECTED_STRING_SPRINTF, TtsVoiceTransformerInterface::KEY_ID)];
-        yield 'idWrongType' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider', TtsVoiceTransformerInterface::KEY_ID => 42], sprintf(TtsVoiceTransformerInterface::UNEXPECTED_STRING_SPRINTF, TtsVoiceTransformerInterface::KEY_ID)];
-        yield 'languageCodeAbsent' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider'], sprintf(TtsVoiceTransformerInterface::UNEXPECTED_STRING_SPRINTF, TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE)];
-        yield 'languageCodeWrongType' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 42], sprintf(TtsVoiceTransformerInterface::UNEXPECTED_STRING_SPRINTF, TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE)];
-        yield 'languageNameAbsent' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider'], sprintf(TtsVoiceTransformerInterface::UNEXPECTED_STRING_SPRINTF, TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME)];
-        yield 'languageNameWrongType' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 42], sprintf(TtsVoiceTransformerInterface::UNEXPECTED_STRING_SPRINTF, TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME)];
-        yield 'nameAbsent' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider'], sprintf(TtsVoiceTransformerInterface::UNEXPECTED_STRING_SPRINTF, TtsVoiceTransformerInterface::KEY_NAME)];
-        yield 'nameWrongType' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 'test-ttsprovider', TtsVoiceTransformerInterface::KEY_NAME => 42], sprintf(TtsVoiceTransformerInterface::UNEXPECTED_STRING_SPRINTF, TtsVoiceTransformerInterface::KEY_NAME)];
-        yield 'ttsProviderAbsent' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name'], sprintf(TtsVoiceTransformerInterface::UNEXPECTED_STRING_SPRINTF, TtsVoiceTransformerInterface::KEY_TTSPROVIDER)];
-        yield 'ttsProviderWrongType' => [[TtsVoiceTransformerInterface::KEY_GENDER => 'test-gender', TtsVoiceTransformerInterface::KEY_ID => 'test-id', TtsVoiceTransformerInterface::KEY_LANGUAGE_CODE => 'test-language-code', TtsVoiceTransformerInterface::KEY_LANGUAGE_NAME => 'test-language-name', TtsVoiceTransformerInterface::KEY_NAME => 'test-name', TtsVoiceTransformerInterface::KEY_TTSPROVIDER => 42], sprintf(TtsVoiceTransformerInterface::UNEXPECTED_STRING_SPRINTF, TtsVoiceTransformerInterface::KEY_TTSPROVIDER)];
     }
 }

@@ -10,9 +10,9 @@ interface PlayStopCommandInterface
 
     public function getName(): ?string;
 
-    public function getPlay(): string;
+    public function getPlay(): ?string;
 
-    public function getStop(): string;
+    public function getStop(): ?string;
 
     public function setArgumentType(?string $value): self;
 

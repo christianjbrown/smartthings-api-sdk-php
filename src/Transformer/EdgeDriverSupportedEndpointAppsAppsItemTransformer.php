@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\EdgeDriverSupportedEndpointAppsAppsItem;
 use ChristianBrown\SmartThings\Model\EdgeDriverSupportedEndpointAppsAppsItemInterface;
 
 use function is_string;
-use function sprintf;
 
 final class EdgeDriverSupportedEndpointAppsAppsItemTransformer implements EdgeDriverSupportedEndpointAppsAppsItemTransformerInterface
 {
@@ -26,13 +24,13 @@ final class EdgeDriverSupportedEndpointAppsAppsItemTransformer implements EdgeDr
     /**
      * @param mixed[] $data
      */
-    private static function requireAppName(array $data): string
+    private static function requireAppName(array $data): ?string
     {
         if (empty($data[self::KEY_APP_NAME])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_APP_NAME));
+            return null;
         }
         if (!is_string($data[self::KEY_APP_NAME])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_APP_NAME));
+            return null;
         }
 
         return $data[self::KEY_APP_NAME];
@@ -41,13 +39,13 @@ final class EdgeDriverSupportedEndpointAppsAppsItemTransformer implements EdgeDr
     /**
      * @param mixed[] $data
      */
-    private static function requireVersion(array $data): string
+    private static function requireVersion(array $data): ?string
     {
         if (empty($data[self::KEY_VERSION])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_VERSION));
+            return null;
         }
         if (!is_string($data[self::KEY_VERSION])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_VERSION));
+            return null;
         }
 
         return $data[self::KEY_VERSION];

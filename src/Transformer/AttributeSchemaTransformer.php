@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AttributePropertiesInterface;
 use ChristianBrown\SmartThings\Model\AttributeSchema;
 use ChristianBrown\SmartThings\Model\AttributeSchemaInterface;
@@ -14,7 +13,6 @@ use function array_values;
 use function is_array;
 use function is_bool;
 use function is_string;
-use function sprintf;
 
 final class AttributeSchemaTransformer implements AttributeSchemaTransformerInterface
 {
@@ -114,13 +112,13 @@ final class AttributeSchemaTransformer implements AttributeSchemaTransformerInte
     /**
      * @param mixed[] $data
      */
-    private function requireProperties(array $data): AttributePropertiesInterface
+    private function requireProperties(array $data): ?AttributePropertiesInterface
     {
         if (!isset($data[self::KEY_PROPERTIES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_PROPERTIES));
+            return null;
         }
         if (!is_array($data[self::KEY_PROPERTIES])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_PROPERTIES));
+            return null;
         }
 
         return $this->attributePropertiesTransformer->transform($data[self::KEY_PROPERTIES]);

@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\PatchItem;
 use ChristianBrown\SmartThings\Model\PatchItemInterface;
 
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class PatchItemTransformer implements PatchItemTransformerInterface
 {
@@ -43,13 +41,13 @@ final class PatchItemTransformer implements PatchItemTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireOp(array $data): string
+    private static function requireOp(array $data): ?string
     {
         if (empty($data[self::KEY_OP])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OP));
+            return null;
         }
         if (!is_string($data[self::KEY_OP])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OP));
+            return null;
         }
 
         return $data[self::KEY_OP];
@@ -58,13 +56,13 @@ final class PatchItemTransformer implements PatchItemTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requirePath(array $data): string
+    private static function requirePath(array $data): ?string
     {
         if (empty($data[self::KEY_PATH])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_PATH));
+            return null;
         }
         if (!is_string($data[self::KEY_PATH])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_PATH));
+            return null;
         }
 
         return $data[self::KEY_PATH];

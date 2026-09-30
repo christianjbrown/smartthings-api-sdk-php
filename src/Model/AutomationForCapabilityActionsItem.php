@@ -7,10 +7,10 @@ namespace ChristianBrown\SmartThings\Model;
 final class AutomationForCapabilityActionsItem implements AutomationForCapabilityActionsItemInterface
 {
     private ?string $description = null;
-    private string $displayType;
+    private ?string $displayType;
     private ?DynamicListForAutomationActionInterface $dynamicList = null;
     private ?bool $emphasis = null;
-    private string $label;
+    private ?string $label;
     private ?ListForAutomationActionInterface $list = null;
     private ?MultiArgCommandInterface $multiArgCommand = null;
     private ?NumberFieldForAutomationActionInterface $numberField = null;
@@ -18,7 +18,7 @@ final class AutomationForCapabilityActionsItem implements AutomationForCapabilit
     private ?TextFieldForAutomationActionInterface $textField = null;
     private ?VisibleConditionBaseInterface $visibleCondition = null;
 
-    public function __construct(string $label, string $displayType)
+    public function __construct(?string $label, ?string $displayType)
     {
         $this->label = $label;
         $this->displayType = $displayType;
@@ -29,7 +29,7 @@ final class AutomationForCapabilityActionsItem implements AutomationForCapabilit
         return $this->description;
     }
 
-    public function getDisplayType(): string
+    public function getDisplayType(): ?string
     {
         return $this->displayType;
     }
@@ -44,7 +44,7 @@ final class AutomationForCapabilityActionsItem implements AutomationForCapabilit
         return $this->emphasis;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }

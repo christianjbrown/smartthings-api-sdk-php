@@ -11,9 +11,9 @@ interface StateForPanelItemInterface
      */
     public function getAlternatives(): ?array;
 
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
-    public function getSize(): string;
+    public function getSize(): ?string;
 
     public function getUnit(): ?string;
 

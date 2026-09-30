@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusTvDirectionalPad;
 use ChristianBrown\SmartThings\Model\BasicPlusTvDirectionalPadCommandInterface;
 use ChristianBrown\SmartThings\Transformer\BasicPlusTvDirectionalPadCommandTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\BasicPlusTvDirectionalPadTransformerI
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(BasicPlusTvDirectionalPad::class)]
 #[CoversClass(BasicPlusTvDirectionalPadTransformer::class)]
@@ -40,6 +37,32 @@ final class BasicPlusTvDirectionalPadTransformerTest extends TestCase
         self::assertSame(7, $actual->getVersion());
         self::assertSame('test-component', $actual->getComponent());
         self::assertSame($basicPlusTvDirectionalPadCommandModel, $actual->getCommand());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new BasicPlusTvDirectionalPadTransformer(self::createStub(BasicPlusTvDirectionalPadCommandTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'capabilityAbsent' => [[BasicPlusTvDirectionalPadTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMMAND => ['test-nested']], 'getCapability', null];
+        yield 'capabilityWrongType' => [[BasicPlusTvDirectionalPadTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMMAND => ['test-nested'], BasicPlusTvDirectionalPadTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
+        yield 'componentAbsent' => [[BasicPlusTvDirectionalPadTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMMAND => ['test-nested']], 'getComponent', null];
+        yield 'componentWrongType' => [[BasicPlusTvDirectionalPadTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMMAND => ['test-nested'], BasicPlusTvDirectionalPadTransformerInterface::KEY_COMPONENT => 42], 'getComponent', null];
+        yield 'commandAbsent' => [[BasicPlusTvDirectionalPadTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMPONENT => 'test-component'], 'getCommand', null];
+        yield 'commandWrongType' => [[BasicPlusTvDirectionalPadTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMMAND => 'not-array'], 'getCommand', null];
     }
 
     /**
@@ -77,31 +100,5 @@ final class BasicPlusTvDirectionalPadTransformerTest extends TestCase
         $actual = $transformer->transform([BasicPlusTvDirectionalPadTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMMAND => ['test-nested']]);
 
         self::assertNull($actual->getVersion());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new BasicPlusTvDirectionalPadTransformer(self::createStub(BasicPlusTvDirectionalPadCommandTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'capabilityAbsent' => [[BasicPlusTvDirectionalPadTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMMAND => ['test-nested']], sprintf(BasicPlusTvDirectionalPadTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvDirectionalPadTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[BasicPlusTvDirectionalPadTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMMAND => ['test-nested'], BasicPlusTvDirectionalPadTransformerInterface::KEY_CAPABILITY => 42], sprintf(BasicPlusTvDirectionalPadTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvDirectionalPadTransformerInterface::KEY_CAPABILITY)];
-        yield 'componentAbsent' => [[BasicPlusTvDirectionalPadTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMMAND => ['test-nested']], sprintf(BasicPlusTvDirectionalPadTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvDirectionalPadTransformerInterface::KEY_COMPONENT)];
-        yield 'componentWrongType' => [[BasicPlusTvDirectionalPadTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMMAND => ['test-nested'], BasicPlusTvDirectionalPadTransformerInterface::KEY_COMPONENT => 42], sprintf(BasicPlusTvDirectionalPadTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvDirectionalPadTransformerInterface::KEY_COMPONENT)];
-        yield 'commandAbsent' => [[BasicPlusTvDirectionalPadTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMPONENT => 'test-component'], sprintf(BasicPlusTvDirectionalPadTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, BasicPlusTvDirectionalPadTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[BasicPlusTvDirectionalPadTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusTvDirectionalPadTransformerInterface::KEY_COMMAND => 'not-array'], sprintf(BasicPlusTvDirectionalPadTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, BasicPlusTvDirectionalPadTransformerInterface::KEY_COMMAND)];
     }
 }

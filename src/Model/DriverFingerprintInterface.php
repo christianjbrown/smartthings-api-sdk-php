@@ -8,9 +8,9 @@ interface DriverFingerprintInterface
 {
     public function getDeviceLabel(): ?string;
 
-    public function getId(): string;
+    public function getId(): ?string;
 
-    public function getType(): string;
+    public function getType(): ?string;
 
     public function getZigbeeGeneric(): ?ZigbeeGenericFingerprintInterface;
 

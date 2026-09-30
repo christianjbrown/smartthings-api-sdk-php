@@ -6,14 +6,14 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class PreferenceOptionLocalization implements PreferenceOptionLocalizationInterface
 {
-    private string $label;
+    private ?string $label;
 
-    public function __construct(string $label)
+    public function __construct(?string $label)
     {
         $this->label = $label;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }

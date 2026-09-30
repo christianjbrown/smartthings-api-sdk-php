@@ -6,9 +6,9 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface PatchItemInterface
 {
-    public function getOp(): string;
+    public function getOp(): ?string;
 
-    public function getPath(): string;
+    public function getPath(): ?string;
 
     /**
      * @return null|mixed[]

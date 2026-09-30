@@ -6,9 +6,9 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface ExcludedDeviceActionConfigEntryInterface
 {
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getComponent(): string;
+    public function getComponent(): ?string;
 
     /**
      * @return null|array<int, ExcludedActionItemIdInterface>

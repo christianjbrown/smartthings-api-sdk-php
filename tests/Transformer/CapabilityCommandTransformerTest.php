@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilityCommand;
 use ChristianBrown\SmartThings\Model\CommandArgumentInterface;
 use ChristianBrown\SmartThings\Transformer\CapabilityCommandTransformer;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\CommandArgumentTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(CapabilityCommand::class)]
 #[CoversClass(CapabilityCommandTransformer::class)]
@@ -54,6 +51,28 @@ final class CapabilityCommandTransformerTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new CapabilityCommandTransformer(self::createStub(CommandArgumentTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'nameAbsent' => [[], 'getName', null];
+        yield 'nameWrongType' => [[CapabilityCommandTransformerInterface::KEY_NAME => 42], 'getName', null];
+    }
+
+    /**
      * Each optional field in each of its states: absent, present but the wrong type, or valid.
      *
      * @param array<string, mixed> $extra
@@ -89,27 +108,5 @@ final class CapabilityCommandTransformerTest extends TestCase
 
         self::assertNull($actual->getArguments());
         self::assertNull($actual->getSensitive());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new CapabilityCommandTransformer(self::createStub(CommandArgumentTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'nameAbsent' => [[], sprintf(CapabilityCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, CapabilityCommandTransformerInterface::KEY_NAME)];
-        yield 'nameWrongType' => [[CapabilityCommandTransformerInterface::KEY_NAME => 42], sprintf(CapabilityCommandTransformerInterface::UNEXPECTED_STRING_SPRINTF, CapabilityCommandTransformerInterface::KEY_NAME)];
     }
 }

@@ -11,16 +11,16 @@ interface StepperWithAvailableSizeInterface
      */
     public function getAvailableSizes(): ?array;
 
-    public function getCommand(): StepperWithAvailableSizeCommandInterface;
+    public function getCommand(): ?StepperWithAvailableSizeCommandInterface;
 
     /**
      * @return mixed[]
      */
     public function getRange(): array;
 
-    public function getState(): StepperWithAvailableSizeStateInterface;
+    public function getState(): ?StepperWithAvailableSizeStateInterface;
 
-    public function getStep(): float;
+    public function getStep(): ?float;
 
     public function getSupportedValues(): ?string;
 

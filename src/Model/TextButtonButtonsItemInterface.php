@@ -6,9 +6,9 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface TextButtonButtonsItemInterface
 {
-    public function getKey(): string;
+    public function getKey(): ?string;
 
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
     public function getState(): ?string;
 

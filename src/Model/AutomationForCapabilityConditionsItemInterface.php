@@ -8,7 +8,7 @@ interface AutomationForCapabilityConditionsItemInterface
 {
     public function getDescription(): ?string;
 
-    public function getDisplayType(): string;
+    public function getDisplayType(): ?string;
 
     public function getDynamicList(): ?DynamicListForAutomationConditionInterface;
 
@@ -16,7 +16,7 @@ interface AutomationForCapabilityConditionsItemInterface
 
     public function getEnumSlider(): ?EnumSliderForAutomationConditionInterface;
 
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
     public function getList(): ?ListForAutomationConditionInterface;
 

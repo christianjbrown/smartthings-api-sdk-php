@@ -11,9 +11,9 @@ interface RuleDeviceCommandInterface
      */
     public function getArguments(): ?array;
 
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getCommand(): string;
+    public function getCommand(): ?string;
 
     public function getCommandId(): ?string;
 

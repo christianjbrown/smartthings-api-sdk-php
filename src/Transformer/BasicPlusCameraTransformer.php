@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusCamera;
 use ChristianBrown\SmartThings\Model\BasicPlusCameraImageInterface;
 use ChristianBrown\SmartThings\Model\BasicPlusCameraInterface;
@@ -14,7 +13,6 @@ use function array_filter;
 use function array_map;
 use function array_values;
 use function is_array;
-use function sprintf;
 
 final class BasicPlusCameraTransformer implements BasicPlusCameraTransformerInterface
 {
@@ -56,13 +54,13 @@ final class BasicPlusCameraTransformer implements BasicPlusCameraTransformerInte
     /**
      * @param mixed[] $data
      */
-    private function requireImage(array $data): BasicPlusCameraImageInterface
+    private function requireImage(array $data): ?BasicPlusCameraImageInterface
     {
         if (!isset($data[self::KEY_IMAGE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_IMAGE));
+            return null;
         }
         if (!is_array($data[self::KEY_IMAGE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_IMAGE));
+            return null;
         }
 
         return $this->basicPlusCameraImageTransformer->transform($data[self::KEY_IMAGE]);

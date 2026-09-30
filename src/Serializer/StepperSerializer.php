@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Serializer;
 
 use ChristianBrown\SmartThings\Model\StepperInterface;
+use ChristianBrown\SmartThings\Model\StepperWithAvailableSizeCommandInterface;
 
 use function array_filter;
 
@@ -23,7 +24,7 @@ final class StepperSerializer implements StepperSerializerInterface
     public function serialize(StepperInterface $model): array
     {
         $serialized = [
-            self::KEY_COMMAND => $this->stepperWithAvailableSizeCommandSerializer->serialize($model->getCommand()),
+            self::KEY_COMMAND => $this->serializeOptionalStepperWithAvailableSizeCommand($model->getCommand()),
             self::KEY_STEP => $model->getStep(),
             self::KEY_RANGE => $model->getRange(),
             self::KEY_SUPPORTED_VALUES => $model->getSupportedValues(),
@@ -33,5 +34,17 @@ final class StepperSerializer implements StepperSerializerInterface
 
         // Omit null optionals rather than sending them as explicit nulls.
         return array_filter($serialized, static fn (mixed $value): bool => null !== $value);
+    }
+
+    /**
+     * @return null|mixed[]
+     */
+    private function serializeOptionalStepperWithAvailableSizeCommand(?StepperWithAvailableSizeCommandInterface $value): ?array
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->stepperWithAvailableSizeCommandSerializer->serialize($value);
     }
 }

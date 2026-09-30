@@ -10,13 +10,13 @@ final class ListForPanelItemState implements ListForPanelItemStateInterface
      * @var array<int, AlternativeItemInterface>
      */
     private array $alternatives;
-    private string $value;
+    private ?string $value;
     private ?string $valueType = null;
 
     /**
      * @phpstan-param array<int, AlternativeItemInterface> $alternatives
      */
-    public function __construct(string $value, array $alternatives)
+    public function __construct(?string $value, array $alternatives)
     {
         $this->value = $value;
         $this->alternatives = $alternatives;
@@ -30,7 +30,7 @@ final class ListForPanelItemState implements ListForPanelItemStateInterface
         return $this->alternatives;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

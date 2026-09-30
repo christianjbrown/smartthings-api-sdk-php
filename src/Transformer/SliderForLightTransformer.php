@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\SliderForLight;
 use ChristianBrown\SmartThings\Model\SliderForLightInterface;
 
@@ -12,7 +11,6 @@ use function is_array;
 use function is_int;
 use function is_numeric;
 use function is_string;
-use function sprintf;
 
 final class SliderForLightTransformer implements SliderForLightTransformerInterface
 {
@@ -120,13 +118,13 @@ final class SliderForLightTransformer implements SliderForLightTransformerInterf
     /**
      * @param mixed[] $data
      */
-    private static function requireCapability(array $data): string
+    private static function requireCapability(array $data): ?string
     {
         if (empty($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
         if (!is_string($data[self::KEY_CAPABILITY])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_CAPABILITY));
+            return null;
         }
 
         return $data[self::KEY_CAPABILITY];
@@ -135,13 +133,13 @@ final class SliderForLightTransformer implements SliderForLightTransformerInterf
     /**
      * @param mixed[] $data
      */
-    private static function requireCommand(array $data): string
+    private static function requireCommand(array $data): ?string
     {
         if (empty($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
         if (!is_string($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
 
         return $data[self::KEY_COMMAND];
@@ -150,13 +148,13 @@ final class SliderForLightTransformer implements SliderForLightTransformerInterf
     /**
      * @param mixed[] $data
      */
-    private static function requireComponent(array $data): string
+    private static function requireComponent(array $data): ?string
     {
         if (empty($data[self::KEY_COMPONENT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMPONENT));
+            return null;
         }
         if (!is_string($data[self::KEY_COMPONENT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMPONENT));
+            return null;
         }
 
         return $data[self::KEY_COMPONENT];
@@ -165,13 +163,13 @@ final class SliderForLightTransformer implements SliderForLightTransformerInterf
     /**
      * @param mixed[] $data
      */
-    private static function requireLabel(array $data): string
+    private static function requireLabel(array $data): ?string
     {
         if (empty($data[self::KEY_LABEL])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LABEL));
+            return null;
         }
         if (!is_string($data[self::KEY_LABEL])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LABEL));
+            return null;
         }
 
         return $data[self::KEY_LABEL];
@@ -185,10 +183,10 @@ final class SliderForLightTransformer implements SliderForLightTransformerInterf
     private static function requireRange(array $data): array
     {
         if (!isset($data[self::KEY_RANGE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RANGE));
+            return [];
         }
         if (!is_array($data[self::KEY_RANGE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RANGE));
+            return [];
         }
 
         return $data[self::KEY_RANGE];
@@ -197,13 +195,13 @@ final class SliderForLightTransformer implements SliderForLightTransformerInterf
     /**
      * @param mixed[] $data
      */
-    private static function requireValue(array $data): string
+    private static function requireValue(array $data): ?string
     {
         if (empty($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_VALUE));
+            return null;
         }
         if (!is_string($data[self::KEY_VALUE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_VALUE));
+            return null;
         }
 
         return $data[self::KEY_VALUE];

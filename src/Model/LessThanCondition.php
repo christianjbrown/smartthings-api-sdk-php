@@ -8,10 +8,10 @@ final class LessThanCondition implements LessThanConditionInterface
 {
     private ?string $aggregation = null;
     private ?bool $changesOnly = null;
-    private OperandInterface $left;
-    private OperandInterface $right;
+    private ?OperandInterface $left;
+    private ?OperandInterface $right;
 
-    public function __construct(OperandInterface $left, OperandInterface $right)
+    public function __construct(?OperandInterface $left, ?OperandInterface $right)
     {
         $this->left = $left;
         $this->right = $right;
@@ -27,12 +27,12 @@ final class LessThanCondition implements LessThanConditionInterface
         return $this->changesOnly;
     }
 
-    public function getLeft(): OperandInterface
+    public function getLeft(): ?OperandInterface
     {
         return $this->left;
     }
 
-    public function getRight(): OperandInterface
+    public function getRight(): ?OperandInterface
     {
         return $this->right;
     }

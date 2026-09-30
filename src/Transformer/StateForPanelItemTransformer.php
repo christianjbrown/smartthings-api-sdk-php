@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\StateForPanelItem;
 use ChristianBrown\SmartThings\Model\StateForPanelItemInterface;
@@ -14,7 +13,6 @@ use function array_map;
 use function array_values;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class StateForPanelItemTransformer implements StateForPanelItemTransformerInterface
 {
@@ -69,13 +67,13 @@ final class StateForPanelItemTransformer implements StateForPanelItemTransformer
     /**
      * @param mixed[] $data
      */
-    private static function requireLabel(array $data): string
+    private static function requireLabel(array $data): ?string
     {
         if (empty($data[self::KEY_LABEL])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LABEL));
+            return null;
         }
         if (!is_string($data[self::KEY_LABEL])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LABEL));
+            return null;
         }
 
         return $data[self::KEY_LABEL];
@@ -84,13 +82,13 @@ final class StateForPanelItemTransformer implements StateForPanelItemTransformer
     /**
      * @param mixed[] $data
      */
-    private static function requireSize(array $data): string
+    private static function requireSize(array $data): ?string
     {
         if (empty($data[self::KEY_SIZE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_SIZE));
+            return null;
         }
         if (!is_string($data[self::KEY_SIZE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_SIZE));
+            return null;
         }
 
         return $data[self::KEY_SIZE];

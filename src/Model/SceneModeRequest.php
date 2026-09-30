@@ -7,10 +7,10 @@ namespace ChristianBrown\SmartThings\Model;
 final class SceneModeRequest implements SceneModeRequestInterface
 {
     private ?string $actionId = null;
-    private string $modeId;
+    private ?string $modeId;
     private ?string $modeName = null;
 
-    public function __construct(string $modeId)
+    public function __construct(?string $modeId)
     {
         $this->modeId = $modeId;
     }
@@ -20,7 +20,7 @@ final class SceneModeRequest implements SceneModeRequestInterface
         return $this->actionId;
     }
 
-    public function getModeId(): string
+    public function getModeId(): ?string
     {
         return $this->modeId;
     }

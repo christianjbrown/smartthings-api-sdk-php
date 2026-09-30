@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusProgressBarsBarItem;
 use ChristianBrown\SmartThings\Transformer\BasicPlusProgressBarsBarItemTransformer;
 use ChristianBrown\SmartThings\Transformer\BasicPlusProgressBarsBarItemTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(BasicPlusProgressBarsBarItem::class)]
 #[CoversClass(BasicPlusProgressBarsBarItemTransformer::class)]
@@ -39,6 +36,32 @@ final class BasicPlusProgressBarsBarItemTransformerTest extends TestCase
         self::assertSame('test-value', $actual->getValue());
         self::assertSame('test-value-type', $actual->getValueType());
         self::assertSame(['test-range-key' => 'test-value'], $actual->getRange());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new BasicPlusProgressBarsBarItemTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'capabilityAbsent' => [[BasicPlusProgressBarsBarItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusProgressBarsBarItemTransformerInterface::KEY_VALUE => 'test-value'], 'getCapability', null];
+        yield 'capabilityWrongType' => [[BasicPlusProgressBarsBarItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusProgressBarsBarItemTransformerInterface::KEY_VALUE => 'test-value', BasicPlusProgressBarsBarItemTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
+        yield 'componentAbsent' => [[BasicPlusProgressBarsBarItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusProgressBarsBarItemTransformerInterface::KEY_VALUE => 'test-value'], 'getComponent', null];
+        yield 'componentWrongType' => [[BasicPlusProgressBarsBarItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusProgressBarsBarItemTransformerInterface::KEY_VALUE => 'test-value', BasicPlusProgressBarsBarItemTransformerInterface::KEY_COMPONENT => 42], 'getComponent', null];
+        yield 'valueAbsent' => [[BasicPlusProgressBarsBarItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusProgressBarsBarItemTransformerInterface::KEY_COMPONENT => 'test-component'], 'getValue', null];
+        yield 'valueWrongType' => [[BasicPlusProgressBarsBarItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusProgressBarsBarItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusProgressBarsBarItemTransformerInterface::KEY_VALUE => 42], 'getValue', null];
     }
 
     /**
@@ -81,31 +104,5 @@ final class BasicPlusProgressBarsBarItemTransformerTest extends TestCase
         self::assertNull($actual->getVersion());
         self::assertNull($actual->getValueType());
         self::assertNull($actual->getRange());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new BasicPlusProgressBarsBarItemTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'capabilityAbsent' => [[BasicPlusProgressBarsBarItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusProgressBarsBarItemTransformerInterface::KEY_VALUE => 'test-value'], sprintf(BasicPlusProgressBarsBarItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusProgressBarsBarItemTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[BasicPlusProgressBarsBarItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusProgressBarsBarItemTransformerInterface::KEY_VALUE => 'test-value', BasicPlusProgressBarsBarItemTransformerInterface::KEY_CAPABILITY => 42], sprintf(BasicPlusProgressBarsBarItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusProgressBarsBarItemTransformerInterface::KEY_CAPABILITY)];
-        yield 'componentAbsent' => [[BasicPlusProgressBarsBarItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusProgressBarsBarItemTransformerInterface::KEY_VALUE => 'test-value'], sprintf(BasicPlusProgressBarsBarItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusProgressBarsBarItemTransformerInterface::KEY_COMPONENT)];
-        yield 'componentWrongType' => [[BasicPlusProgressBarsBarItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusProgressBarsBarItemTransformerInterface::KEY_VALUE => 'test-value', BasicPlusProgressBarsBarItemTransformerInterface::KEY_COMPONENT => 42], sprintf(BasicPlusProgressBarsBarItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusProgressBarsBarItemTransformerInterface::KEY_COMPONENT)];
-        yield 'valueAbsent' => [[BasicPlusProgressBarsBarItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusProgressBarsBarItemTransformerInterface::KEY_COMPONENT => 'test-component'], sprintf(BasicPlusProgressBarsBarItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusProgressBarsBarItemTransformerInterface::KEY_VALUE)];
-        yield 'valueWrongType' => [[BasicPlusProgressBarsBarItemTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusProgressBarsBarItemTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusProgressBarsBarItemTransformerInterface::KEY_VALUE => 42], sprintf(BasicPlusProgressBarsBarItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusProgressBarsBarItemTransformerInterface::KEY_VALUE)];
     }
 }

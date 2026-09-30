@@ -6,9 +6,9 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class ToggleAction implements ToggleActionInterface
 {
-    private string $attribute;
-    private string $capability;
-    private string $component;
+    private ?string $attribute;
+    private ?string $capability;
+    private ?string $component;
 
     /**
      * @var array<int, string>
@@ -18,7 +18,7 @@ final class ToggleAction implements ToggleActionInterface
     /**
      * @phpstan-param array<int, string> $devices
      */
-    public function __construct(array $devices, string $component, string $capability, string $attribute)
+    public function __construct(array $devices, ?string $component, ?string $capability, ?string $attribute)
     {
         $this->devices = $devices;
         $this->component = $component;
@@ -26,17 +26,17 @@ final class ToggleAction implements ToggleActionInterface
         $this->attribute = $attribute;
     }
 
-    public function getAttribute(): string
+    public function getAttribute(): ?string
     {
         return $this->attribute;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }

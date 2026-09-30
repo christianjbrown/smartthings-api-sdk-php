@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Owner;
 use ChristianBrown\SmartThings\Model\OwnerInterface;
 
 use function is_string;
-use function sprintf;
 
 final class OwnerTransformer implements OwnerTransformerInterface
 {
@@ -26,13 +24,13 @@ final class OwnerTransformer implements OwnerTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireOwnerId(array $data): string
+    private static function requireOwnerId(array $data): ?string
     {
         if (empty($data[self::KEY_OWNER_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OWNER_ID));
+            return null;
         }
         if (!is_string($data[self::KEY_OWNER_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OWNER_ID));
+            return null;
         }
 
         return $data[self::KEY_OWNER_ID];
@@ -41,13 +39,13 @@ final class OwnerTransformer implements OwnerTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireOwnerType(array $data): string
+    private static function requireOwnerType(array $data): ?string
     {
         if (empty($data[self::KEY_OWNER_TYPE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OWNER_TYPE));
+            return null;
         }
         if (!is_string($data[self::KEY_OWNER_TYPE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OWNER_TYPE));
+            return null;
         }
 
         return $data[self::KEY_OWNER_TYPE];

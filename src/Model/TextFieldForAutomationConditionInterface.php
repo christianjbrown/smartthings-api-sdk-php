@@ -11,7 +11,7 @@ interface TextFieldForAutomationConditionInterface
      */
     public function getRange(): ?array;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function getValueType(): ?string;
 

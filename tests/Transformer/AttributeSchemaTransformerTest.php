@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AttributePropertiesInterface;
 use ChristianBrown\SmartThings\Model\AttributeSchema;
 use ChristianBrown\SmartThings\Transformer\AttributePropertiesTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\AttributeSchemaTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(AttributeSchema::class)]
 #[CoversClass(AttributeSchemaTransformer::class)]
@@ -44,6 +41,28 @@ final class AttributeSchemaTransformerTest extends TestCase
         self::assertTrue($actual->getSensitive());
         self::assertTrue($actual->getAdditionalProperties());
         self::assertSame(['test-required-1', 'test-required-2'], $actual->getRequired());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new AttributeSchemaTransformer(self::createStub(AttributePropertiesTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'propertiesAbsent' => [[], 'getProperties', null];
+        yield 'propertiesWrongType' => [[AttributeSchemaTransformerInterface::KEY_PROPERTIES => 'not-array'], 'getProperties', null];
     }
 
     /**
@@ -97,27 +116,5 @@ final class AttributeSchemaTransformerTest extends TestCase
         self::assertNull($actual->getSensitive());
         self::assertNull($actual->getAdditionalProperties());
         self::assertNull($actual->getRequired());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new AttributeSchemaTransformer(self::createStub(AttributePropertiesTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'propertiesAbsent' => [[], sprintf(AttributeSchemaTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, AttributeSchemaTransformerInterface::KEY_PROPERTIES)];
-        yield 'propertiesWrongType' => [[AttributeSchemaTransformerInterface::KEY_PROPERTIES => 'not-array'], sprintf(AttributeSchemaTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, AttributeSchemaTransformerInterface::KEY_PROPERTIES)];
     }
 }

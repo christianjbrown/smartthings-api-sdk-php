@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\PushButtonForPanelItem;
 use ChristianBrown\SmartThings\Transformer\PushButtonForPanelItemTransformer;
 use ChristianBrown\SmartThings\Transformer\PushButtonForPanelItemTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(PushButtonForPanelItem::class)]
 #[CoversClass(PushButtonForPanelItemTransformer::class)]
@@ -37,6 +34,30 @@ final class PushButtonForPanelItemTransformerTest extends TestCase
         self::assertSame('test-argument-type', $actual->getArgumentType());
         self::assertSame('test-icon-url', $actual->getIconUrl());
         self::assertSame('test-size', $actual->getSize());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new PushButtonForPanelItemTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'commandAbsent' => [[PushButtonForPanelItemTransformerInterface::KEY_SIZE => 'test-size'], 'getCommand', null];
+        yield 'commandWrongType' => [[PushButtonForPanelItemTransformerInterface::KEY_SIZE => 'test-size', PushButtonForPanelItemTransformerInterface::KEY_COMMAND => 42], 'getCommand', null];
+        yield 'sizeAbsent' => [[PushButtonForPanelItemTransformerInterface::KEY_COMMAND => 'test-command'], 'getSize', null];
+        yield 'sizeWrongType' => [[PushButtonForPanelItemTransformerInterface::KEY_COMMAND => 'test-command', PushButtonForPanelItemTransformerInterface::KEY_SIZE => 42], 'getSize', null];
     }
 
     /**
@@ -79,29 +100,5 @@ final class PushButtonForPanelItemTransformerTest extends TestCase
         self::assertNull($actual->getArgument());
         self::assertNull($actual->getArgumentType());
         self::assertNull($actual->getIconUrl());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new PushButtonForPanelItemTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'commandAbsent' => [[PushButtonForPanelItemTransformerInterface::KEY_SIZE => 'test-size'], sprintf(PushButtonForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, PushButtonForPanelItemTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[PushButtonForPanelItemTransformerInterface::KEY_SIZE => 'test-size', PushButtonForPanelItemTransformerInterface::KEY_COMMAND => 42], sprintf(PushButtonForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, PushButtonForPanelItemTransformerInterface::KEY_COMMAND)];
-        yield 'sizeAbsent' => [[PushButtonForPanelItemTransformerInterface::KEY_COMMAND => 'test-command'], sprintf(PushButtonForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, PushButtonForPanelItemTransformerInterface::KEY_SIZE)];
-        yield 'sizeWrongType' => [[PushButtonForPanelItemTransformerInterface::KEY_COMMAND => 'test-command', PushButtonForPanelItemTransformerInterface::KEY_SIZE => 42], sprintf(PushButtonForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, PushButtonForPanelItemTransformerInterface::KEY_SIZE)];
     }
 }

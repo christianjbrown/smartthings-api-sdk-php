@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\VisibleConditionForDashboardState;
 use ChristianBrown\SmartThings\Transformer\VisibleConditionForDashboardStateTransformer;
 use ChristianBrown\SmartThings\Transformer\VisibleConditionForDashboardStateTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(VisibleConditionForDashboardState::class)]
 #[CoversClass(VisibleConditionForDashboardStateTransformer::class)]
@@ -43,6 +40,36 @@ final class VisibleConditionForDashboardStateTransformerTest extends TestCase
         self::assertSame('test-capability', $actual->getCapability());
         self::assertSame(7, $actual->getVersion());
         self::assertTrue($actual->getIsOffline());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new VisibleConditionForDashboardStateTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'valueAbsent' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getValue', null];
+        yield 'valueWrongType' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 42], 'getValue', null];
+        yield 'operatorAbsent' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getOperator', null];
+        yield 'operatorWrongType' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 42], 'getOperator', null];
+        yield 'operandAbsent' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getOperand', null];
+        yield 'operandWrongType' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 42], 'getOperand', null];
+        yield 'componentAbsent' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getComponent', null];
+        yield 'componentWrongType' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 42], 'getComponent', null];
+        yield 'capabilityAbsent' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component'], 'getCapability', null];
+        yield 'capabilityWrongType' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
     }
 
     /**
@@ -85,35 +112,5 @@ final class VisibleConditionForDashboardStateTransformerTest extends TestCase
         self::assertNull($actual->getValueType());
         self::assertNull($actual->getVersion());
         self::assertNull($actual->getIsOffline());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new VisibleConditionForDashboardStateTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'valueAbsent' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(VisibleConditionForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE)];
-        yield 'valueWrongType' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 42], sprintf(VisibleConditionForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE)];
-        yield 'operatorAbsent' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(VisibleConditionForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR)];
-        yield 'operatorWrongType' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 42], sprintf(VisibleConditionForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR)];
-        yield 'operandAbsent' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(VisibleConditionForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND)];
-        yield 'operandWrongType' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 42], sprintf(VisibleConditionForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND)];
-        yield 'componentAbsent' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(VisibleConditionForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT)];
-        yield 'componentWrongType' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 'test-capability', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 42], sprintf(VisibleConditionForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT)];
-        yield 'capabilityAbsent' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component'], sprintf(VisibleConditionForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[VisibleConditionForDashboardStateTransformerInterface::KEY_VALUE => 'test-value', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERATOR => 'test-operator', VisibleConditionForDashboardStateTransformerInterface::KEY_OPERAND => 'test-operand', VisibleConditionForDashboardStateTransformerInterface::KEY_COMPONENT => 'test-component', VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY => 42], sprintf(VisibleConditionForDashboardStateTransformerInterface::UNEXPECTED_STRING_SPRINTF, VisibleConditionForDashboardStateTransformerInterface::KEY_CAPABILITY)];
     }
 }

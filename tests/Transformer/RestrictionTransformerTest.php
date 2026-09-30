@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Restriction;
 use ChristianBrown\SmartThings\Transformer\RestrictionTransformer;
 use ChristianBrown\SmartThings\Transformer\RestrictionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(Restriction::class)]
 #[CoversClass(RestrictionTransformer::class)]
@@ -33,6 +30,28 @@ final class RestrictionTransformerTest extends TestCase
         self::assertSame(7, $actual->getTier());
         self::assertSame(7, $actual->getHistoryRetentionTTLDays());
         self::assertTrue($actual->getVisibleWhenRestricted());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new RestrictionTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'tierAbsent' => [[], 'getTier', null];
+        yield 'tierWrongType' => [[RestrictionTransformerInterface::KEY_TIER => 'not-int'], 'getTier', null];
     }
 
     /**
@@ -71,27 +90,5 @@ final class RestrictionTransformerTest extends TestCase
 
         self::assertNull($actual->getHistoryRetentionTTLDays());
         self::assertNull($actual->getVisibleWhenRestricted());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new RestrictionTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'tierAbsent' => [[], sprintf(RestrictionTransformerInterface::UNEXPECTED_INT_SPRINTF, RestrictionTransformerInterface::KEY_TIER)];
-        yield 'tierWrongType' => [[RestrictionTransformerInterface::KEY_TIER => 'not-int'], sprintf(RestrictionTransformerInterface::UNEXPECTED_INT_SPRINTF, RestrictionTransformerInterface::KEY_TIER)];
     }
 }

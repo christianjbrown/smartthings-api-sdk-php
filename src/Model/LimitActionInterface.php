@@ -11,9 +11,9 @@ interface LimitActionInterface
      */
     public function getActions(): array;
 
-    public function getCount(): int;
+    public function getCount(): ?int;
 
-    public function getPeriod(): string;
+    public function getPeriod(): ?string;
 
     public function getSequence(): ?ActionSequenceInterface;
 

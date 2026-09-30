@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DthDeviceDetails;
 use ChristianBrown\SmartThings\Transformer\DthDeviceDetailsTransformer;
 use ChristianBrown\SmartThings\Transformer\DthDeviceDetailsTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(DthDeviceDetails::class)]
 #[CoversClass(DthDeviceDetailsTransformer::class)]
@@ -49,6 +46,32 @@ final class DthDeviceDetailsTransformerTest extends TestCase
         self::assertSame('test-network-security-level', $actual->getNetworkSecurityLevel());
         self::assertSame('test-fingerprint-type', $actual->getFingerprintType());
         self::assertSame('test-fingerprint-id', $actual->getFingerprintId());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new DthDeviceDetailsTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'completedSetupAbsent' => [[DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_ID => 'test-device-type-id', DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_NAME => 'test-device-type-name'], 'getCompletedSetup', null];
+        yield 'completedSetupWrongType' => [[DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_ID => 'test-device-type-id', DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_NAME => 'test-device-type-name', DthDeviceDetailsTransformerInterface::KEY_COMPLETED_SETUP => 'not-bool'], 'getCompletedSetup', null];
+        yield 'deviceTypeIdAbsent' => [[DthDeviceDetailsTransformerInterface::KEY_COMPLETED_SETUP => true, DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_NAME => 'test-device-type-name'], 'getDeviceTypeId', null];
+        yield 'deviceTypeIdWrongType' => [[DthDeviceDetailsTransformerInterface::KEY_COMPLETED_SETUP => true, DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_NAME => 'test-device-type-name', DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_ID => 42], 'getDeviceTypeId', null];
+        yield 'deviceTypeNameAbsent' => [[DthDeviceDetailsTransformerInterface::KEY_COMPLETED_SETUP => true, DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_ID => 'test-device-type-id'], 'getDeviceTypeName', null];
+        yield 'deviceTypeNameWrongType' => [[DthDeviceDetailsTransformerInterface::KEY_COMPLETED_SETUP => true, DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_ID => 'test-device-type-id', DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_NAME => 42], 'getDeviceTypeName', null];
     }
 
     /**
@@ -111,31 +134,5 @@ final class DthDeviceDetailsTransformerTest extends TestCase
         self::assertNull($actual->getNetworkSecurityLevel());
         self::assertNull($actual->getFingerprintType());
         self::assertNull($actual->getFingerprintId());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new DthDeviceDetailsTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'completedSetupAbsent' => [[DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_ID => 'test-device-type-id', DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_NAME => 'test-device-type-name'], sprintf(DthDeviceDetailsTransformerInterface::UNEXPECTED_BOOL_SPRINTF, DthDeviceDetailsTransformerInterface::KEY_COMPLETED_SETUP)];
-        yield 'completedSetupWrongType' => [[DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_ID => 'test-device-type-id', DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_NAME => 'test-device-type-name', DthDeviceDetailsTransformerInterface::KEY_COMPLETED_SETUP => 'not-bool'], sprintf(DthDeviceDetailsTransformerInterface::UNEXPECTED_BOOL_SPRINTF, DthDeviceDetailsTransformerInterface::KEY_COMPLETED_SETUP)];
-        yield 'deviceTypeIdAbsent' => [[DthDeviceDetailsTransformerInterface::KEY_COMPLETED_SETUP => true, DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_NAME => 'test-device-type-name'], sprintf(DthDeviceDetailsTransformerInterface::UNEXPECTED_STRING_SPRINTF, DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_ID)];
-        yield 'deviceTypeIdWrongType' => [[DthDeviceDetailsTransformerInterface::KEY_COMPLETED_SETUP => true, DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_NAME => 'test-device-type-name', DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_ID => 42], sprintf(DthDeviceDetailsTransformerInterface::UNEXPECTED_STRING_SPRINTF, DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_ID)];
-        yield 'deviceTypeNameAbsent' => [[DthDeviceDetailsTransformerInterface::KEY_COMPLETED_SETUP => true, DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_ID => 'test-device-type-id'], sprintf(DthDeviceDetailsTransformerInterface::UNEXPECTED_STRING_SPRINTF, DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_NAME)];
-        yield 'deviceTypeNameWrongType' => [[DthDeviceDetailsTransformerInterface::KEY_COMPLETED_SETUP => true, DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_ID => 'test-device-type-id', DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_NAME => 42], sprintf(DthDeviceDetailsTransformerInterface::UNEXPECTED_STRING_SPRINTF, DthDeviceDetailsTransformerInterface::KEY_DEVICE_TYPE_NAME)];
     }
 }

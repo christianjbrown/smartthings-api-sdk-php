@@ -6,19 +6,19 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class CommandMapping implements CommandMappingInterface
 {
-    private string $capabilityId;
-    private string $command;
+    private ?string $capabilityId;
+    private ?string $command;
 
     /**
      * @var array<int, AttributeValueInterface>
      */
     private array $eventValues;
-    private int $version;
+    private ?int $version;
 
     /**
      * @phpstan-param array<int, AttributeValueInterface> $eventValues
      */
-    public function __construct(string $capabilityId, int $version, string $command, array $eventValues)
+    public function __construct(?string $capabilityId, ?int $version, ?string $command, array $eventValues)
     {
         $this->capabilityId = $capabilityId;
         $this->version = $version;
@@ -26,12 +26,12 @@ final class CommandMapping implements CommandMappingInterface
         $this->eventValues = $eventValues;
     }
 
-    public function getCapabilityId(): string
+    public function getCapabilityId(): ?string
     {
         return $this->capabilityId;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }
@@ -44,7 +44,7 @@ final class CommandMapping implements CommandMappingInterface
         return $this->eventValues;
     }
 
-    public function getVersion(): int
+    public function getVersion(): ?int
     {
         return $this->version;
     }

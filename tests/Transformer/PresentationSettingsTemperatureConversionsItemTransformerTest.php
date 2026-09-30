@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\PresentationSettingsTemperatureConversionsItem;
 use ChristianBrown\SmartThings\Transformer\PresentationSettingsTemperatureConversionsItemTransformer;
 use ChristianBrown\SmartThings\Transformer\PresentationSettingsTemperatureConversionsItemTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(PresentationSettingsTemperatureConversionsItem::class)]
 #[CoversClass(PresentationSettingsTemperatureConversionsItemTransformer::class)]
@@ -31,6 +28,28 @@ final class PresentationSettingsTemperatureConversionsItemTransformerTest extend
 
         self::assertSame('test-value', $actual->getValue());
         self::assertSame('test-unit', $actual->getUnit());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new PresentationSettingsTemperatureConversionsItemTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'valueAbsent' => [[], 'getValue', null];
+        yield 'valueWrongType' => [[PresentationSettingsTemperatureConversionsItemTransformerInterface::KEY_VALUE => 42], 'getValue', null];
     }
 
     /**
@@ -65,27 +84,5 @@ final class PresentationSettingsTemperatureConversionsItemTransformerTest extend
         $actual = $transformer->transform([PresentationSettingsTemperatureConversionsItemTransformerInterface::KEY_VALUE => 'test-value']);
 
         self::assertNull($actual->getUnit());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new PresentationSettingsTemperatureConversionsItemTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'valueAbsent' => [[], sprintf(PresentationSettingsTemperatureConversionsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, PresentationSettingsTemperatureConversionsItemTransformerInterface::KEY_VALUE)];
-        yield 'valueWrongType' => [[PresentationSettingsTemperatureConversionsItemTransformerInterface::KEY_VALUE => 42], sprintf(PresentationSettingsTemperatureConversionsItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, PresentationSettingsTemperatureConversionsItemTransformerInterface::KEY_VALUE)];
     }
 }

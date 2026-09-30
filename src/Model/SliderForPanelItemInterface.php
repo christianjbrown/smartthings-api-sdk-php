@@ -13,14 +13,14 @@ interface SliderForPanelItemInterface
 
     public function getArgumentType(): ?string;
 
-    public function getCommand(): string;
+    public function getCommand(): ?string;
 
     /**
      * @return mixed[]
      */
     public function getRange(): array;
 
-    public function getSize(): string;
+    public function getSize(): ?string;
 
     public function getStep(): ?float;
 

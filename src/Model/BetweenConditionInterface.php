@@ -10,11 +10,11 @@ interface BetweenConditionInterface
 
     public function getChangesOnly(): ?bool;
 
-    public function getEnd(): OperandInterface;
+    public function getEnd(): ?OperandInterface;
 
-    public function getStart(): OperandInterface;
+    public function getStart(): ?OperandInterface;
 
-    public function getValue(): OperandInterface;
+    public function getValue(): ?OperandInterface;
 
     public function setAggregation(?string $value): self;
 

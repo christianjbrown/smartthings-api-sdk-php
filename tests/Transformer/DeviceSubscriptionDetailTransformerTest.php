@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceSubscriptionDetail;
 use ChristianBrown\SmartThings\Transformer\DeviceSubscriptionDetailTransformer;
 use ChristianBrown\SmartThings\Transformer\DeviceSubscriptionDetailTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(DeviceSubscriptionDetail::class)]
 #[CoversClass(DeviceSubscriptionDetailTransformer::class)]
@@ -43,6 +40,28 @@ final class DeviceSubscriptionDetailTransformerTest extends TestCase
         self::assertTrue($actual->getStateChangeOnly());
         self::assertSame('test-subscription-name', $actual->getSubscriptionName());
         self::assertSame(['test-modes-1', 'test-modes-2'], $actual->getModes());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new DeviceSubscriptionDetailTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'deviceIdAbsent' => [[], 'getDeviceId', null];
+        yield 'deviceIdWrongType' => [[DeviceSubscriptionDetailTransformerInterface::KEY_DEVICE_ID => 42], 'getDeviceId', null];
     }
 
     /**
@@ -101,27 +120,5 @@ final class DeviceSubscriptionDetailTransformerTest extends TestCase
         self::assertNull($actual->getStateChangeOnly());
         self::assertNull($actual->getSubscriptionName());
         self::assertNull($actual->getModes());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new DeviceSubscriptionDetailTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'deviceIdAbsent' => [[], sprintf(DeviceSubscriptionDetailTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceSubscriptionDetailTransformerInterface::KEY_DEVICE_ID)];
-        yield 'deviceIdWrongType' => [[DeviceSubscriptionDetailTransformerInterface::KEY_DEVICE_ID => 42], sprintf(DeviceSubscriptionDetailTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceSubscriptionDetailTransformerInterface::KEY_DEVICE_ID)];
     }
 }

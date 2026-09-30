@@ -13,7 +13,7 @@ interface BasicPlusItemForPresentationInterface
 
     public function getCamera(): ?BasicPlusCameraInterface;
 
-    public function getDisplayType(): string;
+    public function getDisplayType(): ?string;
 
     public function getLight(): ?BasicPlusLightInterface;
 

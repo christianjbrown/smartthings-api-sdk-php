@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\SliderType;
 use ChristianBrown\SmartThings\Model\SliderTypeInterface;
@@ -15,7 +14,6 @@ use function array_values;
 use function is_array;
 use function is_numeric;
 use function is_string;
-use function sprintf;
 
 final class SliderTypeTransformer implements SliderTypeTransformerInterface
 {
@@ -165,10 +163,10 @@ final class SliderTypeTransformer implements SliderTypeTransformerInterface
     private static function requireRange(array $data): array
     {
         if (!isset($data[self::KEY_RANGE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RANGE));
+            return [];
         }
         if (!is_array($data[self::KEY_RANGE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RANGE));
+            return [];
         }
 
         return $data[self::KEY_RANGE];

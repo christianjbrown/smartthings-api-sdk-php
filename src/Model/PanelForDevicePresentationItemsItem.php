@@ -6,9 +6,9 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class PanelForDevicePresentationItemsItem implements PanelForDevicePresentationItemsItemInterface
 {
-    private string $capability;
-    private string $component;
-    private string $displayType;
+    private ?string $capability;
+    private ?string $component;
+    private ?string $displayType;
     private ?EmptyForPanelItemInterface $empty = null;
     private ?bool $hideOnUnmatch = null;
     private ?string $label = null;
@@ -25,24 +25,24 @@ final class PanelForDevicePresentationItemsItem implements PanelForDevicePresent
      */
     private ?array $visibleConditions = null;
 
-    public function __construct(string $capability, string $component, string $displayType)
+    public function __construct(?string $capability, ?string $component, ?string $displayType)
     {
         $this->capability = $capability;
         $this->component = $component;
         $this->displayType = $displayType;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }
 
-    public function getDisplayType(): string
+    public function getDisplayType(): ?string
     {
         return $this->displayType;
     }

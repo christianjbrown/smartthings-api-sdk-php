@@ -6,11 +6,11 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface TemperatureConversionsItemForDevicePresentationInterface
 {
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
     public function getUnit(): ?string;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function getVersion(): ?int;
 

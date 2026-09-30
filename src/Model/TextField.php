@@ -7,7 +7,7 @@ namespace ChristianBrown\SmartThings\Model;
 final class TextField implements TextFieldInterface
 {
     private ?string $argumentType = null;
-    private string $command;
+    private ?string $command;
 
     /**
      * @var null|mixed[]
@@ -16,7 +16,7 @@ final class TextField implements TextFieldInterface
     private ?string $value = null;
     private ?string $valueType = null;
 
-    public function __construct(string $command)
+    public function __construct(?string $command)
     {
         $this->command = $command;
     }
@@ -26,7 +26,7 @@ final class TextField implements TextFieldInterface
         return $this->argumentType;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }

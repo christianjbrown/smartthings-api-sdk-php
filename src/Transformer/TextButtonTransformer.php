@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\TextButton;
 use ChristianBrown\SmartThings\Model\TextButtonButtonsItemInterface;
 use ChristianBrown\SmartThings\Model\TextButtonInterface;
@@ -14,7 +13,6 @@ use function array_map;
 use function array_values;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class TextButtonTransformer implements TextButtonTransformerInterface
 {
@@ -89,10 +87,10 @@ final class TextButtonTransformer implements TextButtonTransformerInterface
     private function requireButtons(array $data): array
     {
         if (!isset($data[self::KEY_BUTTONS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_BUTTONS));
+            return [];
         }
         if (!is_array($data[self::KEY_BUTTONS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_BUTTONS));
+            return [];
         }
 
         return $this->transformListTextButtonButtonsItem($data[self::KEY_BUTTONS]);

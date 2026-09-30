@@ -6,19 +6,19 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class BasicPlusCamera implements BasicPlusCameraInterface
 {
-    private BasicPlusCameraImageInterface $image;
+    private ?BasicPlusCameraImageInterface $image;
 
     /**
      * @var null|array<int, BasicPlusCameraOverlayIconsItemInterface>
      */
     private ?array $overlayIcons = null;
 
-    public function __construct(BasicPlusCameraImageInterface $image)
+    public function __construct(?BasicPlusCameraImageInterface $image)
     {
         $this->image = $image;
     }
 
-    public function getImage(): BasicPlusCameraImageInterface
+    public function getImage(): ?BasicPlusCameraImageInterface
     {
         return $this->image;
     }

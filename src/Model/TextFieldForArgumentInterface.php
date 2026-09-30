@@ -8,7 +8,7 @@ interface TextFieldForArgumentInterface
 {
     public function getArgumentType(): ?string;
 
-    public function getName(): string;
+    public function getName(): ?string;
 
     /**
      * @return null|mixed[]

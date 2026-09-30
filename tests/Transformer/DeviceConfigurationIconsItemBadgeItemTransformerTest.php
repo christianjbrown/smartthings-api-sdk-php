@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationIconsItemBadgeItem;
 use ChristianBrown\SmartThings\Model\VisibleConditionInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceConfigurationIconsItemBadgeItemTransformer;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\VisibleConditionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(DeviceConfigurationIconsItemBadgeItem::class)]
 #[CoversClass(DeviceConfigurationIconsItemBadgeItemTransformer::class)]
@@ -38,6 +35,28 @@ final class DeviceConfigurationIconsItemBadgeItemTransformerTest extends TestCas
         self::assertSame([$visibleConditionModel], $actual->getVisibleConditions());
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new DeviceConfigurationIconsItemBadgeItemTransformer(self::createStub(VisibleConditionTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'iconUrlAbsent' => [[], 'getIconUrl', null];
+        yield 'iconUrlWrongType' => [[DeviceConfigurationIconsItemBadgeItemTransformerInterface::KEY_ICON_URL => 42], 'getIconUrl', null];
+    }
+
     public function testTransformRequiredFieldsOnly(): void
     {
         $visibleConditionModel = self::createStub(VisibleConditionInterface::class);
@@ -48,28 +67,6 @@ final class DeviceConfigurationIconsItemBadgeItemTransformerTest extends TestCas
         $actual = $transformer->transform([DeviceConfigurationIconsItemBadgeItemTransformerInterface::KEY_ICON_URL => 'test-icon-url']);
 
         self::assertNull($actual->getVisibleConditions());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new DeviceConfigurationIconsItemBadgeItemTransformer(self::createStub(VisibleConditionTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'iconUrlAbsent' => [[], sprintf(DeviceConfigurationIconsItemBadgeItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceConfigurationIconsItemBadgeItemTransformerInterface::KEY_ICON_URL)];
-        yield 'iconUrlWrongType' => [[DeviceConfigurationIconsItemBadgeItemTransformerInterface::KEY_ICON_URL => 42], sprintf(DeviceConfigurationIconsItemBadgeItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceConfigurationIconsItemBadgeItemTransformerInterface::KEY_ICON_URL)];
     }
 
     public function testTransformVisibleConditions(): void

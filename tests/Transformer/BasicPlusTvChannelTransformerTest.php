@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusTvChannel;
 use ChristianBrown\SmartThings\Model\BasicPlusTvVolumeCommandInterface;
 use ChristianBrown\SmartThings\Transformer\BasicPlusTvChannelTransformer;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\BasicPlusTvVolumeCommandTransformerIn
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(BasicPlusTvChannel::class)]
 #[CoversClass(BasicPlusTvChannelTransformer::class)]
@@ -44,6 +41,32 @@ final class BasicPlusTvChannelTransformerTest extends TestCase
         self::assertSame('test-label', $actual->getLabel());
         self::assertSame('test-value', $actual->getValue());
         self::assertSame($basicPlusTvVolumeCommandModel, $actual->getCommand());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new BasicPlusTvChannelTransformer(self::createStub(BasicPlusTvVolumeCommandTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'capabilityAbsent' => [[BasicPlusTvChannelTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusTvChannelTransformerInterface::KEY_COMMAND => ['test-nested']], 'getCapability', null];
+        yield 'capabilityWrongType' => [[BasicPlusTvChannelTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusTvChannelTransformerInterface::KEY_COMMAND => ['test-nested'], BasicPlusTvChannelTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
+        yield 'componentAbsent' => [[BasicPlusTvChannelTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvChannelTransformerInterface::KEY_COMMAND => ['test-nested']], 'getComponent', null];
+        yield 'componentWrongType' => [[BasicPlusTvChannelTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvChannelTransformerInterface::KEY_COMMAND => ['test-nested'], BasicPlusTvChannelTransformerInterface::KEY_COMPONENT => 42], 'getComponent', null];
+        yield 'commandAbsent' => [[BasicPlusTvChannelTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvChannelTransformerInterface::KEY_COMPONENT => 'test-component'], 'getCommand', null];
+        yield 'commandWrongType' => [[BasicPlusTvChannelTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvChannelTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusTvChannelTransformerInterface::KEY_COMMAND => 'not-array'], 'getCommand', null];
     }
 
     /**
@@ -89,31 +112,5 @@ final class BasicPlusTvChannelTransformerTest extends TestCase
         self::assertNull($actual->getVersion());
         self::assertNull($actual->getLabel());
         self::assertNull($actual->getValue());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new BasicPlusTvChannelTransformer(self::createStub(BasicPlusTvVolumeCommandTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'capabilityAbsent' => [[BasicPlusTvChannelTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusTvChannelTransformerInterface::KEY_COMMAND => ['test-nested']], sprintf(BasicPlusTvChannelTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvChannelTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[BasicPlusTvChannelTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusTvChannelTransformerInterface::KEY_COMMAND => ['test-nested'], BasicPlusTvChannelTransformerInterface::KEY_CAPABILITY => 42], sprintf(BasicPlusTvChannelTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvChannelTransformerInterface::KEY_CAPABILITY)];
-        yield 'componentAbsent' => [[BasicPlusTvChannelTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvChannelTransformerInterface::KEY_COMMAND => ['test-nested']], sprintf(BasicPlusTvChannelTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvChannelTransformerInterface::KEY_COMPONENT)];
-        yield 'componentWrongType' => [[BasicPlusTvChannelTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvChannelTransformerInterface::KEY_COMMAND => ['test-nested'], BasicPlusTvChannelTransformerInterface::KEY_COMPONENT => 42], sprintf(BasicPlusTvChannelTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusTvChannelTransformerInterface::KEY_COMPONENT)];
-        yield 'commandAbsent' => [[BasicPlusTvChannelTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvChannelTransformerInterface::KEY_COMPONENT => 'test-component'], sprintf(BasicPlusTvChannelTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, BasicPlusTvChannelTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[BasicPlusTvChannelTransformerInterface::KEY_CAPABILITY => 'test-capability', BasicPlusTvChannelTransformerInterface::KEY_COMPONENT => 'test-component', BasicPlusTvChannelTransformerInterface::KEY_COMMAND => 'not-array'], sprintf(BasicPlusTvChannelTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, BasicPlusTvChannelTransformerInterface::KEY_COMMAND)];
     }
 }

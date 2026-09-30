@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusTv;
 use ChristianBrown\SmartThings\Model\BasicPlusTvChannelInterface;
 use ChristianBrown\SmartThings\Model\BasicPlusTvDirectionalPadInterface;
@@ -21,8 +20,6 @@ use ChristianBrown\SmartThings\Transformer\VisibleConditionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(BasicPlusTv::class)]
 #[CoversClass(BasicPlusTvTransformer::class)]
@@ -119,6 +116,28 @@ final class BasicPlusTvTransformerTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new BasicPlusTvTransformer(self::createStub(BasicPlusTvVolumeTransformerInterface::class), self::createStub(ButtonForTvTransformerInterface::class), self::createStub(BasicPlusTvChannelTransformerInterface::class), self::createStub(BasicPlusTvDirectionalPadTransformerInterface::class), self::createStub(VisibleConditionTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'buttonsAbsent' => [[], 'getButtons', []];
+        yield 'buttonsWrongType' => [[BasicPlusTvTransformerInterface::KEY_BUTTONS => 'not-array'], 'getButtons', []];
+    }
+
+    /**
      * Each optional field in each of its states: absent, present but the wrong type, or valid.
      *
      * @param array<string, mixed> $extra
@@ -173,28 +192,6 @@ final class BasicPlusTvTransformerTest extends TestCase
         self::assertNull($actual->getOperator());
         self::assertNull($actual->getVisibleConditions());
         self::assertNull($actual->getHideDashboardActions());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new BasicPlusTvTransformer(self::createStub(BasicPlusTvVolumeTransformerInterface::class), self::createStub(ButtonForTvTransformerInterface::class), self::createStub(BasicPlusTvChannelTransformerInterface::class), self::createStub(BasicPlusTvDirectionalPadTransformerInterface::class), self::createStub(VisibleConditionTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'buttonsAbsent' => [[], sprintf(BasicPlusTvTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, BasicPlusTvTransformerInterface::KEY_BUTTONS)];
-        yield 'buttonsWrongType' => [[BasicPlusTvTransformerInterface::KEY_BUTTONS => 'not-array'], sprintf(BasicPlusTvTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, BasicPlusTvTransformerInterface::KEY_BUTTONS)];
     }
 
     public function testTransformVisibleConditions(): void

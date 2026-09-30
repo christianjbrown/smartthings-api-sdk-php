@@ -18,7 +18,7 @@ interface SliderWithAvailableSizeInterface
      */
     public function getAvailableSizes(): ?array;
 
-    public function getCommand(): string;
+    public function getCommand(): ?string;
 
     /**
      * @return mixed[]

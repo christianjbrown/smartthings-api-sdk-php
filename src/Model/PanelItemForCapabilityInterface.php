@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface PanelItemForCapabilityInterface
 {
-    public function getDisplayType(): string;
+    public function getDisplayType(): ?string;
 
     public function getEmpty(): ?EmptyWithAvailableSizeInterface;
 

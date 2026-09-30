@@ -6,13 +6,13 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface AutomationListItemInterface
 {
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
     public function getComponent(): ?string;
 
     public function getDescription(): ?string;
 
-    public function getDisplayType(): string;
+    public function getDisplayType(): ?string;
 
     public function getDynamicList(): ?DynamicListForAutomationConditionInterface;
 
@@ -25,7 +25,7 @@ interface AutomationListItemInterface
      */
     public function getExclusion(): ?array;
 
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
     public function getList(): ?ListForAutomationConditionInterface;
 

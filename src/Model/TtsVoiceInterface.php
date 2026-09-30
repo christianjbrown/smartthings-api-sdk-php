@@ -6,15 +6,15 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface TtsVoiceInterface
 {
-    public function getGender(): string;
+    public function getGender(): ?string;
 
-    public function getId(): string;
+    public function getId(): ?string;
 
-    public function getLanguageCode(): string;
+    public function getLanguageCode(): ?string;
 
-    public function getLanguageName(): string;
+    public function getLanguageName(): ?string;
 
-    public function getName(): string;
+    public function getName(): ?string;
 
     /**
      * @return null|array<int, string>
@@ -26,7 +26,7 @@ interface TtsVoiceInterface
      */
     public function getSupportedEngines(): ?array;
 
-    public function getTtsProvider(): string;
+    public function getTtsProvider(): ?string;
 
     /**
      * @param null|array<int, string> $value

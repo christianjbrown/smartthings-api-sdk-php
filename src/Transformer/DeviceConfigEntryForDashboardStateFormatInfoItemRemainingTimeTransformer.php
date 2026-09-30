@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTime;
 use ChristianBrown\SmartThings\Model\DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeInterface;
 
 use function is_int;
 use function is_string;
-use function sprintf;
 
 final class DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeTransformer implements DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeTransformerInterface
 {
@@ -43,13 +41,13 @@ final class DeviceConfigEntryForDashboardStateFormatInfoItemRemainingTimeTransfo
     /**
      * @param mixed[] $data
      */
-    private static function requireTimeFormat(array $data): string
+    private static function requireTimeFormat(array $data): ?string
     {
         if (empty($data[self::KEY_TIME_FORMAT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_TIME_FORMAT));
+            return null;
         }
         if (!is_string($data[self::KEY_TIME_FORMAT])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_TIME_FORMAT));
+            return null;
         }
 
         return $data[self::KEY_TIME_FORMAT];

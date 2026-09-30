@@ -6,5 +6,5 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface PlayedTextInterface
 {
-    public function getMessage(): string;
+    public function getMessage(): ?string;
 }

@@ -15,7 +15,7 @@ final class CapabilityValue implements CapabilityValueInterface
      * @var null|array<int, string>
      */
     private ?array $enabledValues = null;
-    private string $key;
+    private ?string $key;
     private ?string $label = null;
 
     /**
@@ -24,7 +24,7 @@ final class CapabilityValue implements CapabilityValueInterface
     private ?array $range = null;
     private ?float $step = null;
 
-    public function __construct(string $key)
+    public function __construct(?string $key)
     {
         $this->key = $key;
     }
@@ -45,7 +45,7 @@ final class CapabilityValue implements CapabilityValueInterface
         return $this->enabledValues;
     }
 
-    public function getKey(): string
+    public function getKey(): ?string
     {
         return $this->key;
     }

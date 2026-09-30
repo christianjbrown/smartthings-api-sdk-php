@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\TextField;
 use ChristianBrown\SmartThings\Transformer\TextFieldTransformer;
 use ChristianBrown\SmartThings\Transformer\TextFieldTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(TextField::class)]
 #[CoversClass(TextFieldTransformer::class)]
@@ -37,6 +34,28 @@ final class TextFieldTransformerTest extends TestCase
         self::assertSame('test-value', $actual->getValue());
         self::assertSame('test-value-type', $actual->getValueType());
         self::assertSame(['test-range-key' => 'test-value'], $actual->getRange());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new TextFieldTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'commandAbsent' => [[], 'getCommand', null];
+        yield 'commandWrongType' => [[TextFieldTransformerInterface::KEY_COMMAND => 42], 'getCommand', null];
     }
 
     /**
@@ -83,27 +102,5 @@ final class TextFieldTransformerTest extends TestCase
         self::assertNull($actual->getValue());
         self::assertNull($actual->getValueType());
         self::assertNull($actual->getRange());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new TextFieldTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'commandAbsent' => [[], sprintf(TextFieldTransformerInterface::UNEXPECTED_STRING_SPRINTF, TextFieldTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[TextFieldTransformerInterface::KEY_COMMAND => 42], sprintf(TextFieldTransformerInterface::UNEXPECTED_STRING_SPRINTF, TextFieldTransformerInterface::KEY_COMMAND)];
     }
 }

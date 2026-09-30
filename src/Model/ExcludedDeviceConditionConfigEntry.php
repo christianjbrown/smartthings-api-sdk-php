@@ -6,8 +6,8 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class ExcludedDeviceConditionConfigEntry implements ExcludedDeviceConditionConfigEntryInterface
 {
-    private string $capability;
-    private string $component;
+    private ?string $capability;
+    private ?string $component;
 
     /**
      * @var null|array<int, ExcludedConditionItemIdInterface>
@@ -26,18 +26,18 @@ final class ExcludedDeviceConditionConfigEntry implements ExcludedDeviceConditio
     private ?int $version = null;
     private ?VisibleConditionInterface $visibleCondition = null;
 
-    public function __construct(string $component, string $capability)
+    public function __construct(?string $component, ?string $capability)
     {
         $this->component = $component;
         $this->capability = $capability;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }

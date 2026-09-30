@@ -10,10 +10,10 @@ final class CapabilityCommand implements CapabilityCommandInterface
      * @var null|array<int, CommandArgumentInterface>
      */
     private ?array $arguments = null;
-    private string $name;
+    private ?string $name;
     private ?bool $sensitive = null;
 
-    public function __construct(string $name)
+    public function __construct(?string $name)
     {
         $this->name = $name;
     }
@@ -26,7 +26,7 @@ final class CapabilityCommand implements CapabilityCommandInterface
         return $this->arguments;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }

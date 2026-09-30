@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusStateBoardColors;
 use ChristianBrown\SmartThings\Model\VisibleConditionForColorItemInterface;
 use ChristianBrown\SmartThings\Transformer\BasicPlusStateBoardColorsTransformer;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\VisibleConditionForColorItemTransform
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(BasicPlusStateBoardColors::class)]
 #[CoversClass(BasicPlusStateBoardColorsTransformer::class)]
@@ -38,6 +35,28 @@ final class BasicPlusStateBoardColorsTransformerTest extends TestCase
         self::assertSame('test-color', $actual->getColor());
         self::assertSame('test-operator', $actual->getOperator());
         self::assertSame([$visibleConditionForColorItemModel], $actual->getVisibleConditions());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new BasicPlusStateBoardColorsTransformer(self::createStub(VisibleConditionForColorItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'colorAbsent' => [[], 'getColor', null];
+        yield 'colorWrongType' => [[BasicPlusStateBoardColorsTransformerInterface::KEY_COLOR => 42], 'getColor', null];
     }
 
     /**
@@ -76,28 +95,6 @@ final class BasicPlusStateBoardColorsTransformerTest extends TestCase
 
         self::assertNull($actual->getOperator());
         self::assertNull($actual->getVisibleConditions());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new BasicPlusStateBoardColorsTransformer(self::createStub(VisibleConditionForColorItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'colorAbsent' => [[], sprintf(BasicPlusStateBoardColorsTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusStateBoardColorsTransformerInterface::KEY_COLOR)];
-        yield 'colorWrongType' => [[BasicPlusStateBoardColorsTransformerInterface::KEY_COLOR => 42], sprintf(BasicPlusStateBoardColorsTransformerInterface::UNEXPECTED_STRING_SPRINTF, BasicPlusStateBoardColorsTransformerInterface::KEY_COLOR)];
     }
 
     public function testTransformVisibleConditions(): void

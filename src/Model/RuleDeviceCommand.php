@@ -10,12 +10,12 @@ final class RuleDeviceCommand implements RuleDeviceCommandInterface
      * @var null|mixed[]
      */
     private ?array $arguments = null;
-    private string $capability;
-    private string $command;
+    private ?string $capability;
+    private ?string $command;
     private ?string $commandId = null;
     private ?string $component = null;
 
-    public function __construct(string $capability, string $command)
+    public function __construct(?string $capability, ?string $command)
     {
         $this->capability = $capability;
         $this->command = $command;
@@ -29,12 +29,12 @@ final class RuleDeviceCommand implements RuleDeviceCommandInterface
         return $this->arguments;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }

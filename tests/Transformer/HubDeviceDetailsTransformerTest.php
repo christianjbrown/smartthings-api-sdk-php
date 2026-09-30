@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\HubDeviceDetails;
 use ChristianBrown\SmartThings\Model\HubDeviceDetailsHubDataInterface;
 use ChristianBrown\SmartThings\Model\HubDriverInterface;
@@ -15,8 +14,6 @@ use ChristianBrown\SmartThings\Transformer\HubDriverTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(HubDeviceDetails::class)]
 #[CoversClass(HubDeviceDetailsTransformer::class)]
@@ -52,30 +49,30 @@ final class HubDeviceDetailsTransformerTest extends TestCase
     /**
      * @param array<string, mixed> $data
      */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
     {
         $transformer = new HubDeviceDetailsTransformer(self::createStub(HubDriverTransformerInterface::class), self::createStub(HubDeviceDetailsHubDataTransformerInterface::class));
 
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
     }
 
     /**
-     * @return iterable<string, array{array<string, mixed>, string}>
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
      */
-    public static function provideTransformUnexpectedCases(): iterable
+    public static function provideTransformLenientCases(): iterable
     {
-        yield 'hubEuiAbsent' => [[HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id'], sprintf(HubDeviceDetailsTransformerInterface::UNEXPECTED_STRING_SPRINTF, HubDeviceDetailsTransformerInterface::KEY_HUB_EUI)];
-        yield 'hubEuiWrongType' => [[HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id', HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 42], sprintf(HubDeviceDetailsTransformerInterface::UNEXPECTED_STRING_SPRINTF, HubDeviceDetailsTransformerInterface::KEY_HUB_EUI)];
-        yield 'firmwareVersionAbsent' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id'], sprintf(HubDeviceDetailsTransformerInterface::UNEXPECTED_STRING_SPRINTF, HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION)];
-        yield 'firmwareVersionWrongType' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id', HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 42], sprintf(HubDeviceDetailsTransformerInterface::UNEXPECTED_STRING_SPRINTF, HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION)];
-        yield 'hubDriversAbsent' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id'], sprintf(HubDeviceDetailsTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS)];
-        yield 'hubDriversWrongType' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => 'not-array'], sprintf(HubDeviceDetailsTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS)];
-        yield 'hubDataAbsent' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id'], sprintf(HubDeviceDetailsTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, HubDeviceDetailsTransformerInterface::KEY_HUB_DATA)];
-        yield 'hubDataWrongType' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id', HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => 'not-array'], sprintf(HubDeviceDetailsTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, HubDeviceDetailsTransformerInterface::KEY_HUB_DATA)];
-        yield 'driverIdAbsent' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested']], sprintf(HubDeviceDetailsTransformerInterface::UNEXPECTED_STRING_SPRINTF, HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID)];
-        yield 'driverIdWrongType' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 42], sprintf(HubDeviceDetailsTransformerInterface::UNEXPECTED_STRING_SPRINTF, HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID)];
+        yield 'hubEuiAbsent' => [[HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id'], 'getHubEui', null];
+        yield 'hubEuiWrongType' => [[HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id', HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 42], 'getHubEui', null];
+        yield 'firmwareVersionAbsent' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id'], 'getFirmwareVersion', null];
+        yield 'firmwareVersionWrongType' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id', HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 42], 'getFirmwareVersion', null];
+        yield 'hubDriversAbsent' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id'], 'getHubDrivers', []];
+        yield 'hubDriversWrongType' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => 'not-array'], 'getHubDrivers', []];
+        yield 'hubDataAbsent' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id'], 'getHubData', null];
+        yield 'hubDataWrongType' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 'test-driver-id', HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => 'not-array'], 'getHubData', null];
+        yield 'driverIdAbsent' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested']], 'getDriverId', null];
+        yield 'driverIdWrongType' => [[HubDeviceDetailsTransformerInterface::KEY_HUB_EUI => 'test-hub-eui', HubDeviceDetailsTransformerInterface::KEY_FIRMWARE_VERSION => 'test-firmware-version', HubDeviceDetailsTransformerInterface::KEY_HUB_DRIVERS => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_HUB_DATA => ['test-nested'], HubDeviceDetailsTransformerInterface::KEY_DRIVER_ID => 42], 'getDriverId', null];
     }
 }

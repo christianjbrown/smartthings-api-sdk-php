@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationDpInfoItemInterface;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationDpInfosItem;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationDpInfosItemInterface;
@@ -14,7 +13,6 @@ use function array_map;
 use function array_values;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class DeviceConfigurationDpInfosItemTransformer implements DeviceConfigurationDpInfosItemTransformerInterface
 {
@@ -59,10 +57,10 @@ final class DeviceConfigurationDpInfosItemTransformer implements DeviceConfigura
     private function requireDpInfo(array $data): array
     {
         if (!isset($data[self::KEY_DP_INFO])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DP_INFO));
+            return [];
         }
         if (!is_array($data[self::KEY_DP_INFO])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_DP_INFO));
+            return [];
         }
 
         return $this->transformListDeviceConfigurationDpInfoItem($data[self::KEY_DP_INFO]);

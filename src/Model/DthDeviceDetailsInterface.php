@@ -6,13 +6,13 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface DthDeviceDetailsInterface
 {
-    public function getCompletedSetup(): bool;
+    public function getCompletedSetup(): ?bool;
 
     public function getDeviceNetworkType(): ?string;
 
-    public function getDeviceTypeId(): string;
+    public function getDeviceTypeId(): ?string;
 
-    public function getDeviceTypeName(): string;
+    public function getDeviceTypeName(): ?string;
 
     public function getExecutingLocally(): ?bool;
 

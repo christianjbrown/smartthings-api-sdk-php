@@ -15,7 +15,7 @@ interface ListForAutomationConditionInterface
 
     public function getSupportedValues(): ?string;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function getValueType(): ?string;
 

@@ -7,14 +7,14 @@ namespace ChristianBrown\SmartThings\Model;
 final class DriverFingerprint implements DriverFingerprintInterface
 {
     private ?string $deviceLabel = null;
-    private string $id;
-    private string $type;
+    private ?string $id;
+    private ?string $type;
     private ?ZigbeeGenericFingerprintInterface $zigbeeGeneric = null;
     private ?ZigbeeManufacturerFingerprintInterface $zigbeeManfacturer = null;
     private ?ZWaveGenericFingerprintInterface $zwaveGeneric = null;
     private ?ZWaveManufacturerFingerprintInterface $zwaveManufacturer = null;
 
-    public function __construct(string $id, string $type)
+    public function __construct(?string $id, ?string $type)
     {
         $this->id = $id;
         $this->type = $type;
@@ -25,12 +25,12 @@ final class DriverFingerprint implements DriverFingerprintInterface
         return $this->deviceLabel;
     }
 
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function getType(): string
+    public function getType(): ?string
     {
         return $this->type;
     }

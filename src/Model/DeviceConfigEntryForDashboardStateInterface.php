@@ -6,9 +6,9 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface DeviceConfigEntryForDashboardStateInterface
 {
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getComponent(): string;
+    public function getComponent(): ?string;
 
     public function getComposite(): ?bool;
 

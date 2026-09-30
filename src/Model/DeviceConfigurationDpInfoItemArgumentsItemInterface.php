@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface DeviceConfigurationDpInfoItemArgumentsItemInterface
 {
-    public function getKey(): string;
+    public function getKey(): ?string;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 }

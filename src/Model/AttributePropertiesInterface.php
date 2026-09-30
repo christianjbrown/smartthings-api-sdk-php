@@ -10,7 +10,7 @@ interface AttributePropertiesInterface
 
     public function getUnit(): ?AttributeUnitSchemaInterface;
 
-    public function getValue(): AttributeValueSchemaInterface;
+    public function getValue(): ?AttributeValueSchemaInterface;
 
     public function setData(?AttributeDataSchemaInterface $value): self;
 

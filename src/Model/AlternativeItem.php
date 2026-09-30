@@ -8,11 +8,11 @@ final class AlternativeItem implements AlternativeItemInterface
 {
     private ?string $description = null;
     private ?string $iconUrl = null;
-    private string $key;
+    private ?string $key;
     private ?string $type = null;
-    private string $value;
+    private ?string $value;
 
-    public function __construct(string $key, string $value)
+    public function __construct(?string $key, ?string $value)
     {
         $this->key = $key;
         $this->value = $value;
@@ -28,7 +28,7 @@ final class AlternativeItem implements AlternativeItemInterface
         return $this->iconUrl;
     }
 
-    public function getKey(): string
+    public function getKey(): ?string
     {
         return $this->key;
     }
@@ -38,7 +38,7 @@ final class AlternativeItem implements AlternativeItemInterface
         return $this->type;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

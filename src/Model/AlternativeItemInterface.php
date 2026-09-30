@@ -10,11 +10,11 @@ interface AlternativeItemInterface
 
     public function getIconUrl(): ?string;
 
-    public function getKey(): string;
+    public function getKey(): ?string;
 
     public function getType(): ?string;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function setDescription(?string $value): self;
 

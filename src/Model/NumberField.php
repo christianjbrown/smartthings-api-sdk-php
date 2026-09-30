@@ -7,7 +7,7 @@ namespace ChristianBrown\SmartThings\Model;
 final class NumberField implements NumberFieldInterface
 {
     private ?string $argumentType = null;
-    private string $command;
+    private ?string $command;
 
     /**
      * @var null|mixed[]
@@ -18,7 +18,7 @@ final class NumberField implements NumberFieldInterface
     private ?string $value = null;
     private ?string $valueType = null;
 
-    public function __construct(string $command)
+    public function __construct(?string $command)
     {
         $this->command = $command;
     }
@@ -28,7 +28,7 @@ final class NumberField implements NumberFieldInterface
         return $this->argumentType;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }

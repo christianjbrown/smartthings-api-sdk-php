@@ -64,7 +64,7 @@ final class CreateCapabilityRequestSerializer implements CreateCapabilityRequest
     private static function serializeAttributeProperties(AttributePropertiesInterface $value): array
     {
         return self::filter([
-            self::KEY_VALUE => self::serializeAttributeValueSchema($value->getValue()),
+            self::KEY_VALUE => self::serializeOptionalAttributeValueSchema($value->getValue()),
             self::KEY_UNIT => self::serializeOptionalAttributeUnitSchema($value->getUnit()),
             self::KEY_DATA => self::serializeOptionalAttributeDataSchema($value->getData()),
         ]);
@@ -78,7 +78,7 @@ final class CreateCapabilityRequestSerializer implements CreateCapabilityRequest
         return self::filter([
             self::KEY_TITLE => $value->getTitle(),
             self::KEY_TYPE => $value->getType(),
-            self::KEY_PROPERTIES => self::serializeAttributeProperties($value->getProperties()),
+            self::KEY_PROPERTIES => self::serializeOptionalAttributeProperties($value->getProperties()),
             self::KEY_SENSITIVE => $value->getSensitive(),
             self::KEY_ADDITIONAL_PROPERTIES => $value->getAdditionalProperties(),
             self::KEY_REQUIRED => $value->getRequired(),
@@ -226,6 +226,18 @@ final class CreateCapabilityRequestSerializer implements CreateCapabilityRequest
     /**
      * @return null|mixed[]
      */
+    private static function serializeOptionalAttributeProperties(?AttributePropertiesInterface $value): ?array
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return self::serializeAttributeProperties($value);
+    }
+
+    /**
+     * @return null|mixed[]
+     */
     private static function serializeOptionalAttributeSchema(?AttributeSchemaInterface $value): ?array
     {
         if (null === $value) {
@@ -245,5 +257,17 @@ final class CreateCapabilityRequestSerializer implements CreateCapabilityRequest
         }
 
         return self::serializeAttributeUnitSchema($value);
+    }
+
+    /**
+     * @return null|mixed[]
+     */
+    private static function serializeOptionalAttributeValueSchema(?AttributeValueSchemaInterface $value): ?array
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return self::serializeAttributeValueSchema($value);
     }
 }

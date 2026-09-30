@@ -15,10 +15,10 @@ final class StateWithAvailableSize implements StateWithAvailableSizeInterface
      * @var null|array<int, string>
      */
     private ?array $availableSizes = null;
-    private string $label;
+    private ?string $label;
     private ?string $unit = null;
 
-    public function __construct(string $label)
+    public function __construct(?string $label)
     {
         $this->label = $label;
     }
@@ -39,7 +39,7 @@ final class StateWithAvailableSize implements StateWithAvailableSizeInterface
         return $this->availableSizes;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }

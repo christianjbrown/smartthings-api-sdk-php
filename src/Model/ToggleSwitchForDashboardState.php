@@ -10,12 +10,12 @@ final class ToggleSwitchForDashboardState implements ToggleSwitchForDashboardSta
      * @var null|array<int, AlternativeItemInterface>
      */
     private ?array $alternatives = null;
-    private string $off;
-    private string $on;
+    private ?string $off;
+    private ?string $on;
     private ?string $value = null;
     private ?string $valueType = null;
 
-    public function __construct(string $on, string $off)
+    public function __construct(?string $on, ?string $off)
     {
         $this->on = $on;
         $this->off = $off;
@@ -29,12 +29,12 @@ final class ToggleSwitchForDashboardState implements ToggleSwitchForDashboardSta
         return $this->alternatives;
     }
 
-    public function getOff(): string
+    public function getOff(): ?string
     {
         return $this->off;
     }
 
-    public function getOn(): string
+    public function getOn(): ?string
     {
         return $this->on;
     }

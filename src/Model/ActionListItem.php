@@ -6,10 +6,10 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class ActionListItem implements ActionListItemInterface
 {
-    private string $capability;
+    private ?string $capability;
     private ?string $component = null;
     private ?string $description = null;
-    private string $displayType;
+    private ?string $displayType;
     private ?DynamicListForAutomationActionInterface $dynamicList = null;
     private ?bool $emphasis = null;
 
@@ -17,7 +17,7 @@ final class ActionListItem implements ActionListItemInterface
      * @var null|array<int, ExcludedActionItemInterface>
      */
     private ?array $exclusion = null;
-    private string $label;
+    private ?string $label;
     private ?ListForAutomationActionInterface $list = null;
     private ?MultiArgCommandInterface $multiArgCommand = null;
     private ?NumberFieldForAutomationActionInterface $numberField = null;
@@ -26,14 +26,14 @@ final class ActionListItem implements ActionListItemInterface
     private ?int $version = null;
     private ?VisibleConditionInterface $visibleCondition = null;
 
-    public function __construct(string $capability, string $label, string $displayType)
+    public function __construct(?string $capability, ?string $label, ?string $displayType)
     {
         $this->capability = $capability;
         $this->label = $label;
         $this->displayType = $displayType;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
@@ -48,7 +48,7 @@ final class ActionListItem implements ActionListItemInterface
         return $this->description;
     }
 
-    public function getDisplayType(): string
+    public function getDisplayType(): ?string
     {
         return $this->displayType;
     }
@@ -71,7 +71,7 @@ final class ActionListItem implements ActionListItemInterface
         return $this->exclusion;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }

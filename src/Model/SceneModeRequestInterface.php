@@ -8,7 +8,7 @@ interface SceneModeRequestInterface
 {
     public function getActionId(): ?string;
 
-    public function getModeId(): string;
+    public function getModeId(): ?string;
 
     public function getModeName(): ?string;
 

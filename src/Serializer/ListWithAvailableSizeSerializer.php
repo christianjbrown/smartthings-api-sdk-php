@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Serializer;
 
+use ChristianBrown\SmartThings\Model\ListWithAvailableSizeCommandInterface;
 use ChristianBrown\SmartThings\Model\ListWithAvailableSizeInterface;
 use ChristianBrown\SmartThings\Model\ListWithAvailableSizeStateInterface;
 
@@ -26,13 +27,25 @@ final class ListWithAvailableSizeSerializer implements ListWithAvailableSizeSeri
     public function serialize(ListWithAvailableSizeInterface $model): array
     {
         $serialized = [
-            self::KEY_COMMAND => $this->listWithAvailableSizeCommandSerializer->serialize($model->getCommand()),
+            self::KEY_COMMAND => $this->serializeOptionalListWithAvailableSizeCommand($model->getCommand()),
             self::KEY_STATE => $this->serializeOptionalState($model->getState()),
             self::KEY_AVAILABLE_SIZES => $model->getAvailableSizes(),
         ];
 
         // Omit null optionals rather than sending them as explicit nulls.
         return array_filter($serialized, static fn (mixed $value): bool => null !== $value);
+    }
+
+    /**
+     * @return null|mixed[]
+     */
+    private function serializeOptionalListWithAvailableSizeCommand(?ListWithAvailableSizeCommandInterface $value): ?array
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        return $this->listWithAvailableSizeCommandSerializer->serialize($value);
     }
 
     /**

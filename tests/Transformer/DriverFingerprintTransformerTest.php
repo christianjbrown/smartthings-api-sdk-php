@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DriverFingerprint;
 use ChristianBrown\SmartThings\Model\ZigbeeGenericFingerprintInterface;
 use ChristianBrown\SmartThings\Model\ZigbeeManufacturerFingerprintInterface;
@@ -19,8 +18,6 @@ use ChristianBrown\SmartThings\Transformer\ZWaveManufacturerFingerprintTransform
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(DriverFingerprint::class)]
 #[CoversClass(DriverFingerprintTransformer::class)]
@@ -61,6 +58,30 @@ final class DriverFingerprintTransformerTest extends TestCase
         self::assertSame($zigbeeManufacturerFingerprintModel, $actual->getZigbeeManfacturer());
         self::assertSame($zWaveManufacturerFingerprintModel, $actual->getZwaveManufacturer());
         self::assertSame($zWaveGenericFingerprintModel, $actual->getZwaveGeneric());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new DriverFingerprintTransformer(self::createStub(ZigbeeGenericFingerprintTransformerInterface::class), self::createStub(ZigbeeManufacturerFingerprintTransformerInterface::class), self::createStub(ZWaveManufacturerFingerprintTransformerInterface::class), self::createStub(ZWaveGenericFingerprintTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'idAbsent' => [[DriverFingerprintTransformerInterface::KEY_TYPE => 'test-type'], 'getId', null];
+        yield 'idWrongType' => [[DriverFingerprintTransformerInterface::KEY_TYPE => 'test-type', DriverFingerprintTransformerInterface::KEY_ID => 42], 'getId', null];
+        yield 'typeAbsent' => [[DriverFingerprintTransformerInterface::KEY_ID => 'test-id'], 'getType', null];
+        yield 'typeWrongType' => [[DriverFingerprintTransformerInterface::KEY_ID => 'test-id', DriverFingerprintTransformerInterface::KEY_TYPE => 42], 'getType', null];
     }
 
     /**
@@ -111,30 +132,6 @@ final class DriverFingerprintTransformerTest extends TestCase
         self::assertNull($actual->getZigbeeManfacturer());
         self::assertNull($actual->getZwaveManufacturer());
         self::assertNull($actual->getZwaveGeneric());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new DriverFingerprintTransformer(self::createStub(ZigbeeGenericFingerprintTransformerInterface::class), self::createStub(ZigbeeManufacturerFingerprintTransformerInterface::class), self::createStub(ZWaveManufacturerFingerprintTransformerInterface::class), self::createStub(ZWaveGenericFingerprintTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'idAbsent' => [[DriverFingerprintTransformerInterface::KEY_TYPE => 'test-type'], sprintf(DriverFingerprintTransformerInterface::UNEXPECTED_STRING_SPRINTF, DriverFingerprintTransformerInterface::KEY_ID)];
-        yield 'idWrongType' => [[DriverFingerprintTransformerInterface::KEY_TYPE => 'test-type', DriverFingerprintTransformerInterface::KEY_ID => 42], sprintf(DriverFingerprintTransformerInterface::UNEXPECTED_STRING_SPRINTF, DriverFingerprintTransformerInterface::KEY_ID)];
-        yield 'typeAbsent' => [[DriverFingerprintTransformerInterface::KEY_ID => 'test-id'], sprintf(DriverFingerprintTransformerInterface::UNEXPECTED_STRING_SPRINTF, DriverFingerprintTransformerInterface::KEY_TYPE)];
-        yield 'typeWrongType' => [[DriverFingerprintTransformerInterface::KEY_ID => 'test-id', DriverFingerprintTransformerInterface::KEY_TYPE => 42], sprintf(DriverFingerprintTransformerInterface::UNEXPECTED_STRING_SPRINTF, DriverFingerprintTransformerInterface::KEY_TYPE)];
     }
 
     public function testTransformZigbeeGeneric(): void

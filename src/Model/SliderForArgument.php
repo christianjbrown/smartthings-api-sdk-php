@@ -11,7 +11,7 @@ final class SliderForArgument implements SliderForArgumentInterface
      */
     private ?array $alternatives = null;
     private ?string $argumentType = null;
-    private string $name;
+    private ?string $name;
 
     /**
      * @var mixed[]
@@ -24,7 +24,7 @@ final class SliderForArgument implements SliderForArgumentInterface
     /**
      * @phpstan-param mixed[] $range
      */
-    public function __construct(array $range, string $name)
+    public function __construct(array $range, ?string $name)
     {
         $this->range = $range;
         $this->name = $name;
@@ -43,7 +43,7 @@ final class SliderForArgument implements SliderForArgumentInterface
         return $this->argumentType;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }

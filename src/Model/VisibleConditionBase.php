@@ -6,29 +6,29 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class VisibleConditionBase implements VisibleConditionBaseInterface
 {
-    private string $operand;
-    private string $operator;
-    private string $value;
+    private ?string $operand;
+    private ?string $operator;
+    private ?string $value;
     private ?string $valueType = null;
 
-    public function __construct(string $value, string $operator, string $operand)
+    public function __construct(?string $value, ?string $operator, ?string $operand)
     {
         $this->value = $value;
         $this->operator = $operator;
         $this->operand = $operand;
     }
 
-    public function getOperand(): string
+    public function getOperand(): ?string
     {
         return $this->operand;
     }
 
-    public function getOperator(): string
+    public function getOperator(): ?string
     {
         return $this->operator;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

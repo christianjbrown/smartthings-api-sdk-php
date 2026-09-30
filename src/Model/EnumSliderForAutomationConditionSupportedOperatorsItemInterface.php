@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface EnumSliderForAutomationConditionSupportedOperatorsItemInterface
 {
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
-    public function getOperator(): string;
+    public function getOperator(): ?string;
 }

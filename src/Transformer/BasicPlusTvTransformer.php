@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\BasicPlusTv;
 use ChristianBrown\SmartThings\Model\BasicPlusTvInterface;
 use ChristianBrown\SmartThings\Model\ButtonForTvInterface;
@@ -16,7 +15,6 @@ use function array_values;
 use function is_array;
 use function is_bool;
 use function is_string;
-use function sprintf;
 
 final class BasicPlusTvTransformer implements BasicPlusTvTransformerInterface
 {
@@ -144,10 +142,10 @@ final class BasicPlusTvTransformer implements BasicPlusTvTransformerInterface
     private function requireButtons(array $data): array
     {
         if (!isset($data[self::KEY_BUTTONS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_BUTTONS));
+            return [];
         }
         if (!is_array($data[self::KEY_BUTTONS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_BUTTONS));
+            return [];
         }
 
         return $this->transformListButtonForTv($data[self::KEY_BUTTONS]);

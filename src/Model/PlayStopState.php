@@ -10,12 +10,12 @@ final class PlayStopState implements PlayStopStateInterface
      * @var null|array<int, AlternativeItemInterface>
      */
     private ?array $alternatives = null;
-    private string $play;
-    private string $stop;
-    private string $value;
+    private ?string $play;
+    private ?string $stop;
+    private ?string $value;
     private ?string $valueType = null;
 
-    public function __construct(string $value, string $play, string $stop)
+    public function __construct(?string $value, ?string $play, ?string $stop)
     {
         $this->value = $value;
         $this->play = $play;
@@ -30,17 +30,17 @@ final class PlayStopState implements PlayStopStateInterface
         return $this->alternatives;
     }
 
-    public function getPlay(): string
+    public function getPlay(): ?string
     {
         return $this->play;
     }
 
-    public function getStop(): string
+    public function getStop(): ?string
     {
         return $this->stop;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

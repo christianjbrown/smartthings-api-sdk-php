@@ -11,7 +11,7 @@ interface CapabilityCommandInterface
      */
     public function getArguments(): ?array;
 
-    public function getName(): string;
+    public function getName(): ?string;
 
     public function getSensitive(): ?bool;
 

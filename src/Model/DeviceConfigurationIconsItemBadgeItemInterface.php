@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface DeviceConfigurationIconsItemBadgeItemInterface
 {
-    public function getIconUrl(): string;
+    public function getIconUrl(): ?string;
 
     /**
      * @return null|array<int, VisibleConditionInterface>

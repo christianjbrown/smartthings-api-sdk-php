@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ServiceSubscriptionReceipt;
 use ChristianBrown\SmartThings\Model\ServiceSubscriptionReceiptInterface;
 
 use function is_string;
-use function sprintf;
 
 final class ServiceSubscriptionReceiptTransformer implements ServiceSubscriptionReceiptTransformerInterface
 {
@@ -18,13 +16,7 @@ final class ServiceSubscriptionReceiptTransformer implements ServiceSubscription
      */
     public function transform(array $data): ServiceSubscriptionReceiptInterface
     {
-        if (empty($data[self::KEY_LOCATION_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LOCATION_ID));
-        }
-        if (!is_string($data[self::KEY_LOCATION_ID])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_LOCATION_ID));
-        }
-        $model = new ServiceSubscriptionReceipt($data[self::KEY_LOCATION_ID]);
+        $model = new ServiceSubscriptionReceipt(self::requireLocationId($data));
 
         self::applySubscriptionId($model, $data);
 
@@ -43,5 +35,20 @@ final class ServiceSubscriptionReceiptTransformer implements ServiceSubscription
             return;
         }
         $model->setSubscriptionId($data[self::KEY_SUBSCRIPTION_ID]);
+    }
+
+    /**
+     * @param mixed[] $data
+     */
+    private static function requireLocationId(array $data): ?string
+    {
+        if (empty($data[self::KEY_LOCATION_ID])) {
+            return null;
+        }
+        if (!is_string($data[self::KEY_LOCATION_ID])) {
+            return null;
+        }
+
+        return $data[self::KEY_LOCATION_ID];
     }
 }

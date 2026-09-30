@@ -6,17 +6,17 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class LocationOperand implements LocationOperandInterface
 {
-    private string $attribute;
+    private ?string $attribute;
     private ?string $locationId = null;
     private ?string $postalCode = null;
     private ?string $trigger = null;
 
-    public function __construct(string $attribute)
+    public function __construct(?string $attribute)
     {
         $this->attribute = $attribute;
     }
 
-    public function getAttribute(): string
+    public function getAttribute(): ?string
     {
         return $this->attribute;
     }

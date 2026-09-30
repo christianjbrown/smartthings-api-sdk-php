@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface ServiceSubscriptionReceiptInterface
 {
-    public function getLocationId(): string;
+    public function getLocationId(): ?string;
 
     public function getSubscriptionId(): ?string;
 

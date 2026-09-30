@@ -32,6 +32,29 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(UpdateCapabilityRequestSerializer::class)]
 final class UpdateCapabilityRequestSerializerTest extends TestCase
 {
+    public function testSerializeAttributeWithoutNestedSchemaParts(): void
+    {
+        $request = (new UpdateCapabilityRequest())
+            ->setAttributes([
+                'test-no-properties' => (new CapabilityAttribute())->setSchema(new AttributeSchema(null)),
+                'test-no-value' => (new CapabilityAttribute())->setSchema(new AttributeSchema(new AttributeProperties(null))),
+            ]);
+
+        $serializer = new UpdateCapabilityRequestSerializer();
+
+        $actual = $serializer->serialize($request);
+
+        self::assertSame(
+            [
+                UpdateCapabilityRequestSerializerInterface::KEY_ATTRIBUTES => [
+                    'test-no-properties' => [UpdateCapabilityRequestSerializerInterface::KEY_SCHEMA => []],
+                    'test-no-value' => [UpdateCapabilityRequestSerializerInterface::KEY_SCHEMA => [UpdateCapabilityRequestSerializerInterface::KEY_PROPERTIES => []]],
+                ],
+            ],
+            $actual
+        );
+    }
+
     public function testSerializeOmitsUnsetOptionals(): void
     {
         $request = new UpdateCapabilityRequest();

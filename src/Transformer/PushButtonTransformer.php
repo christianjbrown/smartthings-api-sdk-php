@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\PushButton;
 use ChristianBrown\SmartThings\Model\PushButtonInterface;
 
 use function is_string;
-use function sprintf;
 
 final class PushButtonTransformer implements PushButtonTransformerInterface
 {
@@ -57,13 +55,13 @@ final class PushButtonTransformer implements PushButtonTransformerInterface
     /**
      * @param mixed[] $data
      */
-    private static function requireCommand(array $data): string
+    private static function requireCommand(array $data): ?string
     {
         if (empty($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
         if (!is_string($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
 
         return $data[self::KEY_COMMAND];

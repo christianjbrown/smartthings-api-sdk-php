@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\SliderForArgument;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\SliderForArgumentTransformerInterface
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(SliderForArgument::class)]
 #[CoversClass(SliderForArgumentTransformer::class)]
@@ -59,6 +56,30 @@ final class SliderForArgumentTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getAlternatives());
         self::assertNull($transformer->transform($base + [SliderForArgumentTransformerInterface::KEY_ALTERNATIVES => 'test-not-array'])->getAlternatives());
         self::assertSame([$alternativeItemModel], $transformer->transform($base + [SliderForArgumentTransformerInterface::KEY_ALTERNATIVES => [['test-nested'], 'test-skipped']])->getAlternatives());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new SliderForArgumentTransformer(self::createStub(AlternativeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'rangeAbsent' => [[SliderForArgumentTransformerInterface::KEY_NAME => 'test-name'], 'getRange', []];
+        yield 'rangeWrongType' => [[SliderForArgumentTransformerInterface::KEY_NAME => 'test-name', SliderForArgumentTransformerInterface::KEY_RANGE => 'not-array'], 'getRange', []];
+        yield 'nameAbsent' => [[SliderForArgumentTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value']], 'getName', null];
+        yield 'nameWrongType' => [[SliderForArgumentTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], SliderForArgumentTransformerInterface::KEY_NAME => 42], 'getName', null];
     }
 
     /**
@@ -109,29 +130,5 @@ final class SliderForArgumentTransformerTest extends TestCase
         self::assertNull($actual->getSupportedValues());
         self::assertNull($actual->getArgumentType());
         self::assertNull($actual->getAlternatives());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new SliderForArgumentTransformer(self::createStub(AlternativeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'rangeAbsent' => [[SliderForArgumentTransformerInterface::KEY_NAME => 'test-name'], sprintf(SliderForArgumentTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, SliderForArgumentTransformerInterface::KEY_RANGE)];
-        yield 'rangeWrongType' => [[SliderForArgumentTransformerInterface::KEY_NAME => 'test-name', SliderForArgumentTransformerInterface::KEY_RANGE => 'not-array'], sprintf(SliderForArgumentTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, SliderForArgumentTransformerInterface::KEY_RANGE)];
-        yield 'nameAbsent' => [[SliderForArgumentTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value']], sprintf(SliderForArgumentTransformerInterface::UNEXPECTED_STRING_SPRINTF, SliderForArgumentTransformerInterface::KEY_NAME)];
-        yield 'nameWrongType' => [[SliderForArgumentTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], SliderForArgumentTransformerInterface::KEY_NAME => 42], sprintf(SliderForArgumentTransformerInterface::UNEXPECTED_STRING_SPRINTF, SliderForArgumentTransformerInterface::KEY_NAME)];
     }
 }

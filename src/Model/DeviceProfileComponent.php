@@ -15,7 +15,7 @@ final class DeviceProfileComponent implements DeviceProfileComponentInterface
      * @var array<int, DeviceCategoryInterface>
      */
     private array $categories;
-    private string $id;
+    private ?string $id;
     private ?string $label = null;
     private ?bool $optional = null;
     private ?RestrictionInterface $restrictions = null;
@@ -24,7 +24,7 @@ final class DeviceProfileComponent implements DeviceProfileComponentInterface
      * @phpstan-param array<int, DeviceCapabilityReferenceInterface> $capabilities
      * @phpstan-param array<int, DeviceCategoryInterface> $categories
      */
-    public function __construct(string $id, array $capabilities, array $categories)
+    public function __construct(?string $id, array $capabilities, array $categories)
     {
         $this->id = $id;
         $this->capabilities = $capabilities;
@@ -47,7 +47,7 @@ final class DeviceProfileComponent implements DeviceProfileComponentInterface
         return $this->categories;
     }
 
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }

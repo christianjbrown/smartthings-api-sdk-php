@@ -11,7 +11,7 @@ interface ExcludedConditionItemIdExcludeItemAttributesItemInterface
      */
     public function getExcludedValues(): ?array;
 
-    public function getName(): string;
+    public function getName(): ?string;
 
     /**
      * @param null|array<int, string> $value

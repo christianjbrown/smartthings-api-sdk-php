@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\StatelessPowerToggleForDashboard;
 use ChristianBrown\SmartThings\Transformer\StatelessPowerToggleForDashboardTransformer;
 use ChristianBrown\SmartThings\Transformer\StatelessPowerToggleForDashboardTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(StatelessPowerToggleForDashboard::class)]
 #[CoversClass(StatelessPowerToggleForDashboardTransformer::class)]
@@ -33,6 +30,28 @@ final class StatelessPowerToggleForDashboardTransformerTest extends TestCase
         self::assertSame('test-command', $actual->getCommand());
         self::assertSame('test-argument', $actual->getArgument());
         self::assertSame('test-argument-type', $actual->getArgumentType());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new StatelessPowerToggleForDashboardTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'commandAbsent' => [[], 'getCommand', null];
+        yield 'commandWrongType' => [[StatelessPowerToggleForDashboardTransformerInterface::KEY_COMMAND => 42], 'getCommand', null];
     }
 
     /**
@@ -71,27 +90,5 @@ final class StatelessPowerToggleForDashboardTransformerTest extends TestCase
 
         self::assertNull($actual->getArgument());
         self::assertNull($actual->getArgumentType());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new StatelessPowerToggleForDashboardTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'commandAbsent' => [[], sprintf(StatelessPowerToggleForDashboardTransformerInterface::UNEXPECTED_STRING_SPRINTF, StatelessPowerToggleForDashboardTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[StatelessPowerToggleForDashboardTransformerInterface::KEY_COMMAND => 42], sprintf(StatelessPowerToggleForDashboardTransformerInterface::UNEXPECTED_STRING_SPRINTF, StatelessPowerToggleForDashboardTransformerInterface::KEY_COMMAND)];
     }
 }

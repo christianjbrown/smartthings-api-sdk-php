@@ -8,9 +8,9 @@ final class BasicPlusItemActionsItem implements BasicPlusItemActionsItemInterfac
 {
     private ?string $argument = null;
     private ?string $argumentType = null;
-    private string $capability;
-    private string $command;
-    private string $component;
+    private ?string $capability;
+    private ?string $command;
+    private ?string $component;
     private ?string $iconUrl = null;
     private ?string $operator = null;
     private ?int $version = null;
@@ -20,7 +20,7 @@ final class BasicPlusItemActionsItem implements BasicPlusItemActionsItemInterfac
      */
     private ?array $visibleConditions = null;
 
-    public function __construct(string $command, string $component, string $capability)
+    public function __construct(?string $command, ?string $component, ?string $capability)
     {
         $this->command = $command;
         $this->component = $component;
@@ -37,17 +37,17 @@ final class BasicPlusItemActionsItem implements BasicPlusItemActionsItemInterfac
         return $this->argumentType;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }

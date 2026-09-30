@@ -11,12 +11,12 @@ final class StandbyPowerSwitchForDashboardState implements StandbyPowerSwitchFor
      */
     private ?array $alternatives = null;
     private ?string $label = null;
-    private string $off;
-    private string $on;
-    private string $value;
+    private ?string $off;
+    private ?string $on;
+    private ?string $value;
     private ?string $valueType = null;
 
-    public function __construct(string $value, string $on, string $off)
+    public function __construct(?string $value, ?string $on, ?string $off)
     {
         $this->value = $value;
         $this->on = $on;
@@ -36,17 +36,17 @@ final class StandbyPowerSwitchForDashboardState implements StandbyPowerSwitchFor
         return $this->label;
     }
 
-    public function getOff(): string
+    public function getOff(): ?string
     {
         return $this->off;
     }
 
-    public function getOn(): string
+    public function getOn(): ?string
     {
         return $this->on;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

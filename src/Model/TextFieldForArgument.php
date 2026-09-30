@@ -7,14 +7,14 @@ namespace ChristianBrown\SmartThings\Model;
 final class TextFieldForArgument implements TextFieldForArgumentInterface
 {
     private ?string $argumentType = null;
-    private string $name;
+    private ?string $name;
 
     /**
      * @var null|mixed[]
      */
     private ?array $range = null;
 
-    public function __construct(string $name)
+    public function __construct(?string $name)
     {
         $this->name = $name;
     }
@@ -24,7 +24,7 @@ final class TextFieldForArgument implements TextFieldForArgumentInterface
         return $this->argumentType;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }

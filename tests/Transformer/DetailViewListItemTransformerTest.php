@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DetailViewListItem;
 use ChristianBrown\SmartThings\Model\ListForDetailViewInterface;
 use ChristianBrown\SmartThings\Model\MultiArgCommandInterface;
@@ -41,8 +40,6 @@ use ChristianBrown\SmartThings\Transformer\VisibleConditionForDetailViewTransfor
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(DetailViewListItem::class)]
 #[CoversClass(DetailViewListItemTransformer::class)]
@@ -142,6 +139,32 @@ final class DetailViewListItemTransformerTest extends TestCase
         self::assertSame($multiArgCommandModel, $actual->getMultiArgCommand());
         self::assertSame('test-component', $actual->getComponent());
         self::assertSame($visibleConditionForDetailViewModel, $actual->getVisibleCondition());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new DetailViewListItemTransformer(self::createStub(ToggleSwitchTransformerInterface::class), self::createStub(StandbyPowerSwitchTransformerInterface::class), self::createStub(SwitchControlTransformerInterface::class), self::createStub(SliderTypeTransformerInterface::class), self::createStub(PushButtonTransformerInterface::class), self::createStub(TextButtonTransformerInterface::class), self::createStub(PlayPauseTransformerInterface::class), self::createStub(PlayStopTransformerInterface::class), self::createStub(ListForDetailViewTransformerInterface::class), self::createStub(TextFieldTransformerInterface::class), self::createStub(NumberFieldTransformerInterface::class), self::createStub(StepperTransformerInterface::class), self::createStub(StateTransformerInterface::class), self::createStub(MultiArgCommandTransformerInterface::class), self::createStub(VisibleConditionForDetailViewTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'capabilityAbsent' => [[DetailViewListItemTransformerInterface::KEY_LABEL => 'test-label', DetailViewListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type'], 'getCapability', null];
+        yield 'capabilityWrongType' => [[DetailViewListItemTransformerInterface::KEY_LABEL => 'test-label', DetailViewListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type', DetailViewListItemTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
+        yield 'labelAbsent' => [[DetailViewListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', DetailViewListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type'], 'getLabel', null];
+        yield 'labelWrongType' => [[DetailViewListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', DetailViewListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type', DetailViewListItemTransformerInterface::KEY_LABEL => 42], 'getLabel', null];
+        yield 'displayTypeAbsent' => [[DetailViewListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', DetailViewListItemTransformerInterface::KEY_LABEL => 'test-label'], 'getDisplayType', null];
+        yield 'displayTypeWrongType' => [[DetailViewListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', DetailViewListItemTransformerInterface::KEY_LABEL => 'test-label', DetailViewListItemTransformerInterface::KEY_DISPLAY_TYPE => 42], 'getDisplayType', null];
     }
 
     public function testTransformList(): void
@@ -1010,32 +1033,6 @@ final class DetailViewListItemTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getToggleSwitch());
         self::assertNull($transformer->transform($base + [DetailViewListItemTransformerInterface::KEY_TOGGLE_SWITCH => 'test-not-array'])->getToggleSwitch());
         self::assertSame($toggleSwitchModel, $transformer->transform($base + [DetailViewListItemTransformerInterface::KEY_TOGGLE_SWITCH => ['test-nested']])->getToggleSwitch());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new DetailViewListItemTransformer(self::createStub(ToggleSwitchTransformerInterface::class), self::createStub(StandbyPowerSwitchTransformerInterface::class), self::createStub(SwitchControlTransformerInterface::class), self::createStub(SliderTypeTransformerInterface::class), self::createStub(PushButtonTransformerInterface::class), self::createStub(TextButtonTransformerInterface::class), self::createStub(PlayPauseTransformerInterface::class), self::createStub(PlayStopTransformerInterface::class), self::createStub(ListForDetailViewTransformerInterface::class), self::createStub(TextFieldTransformerInterface::class), self::createStub(NumberFieldTransformerInterface::class), self::createStub(StepperTransformerInterface::class), self::createStub(StateTransformerInterface::class), self::createStub(MultiArgCommandTransformerInterface::class), self::createStub(VisibleConditionForDetailViewTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'capabilityAbsent' => [[DetailViewListItemTransformerInterface::KEY_LABEL => 'test-label', DetailViewListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type'], sprintf(DetailViewListItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, DetailViewListItemTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[DetailViewListItemTransformerInterface::KEY_LABEL => 'test-label', DetailViewListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type', DetailViewListItemTransformerInterface::KEY_CAPABILITY => 42], sprintf(DetailViewListItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, DetailViewListItemTransformerInterface::KEY_CAPABILITY)];
-        yield 'labelAbsent' => [[DetailViewListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', DetailViewListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type'], sprintf(DetailViewListItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, DetailViewListItemTransformerInterface::KEY_LABEL)];
-        yield 'labelWrongType' => [[DetailViewListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', DetailViewListItemTransformerInterface::KEY_DISPLAY_TYPE => 'test-display-type', DetailViewListItemTransformerInterface::KEY_LABEL => 42], sprintf(DetailViewListItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, DetailViewListItemTransformerInterface::KEY_LABEL)];
-        yield 'displayTypeAbsent' => [[DetailViewListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', DetailViewListItemTransformerInterface::KEY_LABEL => 'test-label'], sprintf(DetailViewListItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, DetailViewListItemTransformerInterface::KEY_DISPLAY_TYPE)];
-        yield 'displayTypeWrongType' => [[DetailViewListItemTransformerInterface::KEY_CAPABILITY => 'test-capability', DetailViewListItemTransformerInterface::KEY_LABEL => 'test-label', DetailViewListItemTransformerInterface::KEY_DISPLAY_TYPE => 42], sprintf(DetailViewListItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, DetailViewListItemTransformerInterface::KEY_DISPLAY_TYPE)];
     }
 
     public function testTransformVisibleCondition(): void

@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface EnumCommandInterface
 {
-    public function getCommand(): string;
+    public function getCommand(): ?string;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\Action;
 use ChristianBrown\SmartThings\Model\ActionSequence;
 use ChristianBrown\SmartThings\Model\ArrayOperand;
@@ -51,8 +50,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-use function sprintf;
-
 #[CoversClass(Action::class)]
 #[CoversClass(ActionSequence::class)]
 #[CoversClass(ArrayOperand::class)]
@@ -94,38 +91,37 @@ use function sprintf;
 #[CoversClass(WasCondition::class)]
 #[CoversClass(ActionTransformer::class)]
 #[CoversClass(ActionSerializer::class)]
-final class ActionTransformerUnexpectedTest extends TestCase
+final class ActionTransformerLenientTest extends TestCase
 {
     /**
      * @param array<array-key, mixed> $data
      */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data): void
     {
         $transformer = new ActionTransformer();
 
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
         $transformer->transform($data);
+
+        $this->addToAssertionCount(1);
     }
 
     /**
-     * @return iterable<string, array{array<array-key, mixed>, string}>
+     * @return iterable<string, array{array<array-key, mixed>}>
      */
-    public static function provideTransformUnexpectedCases(): iterable
+    public static function provideTransformLenientCases(): iterable
     {
-        yield 'EqualsCondition.left.missing' => self::unexpectedCase(
+        yield 'EqualsCondition.left.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_LEFT)
+            ]
         );
 
-        yield 'EqualsCondition.left.wrongReq' => self::unexpectedCase(
+        yield 'EqualsCondition.left.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -133,22 +129,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_LEFT)
+            ]
         );
 
-        yield 'EqualsCondition.right.missing' => self::unexpectedCase(
+        yield 'EqualsCondition.right.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
                         ActionTransformerInterface::KEY_LEFT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_RIGHT)
+            ]
         );
 
-        yield 'EqualsCondition.right.wrongReq' => self::unexpectedCase(
+        yield 'EqualsCondition.right.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -156,11 +150,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => 'not-array',
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_RIGHT)
+            ]
         );
 
-        yield 'ArrayOperand.operands.missing' => self::unexpectedCase(
+        yield 'ArrayOperand.operands.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -170,11 +163,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_OPERANDS)
+            ]
         );
 
-        yield 'ArrayOperand.operands.wrongReq' => self::unexpectedCase(
+        yield 'ArrayOperand.operands.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -186,11 +178,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_OPERANDS)
+            ]
         );
 
-        yield 'DeviceOperand.devices.missing' => self::unexpectedCase(
+        yield 'DeviceOperand.devices.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -204,11 +195,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_DEVICES)
+            ]
         );
 
-        yield 'DeviceOperand.devices.wrongReq' => self::unexpectedCase(
+        yield 'DeviceOperand.devices.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -223,11 +213,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_DEVICES)
+            ]
         );
 
-        yield 'DeviceOperand.component.missing' => self::unexpectedCase(
+        yield 'DeviceOperand.component.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -241,11 +230,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_COMPONENT)
+            ]
         );
 
-        yield 'DeviceOperand.component.wrongReq' => self::unexpectedCase(
+        yield 'DeviceOperand.component.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -260,11 +248,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_COMPONENT)
+            ]
         );
 
-        yield 'DeviceOperand.capability.missing' => self::unexpectedCase(
+        yield 'DeviceOperand.capability.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -278,11 +265,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_CAPABILITY)
+            ]
         );
 
-        yield 'DeviceOperand.capability.wrongReq' => self::unexpectedCase(
+        yield 'DeviceOperand.capability.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -297,11 +283,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_CAPABILITY)
+            ]
         );
 
-        yield 'DeviceOperand.attribute.missing' => self::unexpectedCase(
+        yield 'DeviceOperand.attribute.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -315,11 +300,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_ATTRIBUTE)
+            ]
         );
 
-        yield 'DeviceOperand.attribute.wrongReq' => self::unexpectedCase(
+        yield 'DeviceOperand.attribute.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -334,11 +318,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_ATTRIBUTE)
+            ]
         );
 
-        yield 'LocationOperand.attribute.missing' => self::unexpectedCase(
+        yield 'LocationOperand.attribute.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -348,11 +331,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_ATTRIBUTE)
+            ]
         );
 
-        yield 'LocationOperand.attribute.wrongReq' => self::unexpectedCase(
+        yield 'LocationOperand.attribute.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -364,11 +346,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_ATTRIBUTE)
+            ]
         );
 
-        yield 'TimeOperand.reference.missing' => self::unexpectedCase(
+        yield 'TimeOperand.reference.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -378,11 +359,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_REFERENCE)
+            ]
         );
 
-        yield 'TimeOperand.reference.wrongReq' => self::unexpectedCase(
+        yield 'TimeOperand.reference.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_EQUALS => [
@@ -394,22 +374,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_REFERENCE)
+            ]
         );
 
-        yield 'Interval.value.missing' => self::unexpectedCase(
+        yield 'Interval.value.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_SLEEP => [
                     ActionTransformerInterface::KEY_DURATION => [
                         ActionTransformerInterface::KEY_UNIT => 'test-unit',
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_VALUE)
+            ]
         );
 
-        yield 'Interval.value.wrongReq' => self::unexpectedCase(
+        yield 'Interval.value.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_SLEEP => [
                     ActionTransformerInterface::KEY_DURATION => [
@@ -417,22 +395,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_UNIT => 'test-unit',
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_VALUE)
+            ]
         );
 
-        yield 'Interval.unit.missing' => self::unexpectedCase(
+        yield 'Interval.unit.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_SLEEP => [
                     ActionTransformerInterface::KEY_DURATION => [
                         ActionTransformerInterface::KEY_VALUE => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_UNIT)
+            ]
         );
 
-        yield 'Interval.unit.wrongReq' => self::unexpectedCase(
+        yield 'Interval.unit.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_SLEEP => [
                     ActionTransformerInterface::KEY_DURATION => [
@@ -440,21 +416,19 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_UNIT => 42,
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_UNIT)
+            ]
         );
 
-        yield 'DateTimeOperand.reference.missing' => self::unexpectedCase(
+        yield 'DateTimeOperand.reference.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_EVERY => [
                     ActionTransformerInterface::KEY_SPECIFIC => [],
                     ActionTransformerInterface::KEY_ACTIONS => [[]],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_REFERENCE)
+            ]
         );
 
-        yield 'DateTimeOperand.reference.wrongReq' => self::unexpectedCase(
+        yield 'DateTimeOperand.reference.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_EVERY => [
                     ActionTransformerInterface::KEY_SPECIFIC => [
@@ -462,22 +436,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                     ],
                     ActionTransformerInterface::KEY_ACTIONS => [[]],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_REFERENCE)
+            ]
         );
 
-        yield 'GreaterThanCondition.left.missing' => self::unexpectedCase(
+        yield 'GreaterThanCondition.left.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_GREATER_THAN => [
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_LEFT)
+            ]
         );
 
-        yield 'GreaterThanCondition.left.wrongReq' => self::unexpectedCase(
+        yield 'GreaterThanCondition.left.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_GREATER_THAN => [
@@ -485,22 +457,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_LEFT)
+            ]
         );
 
-        yield 'GreaterThanCondition.right.missing' => self::unexpectedCase(
+        yield 'GreaterThanCondition.right.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_GREATER_THAN => [
                         ActionTransformerInterface::KEY_LEFT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_RIGHT)
+            ]
         );
 
-        yield 'GreaterThanCondition.right.wrongReq' => self::unexpectedCase(
+        yield 'GreaterThanCondition.right.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_GREATER_THAN => [
@@ -508,22 +478,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => 'not-array',
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_RIGHT)
+            ]
         );
 
-        yield 'GreaterThanOrEqualsCondition.left.missing' => self::unexpectedCase(
+        yield 'GreaterThanOrEqualsCondition.left.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_GREATER_THAN_OR_EQUALS => [
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_LEFT)
+            ]
         );
 
-        yield 'GreaterThanOrEqualsCondition.left.wrongReq' => self::unexpectedCase(
+        yield 'GreaterThanOrEqualsCondition.left.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_GREATER_THAN_OR_EQUALS => [
@@ -531,22 +499,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_LEFT)
+            ]
         );
 
-        yield 'GreaterThanOrEqualsCondition.right.missing' => self::unexpectedCase(
+        yield 'GreaterThanOrEqualsCondition.right.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_GREATER_THAN_OR_EQUALS => [
                         ActionTransformerInterface::KEY_LEFT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_RIGHT)
+            ]
         );
 
-        yield 'GreaterThanOrEqualsCondition.right.wrongReq' => self::unexpectedCase(
+        yield 'GreaterThanOrEqualsCondition.right.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_GREATER_THAN_OR_EQUALS => [
@@ -554,22 +520,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => 'not-array',
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_RIGHT)
+            ]
         );
 
-        yield 'LessThanCondition.left.missing' => self::unexpectedCase(
+        yield 'LessThanCondition.left.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_LESS_THAN => [
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_LEFT)
+            ]
         );
 
-        yield 'LessThanCondition.left.wrongReq' => self::unexpectedCase(
+        yield 'LessThanCondition.left.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_LESS_THAN => [
@@ -577,22 +541,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_LEFT)
+            ]
         );
 
-        yield 'LessThanCondition.right.missing' => self::unexpectedCase(
+        yield 'LessThanCondition.right.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_LESS_THAN => [
                         ActionTransformerInterface::KEY_LEFT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_RIGHT)
+            ]
         );
 
-        yield 'LessThanCondition.right.wrongReq' => self::unexpectedCase(
+        yield 'LessThanCondition.right.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_LESS_THAN => [
@@ -600,22 +562,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => 'not-array',
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_RIGHT)
+            ]
         );
 
-        yield 'LessThanOrEqualsCondition.left.missing' => self::unexpectedCase(
+        yield 'LessThanOrEqualsCondition.left.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_LESS_THAN_OR_EQUALS => [
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_LEFT)
+            ]
         );
 
-        yield 'LessThanOrEqualsCondition.left.wrongReq' => self::unexpectedCase(
+        yield 'LessThanOrEqualsCondition.left.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_LESS_THAN_OR_EQUALS => [
@@ -623,22 +583,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_LEFT)
+            ]
         );
 
-        yield 'LessThanOrEqualsCondition.right.missing' => self::unexpectedCase(
+        yield 'LessThanOrEqualsCondition.right.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_LESS_THAN_OR_EQUALS => [
                         ActionTransformerInterface::KEY_LEFT => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_RIGHT)
+            ]
         );
 
-        yield 'LessThanOrEqualsCondition.right.wrongReq' => self::unexpectedCase(
+        yield 'LessThanOrEqualsCondition.right.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_LESS_THAN_OR_EQUALS => [
@@ -646,11 +604,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_RIGHT => 'not-array',
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_RIGHT)
+            ]
         );
 
-        yield 'BetweenCondition.value.missing' => self::unexpectedCase(
+        yield 'BetweenCondition.value.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_BETWEEN => [
@@ -658,11 +615,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_END => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_VALUE)
+            ]
         );
 
-        yield 'BetweenCondition.value.wrongReq' => self::unexpectedCase(
+        yield 'BetweenCondition.value.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_BETWEEN => [
@@ -671,11 +627,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_END => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_VALUE)
+            ]
         );
 
-        yield 'BetweenCondition.start.missing' => self::unexpectedCase(
+        yield 'BetweenCondition.start.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_BETWEEN => [
@@ -683,11 +638,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_END => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_START)
+            ]
         );
 
-        yield 'BetweenCondition.start.wrongReq' => self::unexpectedCase(
+        yield 'BetweenCondition.start.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_BETWEEN => [
@@ -696,11 +650,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_END => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_START)
+            ]
         );
 
-        yield 'BetweenCondition.end.missing' => self::unexpectedCase(
+        yield 'BetweenCondition.end.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_BETWEEN => [
@@ -708,11 +661,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_START => [],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_END)
+            ]
         );
 
-        yield 'BetweenCondition.end.wrongReq' => self::unexpectedCase(
+        yield 'BetweenCondition.end.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_BETWEEN => [
@@ -721,31 +673,28 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_END => 'not-array',
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_END)
+            ]
         );
 
-        yield 'ChangesCondition.id.missing' => self::unexpectedCase(
+        yield 'ChangesCondition.id.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_CHANGES => [],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_ID)
+            ]
         );
 
-        yield 'ChangesCondition.id.wrongReq' => self::unexpectedCase(
+        yield 'ChangesCondition.id.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_CHANGES => [
                         ActionTransformerInterface::KEY_ID => 42,
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_ID)
+            ]
         );
 
-        yield 'RemainsCondition.id.missing' => self::unexpectedCase(
+        yield 'RemainsCondition.id.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_REMAINS => [
@@ -755,11 +704,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_ID)
+            ]
         );
 
-        yield 'RemainsCondition.id.wrongReq' => self::unexpectedCase(
+        yield 'RemainsCondition.id.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_REMAINS => [
@@ -770,22 +718,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_ID)
+            ]
         );
 
-        yield 'RemainsCondition.duration.missing' => self::unexpectedCase(
+        yield 'RemainsCondition.duration.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_REMAINS => [
                         ActionTransformerInterface::KEY_ID => 'test-id',
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_DURATION)
+            ]
         );
 
-        yield 'RemainsCondition.duration.wrongReq' => self::unexpectedCase(
+        yield 'RemainsCondition.duration.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_REMAINS => [
@@ -793,11 +739,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_DURATION => 'not-array',
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_DURATION)
+            ]
         );
 
-        yield 'WasCondition.id.missing' => self::unexpectedCase(
+        yield 'WasCondition.id.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_WAS => [
@@ -807,11 +752,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_ID)
+            ]
         );
 
-        yield 'WasCondition.id.wrongReq' => self::unexpectedCase(
+        yield 'WasCondition.id.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_WAS => [
@@ -822,22 +766,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ],
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_ID)
+            ]
         );
 
-        yield 'WasCondition.duration.missing' => self::unexpectedCase(
+        yield 'WasCondition.duration.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_WAS => [
                         ActionTransformerInterface::KEY_ID => 'test-id',
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_DURATION)
+            ]
         );
 
-        yield 'WasCondition.duration.wrongReq' => self::unexpectedCase(
+        yield 'WasCondition.duration.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_IF => [
                     ActionTransformerInterface::KEY_WAS => [
@@ -845,27 +787,24 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_DURATION => 'not-array',
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_DURATION)
+            ]
         );
 
-        yield 'SleepAction.duration.missing' => self::unexpectedCase(
+        yield 'SleepAction.duration.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_SLEEP => [],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_DURATION)
+            ]
         );
 
-        yield 'SleepAction.duration.wrongReq' => self::unexpectedCase(
+        yield 'SleepAction.duration.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_SLEEP => [
                     ActionTransformerInterface::KEY_DURATION => 'not-array',
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_DURATION)
+            ]
         );
 
-        yield 'CommandAction.devices.missing' => self::unexpectedCase(
+        yield 'CommandAction.devices.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_COMMAND => [
                     ActionTransformerInterface::KEY_COMMANDS => [[
@@ -873,11 +812,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_COMMAND => 'test-command',
                     ]],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_DEVICES)
+            ]
         );
 
-        yield 'CommandAction.devices.wrongReq' => self::unexpectedCase(
+        yield 'CommandAction.devices.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_COMMAND => [
                     ActionTransformerInterface::KEY_DEVICES => 'not-array',
@@ -886,30 +824,27 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_COMMAND => 'test-command',
                     ]],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_DEVICES)
+            ]
         );
 
-        yield 'CommandAction.commands.missing' => self::unexpectedCase(
+        yield 'CommandAction.commands.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_COMMAND => [
                     ActionTransformerInterface::KEY_DEVICES => ['test-devices-1', 'test-devices-2'],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_COMMANDS)
+            ]
         );
 
-        yield 'CommandAction.commands.wrongReq' => self::unexpectedCase(
+        yield 'CommandAction.commands.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_COMMAND => [
                     ActionTransformerInterface::KEY_DEVICES => ['test-devices-1', 'test-devices-2'],
                     ActionTransformerInterface::KEY_COMMANDS => 'not-array',
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_COMMANDS)
+            ]
         );
 
-        yield 'RuleDeviceCommand.capability.missing' => self::unexpectedCase(
+        yield 'RuleDeviceCommand.capability.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_COMMAND => [
                     ActionTransformerInterface::KEY_DEVICES => ['test-devices-1', 'test-devices-2'],
@@ -917,11 +852,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_COMMAND => 'test-command',
                     ]],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_CAPABILITY)
+            ]
         );
 
-        yield 'RuleDeviceCommand.capability.wrongReq' => self::unexpectedCase(
+        yield 'RuleDeviceCommand.capability.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_COMMAND => [
                     ActionTransformerInterface::KEY_DEVICES => ['test-devices-1', 'test-devices-2'],
@@ -930,11 +864,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_COMMAND => 'test-command',
                     ]],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_CAPABILITY)
+            ]
         );
 
-        yield 'RuleDeviceCommand.command.missing' => self::unexpectedCase(
+        yield 'RuleDeviceCommand.command.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_COMMAND => [
                     ActionTransformerInterface::KEY_DEVICES => ['test-devices-1', 'test-devices-2'],
@@ -942,11 +875,10 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_CAPABILITY => 'test-capability',
                     ]],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_COMMAND)
+            ]
         );
 
-        yield 'RuleDeviceCommand.command.wrongReq' => self::unexpectedCase(
+        yield 'RuleDeviceCommand.command.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_COMMAND => [
                     ActionTransformerInterface::KEY_DEVICES => ['test-devices-1', 'test-devices-2'],
@@ -955,161 +887,145 @@ final class ActionTransformerUnexpectedTest extends TestCase
                         ActionTransformerInterface::KEY_COMMAND => 42,
                     ]],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_COMMAND)
+            ]
         );
 
-        yield 'SceneModeRequest.modeId.missing' => self::unexpectedCase(
+        yield 'SceneModeRequest.modeId.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_SCENE => [
                     ActionTransformerInterface::KEY_MODE_REQUEST => [],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_MODE_ID)
+            ]
         );
 
-        yield 'SceneModeRequest.modeId.wrongReq' => self::unexpectedCase(
+        yield 'SceneModeRequest.modeId.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_SCENE => [
                     ActionTransformerInterface::KEY_MODE_REQUEST => [
                         ActionTransformerInterface::KEY_MODE_ID => 42,
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_MODE_ID)
+            ]
         );
 
-        yield 'SceneSleepRequest.seconds.missing' => self::unexpectedCase(
+        yield 'SceneSleepRequest.seconds.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_SCENE => [
                     ActionTransformerInterface::KEY_SLEEP_REQUEST => [],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_INT_SPRINTF, ActionTransformerInterface::KEY_SECONDS)
+            ]
         );
 
-        yield 'SceneSleepRequest.seconds.wrongReq' => self::unexpectedCase(
+        yield 'SceneSleepRequest.seconds.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_SCENE => [
                     ActionTransformerInterface::KEY_SLEEP_REQUEST => [
                         ActionTransformerInterface::KEY_SECONDS => 'not-int',
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_INT_SPRINTF, ActionTransformerInterface::KEY_SECONDS)
+            ]
         );
 
-        yield 'SceneDeviceGroupRequest.deviceGroupId.missing' => self::unexpectedCase(
+        yield 'SceneDeviceGroupRequest.deviceGroupId.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_SCENE => [
                     ActionTransformerInterface::KEY_DEVICE_GROUP_REQUEST => [],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_DEVICE_GROUP_ID)
+            ]
         );
 
-        yield 'SceneDeviceGroupRequest.deviceGroupId.wrongReq' => self::unexpectedCase(
+        yield 'SceneDeviceGroupRequest.deviceGroupId.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_SCENE => [
                     ActionTransformerInterface::KEY_DEVICE_GROUP_REQUEST => [
                         ActionTransformerInterface::KEY_DEVICE_GROUP_ID => 42,
                     ],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_DEVICE_GROUP_ID)
+            ]
         );
 
-        yield 'EveryAction.actions.missing' => self::unexpectedCase(
+        yield 'EveryAction.actions.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_EVERY => [],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_ACTIONS)
+            ]
         );
 
-        yield 'EveryAction.actions.wrongReq' => self::unexpectedCase(
+        yield 'EveryAction.actions.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_EVERY => [
                     ActionTransformerInterface::KEY_ACTIONS => 'not-array',
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_ACTIONS)
+            ]
         );
 
-        yield 'LimitAction.count.missing' => self::unexpectedCase(
+        yield 'LimitAction.count.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_LIMIT => [
                     ActionTransformerInterface::KEY_PERIOD => 'test-period',
                     ActionTransformerInterface::KEY_ACTIONS => [[]],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_INT_SPRINTF, ActionTransformerInterface::KEY_COUNT)
+            ]
         );
 
-        yield 'LimitAction.count.wrongReq' => self::unexpectedCase(
+        yield 'LimitAction.count.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_LIMIT => [
                     ActionTransformerInterface::KEY_COUNT => 'not-int',
                     ActionTransformerInterface::KEY_PERIOD => 'test-period',
                     ActionTransformerInterface::KEY_ACTIONS => [[]],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_INT_SPRINTF, ActionTransformerInterface::KEY_COUNT)
+            ]
         );
 
-        yield 'LimitAction.period.missing' => self::unexpectedCase(
+        yield 'LimitAction.period.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_LIMIT => [
                     ActionTransformerInterface::KEY_COUNT => 7,
                     ActionTransformerInterface::KEY_ACTIONS => [[]],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_PERIOD)
+            ]
         );
 
-        yield 'LimitAction.period.wrongReq' => self::unexpectedCase(
+        yield 'LimitAction.period.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_LIMIT => [
                     ActionTransformerInterface::KEY_COUNT => 7,
                     ActionTransformerInterface::KEY_PERIOD => 42,
                     ActionTransformerInterface::KEY_ACTIONS => [[]],
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_PERIOD)
+            ]
         );
 
-        yield 'LimitAction.actions.missing' => self::unexpectedCase(
+        yield 'LimitAction.actions.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_LIMIT => [
                     ActionTransformerInterface::KEY_COUNT => 7,
                     ActionTransformerInterface::KEY_PERIOD => 'test-period',
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_ACTIONS)
+            ]
         );
 
-        yield 'LimitAction.actions.wrongReq' => self::unexpectedCase(
+        yield 'LimitAction.actions.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_LIMIT => [
                     ActionTransformerInterface::KEY_COUNT => 7,
                     ActionTransformerInterface::KEY_PERIOD => 'test-period',
                     ActionTransformerInterface::KEY_ACTIONS => 'not-array',
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_ACTIONS)
+            ]
         );
 
-        yield 'ToggleAction.devices.missing' => self::unexpectedCase(
+        yield 'ToggleAction.devices.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_TOGGLE => [
                     ActionTransformerInterface::KEY_COMPONENT => 'test-component',
                     ActionTransformerInterface::KEY_CAPABILITY => 'test-capability',
                     ActionTransformerInterface::KEY_ATTRIBUTE => 'test-attribute',
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_DEVICES)
+            ]
         );
 
-        yield 'ToggleAction.devices.wrongReq' => self::unexpectedCase(
+        yield 'ToggleAction.devices.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_TOGGLE => [
                     ActionTransformerInterface::KEY_DEVICES => 'not-array',
@@ -1117,22 +1033,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                     ActionTransformerInterface::KEY_CAPABILITY => 'test-capability',
                     ActionTransformerInterface::KEY_ATTRIBUTE => 'test-attribute',
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ActionTransformerInterface::KEY_DEVICES)
+            ]
         );
 
-        yield 'ToggleAction.component.missing' => self::unexpectedCase(
+        yield 'ToggleAction.component.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_TOGGLE => [
                     ActionTransformerInterface::KEY_DEVICES => ['test-devices-1', 'test-devices-2'],
                     ActionTransformerInterface::KEY_CAPABILITY => 'test-capability',
                     ActionTransformerInterface::KEY_ATTRIBUTE => 'test-attribute',
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_COMPONENT)
+            ]
         );
 
-        yield 'ToggleAction.component.wrongReq' => self::unexpectedCase(
+        yield 'ToggleAction.component.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_TOGGLE => [
                     ActionTransformerInterface::KEY_DEVICES => ['test-devices-1', 'test-devices-2'],
@@ -1140,22 +1054,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                     ActionTransformerInterface::KEY_CAPABILITY => 'test-capability',
                     ActionTransformerInterface::KEY_ATTRIBUTE => 'test-attribute',
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_COMPONENT)
+            ]
         );
 
-        yield 'ToggleAction.capability.missing' => self::unexpectedCase(
+        yield 'ToggleAction.capability.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_TOGGLE => [
                     ActionTransformerInterface::KEY_DEVICES => ['test-devices-1', 'test-devices-2'],
                     ActionTransformerInterface::KEY_COMPONENT => 'test-component',
                     ActionTransformerInterface::KEY_ATTRIBUTE => 'test-attribute',
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_CAPABILITY)
+            ]
         );
 
-        yield 'ToggleAction.capability.wrongReq' => self::unexpectedCase(
+        yield 'ToggleAction.capability.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_TOGGLE => [
                     ActionTransformerInterface::KEY_DEVICES => ['test-devices-1', 'test-devices-2'],
@@ -1163,22 +1075,20 @@ final class ActionTransformerUnexpectedTest extends TestCase
                     ActionTransformerInterface::KEY_CAPABILITY => 42,
                     ActionTransformerInterface::KEY_ATTRIBUTE => 'test-attribute',
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_CAPABILITY)
+            ]
         );
 
-        yield 'ToggleAction.attribute.missing' => self::unexpectedCase(
+        yield 'ToggleAction.attribute.missing' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_TOGGLE => [
                     ActionTransformerInterface::KEY_DEVICES => ['test-devices-1', 'test-devices-2'],
                     ActionTransformerInterface::KEY_COMPONENT => 'test-component',
                     ActionTransformerInterface::KEY_CAPABILITY => 'test-capability',
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_ATTRIBUTE)
+            ]
         );
 
-        yield 'ToggleAction.attribute.wrongReq' => self::unexpectedCase(
+        yield 'ToggleAction.attribute.wrongReq' => self::lenientCase(
             [
                 ActionTransformerInterface::KEY_TOGGLE => [
                     ActionTransformerInterface::KEY_DEVICES => ['test-devices-1', 'test-devices-2'],
@@ -1186,18 +1096,17 @@ final class ActionTransformerUnexpectedTest extends TestCase
                     ActionTransformerInterface::KEY_CAPABILITY => 'test-capability',
                     ActionTransformerInterface::KEY_ATTRIBUTE => 42,
                 ],
-            ],
-            sprintf(ActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, ActionTransformerInterface::KEY_ATTRIBUTE)
+            ]
         );
     }
 
     /**
      * @param array<array-key, mixed> $data
      *
-     * @return array{array<array-key, mixed>, string}
+     * @return array{array<array-key, mixed>}
      */
-    private static function unexpectedCase(array $data, string $message): array
+    private static function lenientCase(array $data): array
     {
-        return [$data, $message];
+        return [$data];
     }
 }

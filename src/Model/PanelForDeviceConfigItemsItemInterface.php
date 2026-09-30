@@ -6,9 +6,9 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface PanelForDeviceConfigItemsItemInterface
 {
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getComponent(): string;
+    public function getComponent(): ?string;
 
     public function getHideOnUnmatch(): ?bool;
 
@@ -16,7 +16,7 @@ interface PanelForDeviceConfigItemsItemInterface
 
     public function getOperator(): ?string;
 
-    public function getSize(): string;
+    public function getSize(): ?string;
 
     /**
      * @return null|array<int, CapabilityValueForPanelInterface>

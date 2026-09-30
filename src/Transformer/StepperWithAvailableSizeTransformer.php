@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\StepperWithAvailableSize;
 use ChristianBrown\SmartThings\Model\StepperWithAvailableSizeCommandInterface;
 use ChristianBrown\SmartThings\Model\StepperWithAvailableSizeInterface;
@@ -15,7 +14,6 @@ use function array_values;
 use function is_array;
 use function is_numeric;
 use function is_string;
-use function sprintf;
 
 final class StepperWithAvailableSizeTransformer implements StepperWithAvailableSizeTransformerInterface
 {
@@ -72,13 +70,13 @@ final class StepperWithAvailableSizeTransformer implements StepperWithAvailableS
     /**
      * @param mixed[] $data
      */
-    private function requireCommand(array $data): StepperWithAvailableSizeCommandInterface
+    private function requireCommand(array $data): ?StepperWithAvailableSizeCommandInterface
     {
         if (!isset($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
         if (!is_array($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
 
         return $this->stepperWithAvailableSizeCommandTransformer->transform($data[self::KEY_COMMAND]);
@@ -92,10 +90,10 @@ final class StepperWithAvailableSizeTransformer implements StepperWithAvailableS
     private static function requireRange(array $data): array
     {
         if (!isset($data[self::KEY_RANGE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RANGE));
+            return [];
         }
         if (!is_array($data[self::KEY_RANGE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_RANGE));
+            return [];
         }
 
         return $data[self::KEY_RANGE];
@@ -104,13 +102,13 @@ final class StepperWithAvailableSizeTransformer implements StepperWithAvailableS
     /**
      * @param mixed[] $data
      */
-    private function requireState(array $data): StepperWithAvailableSizeStateInterface
+    private function requireState(array $data): ?StepperWithAvailableSizeStateInterface
     {
         if (!isset($data[self::KEY_STATE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_STATE));
+            return null;
         }
         if (!is_array($data[self::KEY_STATE])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_STATE));
+            return null;
         }
 
         return $this->stepperWithAvailableSizeStateTransformer->transform($data[self::KEY_STATE]);
@@ -119,13 +117,13 @@ final class StepperWithAvailableSizeTransformer implements StepperWithAvailableS
     /**
      * @param mixed[] $data
      */
-    private static function requireStep(array $data): float
+    private static function requireStep(array $data): ?float
     {
         if (!isset($data[self::KEY_STEP])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_NUMBER_SPRINTF, self::KEY_STEP));
+            return null;
         }
         if (!is_numeric($data[self::KEY_STEP])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_NUMBER_SPRINTF, self::KEY_STEP));
+            return null;
         }
 
         return (float) $data[self::KEY_STEP];

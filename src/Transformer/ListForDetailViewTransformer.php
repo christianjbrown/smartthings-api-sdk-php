@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ListForDetailView;
 use ChristianBrown\SmartThings\Model\ListForDetailViewInterface;
 use ChristianBrown\SmartThings\Model\ListWithAvailableSizeCommandInterface;
 
 use function is_array;
-use function sprintf;
 
 final class ListForDetailViewTransformer implements ListForDetailViewTransformerInterface
 {
@@ -52,13 +50,13 @@ final class ListForDetailViewTransformer implements ListForDetailViewTransformer
     /**
      * @param mixed[] $data
      */
-    private function requireCommand(array $data): ListWithAvailableSizeCommandInterface
+    private function requireCommand(array $data): ?ListWithAvailableSizeCommandInterface
     {
         if (!isset($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
         if (!is_array($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
 
         return $this->listWithAvailableSizeCommandTransformer->transform($data[self::KEY_COMMAND]);

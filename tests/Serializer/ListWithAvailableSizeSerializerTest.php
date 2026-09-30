@@ -18,6 +18,23 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ListWithAvailableSizeSerializer::class)]
 final class ListWithAvailableSizeSerializerTest extends TestCase
 {
+    public function testSerializeNestedAbsent(): void
+    {
+        $listWithAvailableSizeCommandSerializer = self::createStub(ListWithAvailableSizeCommandSerializerInterface::class);
+        $listWithAvailableSizeCommandSerializer->method('serialize')->willReturn(['test-serialized-list-with-available-size-command']);
+        $listWithAvailableSizeStateModel = self::createStub(ListWithAvailableSizeStateInterface::class);
+        $listWithAvailableSizeStateSerializer = self::createStub(ListWithAvailableSizeStateSerializerInterface::class);
+        $listWithAvailableSizeStateSerializer->method('serialize')->willReturn(['test-serialized-list-with-available-size-state']);
+        $model = new ListWithAvailableSize(null);
+
+        $serializer = new ListWithAvailableSizeSerializer($listWithAvailableSizeCommandSerializer, $listWithAvailableSizeStateSerializer);
+
+        self::assertSame(
+            [],
+            $serializer->serialize($model)
+        );
+    }
+
     public function testSerializeRequiredFieldsOnly(): void
     {
         $listWithAvailableSizeCommandModel = self::createStub(ListWithAvailableSizeCommandInterface::class);

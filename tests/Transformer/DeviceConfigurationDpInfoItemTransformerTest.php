@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationDpInfoItem;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationDpInfoItemArgumentsItemInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceConfigurationDpInfoItemArgumentsItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\DeviceConfigurationDpInfoItemTransfor
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(DeviceConfigurationDpInfoItem::class)]
 #[CoversClass(DeviceConfigurationDpInfoItemTransformer::class)]
@@ -58,6 +55,30 @@ final class DeviceConfigurationDpInfoItemTransformerTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new DeviceConfigurationDpInfoItemTransformer(self::createStub(DeviceConfigurationDpInfoItemArgumentsItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'osAbsent' => [[DeviceConfigurationDpInfoItemTransformerInterface::KEY_DP_URI => 'test-dp-uri'], 'getOs', null];
+        yield 'osWrongType' => [[DeviceConfigurationDpInfoItemTransformerInterface::KEY_DP_URI => 'test-dp-uri', DeviceConfigurationDpInfoItemTransformerInterface::KEY_OS => 42], 'getOs', null];
+        yield 'dpUriAbsent' => [[DeviceConfigurationDpInfoItemTransformerInterface::KEY_OS => 'test-os'], 'getDpUri', null];
+        yield 'dpUriWrongType' => [[DeviceConfigurationDpInfoItemTransformerInterface::KEY_OS => 'test-os', DeviceConfigurationDpInfoItemTransformerInterface::KEY_DP_URI => 42], 'getDpUri', null];
+    }
+
+    /**
      * Each optional field in each of its states: absent, present but the wrong type, or valid.
      *
      * @param array<string, mixed> $extra
@@ -97,29 +118,5 @@ final class DeviceConfigurationDpInfoItemTransformerTest extends TestCase
         self::assertNull($actual->getServerDpUri());
         self::assertNull($actual->getOperatingMode());
         self::assertNull($actual->getArguments());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new DeviceConfigurationDpInfoItemTransformer(self::createStub(DeviceConfigurationDpInfoItemArgumentsItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'osAbsent' => [[DeviceConfigurationDpInfoItemTransformerInterface::KEY_DP_URI => 'test-dp-uri'], sprintf(DeviceConfigurationDpInfoItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceConfigurationDpInfoItemTransformerInterface::KEY_OS)];
-        yield 'osWrongType' => [[DeviceConfigurationDpInfoItemTransformerInterface::KEY_DP_URI => 'test-dp-uri', DeviceConfigurationDpInfoItemTransformerInterface::KEY_OS => 42], sprintf(DeviceConfigurationDpInfoItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceConfigurationDpInfoItemTransformerInterface::KEY_OS)];
-        yield 'dpUriAbsent' => [[DeviceConfigurationDpInfoItemTransformerInterface::KEY_OS => 'test-os'], sprintf(DeviceConfigurationDpInfoItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceConfigurationDpInfoItemTransformerInterface::KEY_DP_URI)];
-        yield 'dpUriWrongType' => [[DeviceConfigurationDpInfoItemTransformerInterface::KEY_OS => 'test-os', DeviceConfigurationDpInfoItemTransformerInterface::KEY_DP_URI => 42], sprintf(DeviceConfigurationDpInfoItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, DeviceConfigurationDpInfoItemTransformerInterface::KEY_DP_URI)];
     }
 }

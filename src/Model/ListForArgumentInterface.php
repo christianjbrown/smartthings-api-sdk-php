@@ -13,7 +13,7 @@ interface ListForArgumentInterface
 
     public function getArgumentType(): ?string;
 
-    public function getName(): string;
+    public function getName(): ?string;
 
     public function getSupportedValues(): ?string;
 

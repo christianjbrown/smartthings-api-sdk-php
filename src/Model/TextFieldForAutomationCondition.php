@@ -10,10 +10,10 @@ final class TextFieldForAutomationCondition implements TextFieldForAutomationCon
      * @var null|mixed[]
      */
     private ?array $range = null;
-    private string $value;
+    private ?string $value;
     private ?string $valueType = null;
 
-    public function __construct(string $value)
+    public function __construct(?string $value)
     {
         $this->value = $value;
     }
@@ -26,7 +26,7 @@ final class TextFieldForAutomationCondition implements TextFieldForAutomationCon
         return $this->range;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

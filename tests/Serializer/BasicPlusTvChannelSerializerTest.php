@@ -16,6 +16,23 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(BasicPlusTvChannelSerializer::class)]
 final class BasicPlusTvChannelSerializerTest extends TestCase
 {
+    public function testSerializeNestedAbsent(): void
+    {
+        $basicPlusTvVolumeCommandSerializer = self::createStub(BasicPlusTvVolumeCommandSerializerInterface::class);
+        $basicPlusTvVolumeCommandSerializer->method('serialize')->willReturn(['test-serialized-basic-plus-tv-volume-command']);
+        $model = new BasicPlusTvChannel('test-capability', 'test-component', null);
+
+        $serializer = new BasicPlusTvChannelSerializer($basicPlusTvVolumeCommandSerializer);
+
+        self::assertSame(
+            [
+                BasicPlusTvChannelSerializerInterface::KEY_CAPABILITY => 'test-capability',
+                BasicPlusTvChannelSerializerInterface::KEY_COMPONENT => 'test-component',
+            ],
+            $serializer->serialize($model)
+        );
+    }
+
     public function testSerializeRequiredFieldsOnly(): void
     {
         $basicPlusTvVolumeCommandModel = self::createStub(BasicPlusTvVolumeCommandInterface::class);

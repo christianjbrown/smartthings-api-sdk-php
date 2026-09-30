@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class CommandArgument implements CommandArgumentInterface
 {
-    private string $name;
+    private ?string $name;
     private ?bool $optional = null;
 
     /**
@@ -17,13 +17,13 @@ final class CommandArgument implements CommandArgumentInterface
     /**
      * @phpstan-param mixed[] $schema
      */
-    public function __construct(string $name, array $schema)
+    public function __construct(?string $name, array $schema)
     {
         $this->name = $name;
         $this->schema = $schema;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }

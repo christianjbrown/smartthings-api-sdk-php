@@ -6,25 +6,25 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class MultiArgCommandArgumentsItem implements MultiArgCommandArgumentsItemInterface
 {
-    private string $displayType;
-    private string $label;
+    private ?string $displayType;
+    private ?string $label;
     private ?ListForArgumentInterface $list = null;
     private ?NumberFieldForArgumentInterface $numberField = null;
     private ?SliderForArgumentInterface $slider = null;
     private ?TextFieldForArgumentInterface $textField = null;
 
-    public function __construct(string $label, string $displayType)
+    public function __construct(?string $label, ?string $displayType)
     {
         $this->label = $label;
         $this->displayType = $displayType;
     }
 
-    public function getDisplayType(): string
+    public function getDisplayType(): ?string
     {
         return $this->displayType;
     }
 
-    public function getLabel(): string
+    public function getLabel(): ?string
     {
         return $this->label;
     }

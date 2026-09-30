@@ -8,10 +8,10 @@ final class PlayStopCommand implements PlayStopCommandInterface
 {
     private ?string $argumentType = null;
     private ?string $name = null;
-    private string $play;
-    private string $stop;
+    private ?string $play;
+    private ?string $stop;
 
-    public function __construct(string $play, string $stop)
+    public function __construct(?string $play, ?string $stop)
     {
         $this->play = $play;
         $this->stop = $stop;
@@ -27,12 +27,12 @@ final class PlayStopCommand implements PlayStopCommandInterface
         return $this->name;
     }
 
-    public function getPlay(): string
+    public function getPlay(): ?string
     {
         return $this->play;
     }
 
-    public function getStop(): string
+    public function getStop(): ?string
     {
         return $this->stop;
     }

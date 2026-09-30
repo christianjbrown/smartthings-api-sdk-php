@@ -8,11 +8,11 @@ interface ButtonForTvInterface
 {
     public function getArgument(): ?string;
 
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getCommand(): string;
+    public function getCommand(): ?string;
 
-    public function getComponent(): string;
+    public function getComponent(): ?string;
 
     public function getIconUrl(): ?string;
 

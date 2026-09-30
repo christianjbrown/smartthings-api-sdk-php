@@ -6,21 +6,21 @@ namespace ChristianBrown\SmartThings\Model;
 
 final class ConvertedTts implements ConvertedTtsInterface
 {
-    private string $audioUrl;
-    private string $message;
+    private ?string $audioUrl;
+    private ?string $message;
 
-    public function __construct(string $message, string $audioUrl)
+    public function __construct(?string $message, ?string $audioUrl)
     {
         $this->message = $message;
         $this->audioUrl = $audioUrl;
     }
 
-    public function getAudioUrl(): string
+    public function getAudioUrl(): ?string
     {
         return $this->audioUrl;
     }
 
-    public function getMessage(): string
+    public function getMessage(): ?string
     {
         return $this->message;
     }

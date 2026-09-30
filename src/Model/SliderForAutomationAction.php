@@ -11,7 +11,7 @@ final class SliderForAutomationAction implements SliderForAutomationActionInterf
      */
     private ?array $alternatives = null;
     private ?string $argumentType = null;
-    private string $command;
+    private ?string $command;
 
     /**
      * @var mixed[]
@@ -24,7 +24,7 @@ final class SliderForAutomationAction implements SliderForAutomationActionInterf
     /**
      * @phpstan-param mixed[] $range
      */
-    public function __construct(array $range, string $command)
+    public function __construct(array $range, ?string $command)
     {
         $this->range = $range;
         $this->command = $command;
@@ -43,7 +43,7 @@ final class SliderForAutomationAction implements SliderForAutomationActionInterf
         return $this->argumentType;
     }
 
-    public function getCommand(): string
+    public function getCommand(): ?string
     {
         return $this->command;
     }

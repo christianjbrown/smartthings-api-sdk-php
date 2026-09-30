@@ -7,9 +7,9 @@ namespace ChristianBrown\SmartThings\Model;
 final class DeviceOperand implements DeviceOperandInterface
 {
     private ?string $aggregation = null;
-    private string $attribute;
-    private string $capability;
-    private string $component;
+    private ?string $attribute;
+    private ?string $capability;
+    private ?string $component;
 
     /**
      * @var array<int, string>
@@ -21,7 +21,7 @@ final class DeviceOperand implements DeviceOperandInterface
     /**
      * @phpstan-param array<int, string> $devices
      */
-    public function __construct(array $devices, string $component, string $capability, string $attribute)
+    public function __construct(array $devices, ?string $component, ?string $capability, ?string $attribute)
     {
         $this->devices = $devices;
         $this->component = $component;
@@ -34,17 +34,17 @@ final class DeviceOperand implements DeviceOperandInterface
         return $this->aggregation;
     }
 
-    public function getAttribute(): string
+    public function getAttribute(): ?string
     {
         return $this->attribute;
     }
 
-    public function getCapability(): string
+    public function getCapability(): ?string
     {
         return $this->capability;
     }
 
-    public function getComponent(): string
+    public function getComponent(): ?string
     {
         return $this->component;
     }

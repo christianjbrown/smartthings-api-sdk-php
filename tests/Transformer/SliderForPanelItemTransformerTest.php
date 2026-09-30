@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\SliderForPanelItem;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\SliderForPanelItemTransformerInterfac
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(SliderForPanelItem::class)]
 #[CoversClass(SliderForPanelItemTransformer::class)]
@@ -65,6 +62,32 @@ final class SliderForPanelItemTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getAlternatives());
         self::assertNull($transformer->transform($base + [SliderForPanelItemTransformerInterface::KEY_ALTERNATIVES => 'test-not-array'])->getAlternatives());
         self::assertSame([$alternativeItemModel], $transformer->transform($base + [SliderForPanelItemTransformerInterface::KEY_ALTERNATIVES => [['test-nested'], 'test-skipped']])->getAlternatives());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new SliderForPanelItemTransformer(self::createStub(AlternativeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'rangeAbsent' => [[SliderForPanelItemTransformerInterface::KEY_COMMAND => 'test-command', SliderForPanelItemTransformerInterface::KEY_SIZE => 'test-size'], 'getRange', []];
+        yield 'rangeWrongType' => [[SliderForPanelItemTransformerInterface::KEY_COMMAND => 'test-command', SliderForPanelItemTransformerInterface::KEY_SIZE => 'test-size', SliderForPanelItemTransformerInterface::KEY_RANGE => 'not-array'], 'getRange', []];
+        yield 'commandAbsent' => [[SliderForPanelItemTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], SliderForPanelItemTransformerInterface::KEY_SIZE => 'test-size'], 'getCommand', null];
+        yield 'commandWrongType' => [[SliderForPanelItemTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], SliderForPanelItemTransformerInterface::KEY_SIZE => 'test-size', SliderForPanelItemTransformerInterface::KEY_COMMAND => 42], 'getCommand', null];
+        yield 'sizeAbsent' => [[SliderForPanelItemTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], SliderForPanelItemTransformerInterface::KEY_COMMAND => 'test-command'], 'getSize', null];
+        yield 'sizeWrongType' => [[SliderForPanelItemTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], SliderForPanelItemTransformerInterface::KEY_COMMAND => 'test-command', SliderForPanelItemTransformerInterface::KEY_SIZE => 42], 'getSize', null];
     }
 
     /**
@@ -123,31 +146,5 @@ final class SliderForPanelItemTransformerTest extends TestCase
         self::assertNull($actual->getArgumentType());
         self::assertNull($actual->getValue());
         self::assertNull($actual->getValueType());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new SliderForPanelItemTransformer(self::createStub(AlternativeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'rangeAbsent' => [[SliderForPanelItemTransformerInterface::KEY_COMMAND => 'test-command', SliderForPanelItemTransformerInterface::KEY_SIZE => 'test-size'], sprintf(SliderForPanelItemTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, SliderForPanelItemTransformerInterface::KEY_RANGE)];
-        yield 'rangeWrongType' => [[SliderForPanelItemTransformerInterface::KEY_COMMAND => 'test-command', SliderForPanelItemTransformerInterface::KEY_SIZE => 'test-size', SliderForPanelItemTransformerInterface::KEY_RANGE => 'not-array'], sprintf(SliderForPanelItemTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, SliderForPanelItemTransformerInterface::KEY_RANGE)];
-        yield 'commandAbsent' => [[SliderForPanelItemTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], SliderForPanelItemTransformerInterface::KEY_SIZE => 'test-size'], sprintf(SliderForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, SliderForPanelItemTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[SliderForPanelItemTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], SliderForPanelItemTransformerInterface::KEY_SIZE => 'test-size', SliderForPanelItemTransformerInterface::KEY_COMMAND => 42], sprintf(SliderForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, SliderForPanelItemTransformerInterface::KEY_COMMAND)];
-        yield 'sizeAbsent' => [[SliderForPanelItemTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], SliderForPanelItemTransformerInterface::KEY_COMMAND => 'test-command'], sprintf(SliderForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, SliderForPanelItemTransformerInterface::KEY_SIZE)];
-        yield 'sizeWrongType' => [[SliderForPanelItemTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], SliderForPanelItemTransformerInterface::KEY_COMMAND => 'test-command', SliderForPanelItemTransformerInterface::KEY_SIZE => 42], sprintf(SliderForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, SliderForPanelItemTransformerInterface::KEY_SIZE)];
     }
 }

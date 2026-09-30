@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface LanguageItemInterface
 {
-    public function getLocale(): string;
+    public function getLocale(): ?string;
 
     /**
      * @return array<int, PoCodesInterface>

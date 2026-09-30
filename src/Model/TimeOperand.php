@@ -11,10 +11,10 @@ final class TimeOperand implements TimeOperandInterface
      */
     private ?array $daysOfWeek = null;
     private ?IntervalInterface $offset = null;
-    private string $reference;
+    private ?string $reference;
     private ?string $timeZoneId = null;
 
-    public function __construct(string $reference)
+    public function __construct(?string $reference)
     {
         $this->reference = $reference;
     }
@@ -32,7 +32,7 @@ final class TimeOperand implements TimeOperandInterface
         return $this->offset;
     }
 
-    public function getReference(): string
+    public function getReference(): ?string
     {
         return $this->reference;
     }

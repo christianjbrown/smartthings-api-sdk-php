@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\SliderForAutomationAction;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\SliderForAutomationActionTransformerI
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(SliderForAutomationAction::class)]
 #[CoversClass(SliderForAutomationActionTransformer::class)]
@@ -59,6 +56,30 @@ final class SliderForAutomationActionTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getAlternatives());
         self::assertNull($transformer->transform($base + [SliderForAutomationActionTransformerInterface::KEY_ALTERNATIVES => 'test-not-array'])->getAlternatives());
         self::assertSame([$alternativeItemModel], $transformer->transform($base + [SliderForAutomationActionTransformerInterface::KEY_ALTERNATIVES => [['test-nested'], 'test-skipped']])->getAlternatives());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new SliderForAutomationActionTransformer(self::createStub(AlternativeItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'rangeAbsent' => [[SliderForAutomationActionTransformerInterface::KEY_COMMAND => 'test-command'], 'getRange', []];
+        yield 'rangeWrongType' => [[SliderForAutomationActionTransformerInterface::KEY_COMMAND => 'test-command', SliderForAutomationActionTransformerInterface::KEY_RANGE => 'not-array'], 'getRange', []];
+        yield 'commandAbsent' => [[SliderForAutomationActionTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value']], 'getCommand', null];
+        yield 'commandWrongType' => [[SliderForAutomationActionTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], SliderForAutomationActionTransformerInterface::KEY_COMMAND => 42], 'getCommand', null];
     }
 
     /**
@@ -109,29 +130,5 @@ final class SliderForAutomationActionTransformerTest extends TestCase
         self::assertNull($actual->getSupportedValues());
         self::assertNull($actual->getAlternatives());
         self::assertNull($actual->getArgumentType());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new SliderForAutomationActionTransformer(self::createStub(AlternativeItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'rangeAbsent' => [[SliderForAutomationActionTransformerInterface::KEY_COMMAND => 'test-command'], sprintf(SliderForAutomationActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, SliderForAutomationActionTransformerInterface::KEY_RANGE)];
-        yield 'rangeWrongType' => [[SliderForAutomationActionTransformerInterface::KEY_COMMAND => 'test-command', SliderForAutomationActionTransformerInterface::KEY_RANGE => 'not-array'], sprintf(SliderForAutomationActionTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, SliderForAutomationActionTransformerInterface::KEY_RANGE)];
-        yield 'commandAbsent' => [[SliderForAutomationActionTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value']], sprintf(SliderForAutomationActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, SliderForAutomationActionTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[SliderForAutomationActionTransformerInterface::KEY_RANGE => ['test-range-key' => 'test-value'], SliderForAutomationActionTransformerInterface::KEY_COMMAND => 42], sprintf(SliderForAutomationActionTransformerInterface::UNEXPECTED_STRING_SPRINTF, SliderForAutomationActionTransformerInterface::KEY_COMMAND)];
     }
 }

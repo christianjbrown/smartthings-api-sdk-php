@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface ListForDetailViewInterface
 {
-    public function getCommand(): ListWithAvailableSizeCommandInterface;
+    public function getCommand(): ?ListWithAvailableSizeCommandInterface;
 
     public function getState(): ?ListWithAvailableSizeStateInterface;
 

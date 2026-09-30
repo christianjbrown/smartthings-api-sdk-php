@@ -8,13 +8,13 @@ interface SliderForLightInterface
 {
     public function getArgumentType(): ?string;
 
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
-    public function getCommand(): string;
+    public function getCommand(): ?string;
 
-    public function getComponent(): string;
+    public function getComponent(): ?string;
 
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
     /**
      * @return mixed[]
@@ -27,7 +27,7 @@ interface SliderForLightInterface
 
     public function getUnit(): ?string;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function getValueType(): ?string;
 

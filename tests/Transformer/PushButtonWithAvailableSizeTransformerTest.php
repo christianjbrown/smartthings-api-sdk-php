@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\PushButtonWithAvailableSize;
 use ChristianBrown\SmartThings\Transformer\PushButtonWithAvailableSizeTransformer;
 use ChristianBrown\SmartThings\Transformer\PushButtonWithAvailableSizeTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(PushButtonWithAvailableSize::class)]
 #[CoversClass(PushButtonWithAvailableSizeTransformer::class)]
@@ -37,6 +34,28 @@ final class PushButtonWithAvailableSizeTransformerTest extends TestCase
         self::assertSame('test-argument-type', $actual->getArgumentType());
         self::assertSame('test-icon-url', $actual->getIconUrl());
         self::assertSame(['test-available-sizes-1', 'test-available-sizes-2'], $actual->getAvailableSizes());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new PushButtonWithAvailableSizeTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'commandAbsent' => [[], 'getCommand', null];
+        yield 'commandWrongType' => [[PushButtonWithAvailableSizeTransformerInterface::KEY_COMMAND => 42], 'getCommand', null];
     }
 
     /**
@@ -83,27 +102,5 @@ final class PushButtonWithAvailableSizeTransformerTest extends TestCase
         self::assertNull($actual->getArgumentType());
         self::assertNull($actual->getIconUrl());
         self::assertNull($actual->getAvailableSizes());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new PushButtonWithAvailableSizeTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'commandAbsent' => [[], sprintf(PushButtonWithAvailableSizeTransformerInterface::UNEXPECTED_STRING_SPRINTF, PushButtonWithAvailableSizeTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[PushButtonWithAvailableSizeTransformerInterface::KEY_COMMAND => 42], sprintf(PushButtonWithAvailableSizeTransformerInterface::UNEXPECTED_STRING_SPRINTF, PushButtonWithAvailableSizeTransformerInterface::KEY_COMMAND)];
     }
 }

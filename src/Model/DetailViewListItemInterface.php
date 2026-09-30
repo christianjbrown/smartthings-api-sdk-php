@@ -6,13 +6,13 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface DetailViewListItemInterface
 {
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
     public function getComponent(): ?string;
 
-    public function getDisplayType(): string;
+    public function getDisplayType(): ?string;
 
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
     public function getList(): ?ListForDetailViewInterface;
 

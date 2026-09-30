@@ -6,7 +6,7 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface IntervalInterface
 {
-    public function getUnit(): string;
+    public function getUnit(): ?string;
 
-    public function getValue(): OperandInterface;
+    public function getValue(): ?OperandInterface;
 }

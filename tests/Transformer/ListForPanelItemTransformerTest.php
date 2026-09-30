@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ListForPanelItem;
 use ChristianBrown\SmartThings\Model\ListForPanelItemCommandInterface;
 use ChristianBrown\SmartThings\Model\ListForPanelItemStateInterface;
@@ -15,8 +14,6 @@ use ChristianBrown\SmartThings\Transformer\ListForPanelItemTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(ListForPanelItem::class)]
 #[CoversClass(ListForPanelItemTransformer::class)]
@@ -43,6 +40,30 @@ final class ListForPanelItemTransformerTest extends TestCase
         self::assertSame($listForPanelItemCommandModel, $actual->getCommand());
         self::assertSame($listForPanelItemStateModel, $actual->getState());
         self::assertSame('test-size', $actual->getSize());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new ListForPanelItemTransformer(self::createStub(ListForPanelItemCommandTransformerInterface::class), self::createStub(ListForPanelItemStateTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'commandAbsent' => [[ListForPanelItemTransformerInterface::KEY_SIZE => 'test-size'], 'getCommand', null];
+        yield 'commandWrongType' => [[ListForPanelItemTransformerInterface::KEY_SIZE => 'test-size', ListForPanelItemTransformerInterface::KEY_COMMAND => 'not-array'], 'getCommand', null];
+        yield 'sizeAbsent' => [[ListForPanelItemTransformerInterface::KEY_COMMAND => ['test-nested']], 'getSize', null];
+        yield 'sizeWrongType' => [[ListForPanelItemTransformerInterface::KEY_COMMAND => ['test-nested'], ListForPanelItemTransformerInterface::KEY_SIZE => 42], 'getSize', null];
     }
 
     public function testTransformRequiredFieldsOnly(): void
@@ -74,29 +95,5 @@ final class ListForPanelItemTransformerTest extends TestCase
         self::assertNull($transformer->transform($base)->getState());
         self::assertNull($transformer->transform($base + [ListForPanelItemTransformerInterface::KEY_STATE => 'test-not-array'])->getState());
         self::assertSame($listForPanelItemStateModel, $transformer->transform($base + [ListForPanelItemTransformerInterface::KEY_STATE => ['test-nested']])->getState());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new ListForPanelItemTransformer(self::createStub(ListForPanelItemCommandTransformerInterface::class), self::createStub(ListForPanelItemStateTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'commandAbsent' => [[ListForPanelItemTransformerInterface::KEY_SIZE => 'test-size'], sprintf(ListForPanelItemTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ListForPanelItemTransformerInterface::KEY_COMMAND)];
-        yield 'commandWrongType' => [[ListForPanelItemTransformerInterface::KEY_SIZE => 'test-size', ListForPanelItemTransformerInterface::KEY_COMMAND => 'not-array'], sprintf(ListForPanelItemTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, ListForPanelItemTransformerInterface::KEY_COMMAND)];
-        yield 'sizeAbsent' => [[ListForPanelItemTransformerInterface::KEY_COMMAND => ['test-nested']], sprintf(ListForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, ListForPanelItemTransformerInterface::KEY_SIZE)];
-        yield 'sizeWrongType' => [[ListForPanelItemTransformerInterface::KEY_COMMAND => ['test-nested'], ListForPanelItemTransformerInterface::KEY_SIZE => 42], sprintf(ListForPanelItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, ListForPanelItemTransformerInterface::KEY_SIZE)];
     }
 }

@@ -12,7 +12,7 @@ interface DeviceSubscriptionDetailInterface
 
     public function getComponentId(): ?string;
 
-    public function getDeviceId(): string;
+    public function getDeviceId(): ?string;
 
     /**
      * @return null|array<int, string>

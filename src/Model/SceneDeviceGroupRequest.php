@@ -8,9 +8,9 @@ final class SceneDeviceGroupRequest implements SceneDeviceGroupRequestInterface
 {
     private ?string $actionId = null;
     private ?SceneCapabilityInterface $capability = null;
-    private string $deviceGroupId;
+    private ?string $deviceGroupId;
 
-    public function __construct(string $deviceGroupId)
+    public function __construct(?string $deviceGroupId)
     {
         $this->deviceGroupId = $deviceGroupId;
     }
@@ -25,7 +25,7 @@ final class SceneDeviceGroupRequest implements SceneDeviceGroupRequestInterface
         return $this->capability;
     }
 
-    public function getDeviceGroupId(): string
+    public function getDeviceGroupId(): ?string
     {
         return $this->deviceGroupId;
     }

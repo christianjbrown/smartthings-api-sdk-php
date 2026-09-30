@@ -18,13 +18,13 @@ final class SliderForAutomationCondition implements SliderForAutomationCondition
     private ?float $step = null;
     private ?string $supportedValues = null;
     private ?string $unit = null;
-    private string $value;
+    private ?string $value;
     private ?string $valueType = null;
 
     /**
      * @phpstan-param mixed[] $range
      */
-    public function __construct(array $range, string $value)
+    public function __construct(array $range, ?string $value)
     {
         $this->range = $range;
         $this->value = $value;
@@ -61,7 +61,7 @@ final class SliderForAutomationCondition implements SliderForAutomationCondition
         return $this->unit;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

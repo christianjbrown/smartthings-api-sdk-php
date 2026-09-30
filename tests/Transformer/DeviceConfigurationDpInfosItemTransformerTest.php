@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationDpInfoItemInterface;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationDpInfosItem;
 use ChristianBrown\SmartThings\Transformer\DeviceConfigurationDpInfoItemTransformerInterface;
@@ -13,8 +12,6 @@ use ChristianBrown\SmartThings\Transformer\DeviceConfigurationDpInfosItemTransfo
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(DeviceConfigurationDpInfosItem::class)]
 #[CoversClass(DeviceConfigurationDpInfosItemTransformer::class)]
@@ -36,6 +33,28 @@ final class DeviceConfigurationDpInfosItemTransformerTest extends TestCase
 
         self::assertSame('test-st-plugin-api-version', $actual->getStPluginApiVersion());
         self::assertSame([$deviceConfigurationDpInfoItemModel], $actual->getDpInfo());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new DeviceConfigurationDpInfosItemTransformer(self::createStub(DeviceConfigurationDpInfoItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'dpInfoAbsent' => [[], 'getDpInfo', []];
+        yield 'dpInfoWrongType' => [[DeviceConfigurationDpInfosItemTransformerInterface::KEY_DP_INFO => 'not-array'], 'getDpInfo', []];
     }
 
     /**
@@ -73,27 +92,5 @@ final class DeviceConfigurationDpInfosItemTransformerTest extends TestCase
         $actual = $transformer->transform([DeviceConfigurationDpInfosItemTransformerInterface::KEY_DP_INFO => ['test-nested']]);
 
         self::assertNull($actual->getStPluginApiVersion());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new DeviceConfigurationDpInfosItemTransformer(self::createStub(DeviceConfigurationDpInfoItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'dpInfoAbsent' => [[], sprintf(DeviceConfigurationDpInfosItemTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, DeviceConfigurationDpInfosItemTransformerInterface::KEY_DP_INFO)];
-        yield 'dpInfoWrongType' => [[DeviceConfigurationDpInfosItemTransformerInterface::KEY_DP_INFO => 'not-array'], sprintf(DeviceConfigurationDpInfosItemTransformerInterface::UNEXPECTED_ARRAY_SPRINTF, DeviceConfigurationDpInfosItemTransformerInterface::KEY_DP_INFO)];
     }
 }

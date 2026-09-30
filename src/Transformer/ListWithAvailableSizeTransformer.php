@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ListWithAvailableSize;
 use ChristianBrown\SmartThings\Model\ListWithAvailableSizeCommandInterface;
 use ChristianBrown\SmartThings\Model\ListWithAvailableSizeInterface;
@@ -13,7 +12,6 @@ use function array_filter;
 use function array_values;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class ListWithAvailableSizeTransformer implements ListWithAvailableSizeTransformerInterface
 {
@@ -70,13 +68,13 @@ final class ListWithAvailableSizeTransformer implements ListWithAvailableSizeTra
     /**
      * @param mixed[] $data
      */
-    private function requireCommand(array $data): ListWithAvailableSizeCommandInterface
+    private function requireCommand(array $data): ?ListWithAvailableSizeCommandInterface
     {
         if (!isset($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
         if (!is_array($data[self::KEY_COMMAND])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_ARRAY_SPRINTF, self::KEY_COMMAND));
+            return null;
         }
 
         return $this->listWithAvailableSizeCommandTransformer->transform($data[self::KEY_COMMAND]);

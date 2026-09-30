@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItemInterface;
 use ChristianBrown\SmartThings\Model\DeviceConfigEntryForDashboardStateFormatInfoItemInterface;
 use ChristianBrown\SmartThings\Model\StatesArrayItem;
@@ -17,8 +16,6 @@ use ChristianBrown\SmartThings\Transformer\VisibleConditionForDashboardStateTran
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(StatesArrayItem::class)]
 #[CoversClass(StatesArrayItemTransformer::class)]
@@ -103,6 +100,32 @@ final class StatesArrayItemTransformerTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new StatesArrayItemTransformer(self::createStub(AlternativeItemTransformerInterface::class), self::createStub(VisibleConditionForDashboardStateTransformerInterface::class), self::createStub(DeviceConfigEntryForDashboardStateFormatInfoItemTransformerInterface::class));
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'labelAbsent' => [[StatesArrayItemTransformerInterface::KEY_CAPABILITY => 'test-capability', StatesArrayItemTransformerInterface::KEY_COMPONENT => 'test-component'], 'getLabel', null];
+        yield 'labelWrongType' => [[StatesArrayItemTransformerInterface::KEY_CAPABILITY => 'test-capability', StatesArrayItemTransformerInterface::KEY_COMPONENT => 'test-component', StatesArrayItemTransformerInterface::KEY_LABEL => 42], 'getLabel', null];
+        yield 'capabilityAbsent' => [[StatesArrayItemTransformerInterface::KEY_LABEL => 'test-label', StatesArrayItemTransformerInterface::KEY_COMPONENT => 'test-component'], 'getCapability', null];
+        yield 'capabilityWrongType' => [[StatesArrayItemTransformerInterface::KEY_LABEL => 'test-label', StatesArrayItemTransformerInterface::KEY_COMPONENT => 'test-component', StatesArrayItemTransformerInterface::KEY_CAPABILITY => 42], 'getCapability', null];
+        yield 'componentAbsent' => [[StatesArrayItemTransformerInterface::KEY_LABEL => 'test-label', StatesArrayItemTransformerInterface::KEY_CAPABILITY => 'test-capability'], 'getComponent', null];
+        yield 'componentWrongType' => [[StatesArrayItemTransformerInterface::KEY_LABEL => 'test-label', StatesArrayItemTransformerInterface::KEY_CAPABILITY => 'test-capability', StatesArrayItemTransformerInterface::KEY_COMPONENT => 42], 'getComponent', null];
+    }
+
+    /**
      * Each optional field in each of its states: absent, present but the wrong type, or valid.
      *
      * @param array<string, mixed> $extra
@@ -158,32 +181,6 @@ final class StatesArrayItemTransformerTest extends TestCase
         self::assertNull($actual->getGroup());
         self::assertNull($actual->getFormatInfo());
         self::assertNull($actual->getTransient());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new StatesArrayItemTransformer(self::createStub(AlternativeItemTransformerInterface::class), self::createStub(VisibleConditionForDashboardStateTransformerInterface::class), self::createStub(DeviceConfigEntryForDashboardStateFormatInfoItemTransformerInterface::class));
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'labelAbsent' => [[StatesArrayItemTransformerInterface::KEY_CAPABILITY => 'test-capability', StatesArrayItemTransformerInterface::KEY_COMPONENT => 'test-component'], sprintf(StatesArrayItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, StatesArrayItemTransformerInterface::KEY_LABEL)];
-        yield 'labelWrongType' => [[StatesArrayItemTransformerInterface::KEY_CAPABILITY => 'test-capability', StatesArrayItemTransformerInterface::KEY_COMPONENT => 'test-component', StatesArrayItemTransformerInterface::KEY_LABEL => 42], sprintf(StatesArrayItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, StatesArrayItemTransformerInterface::KEY_LABEL)];
-        yield 'capabilityAbsent' => [[StatesArrayItemTransformerInterface::KEY_LABEL => 'test-label', StatesArrayItemTransformerInterface::KEY_COMPONENT => 'test-component'], sprintf(StatesArrayItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, StatesArrayItemTransformerInterface::KEY_CAPABILITY)];
-        yield 'capabilityWrongType' => [[StatesArrayItemTransformerInterface::KEY_LABEL => 'test-label', StatesArrayItemTransformerInterface::KEY_COMPONENT => 'test-component', StatesArrayItemTransformerInterface::KEY_CAPABILITY => 42], sprintf(StatesArrayItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, StatesArrayItemTransformerInterface::KEY_CAPABILITY)];
-        yield 'componentAbsent' => [[StatesArrayItemTransformerInterface::KEY_LABEL => 'test-label', StatesArrayItemTransformerInterface::KEY_CAPABILITY => 'test-capability'], sprintf(StatesArrayItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, StatesArrayItemTransformerInterface::KEY_COMPONENT)];
-        yield 'componentWrongType' => [[StatesArrayItemTransformerInterface::KEY_LABEL => 'test-label', StatesArrayItemTransformerInterface::KEY_CAPABILITY => 'test-capability', StatesArrayItemTransformerInterface::KEY_COMPONENT => 42], sprintf(StatesArrayItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, StatesArrayItemTransformerInterface::KEY_COMPONENT)];
     }
 
     public function testTransformVisibleCondition(): void

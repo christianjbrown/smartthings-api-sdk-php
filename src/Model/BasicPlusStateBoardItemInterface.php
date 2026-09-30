@@ -11,24 +11,24 @@ interface BasicPlusStateBoardItemInterface
      */
     public function getAlternatives(): ?array;
 
-    public function getCapability(): string;
+    public function getCapability(): ?string;
 
     /**
      * @return null|array<int, BasicPlusStateBoardColorsInterface>
      */
     public function getColors(): ?array;
 
-    public function getComponent(): string;
+    public function getComponent(): ?string;
 
     public function getIconUrl(): ?string;
 
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 
     public function getOperator(): ?string;
 
     public function getUnit(): ?string;
 
-    public function getValue(): string;
+    public function getValue(): ?string;
 
     public function getValueType(): ?string;
 

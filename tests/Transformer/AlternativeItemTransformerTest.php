@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Tests\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\AlternativeItem;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformer;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-
-use function sprintf;
 
 #[CoversClass(AlternativeItem::class)]
 #[CoversClass(AlternativeItemTransformer::class)]
@@ -37,6 +34,30 @@ final class AlternativeItemTransformerTest extends TestCase
         self::assertSame('test-type', $actual->getType());
         self::assertSame('test-icon-url', $actual->getIconUrl());
         self::assertSame('test-description', $actual->getDescription());
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    #[DataProvider('provideTransformLenientCases')]
+    public function testTransformLenient(array $data, string $getter, mixed $expected): void
+    {
+        $transformer = new AlternativeItemTransformer();
+
+        $actual = $transformer->transform($data);
+
+        self::assertSame($expected, $actual->{$getter}());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, string, mixed}>
+     */
+    public static function provideTransformLenientCases(): iterable
+    {
+        yield 'keyAbsent' => [[AlternativeItemTransformerInterface::KEY_VALUE => 'test-value'], 'getKey', null];
+        yield 'keyWrongType' => [[AlternativeItemTransformerInterface::KEY_VALUE => 'test-value', AlternativeItemTransformerInterface::KEY_KEY => 42], 'getKey', null];
+        yield 'valueAbsent' => [[AlternativeItemTransformerInterface::KEY_KEY => 'test-key'], 'getValue', null];
+        yield 'valueWrongType' => [[AlternativeItemTransformerInterface::KEY_KEY => 'test-key', AlternativeItemTransformerInterface::KEY_VALUE => 42], 'getValue', null];
     }
 
     /**
@@ -79,29 +100,5 @@ final class AlternativeItemTransformerTest extends TestCase
         self::assertNull($actual->getType());
         self::assertNull($actual->getIconUrl());
         self::assertNull($actual->getDescription());
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    #[DataProvider('provideTransformUnexpectedCases')]
-    public function testTransformUnexpected(array $data, string $message): void
-    {
-        $transformer = new AlternativeItemTransformer();
-
-        $this->expectException(UnexpectedResponseException::class);
-        $this->expectExceptionMessage($message);
-        $transformer->transform($data);
-    }
-
-    /**
-     * @return iterable<string, array{array<string, mixed>, string}>
-     */
-    public static function provideTransformUnexpectedCases(): iterable
-    {
-        yield 'keyAbsent' => [[AlternativeItemTransformerInterface::KEY_VALUE => 'test-value'], sprintf(AlternativeItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, AlternativeItemTransformerInterface::KEY_KEY)];
-        yield 'keyWrongType' => [[AlternativeItemTransformerInterface::KEY_VALUE => 'test-value', AlternativeItemTransformerInterface::KEY_KEY => 42], sprintf(AlternativeItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, AlternativeItemTransformerInterface::KEY_KEY)];
-        yield 'valueAbsent' => [[AlternativeItemTransformerInterface::KEY_KEY => 'test-key'], sprintf(AlternativeItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, AlternativeItemTransformerInterface::KEY_VALUE)];
-        yield 'valueWrongType' => [[AlternativeItemTransformerInterface::KEY_KEY => 'test-key', AlternativeItemTransformerInterface::KEY_VALUE => 42], sprintf(AlternativeItemTransformerInterface::UNEXPECTED_STRING_SPRINTF, AlternativeItemTransformerInterface::KEY_VALUE)];
     }
 }

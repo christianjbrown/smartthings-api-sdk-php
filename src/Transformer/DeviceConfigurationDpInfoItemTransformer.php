@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationDpInfoItem;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationDpInfoItemArgumentsItemInterface;
 use ChristianBrown\SmartThings\Model\DeviceConfigurationDpInfoItemInterface;
@@ -14,7 +13,6 @@ use function array_map;
 use function array_values;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 final class DeviceConfigurationDpInfoItemTransformer implements DeviceConfigurationDpInfoItemTransformerInterface
 {
@@ -84,13 +82,13 @@ final class DeviceConfigurationDpInfoItemTransformer implements DeviceConfigurat
     /**
      * @param mixed[] $data
      */
-    private static function requireDpUri(array $data): string
+    private static function requireDpUri(array $data): ?string
     {
         if (empty($data[self::KEY_DP_URI])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DP_URI));
+            return null;
         }
         if (!is_string($data[self::KEY_DP_URI])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_DP_URI));
+            return null;
         }
 
         return $data[self::KEY_DP_URI];
@@ -99,13 +97,13 @@ final class DeviceConfigurationDpInfoItemTransformer implements DeviceConfigurat
     /**
      * @param mixed[] $data
      */
-    private static function requireOs(array $data): string
+    private static function requireOs(array $data): ?string
     {
         if (empty($data[self::KEY_OS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OS));
+            return null;
         }
         if (!is_string($data[self::KEY_OS])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OS));
+            return null;
         }
 
         return $data[self::KEY_OS];

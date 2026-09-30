@@ -6,5 +6,5 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface PreferenceOptionLocalizationInterface
 {
-    public function getLabel(): string;
+    public function getLabel(): ?string;
 }

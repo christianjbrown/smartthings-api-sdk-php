@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings\Transformer;
 
-use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ToggleSwitchForDashboardCommand;
 use ChristianBrown\SmartThings\Model\ToggleSwitchForDashboardCommandInterface;
 
 use function is_string;
-use function sprintf;
 
 final class ToggleSwitchForDashboardCommandTransformer implements ToggleSwitchForDashboardCommandTransformerInterface
 {
@@ -57,13 +55,13 @@ final class ToggleSwitchForDashboardCommandTransformer implements ToggleSwitchFo
     /**
      * @param mixed[] $data
      */
-    private static function requireOff(array $data): string
+    private static function requireOff(array $data): ?string
     {
         if (empty($data[self::KEY_OFF])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OFF));
+            return null;
         }
         if (!is_string($data[self::KEY_OFF])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_OFF));
+            return null;
         }
 
         return $data[self::KEY_OFF];
@@ -72,13 +70,13 @@ final class ToggleSwitchForDashboardCommandTransformer implements ToggleSwitchFo
     /**
      * @param mixed[] $data
      */
-    private static function requireOn(array $data): string
+    private static function requireOn(array $data): ?string
     {
         if (empty($data[self::KEY_ON])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ON));
+            return null;
         }
         if (!is_string($data[self::KEY_ON])) {
-            throw new UnexpectedResponseException(sprintf(self::UNEXPECTED_STRING_SPRINTF, self::KEY_ON));
+            return null;
         }
 
         return $data[self::KEY_ON];

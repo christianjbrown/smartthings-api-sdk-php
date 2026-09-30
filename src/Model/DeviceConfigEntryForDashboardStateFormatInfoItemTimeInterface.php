@@ -6,5 +6,5 @@ namespace ChristianBrown\SmartThings\Model;
 
 interface DeviceConfigEntryForDashboardStateFormatInfoItemTimeInterface
 {
-    public function getTimeFormat(): string;
+    public function getTimeFormat(): ?string;
 }
