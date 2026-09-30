@@ -14,6 +14,7 @@ use ChristianBrown\ApiClient\Transformer\JsonToArrayTransformer;
 use ChristianBrown\SmartThings\Api\ApiHostInterface;
 use ChristianBrown\SmartThings\Api\DriverPackageUploader;
 use ChristianBrown\SmartThings\Api\HostOverridingJsonApiRequestSender;
+use ChristianBrown\SmartThings\Api\PagingJsonApiRequestSender;
 use ChristianBrown\SmartThings\Api\RedirectLocationResponseMapper;
 use ChristianBrown\SmartThings\Api\RequestUrlBuilder;
 use ChristianBrown\SmartThings\DependencyInjection\ServiceRegistrarInterface;
@@ -29,6 +30,7 @@ use Symfony\Component\DependencyInjection\Reference;
 final class CoreRegistrar implements ServiceRegistrarInterface
 {
     private const string GUZZLE_HANDLER_OPTION = 'handler';
+    private const int MAX_PAGES = 100;
     private ApiHostInterface $apiHost;
 
     public function __construct(ApiHostInterface $apiHost)
@@ -46,6 +48,13 @@ final class CoreRegistrar implements ServiceRegistrarInterface
                 [
                     $container->getDefinition(SmartThingsInterface::SERVICE_RAW_JSON_API_REQUEST_SENDER),
                     $this->apiHost,
+                ]
+            );
+        $container->register(SmartThingsInterface::SERVICE_PAGING_JSON_API_REQUEST_SENDER, PagingJsonApiRequestSender::class)
+            ->setArguments(
+                [
+                    $container->getDefinition(SmartThingsInterface::SERVICE_JSON_API_REQUEST_SENDER),
+                    self::MAX_PAGES,
                 ]
             );
         $container->register(SmartThingsInterface::SERVICE_RAW_API_REQUEST_SENDER, ApiRequestSenderInterface::class)

@@ -235,6 +235,10 @@ responses are kept per organization and language.
 `ServiceApi::getAlertLink()` returns the address the coordinate service redirects to for a
 location's weather alert page. The redirect is read, not followed.
 
+List calls read every page: when a response carries `_links.next.href` the client follows it
+(up to 100 pages) and returns all the items together. `DeviceHistoryApi` keeps its own `$maxPages`
+limit and is not affected.
+
 The other query objects are `InstalledAppListQuery`, `AppListQuery`, `RuleListQuery`,
 `LocationListQuery` and `PreferenceListQuery`. Each response is cached per full request, so
 the same call with a different filter is fetched again.
