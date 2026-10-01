@@ -6,6 +6,8 @@ All notable changes to this package are recorded here. The format follows
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-10-01
+
 ### Added
 
 - `SmartThingsFactory` (behind `SmartThingsFactoryInterface`) builds the facade: `create($token)` for
@@ -132,7 +134,8 @@ First stable release.
 - An optional `ApiHostInterface` argument on `SmartThings` to point requests at another host.
 - A single exception hierarchy, so callers do not depend on the underlying HTTP client.
 
-[Unreleased]: https://github.com/christianjbrown/smartthings-api-sdk-php/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/christianjbrown/smartthings-api-sdk-php/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/christianjbrown/smartthings-api-sdk-php/compare/v2.0.1...v3.0.0
 [2.0.1]: https://github.com/christianjbrown/smartthings-api-sdk-php/compare/v1.2.0...v2.0.1
 [1.2.0]: https://github.com/christianjbrown/smartthings-api-sdk-php/compare/v1.0.0...v1.2.0
 [1.0.0]: https://github.com/christianjbrown/smartthings-api-sdk-php/releases/tag/v1.0.0
