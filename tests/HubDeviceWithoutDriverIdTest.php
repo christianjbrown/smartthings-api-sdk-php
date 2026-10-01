@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Tests;
 
 use ChristianBrown\SmartThings\Api\ApiHost;
-use ChristianBrown\SmartThings\Api\Token;
-use ChristianBrown\SmartThings\DependencyInjection\ContainerFactory;
+use ChristianBrown\SmartThings\SmartThingsFactory;
 use ChristianBrown\SmartThings\SmartThingsInterface;
 use ChristianBrown\SmartThings\Transformer\DevicesTransformerInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceTransformerInterface;
@@ -25,7 +24,7 @@ final class HubDeviceWithoutDriverIdTest extends TestCase
 {
     public function testDevicesListWithHubMissingDriverId(): void
     {
-        $container = (new ContainerFactory(new Token('test-token'), new ApiHost()))->build();
+        $container = (new SmartThingsFactory())->createContainer('test-token', new ApiHost());
         $transformer = $container->get(SmartThingsInterface::SERVICE_DEVICES_TRANSFORMER);
         self::assertInstanceOf(DevicesTransformerInterface::class, $transformer);
 

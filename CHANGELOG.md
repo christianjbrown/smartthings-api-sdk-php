@@ -6,6 +6,21 @@ All notable changes to this package are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `SmartThingsFactory` (behind `SmartThingsFactoryInterface`) builds the facade: `create($token)` for
+  production, `createForHost($token, $apiHost)` for another host, and `createContainer($token, $apiHost)`
+  for the container itself.
+
+### Changed
+
+- **Breaking:** the `SmartThings` constructor takes a PSR `ContainerInterface` and builds nothing. Replace
+  `new SmartThings($token)` with `(new SmartThingsFactory())->create($token)`, and
+  `new SmartThings($token, $apiHost)` with `(new SmartThingsFactory())->createForHost($token, $apiHost)`.
+  See "Upgrading to 3.0" in the README.
+- **Breaking:** `ContainerFactory` takes the list of `ServiceRegistrarInterface` instances to run, in order,
+  instead of a token and an API host. `SmartThingsFactory::createContainer()` builds the default container.
+
 ## [2.0.1] - 2026-09-30
 
 The 2.0 release. It covers every operation in the SmartThings public API and reads every response field the

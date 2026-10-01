@@ -10,8 +10,9 @@ lists devices and locations, reads a device's status, and reads rooms, returning
 instead of raw arrays. It also covers a growing set of write operations (device commands, switching a
 location's mode, executing scenes and rules — see `DeviceApi::executeCommands()`,
 `LocationModeApi::changeCurrent()`, `SceneApi::execute()`, `RuleApi::execute()`). The primary entry
-point is the `SmartThings` facade (`src/SmartThings.php`),
-which wires the clients and their transformer chains through a Symfony `ContainerBuilder` DI container.
+point is `SmartThingsFactory` (`src/SmartThingsFactory.php`), the composition root, which wires the clients
+and their transformer chains through a Symfony `ContainerBuilder` DI container and hands it to the
+`SmartThings` facade (`src/SmartThings.php`).
 Hand-wiring the same chains without the container is still fully supported (see the "Wiring the clients"
 section of `README.md`).
 
@@ -63,16 +64,19 @@ Four layers under `src/` (`Api/`, `Transformer/`, `Model/`, and `Serializer/` fo
 mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
 `ChristianBrown\SmartThings\` → `src/`, `ChristianBrown\SmartThings\Tests\` → `tests/`.
 
-- **`SmartThings`** (`src/SmartThings.php`) — the facade/entry point. Constructed with a
-  `string $apiToken` and an optional `ApiHostInterface` (defaults to production), it asks
-  `DependencyInjection\ContainerFactory` to build a Symfony `ContainerBuilder` and exposes a getter
+- **`SmartThingsFactory`** (`src/SmartThingsFactory.php`) is the composition root and the only place
+  the default graph is built: `create($token)` (production), `createForHost($token, $apiHost)` and
+  `createContainer($token, $apiHost)`. It hands `DependencyInjection\ContainerFactory` the ordered list of
+  registrars, and passes the built container to the facade.
+- **`SmartThings`** (`src/SmartThings.php`) is the facade. Its constructor takes a PSR
+  `ContainerInterface` and builds nothing; it exposes a getter
   per API client (`getDeviceApi()`, `getDeviceStatusApi()`, `getLocationApi()`, `getLocationRoomApi()`,
   and 21 more — see `SmartThingsInterface`). Service ids live on `SmartThingsInterface` as `SERVICE_*`
   constants. `ContainerFactory` runs a fixed, ordered list of small registrar classes under
   `src/DependencyInjection/Registrar/`, one per resource group (core, devices, locations, automations,
   capabilities, apps, edge, organizations/services, i18n, and so on), each implementing
   `ServiceRegistrarInterface::register(ContainerBuilder $container): void`. Adding a new API group
-  means adding one registrar and one line in `ContainerFactory`, not editing a single giant method.
+  means adding one registrar and one line in `SmartThingsFactory`, not editing a single giant method.
   `SmartThingsInterface` itself is split into ten narrower role interfaces by domain (see
   `src/SmartThings*Interface.php`), which it extends — existing code that type-hints against
   `SmartThingsInterface` is unaffected.
@@ -119,11 +123,9 @@ mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
   with `KEY_*` constants convention as `Transformer/`. `DeviceCommandSerializer` is the first example.
 - **Write operations** (`executeCommands`, `changeCurrent`, `execute`) follow the same client pattern
   as reads: build headers, call the request sender (`post`/`put` instead of `get`), guard the response
-  shape, delegate to a transformer. A write's serializer/transformer collaborator is **appended to the
-  constructor as an optional, nullable parameter** (`?FooInterface $foo = null`) rather than a required
-  one, so existing hand-wired `new SomeApi(...)` call sites keep compiling; a private
-  `resolveFoo(): FooInterface` method returns `$this->foo ?? new Foo()` so the class still has a
-  working default, mirroring `SmartThings::__construct()`'s `$apiHost ?? new ApiHost()`.
+  shape, delegate to a transformer. Every collaborator, the write's serializer and transformer included,
+  is a required constructor argument typed on its interface; there are no `?? new` fallbacks anywhere
+  (`SourceConventionsTest` fails the build if one appears).
 - **`Exception/`** — `final` exception classes + matching interfaces: `UnexpectedResponseException`
   (extends `RuntimeException`, thrown by clients and transformers for malformed responses) and
   `MissingInputException` (extends `InvalidArgumentException`, thrown for bad caller input).

@@ -95,12 +95,12 @@ composer require christianjbrown/smartthings-api-sdk
 
 First, create a SmartThings [personal access token](https://account.smartthings.com/tokens) with the `devices` scopes. This token is passed to each API client.
 
-The quickest way to get the two clients is the `SmartThings` entry point, which builds them (and their transformer chains) for you through a dependency-injection container — just pass your token:
+The quickest way to get the clients is `SmartThingsFactory`, which builds the `SmartThings` facade (and every client's transformer chain) for you through a dependency-injection container. Pass it your token:
 
 ```php
-use ChristianBrown\SmartThings\SmartThings;
+use ChristianBrown\SmartThings\SmartThingsFactory;
 
-$smartThings     = new SmartThings('your-smartthings-personal-access-token');
+$smartThings     = (new SmartThingsFactory())->create('your-smartthings-personal-access-token');
 $deviceApi       = $smartThings->getDeviceApi();  // DeviceApiInterface
 $deviceStatusApi = $smartThings->getDeviceStatusApi();  // DeviceStatusApiInterface
 $deviceHealthApi = $smartThings->getDeviceHealthApi();  // DeviceHealthApiInterface
@@ -117,6 +117,27 @@ $appApi          = $smartThings->getAppApi();  // AppApiInterface
 $installedAppApi = $smartThings->getInstalledAppApi();  // InstalledAppApiInterface
 $subscriptionApi = $smartThings->getSubscriptionApi();  // SubscriptionApiInterface
 $scheduleApi     = $smartThings->getScheduleApi();  // ScheduleApiInterface
+```
+
+Code that only needs some of the clients can depend on the narrower interface for its area rather than the
+whole facade: `SmartThingsDeviceInterface` (devices and their status), `SmartThingsLocationInterface`
+(locations, modes and rooms), `SmartThingsAutomationInterface` (rules, scenes, schedules and subscriptions),
+and so on for apps, capabilities, device metadata, Edge, organizations, schema apps, text to speech and
+virtual devices. `SmartThingsInterface` extends all of them, so the facade can be passed wherever any one is
+expected:
+
+```php
+use ChristianBrown\SmartThings\SmartThingsDeviceInterface;
+
+final class Thermostat
+{
+    private SmartThingsDeviceInterface $smartThings;
+
+    public function __construct(SmartThingsDeviceInterface $smartThings)
+    {
+        $this->smartThings = $smartThings;
+    }
+}
 ```
 
 If you'd rather wire the clients by hand, see [Wiring the clients](#wiring-the-clients) below.
@@ -301,34 +322,34 @@ There are two concrete types:
 
 Both live in `src/Exception/`. Request-level failures (network errors, non-2xx responses) still surface as `RequestExceptionInterface` from [`christianjbrown/api-client`](https://github.com/christianjbrown/api-client-php), which is outside this library's exception hierarchy.
 
-Under the hood, `SmartThings` wires the clients and their transformer chains through a [Symfony dependency-injection](https://symfony.com/doc/current/components/dependency_injection.html) container. If you don't want the container, you can build the same chains by hand — as shown below. The HTTP request sender comes from [`christianjbrown/api-client`](https://github.com/christianjbrown/api-client-php).
+Under the hood, `SmartThingsFactory` wires the clients and their transformer chains through a [Symfony dependency-injection](https://symfony.com/doc/current/components/dependency_injection.html) container. If you don't want the container, you can build the same chains by hand — as shown below. The HTTP request sender comes from [`christianjbrown/api-client`](https://github.com/christianjbrown/api-client-php).
 
 ### Overriding the API host
 
-Every request goes to `https://api.smartthings.com` by default. To point at a different host — a
-staging environment, a proxy, a recorded-fixture server in a test suite — pass an `ApiHostInterface`
-as the second constructor argument:
+Every request goes to `https://api.smartthings.com` by default. To point at a different host, such as a
+staging environment, a proxy, a recorded-fixture server in a test suite - build the facade with
+`createForHost()` and an `ApiHostInterface`:
 
 ```php
 use ChristianBrown\SmartThings\Api\ApiHost;
-use ChristianBrown\SmartThings\SmartThings;
+use ChristianBrown\SmartThings\SmartThingsFactory;
 
-$smartThings = new SmartThings(
+$smartThings = (new SmartThingsFactory())->createForHost(
     'your-smartthings-personal-access-token',
     new ApiHost('https://staging.example.com')
 );
 ```
 
-Omit it, or pass `null`, and requests go to production exactly as before — existing callers don't
-need to change anything. `ApiHostInterface::PRODUCTION_BASE_URL` holds the default. The interface
+`create()` sends requests to production. `ApiHostInterface::PRODUCTION_BASE_URL` holds the default. The interface
 constants on each `*ApiInterface` (e.g. `DeviceApiInterface::API_URL`) still point at production and
 are unaffected by an override; the override only changes the host each request is actually sent to.
 
 <details id="wiring-the-clients">
 <summary><strong>Wiring the clients</strong></summary>
 
-The `SmartThings` facade builds and wires every client, and that is the supported way to use the
-library. If you construct a client yourself, every collaborator is a required constructor
+`SmartThingsFactory` builds and wires every client behind the `SmartThings` facade, and that is the
+supported way to use the library. Its `createContainer()` returns the underlying container, for code that
+needs a service the facade has no getter for. If you construct a client yourself, every collaborator is a required constructor
 argument: the JSON request sender, the client's transformers, a `Token`, and, for the operations
 that write, the request serializers and response transformers. The registrars under
 `src/DependencyInjection/Registrar/` show the exact wiring of each client. For example, the scenes
@@ -355,12 +376,31 @@ $sceneApi = new SceneApi(
 
 </details>
 
+## :arrow_up: Upgrading to 3.0
+
+Version 3.0 moves the default wiring out of the `SmartThings` facade into `SmartThingsFactory`. The
+facade's constructor now takes a ready-built PSR container and builds nothing, so code that constructed it
+from a token switches to the factory. The `get*Api()` getters are unchanged.
+
+```php
+// 2.x
+$smartThings = new SmartThings($token);
+$smartThings = new SmartThings($token, new ApiHost('https://staging.example.com'));
+
+// 3.0
+$smartThings = (new SmartThingsFactory())->create($token);
+$smartThings = (new SmartThingsFactory())->createForHost($token, new ApiHost('https://staging.example.com'));
+```
+
+`ContainerFactory` now takes the list of registrars to run instead of a token and a host; the factory's
+`createContainer($token, $apiHost)` builds the same container as before.
+
 ## :arrow_up: Upgrading to 2.0
 
 Version 2.0 removes the built-in fallbacks: a client no longer builds a default serializer or
 transformer for a collaborator you leave out. Every collaborator of an `*Api` class, and of the
 transformers and serializers that take collaborators, is now a required constructor argument
-typed on its interface. Code that uses the `SmartThings` facade (`new SmartThings($token)` and the
+typed on its interface. Code that uses the `SmartThings` facade (`new SmartThings($token)` in 2.x and the
 `get*Api()` getters) is unaffected, because the facade's registrars wire everything. Code that
 constructs `*Api` classes by hand has to pass the collaborators, including the
 `RequestUrlBuilderInterface` that the clients with query parameters take; the registrars list them.
