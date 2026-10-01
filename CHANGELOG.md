@@ -21,6 +21,14 @@ All notable changes to this package are recorded here. The format follows
 - **Breaking:** `ContainerFactory` takes the list of `ServiceRegistrarInterface` instances to run, in order,
   instead of a token and an API host. `SmartThingsFactory::createContainer()` builds the default container.
 
+### Removed
+
+- **Breaking:** `ShapeRegistrar`, which registered about 400 shared transformers and serializers in one
+  method. Eighteen per-domain `*ShapeRegistrar` classes (for example `DeviceShapeRegistrar`,
+  `DeviceConfigurationShapeRegistrar` and `CapabilityPresentationShapeRegistrar`) register the same services,
+  and `SmartThingsFactory` runs them in its place. Code that ran `ShapeRegistrar` on its own container runs
+  those instead.
+
 ## [2.0.1] - 2026-09-30
 
 The 2.0 release. It covers every operation in the SmartThings public API and reads every response field the

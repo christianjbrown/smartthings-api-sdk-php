@@ -41,31 +41,48 @@ use ChristianBrown\SmartThings\Api\VirtualDeviceApi;
 use ChristianBrown\SmartThings\DependencyInjection\ContainerFactory;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ApiClientRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\AppRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\AppShapeRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\BasicPlusShapeRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\CapabilityAutomationShapeRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\CapabilityLocalizationShapeRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\CapabilityPresentationShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\CapabilityRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\CapabilityShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ChannelRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\CoreRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\DeviceConfigurationShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\DeviceHealthRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\DeviceHistoryRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\DevicePreferenceDefinitionRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\DevicePreferenceRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\DevicePresentationShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\DeviceProfileRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\DeviceProfileShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\DeviceRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\DeviceShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\DeviceStatusRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\DriverRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\DriverShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\HubRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\I18nRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\InstalledAppRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\LocationRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\LocationShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ModeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\OrganizationRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\PresentationRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\RuleRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SceneRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ScheduleRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\ScheduleShapeRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\SchemaAppInviteShapeRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\SchemaAppShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SchemaConnectorRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\ServiceApiRegistrar;
-use ChristianBrown\SmartThings\DependencyInjection\Registrar\ShapeRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\ServiceShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SubscriptionRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\SubscriptionShapeRegistrar;
+use ChristianBrown\SmartThings\DependencyInjection\Registrar\TextToSpeechShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\TreeRegistrar;
 use ChristianBrown\SmartThings\Serializer\ActionItemSerializer;
 use ChristianBrown\SmartThings\Serializer\AlternativeItemSerializer;
@@ -632,7 +649,24 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(ChannelRegistrar::class)]
 #[UsesClass(CoreRegistrar::class)]
 #[UsesClass(TreeRegistrar::class)]
-#[UsesClass(ShapeRegistrar::class)]
+#[UsesClass(TextToSpeechShapeRegistrar::class)]
+#[UsesClass(SchemaAppInviteShapeRegistrar::class)]
+#[UsesClass(LocationShapeRegistrar::class)]
+#[UsesClass(ScheduleShapeRegistrar::class)]
+#[UsesClass(ServiceShapeRegistrar::class)]
+#[UsesClass(DriverShapeRegistrar::class)]
+#[UsesClass(SchemaAppShapeRegistrar::class)]
+#[UsesClass(SubscriptionShapeRegistrar::class)]
+#[UsesClass(AppShapeRegistrar::class)]
+#[UsesClass(DeviceProfileShapeRegistrar::class)]
+#[UsesClass(DeviceShapeRegistrar::class)]
+#[UsesClass(CapabilityLocalizationShapeRegistrar::class)]
+#[UsesClass(CapabilityShapeRegistrar::class)]
+#[UsesClass(DevicePresentationShapeRegistrar::class)]
+#[UsesClass(BasicPlusShapeRegistrar::class)]
+#[UsesClass(DeviceConfigurationShapeRegistrar::class)]
+#[UsesClass(CapabilityAutomationShapeRegistrar::class)]
+#[UsesClass(CapabilityPresentationShapeRegistrar::class)]
 #[UsesClass(ApiHost::class)]
 #[UsesClass(HostOverridingJsonApiRequestSender::class)]
 #[UsesClass(DeviceHealthRegistrar::class)]

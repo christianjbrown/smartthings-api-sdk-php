@@ -77,6 +77,10 @@ mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
   capabilities, apps, edge, organizations/services, i18n, and so on), each implementing
   `ServiceRegistrarInterface::register(ContainerBuilder $container): void`. Adding a new API group
   means adding one registrar and one line in `SmartThingsFactory`, not editing a single giant method.
+  The transformers and serializers shared across clients are registered by per-domain `*ShapeRegistrar`
+  classes (text to speech, locations, devices, device configuration, basic plus, capability presentation,
+  capability automation and so on), so a new group of shapes is a new registrar, not more lines in an
+  existing one.
   `SmartThingsInterface` itself is split into ten narrower role interfaces by domain (see
   `src/SmartThings*Interface.php`), which it extends — existing code that type-hints against
   `SmartThingsInterface` is unaffected.
