@@ -322,7 +322,7 @@ There are two concrete types:
 
 Both live in `src/Exception/`. Request-level failures (network errors, non-2xx responses) still surface as `RequestExceptionInterface` from [`christianjbrown/api-client`](https://github.com/christianjbrown/api-client-php), which is outside this library's exception hierarchy.
 
-Under the hood, `SmartThingsFactory` wires the clients and their transformer chains through a [Symfony dependency-injection](https://symfony.com/doc/current/components/dependency_injection.html) container. If you don't want the container, you can build the same chains by hand — as shown below. The HTTP request sender comes from [`christianjbrown/api-client`](https://github.com/christianjbrown/api-client-php).
+Under the hood, `SmartThingsFactory` wires the clients and their transformer chains through a [Symfony dependency-injection](https://symfony.com/doc/current/components/dependency_injection.html) container. If you don't want the container, you can build the same chains by hand, as shown below. The HTTP request sender comes from [`christianjbrown/api-client`](https://github.com/christianjbrown/api-client-php).
 
 ### Overriding the API host
 
@@ -390,6 +390,19 @@ $smartThings = new SmartThings($token, new ApiHost('https://staging.example.com'
 // 3.0
 $smartThings = (new SmartThingsFactory())->create($token);
 $smartThings = (new SmartThingsFactory())->createForHost($token, new ApiHost('https://staging.example.com'));
+```
+
+Code that builds the Rule action tree's transformer or serializer by hand passes it the registry of
+per-type nodes:
+
+```php
+// 2.x
+$transformer = new ActionTransformer();
+$serializer = new ActionSerializer();
+
+// 3.0
+$transformer = new ActionTransformer((new NodeTransformerRegistryFactory())->create());
+$serializer = new ActionSerializer((new NodeSerializerRegistryFactory())->create());
 ```
 
 `ContainerFactory` now takes the list of registrars to run instead of a token and a host; the factory's

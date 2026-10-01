@@ -128,6 +128,8 @@ mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
   that delegates to it. The JSON keys live on `ActionTreeKeysInterface`, which the node interfaces extend,
   so the node classes read them as `self::KEY_*` (a constant on an unrelated interface would be inlined or
   not depending on load order, and the differing opcodes break merged path coverage under ParaTest).
+  Writing the tree mirrors this: `Serializer/Action/` holds one `*NodeSerializer` per type, resolved
+  through `NodeSerializerRegistryInterface`, with `ActionSerializer` as the entry point.
 - **`Model/`** — plain, mutable typed DTOs with getters and fluent setters. Request-only models (e.g.
   `DeviceCommand`) live here too, alongside the response models.
 - **`Serializer/`** — turns typed request models into the array body an `Api` client posts/puts. One

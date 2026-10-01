@@ -20,6 +20,8 @@ final class TreeRegistrarTest extends TestCase
         (new TreeRegistrar())->register($container);
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_ACTION_SERIALIZER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_ACTION_TRANSFORMER));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_ACTION_NODE_SERIALIZER_REGISTRY));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_ACTION_NODE_SERIALIZER_REGISTRY_FACTORY));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_ACTION_NODE_TRANSFORMER_REGISTRY));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_ACTION_NODE_TRANSFORMER_REGISTRY_FACTORY));
     }

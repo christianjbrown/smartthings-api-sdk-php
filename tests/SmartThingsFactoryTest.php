@@ -84,7 +84,10 @@ use ChristianBrown\SmartThings\DependencyInjection\Registrar\SubscriptionRegistr
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\SubscriptionShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\TextToSpeechShapeRegistrar;
 use ChristianBrown\SmartThings\DependencyInjection\Registrar\TreeRegistrar;
+use ChristianBrown\SmartThings\Serializer\Action\NodeSerializerRegistry;
+use ChristianBrown\SmartThings\Serializer\Action\NodeSerializerRegistryFactory;
 use ChristianBrown\SmartThings\Serializer\ActionItemSerializer;
+use ChristianBrown\SmartThings\Serializer\ActionSerializer;
 use ChristianBrown\SmartThings\Serializer\AlternativeItemSerializer;
 use ChristianBrown\SmartThings\Serializer\AutomationForCapabilityActionsItemSerializer;
 use ChristianBrown\SmartThings\Serializer\AutomationForCapabilityConditionsItemSerializer;
@@ -647,6 +650,9 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(NodeTransformerRegistry::class)]
 #[UsesClass(NodeTransformerRegistryFactory::class)]
 #[UsesClass(ActionTransformer::class)]
+#[UsesClass(ActionSerializer::class)]
+#[UsesClass(NodeSerializerRegistry::class)]
+#[UsesClass(NodeSerializerRegistryFactory::class)]
 #[UsesClass(SmartThings::class)]
 #[UsesClass(ContainerFactory::class)]
 #[UsesClass(ApiClientRegistrar::class)]

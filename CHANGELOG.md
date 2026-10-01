@@ -15,8 +15,11 @@ All notable changes to this package are recorded here. The format follows
   `IfActionNodeTransformer`), looked up through `NodeTransformerRegistry` by the model interface it builds.
   `NodeTransformerRegistryFactory` builds the registry with every type. A new action or operand type is a
   new node transformer and one line in that factory.
-- `ActionTreeKeysInterface` holds the JSON keys of the action tree. `ActionTransformerInterface` extends it,
-  so `ActionTransformerInterface::KEY_*` still works.
+- The same for writing the tree: one serializer per model type under `Serializer\Action\` (for example
+  `IfActionNodeSerializer`), looked up through `NodeSerializerRegistry`, built by
+  `NodeSerializerRegistryFactory`.
+- `ActionTreeKeysInterface` holds the JSON keys of the action tree. `ActionTransformerInterface` and
+  `ActionSerializerInterface` extend it, so their `KEY_*` constants still work.
 - `UnregisteredTypeException` is thrown when a registry is asked for a type nothing was registered for.
 
 ### Changed
@@ -30,6 +33,8 @@ All notable changes to this package are recorded here. The format follows
 - **Breaking:** `ActionTransformer` takes a `NodeTransformerRegistryInterface`. Replace
   `new ActionTransformer()` with
   `new ActionTransformer((new NodeTransformerRegistryFactory())->create())`. What it returns is unchanged.
+- **Breaking:** `ActionSerializer` takes a `NodeSerializerRegistryInterface`. Replace `new ActionSerializer()`
+  with `new ActionSerializer((new NodeSerializerRegistryFactory())->create())`. Its output is unchanged.
 
 ### Removed
 

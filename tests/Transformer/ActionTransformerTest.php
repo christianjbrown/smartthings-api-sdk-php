@@ -43,6 +43,47 @@ use ChristianBrown\SmartThings\Model\SleepAction;
 use ChristianBrown\SmartThings\Model\TimeOperand;
 use ChristianBrown\SmartThings\Model\ToggleAction;
 use ChristianBrown\SmartThings\Model\WasCondition;
+use ChristianBrown\SmartThings\Serializer\Action\ActionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\ActionSequenceNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\ArrayOperandNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\BetweenConditionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\ChangesConditionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\CommandActionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\CommandSequenceNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\ConditionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\DateOperandNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\DateTimeOperandNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\DeviceOperandNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\EqualsConditionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\EveryActionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\GreaterThanConditionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\GreaterThanOrEqualsConditionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\IfActionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\IfActionSequenceNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\IntervalNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\LessThanConditionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\LessThanOrEqualsConditionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\LimitActionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\LocationActionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\LocationOperandNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\NodeSerializerRegistry;
+use ChristianBrown\SmartThings\Serializer\Action\NodeSerializerRegistryFactory;
+use ChristianBrown\SmartThings\Serializer\Action\OperandNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\RemainsConditionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\RuleDeviceCommandNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\SceneActionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\SceneArgumentNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\SceneCapabilityNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\SceneCommandNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\SceneComponentNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\SceneDeviceGroupRequestNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\SceneDeviceRequestNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\SceneModeRequestNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\SceneSleepRequestNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\SleepActionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\TimeOperandNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\ToggleActionNodeSerializer;
+use ChristianBrown\SmartThings\Serializer\Action\WasConditionNodeSerializer;
 use ChristianBrown\SmartThings\Serializer\ActionSerializer;
 use ChristianBrown\SmartThings\Transformer\Action\ActionNodeTransformer;
 use ChristianBrown\SmartThings\Transformer\Action\ActionSequenceNodeTransformer;
@@ -173,6 +214,47 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ToggleActionNodeTransformer::class)]
 #[CoversClass(WasConditionNodeTransformer::class)]
 #[CoversClass(ActionSerializer::class)]
+#[CoversClass(NodeSerializerRegistry::class)]
+#[CoversClass(NodeSerializerRegistryFactory::class)]
+#[CoversClass(ActionNodeSerializer::class)]
+#[CoversClass(ActionSequenceNodeSerializer::class)]
+#[CoversClass(ArrayOperandNodeSerializer::class)]
+#[CoversClass(BetweenConditionNodeSerializer::class)]
+#[CoversClass(ChangesConditionNodeSerializer::class)]
+#[CoversClass(CommandActionNodeSerializer::class)]
+#[CoversClass(CommandSequenceNodeSerializer::class)]
+#[CoversClass(ConditionNodeSerializer::class)]
+#[CoversClass(DateOperandNodeSerializer::class)]
+#[CoversClass(DateTimeOperandNodeSerializer::class)]
+#[CoversClass(DeviceOperandNodeSerializer::class)]
+#[CoversClass(EqualsConditionNodeSerializer::class)]
+#[CoversClass(EveryActionNodeSerializer::class)]
+#[CoversClass(GreaterThanConditionNodeSerializer::class)]
+#[CoversClass(GreaterThanOrEqualsConditionNodeSerializer::class)]
+#[CoversClass(IfActionNodeSerializer::class)]
+#[CoversClass(IfActionSequenceNodeSerializer::class)]
+#[CoversClass(IntervalNodeSerializer::class)]
+#[CoversClass(LessThanConditionNodeSerializer::class)]
+#[CoversClass(LessThanOrEqualsConditionNodeSerializer::class)]
+#[CoversClass(LimitActionNodeSerializer::class)]
+#[CoversClass(LocationActionNodeSerializer::class)]
+#[CoversClass(LocationOperandNodeSerializer::class)]
+#[CoversClass(OperandNodeSerializer::class)]
+#[CoversClass(RemainsConditionNodeSerializer::class)]
+#[CoversClass(RuleDeviceCommandNodeSerializer::class)]
+#[CoversClass(SceneActionNodeSerializer::class)]
+#[CoversClass(SceneArgumentNodeSerializer::class)]
+#[CoversClass(SceneCapabilityNodeSerializer::class)]
+#[CoversClass(SceneCommandNodeSerializer::class)]
+#[CoversClass(SceneComponentNodeSerializer::class)]
+#[CoversClass(SceneDeviceGroupRequestNodeSerializer::class)]
+#[CoversClass(SceneDeviceRequestNodeSerializer::class)]
+#[CoversClass(SceneModeRequestNodeSerializer::class)]
+#[CoversClass(SceneSleepRequestNodeSerializer::class)]
+#[CoversClass(SleepActionNodeSerializer::class)]
+#[CoversClass(TimeOperandNodeSerializer::class)]
+#[CoversClass(ToggleActionNodeSerializer::class)]
+#[CoversClass(WasConditionNodeSerializer::class)]
 final class ActionTransformerTest extends TestCase
 {
     /**
@@ -188,7 +270,7 @@ final class ActionTransformerTest extends TestCase
 
         $actual = $transformer->transform($data);
 
-        self::assertSame($expected, (new ActionSerializer())->serialize($actual));
+        self::assertSame($expected, (new ActionSerializer((new NodeSerializerRegistryFactory())->create()))->serialize($actual));
     }
 
     /**
