@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Api;
 
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
-use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
+use ChristianBrown\ApiClient\JsonReadApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DriverInterface;
 use ChristianBrown\SmartThings\Transformer\DriversTransformerInterface;
@@ -34,7 +34,7 @@ final class DriverApi implements DriverApiInterface
      * @var array<string, array<int, DriverInterface>>
      */
     private array $listCache = [];
-    private JsonApiRequestSenderInterface $requestSender;
+    private JsonReadApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
     private RequestUrlBuilderInterface $urlBuilder;
 
@@ -43,7 +43,7 @@ final class DriverApi implements DriverApiInterface
      */
     private array $versionCache = [];
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DriverTransformerInterface $driverTransformer, DriversTransformerInterface $driversTransformer, TokenInterface $token, DriverPackageUploaderInterface $driverPackageUploader, RequestUrlBuilderInterface $urlBuilder)
+    public function __construct(JsonReadApiRequestSenderInterface $requestSender, DriverTransformerInterface $driverTransformer, DriversTransformerInterface $driversTransformer, TokenInterface $token, DriverPackageUploaderInterface $driverPackageUploader, RequestUrlBuilderInterface $urlBuilder)
     {
         $this->requestSender = $requestSender;
         $this->driverTransformer = $driverTransformer;

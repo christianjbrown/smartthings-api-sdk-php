@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Tests\Api;
 
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
+use ChristianBrown\ApiClient\Multipart\MultipartPartInterface;
 use ChristianBrown\SmartThings\Api\ApiHostInterface;
 use ChristianBrown\SmartThings\Api\HostOverridingJsonApiRequestSender;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -65,6 +66,20 @@ final class HostOverridingJsonApiRequestSenderTest extends TestCase
         self::assertSame(['result' => true], $sender->patchForm('https://api.smartthings.com/v1/devices/', ['a' => 'b'], ['c' => 'd'], ['e' => 'f']));
     }
 
+    public function testPatchMultipart(): void
+    {
+        $parts = [self::createStub(MultipartPartInterface::class)];
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())
+            ->method('patchMultipart')
+            ->with('https://staging.example.test/v1/devices/', ['a' => 'b'], ['c' => 'd'], $parts)
+            ->willReturn(['result' => true]);
+
+        $sender = self::createSender($requestSender);
+
+        self::assertSame(['result' => true], $sender->patchMultipart('https://api.smartthings.com/v1/devices/', ['a' => 'b'], ['c' => 'd'], $parts));
+    }
+
     public function testPost(): void
     {
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
@@ -91,6 +106,20 @@ final class HostOverridingJsonApiRequestSenderTest extends TestCase
         self::assertSame(['result' => true], $sender->postForm('https://api.smartthings.com/v1/devices/', ['a' => 'b'], ['c' => 'd'], ['e' => 'f']));
     }
 
+    public function testPostMultipart(): void
+    {
+        $parts = [self::createStub(MultipartPartInterface::class)];
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())
+            ->method('postMultipart')
+            ->with('https://staging.example.test/v1/devices/', ['a' => 'b'], ['c' => 'd'], $parts)
+            ->willReturn(['result' => true]);
+
+        $sender = self::createSender($requestSender);
+
+        self::assertSame(['result' => true], $sender->postMultipart('https://api.smartthings.com/v1/devices/', ['a' => 'b'], ['c' => 'd'], $parts));
+    }
+
     public function testPut(): void
     {
         $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
@@ -115,6 +144,20 @@ final class HostOverridingJsonApiRequestSenderTest extends TestCase
         $sender = self::createSender($requestSender);
 
         self::assertSame(['result' => true], $sender->putForm('https://api.smartthings.com/v1/devices/', ['a' => 'b'], ['c' => 'd'], ['e' => 'f']));
+    }
+
+    public function testPutMultipart(): void
+    {
+        $parts = [self::createStub(MultipartPartInterface::class)];
+        $requestSender = self::createMock(JsonApiRequestSenderInterface::class);
+        $requestSender->expects(self::once())
+            ->method('putMultipart')
+            ->with('https://staging.example.test/v1/devices/', ['a' => 'b'], ['c' => 'd'], $parts)
+            ->willReturn(['result' => true]);
+
+        $sender = self::createSender($requestSender);
+
+        self::assertSame(['result' => true], $sender->putMultipart('https://api.smartthings.com/v1/devices/', ['a' => 'b'], ['c' => 'd'], $parts));
     }
 
     private static function createSender(JsonApiRequestSenderInterface $requestSender): HostOverridingJsonApiRequestSender

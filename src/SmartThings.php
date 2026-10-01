@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace ChristianBrown\SmartThings;
 
-use ChristianBrown\SmartThings\Api\ApiHost;
-use ChristianBrown\SmartThings\Api\ApiHostInterface;
 use ChristianBrown\SmartThings\Api\AppApiInterface;
 use ChristianBrown\SmartThings\Api\CapabilityApiInterface;
 use ChristianBrown\SmartThings\Api\ChannelApiInterface;
@@ -33,24 +31,22 @@ use ChristianBrown\SmartThings\Api\SchemaConnectorApiInterface;
 use ChristianBrown\SmartThings\Api\ServiceApiInterface;
 use ChristianBrown\SmartThings\Api\SubscriptionApiInterface;
 use ChristianBrown\SmartThings\Api\TextToSpeechApiInterface;
-use ChristianBrown\SmartThings\Api\Token;
-use ChristianBrown\SmartThings\Api\TokenInterface;
 use ChristianBrown\SmartThings\Api\VirtualDeviceApiInterface;
-use ChristianBrown\SmartThings\DependencyInjection\ContainerFactory;
 use ChristianBrown\SmartThings\Transformer\ErrorResponseTransformerInterface;
 use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 final class SmartThings implements SmartThingsInterface
 {
-    private ContainerBuilder $container;
-    private TokenInterface $token;
+    private ContainerInterface $container;
 
-    public function __construct(string $apiToken, ?ApiHostInterface $apiHost = null)
+    /**
+     * Takes a container that already holds every client. SmartThingsFactory builds the default one.
+     */
+    public function __construct(ContainerInterface $container)
     {
-        $this->token = new Token($apiToken);
-        $this->container = (new ContainerFactory($this->token, $apiHost ?? new ApiHost()))->build();
+        $this->container = $container;
     }
 
     /**

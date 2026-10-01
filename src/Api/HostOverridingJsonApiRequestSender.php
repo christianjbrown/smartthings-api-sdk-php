@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Api;
 
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
+use ChristianBrown\ApiClient\Multipart\MultipartPartInterface;
 
 use function str_replace;
 
@@ -70,6 +71,19 @@ final class HostOverridingJsonApiRequestSender implements JsonApiRequestSenderIn
     }
 
     /**
+     * @param string                             $requestUrl          The request URL
+     * @param array<string, string>              $requestQueryStrings
+     * @param array<string, string>              $requestHeaders
+     * @param array<int, MultipartPartInterface> $requestBodyParts
+     *
+     * @return array<array-key, mixed>
+     */
+    public function patchMultipart(string $requestUrl, array $requestQueryStrings = [], array $requestHeaders = [], array $requestBodyParts = []): array
+    {
+        return $this->requestSender->patchMultipart($this->rewriteHost($requestUrl), $requestQueryStrings, $requestHeaders, $requestBodyParts);
+    }
+
+    /**
      * @param string                       $requestUrl          The request URL
      * @param array<string, string>        $requestQueryStrings
      * @param array<string, string>        $requestHeaders
@@ -96,6 +110,19 @@ final class HostOverridingJsonApiRequestSender implements JsonApiRequestSenderIn
     }
 
     /**
+     * @param string                             $requestUrl          The request URL
+     * @param array<string, string>              $requestQueryStrings
+     * @param array<string, string>              $requestHeaders
+     * @param array<int, MultipartPartInterface> $requestBodyParts
+     *
+     * @return array<array-key, mixed>
+     */
+    public function postMultipart(string $requestUrl, array $requestQueryStrings = [], array $requestHeaders = [], array $requestBodyParts = []): array
+    {
+        return $this->requestSender->postMultipart($this->rewriteHost($requestUrl), $requestQueryStrings, $requestHeaders, $requestBodyParts);
+    }
+
+    /**
      * @param string                       $requestUrl          The request URL
      * @param array<string, string>        $requestQueryStrings
      * @param array<string, string>        $requestHeaders
@@ -119,6 +146,19 @@ final class HostOverridingJsonApiRequestSender implements JsonApiRequestSenderIn
     public function putForm(string $requestUrl, array $requestQueryStrings = [], array $requestHeaders = [], array $requestBodyFormData = []): array
     {
         return $this->requestSender->putForm($this->rewriteHost($requestUrl), $requestQueryStrings, $requestHeaders, $requestBodyFormData);
+    }
+
+    /**
+     * @param string                             $requestUrl          The request URL
+     * @param array<string, string>              $requestQueryStrings
+     * @param array<string, string>              $requestHeaders
+     * @param array<int, MultipartPartInterface> $requestBodyParts
+     *
+     * @return array<array-key, mixed>
+     */
+    public function putMultipart(string $requestUrl, array $requestQueryStrings = [], array $requestHeaders = [], array $requestBodyParts = []): array
+    {
+        return $this->requestSender->putMultipart($this->rewriteHost($requestUrl), $requestQueryStrings, $requestHeaders, $requestBodyParts);
     }
 
     private function rewriteHost(string $requestUrl): string

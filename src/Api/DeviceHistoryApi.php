@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Api;
 
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
-use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
+use ChristianBrown\ApiClient\JsonReadApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceHistoryEventInterface;
 use ChristianBrown\SmartThings\Transformer\DeviceHistoryEventsTransformerInterface;
@@ -23,10 +23,10 @@ final class DeviceHistoryApi implements DeviceHistoryApiInterface
      */
     private array $cache = [];
     private DeviceHistoryEventsTransformerInterface $deviceHistoryEventsTransformer;
-    private JsonApiRequestSenderInterface $requestSender;
+    private JsonReadApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceHistoryEventsTransformerInterface $deviceHistoryEventsTransformer, TokenInterface $token)
+    public function __construct(JsonReadApiRequestSenderInterface $requestSender, DeviceHistoryEventsTransformerInterface $deviceHistoryEventsTransformer, TokenInterface $token)
     {
         $this->requestSender = $requestSender;
         $this->deviceHistoryEventsTransformer = $deviceHistoryEventsTransformer;

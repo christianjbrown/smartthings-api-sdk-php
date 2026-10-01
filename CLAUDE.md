@@ -10,8 +10,9 @@ lists devices and locations, reads a device's status, and reads rooms, returning
 instead of raw arrays. It also covers a growing set of write operations (device commands, switching a
 location's mode, executing scenes and rules — see `DeviceApi::executeCommands()`,
 `LocationModeApi::changeCurrent()`, `SceneApi::execute()`, `RuleApi::execute()`). The primary entry
-point is the `SmartThings` facade (`src/SmartThings.php`),
-which wires the clients and their transformer chains through a Symfony `ContainerBuilder` DI container.
+point is `SmartThingsFactory` (`src/SmartThingsFactory.php`), the composition root, which wires the clients
+and their transformer chains through a Symfony `ContainerBuilder` DI container and hands it to the
+`SmartThings` facade (`src/SmartThings.php`).
 Hand-wiring the same chains without the container is still fully supported (see the "Wiring the clients"
 section of `README.md`).
 
@@ -63,16 +64,23 @@ Four layers under `src/` (`Api/`, `Transformer/`, `Model/`, and `Serializer/` fo
 mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
 `ChristianBrown\SmartThings\` → `src/`, `ChristianBrown\SmartThings\Tests\` → `tests/`.
 
-- **`SmartThings`** (`src/SmartThings.php`) — the facade/entry point. Constructed with a
-  `string $apiToken` and an optional `ApiHostInterface` (defaults to production), it asks
-  `DependencyInjection\ContainerFactory` to build a Symfony `ContainerBuilder` and exposes a getter
+- **`SmartThingsFactory`** (`src/SmartThingsFactory.php`) is the composition root and the only place
+  the default graph is built: `create($token)` (production), `createForHost($token, $apiHost)` and
+  `createContainer($token, $apiHost)`. It hands `DependencyInjection\ContainerFactory` the ordered list of
+  registrars, and passes the built container to the facade.
+- **`SmartThings`** (`src/SmartThings.php`) is the facade. Its constructor takes a PSR
+  `ContainerInterface` and builds nothing; it exposes a getter
   per API client (`getDeviceApi()`, `getDeviceStatusApi()`, `getLocationApi()`, `getLocationRoomApi()`,
   and 21 more — see `SmartThingsInterface`). Service ids live on `SmartThingsInterface` as `SERVICE_*`
   constants. `ContainerFactory` runs a fixed, ordered list of small registrar classes under
   `src/DependencyInjection/Registrar/`, one per resource group (core, devices, locations, automations,
   capabilities, apps, edge, organizations/services, i18n, and so on), each implementing
   `ServiceRegistrarInterface::register(ContainerBuilder $container): void`. Adding a new API group
-  means adding one registrar and one line in `ContainerFactory`, not editing a single giant method.
+  means adding one registrar and one line in `SmartThingsFactory`, not editing a single giant method.
+  The transformers and serializers shared across clients are registered by per-domain `*ShapeRegistrar`
+  classes (text to speech, locations, devices, device configuration, basic plus, capability presentation,
+  capability automation and so on), so a new group of shapes is a new registrar, not more lines in an
+  existing one.
   `SmartThingsInterface` itself is split into ten narrower role interfaces by domain (see
   `src/SmartThings*Interface.php`), which it extends — existing code that type-hints against
   `SmartThingsInterface` is unaffected.
@@ -91,8 +99,13 @@ mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
   `CoreRegistrar`), which returns the `Location` header and turns anything else into an
   `UnexpectedResponseException`.
 - **`Api/`** — HTTP clients (`DeviceApi`, `DeviceStatusApi`, `LocationApi`, `LocationRoomApi`). Each is
-  constructed with a `JsonApiRequestSenderInterface` (from `christianjbrown/api-client` — no
-  Guzzle/PSR-18 used directly), its transformer(s), and a `string $apiToken`. They send an
+  constructed with a JSON request sender from `christianjbrown/api-client` 3 (no Guzzle/PSR-18 used
+  directly), typed on the narrowest sender interface it needs: `JsonReadApiRequestSenderInterface` for a
+  client that only reads, the combined `JsonApiRequestSenderInterface` otherwise. The sender decorators
+  (`HostOverridingJsonApiRequestSender`, `PagingJsonApiRequestSender`) implement every verb of the combined
+  interface, the multipart ones included. `CoreRegistrar` gets the default senders from
+  `ApiClientFactory` and wires the alert link `ApiRequestSender` with the redactor, multipart body factory
+  and Guzzle's PSR-17 `HttpFactory`. Each client also takes its transformer(s), and a `string $apiToken`. They send an
   `Authorization: Bearer <token>` header, defensively validate the response shape, delegate to the
   transformer, and return a typed model. List endpoints validate the `items`/`components` wrapper key;
   single-object endpoints (`LocationApi::getOneById`, `LocationRoomApi`'s `getOne`) guard against an
@@ -112,6 +125,16 @@ mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
   `capabilityKey => applier` map built in its constructor: `transform()` dispatches over the map with
   `array_map` (no `foreach`), so a new capability is added by registering one map entry — the dispatch
   logic itself stays closed for modification.
+- **Rule action tree** (`Transformer/Action/`) - the recursive action, condition and operand tree is read by
+  one `*NodeTransformer` per model type, each behind its own interface and returning that type's model.
+  Nested values are built by asking the `NodeTransformerRegistryInterface` (passed into `transform()`) for
+  the transformer of the nested model interface, so there is no if-chain on the type and no constructor
+  cycle. `NodeTransformerRegistryFactory` is the one list of types; `ActionTransformer` is the entry point
+  that delegates to it. The JSON keys live on `ActionTreeKeysInterface`, which the node interfaces extend,
+  so the node classes read them as `self::KEY_*` (a constant on an unrelated interface would be inlined or
+  not depending on load order, and the differing opcodes break merged path coverage under ParaTest).
+  Writing the tree mirrors this: `Serializer/Action/` holds one `*NodeSerializer` per type, resolved
+  through `NodeSerializerRegistryInterface`, with `ActionSerializer` as the entry point.
 - **`Model/`** — plain, mutable typed DTOs with getters and fluent setters. Request-only models (e.g.
   `DeviceCommand`) live here too, alongside the response models.
 - **`Serializer/`** — turns typed request models into the array body an `Api` client posts/puts. One
@@ -119,11 +142,9 @@ mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
   with `KEY_*` constants convention as `Transformer/`. `DeviceCommandSerializer` is the first example.
 - **Write operations** (`executeCommands`, `changeCurrent`, `execute`) follow the same client pattern
   as reads: build headers, call the request sender (`post`/`put` instead of `get`), guard the response
-  shape, delegate to a transformer. A write's serializer/transformer collaborator is **appended to the
-  constructor as an optional, nullable parameter** (`?FooInterface $foo = null`) rather than a required
-  one, so existing hand-wired `new SomeApi(...)` call sites keep compiling; a private
-  `resolveFoo(): FooInterface` method returns `$this->foo ?? new Foo()` so the class still has a
-  working default, mirroring `SmartThings::__construct()`'s `$apiHost ?? new ApiHost()`.
+  shape, delegate to a transformer. Every collaborator, the write's serializer and transformer included,
+  is a required constructor argument typed on its interface; there are no `?? new` fallbacks anywhere
+  (`SourceConventionsTest` fails the build if one appears).
 - **`Exception/`** — `final` exception classes + matching interfaces: `UnexpectedResponseException`
   (extends `RuntimeException`, thrown by clients and transformers for malformed responses) and
   `MissingInputException` (extends `InvalidArgumentException`, thrown for bad caller input).

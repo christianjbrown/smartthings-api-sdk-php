@@ -6,6 +6,56 @@ All notable changes to this package are recorded here. The format follows
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-10-01
+
+### Added
+
+- `SmartThingsFactory` (behind `SmartThingsFactoryInterface`) builds the facade: `create($token)` for
+  production, `createForHost($token, $apiHost)` for another host, and `createContainer($token, $apiHost)`
+  for the container itself.
+- Each model type of the Rule action tree has its own transformer under `Transformer\Action\` (for example
+  `IfActionNodeTransformer`), looked up through `NodeTransformerRegistry` by the model interface it builds.
+  `NodeTransformerRegistryFactory` builds the registry with every type. A new action or operand type is a
+  new node transformer and one line in that factory.
+- The same for writing the tree: one serializer per model type under `Serializer\Action\` (for example
+  `IfActionNodeSerializer`), looked up through `NodeSerializerRegistry`, built by
+  `NodeSerializerRegistryFactory`.
+- `ActionTreeKeysInterface` holds the JSON keys of the action tree. `ActionTransformerInterface` and
+  `ActionSerializerInterface` extend it, so their `KEY_*` constants still work.
+- `UnregisteredTypeException` is thrown when a registry is asked for a type nothing was registered for.
+
+### Changed
+
+- **Breaking:** the `SmartThings` constructor takes a PSR `ContainerInterface` and builds nothing. Replace
+  `new SmartThings($token)` with `(new SmartThingsFactory())->create($token)`, and
+  `new SmartThings($token, $apiHost)` with `(new SmartThingsFactory())->createForHost($token, $apiHost)`.
+  See "Upgrading to 3.0" in the README.
+- **Breaking:** `ContainerFactory` takes the list of `ServiceRegistrarInterface` instances to run, in order,
+  instead of a token and an API host. `SmartThingsFactory::createContainer()` builds the default container.
+- **Breaking:** `ActionTransformer` takes a `NodeTransformerRegistryInterface`. Replace
+  `new ActionTransformer()` with
+  `new ActionTransformer((new NodeTransformerRegistryFactory())->create())`. What it returns is unchanged.
+- **Breaking:** `ActionSerializer` takes a `NodeSerializerRegistryInterface`. Replace `new ActionSerializer()`
+  with `new ActionSerializer((new NodeSerializerRegistryFactory())->create())`. Its output is unchanged.
+
+- **Breaking:** requires `christianjbrown/api-client` 3, so consumers now get that major. Build a sender
+  with `(new ApiClientFactory(new ClientOptions()))->create()` instead of `new ApiClient()`.
+- `HostOverridingJsonApiRequestSender` and `PagingJsonApiRequestSender` implement the multipart verbs
+  (`postMultipart`, `putMultipart`, `patchMultipart`) that api-client 3 adds to the JSON sender interface,
+  passing them through (with the host rewritten, for the former).
+- The clients that only read (`DeviceHealthApi`, `DeviceHistoryApi`, `DevicePreferencesApi`,
+  `DeviceStatusApi`, `DriverApi`, `OrganizationApi`, `SchemaAppOwnerApi`, `VirtualDeviceApi`, and the alert
+  link sender of `ServiceApi`) take a `JsonReadApiRequestSenderInterface`, and `DriverPackageUploader` a
+  `WriteApiRequestSenderInterface`. Anything that passed the wider interface still works.
+
+### Removed
+
+- **Breaking:** `ShapeRegistrar`, which registered about 400 shared transformers and serializers in one
+  method. Eighteen per-domain `*ShapeRegistrar` classes (for example `DeviceShapeRegistrar`,
+  `DeviceConfigurationShapeRegistrar` and `CapabilityPresentationShapeRegistrar`) register the same services,
+  and `SmartThingsFactory` runs them in its place. Code that ran `ShapeRegistrar` on its own container runs
+  those instead.
+
 ## [2.0.1] - 2026-09-30
 
 The 2.0 release. It covers every operation in the SmartThings public API and reads every response field the
@@ -84,7 +134,8 @@ First stable release.
 - An optional `ApiHostInterface` argument on `SmartThings` to point requests at another host.
 - A single exception hierarchy, so callers do not depend on the underlying HTTP client.
 
-[Unreleased]: https://github.com/christianjbrown/smartthings-api-sdk-php/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/christianjbrown/smartthings-api-sdk-php/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/christianjbrown/smartthings-api-sdk-php/compare/v2.0.1...v3.0.0
 [2.0.1]: https://github.com/christianjbrown/smartthings-api-sdk-php/compare/v1.2.0...v2.0.1
 [1.2.0]: https://github.com/christianjbrown/smartthings-api-sdk-php/compare/v1.0.0...v1.2.0
 [1.0.0]: https://github.com/christianjbrown/smartthings-api-sdk-php/releases/tag/v1.0.0

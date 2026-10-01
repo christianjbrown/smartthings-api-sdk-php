@@ -7,16 +7,17 @@ namespace ChristianBrown\SmartThings\Api;
 use ChristianBrown\ApiClient\ApiRequestSenderInterface;
 use ChristianBrown\ApiClient\RequestContext;
 use ChristianBrown\ApiClient\Transformer\JsonToArrayTransformerInterface;
+use ChristianBrown\ApiClient\WriteApiRequestSenderInterface;
 
 use function str_replace;
 
 final class DriverPackageUploader implements DriverPackageUploaderInterface
 {
     private ApiHostInterface $apiHost;
-    private ApiRequestSenderInterface $requestSender;
+    private WriteApiRequestSenderInterface $requestSender;
     private JsonToArrayTransformerInterface $responseTransformer;
 
-    public function __construct(ApiRequestSenderInterface $requestSender, JsonToArrayTransformerInterface $responseTransformer, ApiHostInterface $apiHost)
+    public function __construct(WriteApiRequestSenderInterface $requestSender, JsonToArrayTransformerInterface $responseTransformer, ApiHostInterface $apiHost)
     {
         $this->requestSender = $requestSender;
         $this->responseTransformer = $responseTransformer;

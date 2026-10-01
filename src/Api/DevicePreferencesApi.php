@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Api;
 
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
-use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
+use ChristianBrown\ApiClient\JsonReadApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceInterface;
 use ChristianBrown\SmartThings\Model\DevicePreferenceInterface;
@@ -21,10 +21,10 @@ final class DevicePreferencesApi implements DevicePreferencesApiInterface
      */
     private array $cache = [];
     private DevicePreferencesTransformerInterface $devicePreferencesTransformer;
-    private JsonApiRequestSenderInterface $requestSender;
+    private JsonReadApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DevicePreferencesTransformerInterface $devicePreferencesTransformer, TokenInterface $token)
+    public function __construct(JsonReadApiRequestSenderInterface $requestSender, DevicePreferencesTransformerInterface $devicePreferencesTransformer, TokenInterface $token)
     {
         $this->requestSender = $requestSender;
         $this->devicePreferencesTransformer = $devicePreferencesTransformer;
