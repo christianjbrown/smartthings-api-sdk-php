@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Api;
 
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
-use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
+use ChristianBrown\ApiClient\JsonReadApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\DeviceHealthInterface;
 use ChristianBrown\SmartThings\Model\DeviceInterface;
@@ -21,10 +21,10 @@ final class DeviceHealthApi implements DeviceHealthApiInterface
      */
     private array $cache = [];
     private DeviceHealthTransformerInterface $deviceHealthTransformer;
-    private JsonApiRequestSenderInterface $requestSender;
+    private JsonReadApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceHealthTransformerInterface $deviceHealthTransformer, TokenInterface $token)
+    public function __construct(JsonReadApiRequestSenderInterface $requestSender, DeviceHealthTransformerInterface $deviceHealthTransformer, TokenInterface $token)
     {
         $this->requestSender = $requestSender;
         $this->deviceHealthTransformer = $deviceHealthTransformer;

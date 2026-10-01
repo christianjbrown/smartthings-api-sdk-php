@@ -36,6 +36,16 @@ All notable changes to this package are recorded here. The format follows
 - **Breaking:** `ActionSerializer` takes a `NodeSerializerRegistryInterface`. Replace `new ActionSerializer()`
   with `new ActionSerializer((new NodeSerializerRegistryFactory())->create())`. Its output is unchanged.
 
+- **Breaking:** requires `christianjbrown/api-client` 3, so consumers now get that major. Build a sender
+  with `(new ApiClientFactory(new ClientOptions()))->create()` instead of `new ApiClient()`.
+- `HostOverridingJsonApiRequestSender` and `PagingJsonApiRequestSender` implement the multipart verbs
+  (`postMultipart`, `putMultipart`, `patchMultipart`) that api-client 3 adds to the JSON sender interface,
+  passing them through (with the host rewritten, for the former).
+- The clients that only read (`DeviceHealthApi`, `DeviceHistoryApi`, `DevicePreferencesApi`,
+  `DeviceStatusApi`, `DriverApi`, `OrganizationApi`, `SchemaAppOwnerApi`, `VirtualDeviceApi`, and the alert
+  link sender of `ServiceApi`) take a `JsonReadApiRequestSenderInterface`, and `DriverPackageUploader` a
+  `WriteApiRequestSenderInterface`. Anything that passed the wider interface still works.
+
 ### Removed
 
 - **Breaking:** `ShapeRegistrar`, which registered about 400 shared transformers and serializers in one

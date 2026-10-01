@@ -22,6 +22,12 @@ final class CoreRegistrarTest extends TestCase
         (new CoreRegistrar($apiHost))->register($container);
 
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_API_CLIENT));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_API_CLIENT_FACTORY));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_API_CLIENT_OPTIONS));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_GUZZLE_EXCEPTION_REDACTOR));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_HTTP_FACTORY));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_MULTIPART_BODY_FACTORY));
+        self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_REQUEST_REDACTOR));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_RAW_JSON_API_REQUEST_SENDER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_JSON_API_REQUEST_SENDER));
         self::assertTrue($container->hasDefinition(SmartThingsInterface::SERVICE_PAGING_JSON_API_REQUEST_SENDER));

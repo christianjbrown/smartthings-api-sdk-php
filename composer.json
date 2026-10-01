@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": "^8.5",
-        "christianjbrown/api-client": "^1.0",
+        "christianjbrown/api-client": "^3.0",
         "guzzlehttp/guzzle": "^7.15",
         "psr/container": "^2.0",
         "symfony/dependency-injection": "^8.0"

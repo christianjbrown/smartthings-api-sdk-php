@@ -6,6 +6,7 @@ namespace ChristianBrown\SmartThings\Api;
 
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
+use ChristianBrown\ApiClient\JsonReadApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\ServiceCapabilityDataInterface;
 use ChristianBrown\SmartThings\Model\ServiceLocationInfoInterface;
@@ -24,7 +25,7 @@ use function sprintf;
 
 final class ServiceApi implements ServiceApiInterface
 {
-    private JsonApiRequestSenderInterface $alertLinkRequestSender;
+    private JsonReadApiRequestSenderInterface $alertLinkRequestSender;
 
     /**
      * @var array<string, ServiceCapabilityDataInterface>
@@ -49,7 +50,7 @@ final class ServiceApi implements ServiceApiInterface
     private TokenInterface $token;
     private RequestUrlBuilderInterface $urlBuilder;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, ServiceLocationInfoTransformerInterface $serviceLocationInfoTransformer, ServiceCapabilityNamesTransformerInterface $serviceCapabilityNamesTransformer, ServiceCapabilityDataTransformerInterface $serviceCapabilityDataTransformer, TokenInterface $token, ServiceSubscriptionRequestSerializerInterface $serviceSubscriptionRequestSerializer, ServiceSubscriptionReceiptTransformerInterface $serviceSubscriptionReceiptTransformer, RequestUrlBuilderInterface $urlBuilder, JsonApiRequestSenderInterface $alertLinkRequestSender)
+    public function __construct(JsonApiRequestSenderInterface $requestSender, ServiceLocationInfoTransformerInterface $serviceLocationInfoTransformer, ServiceCapabilityNamesTransformerInterface $serviceCapabilityNamesTransformer, ServiceCapabilityDataTransformerInterface $serviceCapabilityDataTransformer, TokenInterface $token, ServiceSubscriptionRequestSerializerInterface $serviceSubscriptionRequestSerializer, ServiceSubscriptionReceiptTransformerInterface $serviceSubscriptionReceiptTransformer, RequestUrlBuilderInterface $urlBuilder, JsonReadApiRequestSenderInterface $alertLinkRequestSender)
     {
         $this->requestSender = $requestSender;
         $this->serviceLocationInfoTransformer = $serviceLocationInfoTransformer;

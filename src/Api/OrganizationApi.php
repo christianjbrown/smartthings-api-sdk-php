@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Api;
 
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
-use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
+use ChristianBrown\ApiClient\JsonReadApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\OrganizationInterface;
 use ChristianBrown\SmartThings\Transformer\OrganizationsTransformerInterface;
@@ -28,10 +28,10 @@ final class OrganizationApi implements OrganizationApiInterface
     private ?array $listCache = null;
     private OrganizationsTransformerInterface $organizationsTransformer;
     private OrganizationTransformerInterface $organizationTransformer;
-    private JsonApiRequestSenderInterface $requestSender;
+    private JsonReadApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, OrganizationTransformerInterface $organizationTransformer, OrganizationsTransformerInterface $organizationsTransformer, TokenInterface $token)
+    public function __construct(JsonReadApiRequestSenderInterface $requestSender, OrganizationTransformerInterface $organizationTransformer, OrganizationsTransformerInterface $organizationsTransformer, TokenInterface $token)
     {
         $this->requestSender = $requestSender;
         $this->organizationTransformer = $organizationTransformer;

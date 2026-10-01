@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Api;
 
 use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
+use ChristianBrown\ApiClient\Multipart\MultipartPartInterface;
 
 use function array_intersect_key;
 use function array_merge;
@@ -75,6 +76,19 @@ final class PagingJsonApiRequestSender implements PagingJsonApiRequestSenderInte
     }
 
     /**
+     * @param string                             $requestUrl          The request URL
+     * @param array<string, string>              $requestQueryStrings
+     * @param array<string, string>              $requestHeaders
+     * @param array<int, MultipartPartInterface> $requestBodyParts
+     *
+     * @return array<array-key, mixed>
+     */
+    public function patchMultipart(string $requestUrl, array $requestQueryStrings = [], array $requestHeaders = [], array $requestBodyParts = []): array
+    {
+        return $this->requestSender->patchMultipart($requestUrl, $requestQueryStrings, $requestHeaders, $requestBodyParts);
+    }
+
+    /**
      * @param string                       $requestUrl          The request URL
      * @param array<string, string>        $requestQueryStrings
      * @param array<string, string>        $requestHeaders
@@ -101,6 +115,19 @@ final class PagingJsonApiRequestSender implements PagingJsonApiRequestSenderInte
     }
 
     /**
+     * @param string                             $requestUrl          The request URL
+     * @param array<string, string>              $requestQueryStrings
+     * @param array<string, string>              $requestHeaders
+     * @param array<int, MultipartPartInterface> $requestBodyParts
+     *
+     * @return array<array-key, mixed>
+     */
+    public function postMultipart(string $requestUrl, array $requestQueryStrings = [], array $requestHeaders = [], array $requestBodyParts = []): array
+    {
+        return $this->requestSender->postMultipart($requestUrl, $requestQueryStrings, $requestHeaders, $requestBodyParts);
+    }
+
+    /**
      * @param string                       $requestUrl          The request URL
      * @param array<string, string>        $requestQueryStrings
      * @param array<string, string>        $requestHeaders
@@ -124,6 +151,19 @@ final class PagingJsonApiRequestSender implements PagingJsonApiRequestSenderInte
     public function putForm(string $requestUrl, array $requestQueryStrings = [], array $requestHeaders = [], array $requestBodyFormData = []): array
     {
         return $this->requestSender->putForm($requestUrl, $requestQueryStrings, $requestHeaders, $requestBodyFormData);
+    }
+
+    /**
+     * @param string                             $requestUrl          The request URL
+     * @param array<string, string>              $requestQueryStrings
+     * @param array<string, string>              $requestHeaders
+     * @param array<int, MultipartPartInterface> $requestBodyParts
+     *
+     * @return array<array-key, mixed>
+     */
+    public function putMultipart(string $requestUrl, array $requestQueryStrings = [], array $requestHeaders = [], array $requestBodyParts = []): array
+    {
+        return $this->requestSender->putMultipart($requestUrl, $requestQueryStrings, $requestHeaders, $requestBodyParts);
     }
 
     /**

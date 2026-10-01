@@ -356,7 +356,8 @@ that write, the request serializers and response transformers. The registrars un
 client:
 
 ```php
-use ChristianBrown\ApiClient\ApiClient;
+use ChristianBrown\ApiClient\ApiClientFactory;
+use ChristianBrown\ApiClient\ClientOptions;
 use ChristianBrown\SmartThings\Api\SceneApi;
 use ChristianBrown\SmartThings\Api\Token;
 use ChristianBrown\SmartThings\Transformer\SceneExecutionResultTransformer;
@@ -366,7 +367,7 @@ use ChristianBrown\SmartThings\Transformer\SceneTransformer;
 $sceneTransformer = new SceneTransformer();
 
 $sceneApi = new SceneApi(
-    (new ApiClient())->getJsonApiRequestSender(),
+    (new ApiClientFactory(new ClientOptions()))->create()->getJsonApiRequestSender(),
     $sceneTransformer,
     new ScenesTransformer($sceneTransformer),
     new Token($apiToken),
@@ -404,6 +405,11 @@ $serializer = new ActionSerializer();
 $transformer = new ActionTransformer((new NodeTransformerRegistryFactory())->create());
 $serializer = new ActionSerializer((new NodeSerializerRegistryFactory())->create());
 ```
+
+3.0 also requires `christianjbrown/api-client` 3. If you build clients by hand, get the sender from
+`(new ApiClientFactory(new ClientOptions()))->create()` instead of `new ApiClient()`. The read-only clients
+(device health, history, preferences and status, drivers, organizations, schema app owners and virtual
+devices) accept a `JsonReadApiRequestSenderInterface`, so a double for them only needs `get` and `delete`.
 
 `ContainerFactory` now takes the list of registrars to run instead of a token and a host; the factory's
 `createContainer($token, $apiHost)` builds the same container as before.

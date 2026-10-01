@@ -99,8 +99,13 @@ mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
   `CoreRegistrar`), which returns the `Location` header and turns anything else into an
   `UnexpectedResponseException`.
 - **`Api/`** — HTTP clients (`DeviceApi`, `DeviceStatusApi`, `LocationApi`, `LocationRoomApi`). Each is
-  constructed with a `JsonApiRequestSenderInterface` (from `christianjbrown/api-client` — no
-  Guzzle/PSR-18 used directly), its transformer(s), and a `string $apiToken`. They send an
+  constructed with a JSON request sender from `christianjbrown/api-client` 3 (no Guzzle/PSR-18 used
+  directly), typed on the narrowest sender interface it needs: `JsonReadApiRequestSenderInterface` for a
+  client that only reads, the combined `JsonApiRequestSenderInterface` otherwise. The sender decorators
+  (`HostOverridingJsonApiRequestSender`, `PagingJsonApiRequestSender`) implement every verb of the combined
+  interface, the multipart ones included. `CoreRegistrar` gets the default senders from
+  `ApiClientFactory` and wires the alert link `ApiRequestSender` with the redactor, multipart body factory
+  and Guzzle's PSR-17 `HttpFactory`. Each client also takes its transformer(s), and a `string $apiToken`. They send an
   `Authorization: Bearer <token>` header, defensively validate the response shape, delegate to the
   transformer, and return a typed model. List endpoints validate the `items`/`components` wrapper key;
   single-object endpoints (`LocationApi::getOneById`, `LocationRoomApi`'s `getOne`) guard against an

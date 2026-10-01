@@ -6,6 +6,10 @@ namespace ChristianBrown\SmartThings\Tests\Api;
 
 use ChristianBrown\ApiClient\ApiRequestSender;
 use ChristianBrown\ApiClient\JsonApiRequestSender;
+use ChristianBrown\ApiClient\Multipart\MultipartBodyFactory;
+use ChristianBrown\ApiClient\Redactor\GuzzleExceptionRedactor;
+use ChristianBrown\ApiClient\Redactor\RequestRedactor;
+use ChristianBrown\ApiClient\Redactor\RequestRedactorInterface;
 use ChristianBrown\ApiClient\Transformer\ArrayToJsonTransformer;
 use ChristianBrown\ApiClient\Transformer\JsonToArrayTransformer;
 use ChristianBrown\SmartThings\Api\RedirectLocationResponseMapper;
@@ -13,6 +17,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -32,7 +37,8 @@ final class RedirectLocationResponseMapperTest extends TestCase
         $stack = HandlerStack::create(new MockHandler([new Response(302, ['Location' => 'https://weather.example/alert'])]));
         $stack->push(Middleware::mapResponse(new RedirectLocationResponseMapper()));
         $client = new Client(['handler' => $stack, 'allow_redirects' => false]);
-        $sender = new JsonApiRequestSender(new ApiRequestSender($client), new JsonToArrayTransformer(), new ArrayToJsonTransformer());
+        $httpFactory = new HttpFactory();
+        $sender = new JsonApiRequestSender(new ApiRequestSender($client, new GuzzleExceptionRedactor(new RequestRedactor(RequestRedactorInterface::SENSITIVE_HEADERS, $httpFactory)), new MultipartBodyFactory(), $httpFactory, $httpFactory), new JsonToArrayTransformer(), new ArrayToJsonTransformer());
 
         self::assertSame(['location' => 'https://weather.example/alert'], $sender->get('https://api.smartthings.com/v1/alert'));
     }

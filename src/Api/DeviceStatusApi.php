@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ChristianBrown\SmartThings\Api;
 
 use ChristianBrown\ApiClient\Exception\Request\RequestExceptionInterface;
-use ChristianBrown\ApiClient\JsonApiRequestSenderInterface;
+use ChristianBrown\ApiClient\JsonReadApiRequestSenderInterface;
 use ChristianBrown\SmartThings\Exception\UnexpectedResponseException;
 use ChristianBrown\SmartThings\Model\CapabilityStatusInterface;
 use ChristianBrown\SmartThings\Model\ComponentStatusInterface;
@@ -56,10 +56,10 @@ final class DeviceStatusApi implements DeviceStatusApiInterface
      * @var array<string, DeviceStatusReportInterface>
      */
     private array $reportCache = [];
-    private JsonApiRequestSenderInterface $requestSender;
+    private JsonReadApiRequestSenderInterface $requestSender;
     private TokenInterface $token;
 
-    public function __construct(JsonApiRequestSenderInterface $requestSender, DeviceStatusTransformerInterface $deviceStatusTransformer, TokenInterface $token, DeviceStatusReportTransformerInterface $deviceStatusReportTransformer, ComponentStatusTransformerInterface $componentStatusTransformer, CapabilityStatusTransformerInterface $capabilityStatusTransformer)
+    public function __construct(JsonReadApiRequestSenderInterface $requestSender, DeviceStatusTransformerInterface $deviceStatusTransformer, TokenInterface $token, DeviceStatusReportTransformerInterface $deviceStatusReportTransformer, ComponentStatusTransformerInterface $componentStatusTransformer, CapabilityStatusTransformerInterface $capabilityStatusTransformer)
     {
         $this->requestSender = $requestSender;
         $this->deviceStatusTransformer = $deviceStatusTransformer;

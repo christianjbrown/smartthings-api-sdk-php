@@ -27,6 +27,8 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_ALTERNATIVE_ITEM_SERIALIZER = 'smartthings.serializer.alternative_item_serializer';
     public const string SERVICE_ALTERNATIVE_ITEM_TRANSFORMER = 'smartthings.transformer.alternative_item_transformer';
     public const string SERVICE_API_CLIENT = 'smartthings.api_client';
+    public const string SERVICE_API_CLIENT_FACTORY = 'smartthings.api_client_factory';
+    public const string SERVICE_API_CLIENT_OPTIONS = 'smartthings.api_client_options';
     public const string SERVICE_API_ERROR_TRANSFORMER = 'smartthings.transformer.api_error_transformer';
     public const string SERVICE_APP_API = 'smartthings.api.app_api';
     public const string SERVICE_APP_DETAILS_TRANSFORMER = 'smartthings.transformer.app_details_transformer';
@@ -297,6 +299,8 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_GROUP_DEVICE_DETAILS_TRANSFORMER = 'smartthings.transformer.group_device_details_transformer';
     public const string SERVICE_GROUP_VISIBLE_CONDITIONS_SERIALIZER = 'smartthings.serializer.group_visible_conditions_serializer';
     public const string SERVICE_GROUP_VISIBLE_CONDITIONS_TRANSFORMER = 'smartthings.transformer.group_visible_conditions_transformer';
+    public const string SERVICE_GUZZLE_EXCEPTION_REDACTOR = 'smartthings.guzzle_exception_redactor';
+    public const string SERVICE_HTTP_FACTORY = 'smartthings.http_factory';
     public const string SERVICE_HUB_API = 'smartthings.api.hub_api';
     public const string SERVICE_HUB_CHARACTERISTICS_TRANSFORMER = 'smartthings.transformer.hub_characteristics_transformer';
     public const string SERVICE_HUB_DEVICE_DETAILS_HUB_DATA_HUB2HUB_SUPPORT_MATRIX_CAPABILITIES_ITEM_TRANSFORMER = 'smartthings.transformer.hub_device_details_hub_data_hub2hub_support_matrix_capabilities_item_transformer';
@@ -381,6 +385,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_MODE_TRANSFORMER = 'smartthings.transformer.mode_transformer';
     public const string SERVICE_MODES_TRANSFORMER = 'smartthings.transformer.modes_transformer';
     public const string SERVICE_MQTT_DEVICE_DETAILS_TRANSFORMER = 'smartthings.transformer.mqtt_device_details_transformer';
+    public const string SERVICE_MULTIPART_BODY_FACTORY = 'smartthings.multipart_body_factory';
     public const string SERVICE_MULTI_ARG_COMMAND_ARGUMENTS_ITEM_SERIALIZER = 'smartthings.serializer.multi_arg_command_arguments_item_serializer';
     public const string SERVICE_MULTI_ARG_COMMAND_ARGUMENTS_ITEM_TRANSFORMER = 'smartthings.transformer.multi_arg_command_arguments_item_transformer';
     public const string SERVICE_MULTI_ARG_COMMAND_SERIALIZER = 'smartthings.serializer.multi_arg_command_serializer';
@@ -447,6 +452,7 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_PUSH_BUTTON_WITH_AVAILABLE_SIZE_TRANSFORMER = 'smartthings.transformer.push_button_with_available_size_transformer';
     public const string SERVICE_RAW_API_REQUEST_SENDER = 'smartthings.raw_api_request_sender';
     public const string SERVICE_RAW_JSON_API_REQUEST_SENDER = 'smartthings.raw_json_api_request_sender';
+    public const string SERVICE_REQUEST_REDACTOR = 'smartthings.request_redactor';
     public const string SERVICE_REQUEST_URL_BUILDER = 'smartthings.api.request_url_builder';
     public const string SERVICE_RESTRICTION_SERIALIZER = 'smartthings.serializer.restriction_serializer';
     public const string SERVICE_RESTRICTION_TRANSFORMER = 'smartthings.transformer.restriction_transformer';
