@@ -44,6 +44,47 @@ use ChristianBrown\SmartThings\Model\TimeOperand;
 use ChristianBrown\SmartThings\Model\ToggleAction;
 use ChristianBrown\SmartThings\Model\WasCondition;
 use ChristianBrown\SmartThings\Serializer\ActionSerializer;
+use ChristianBrown\SmartThings\Transformer\Action\ActionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\ActionSequenceNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\ArrayOperandNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\BetweenConditionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\ChangesConditionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\CommandActionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\CommandSequenceNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\ConditionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\DateOperandNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\DateTimeOperandNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\DeviceOperandNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\EqualsConditionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\EveryActionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\GreaterThanConditionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\GreaterThanOrEqualsConditionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\IfActionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\IfActionSequenceNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\IntervalNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\LessThanConditionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\LessThanOrEqualsConditionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\LimitActionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\LocationActionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\LocationOperandNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\NodeTransformerRegistry;
+use ChristianBrown\SmartThings\Transformer\Action\NodeTransformerRegistryFactory;
+use ChristianBrown\SmartThings\Transformer\Action\OperandNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\RemainsConditionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\RuleDeviceCommandNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\SceneActionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\SceneArgumentNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\SceneCapabilityNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\SceneCommandNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\SceneComponentNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\SceneDeviceGroupRequestNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\SceneDeviceRequestNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\SceneModeRequestNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\SceneSleepRequestNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\SleepActionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\TimeOperandNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\ToggleActionNodeTransformer;
+use ChristianBrown\SmartThings\Transformer\Action\WasConditionNodeTransformer;
 use ChristianBrown\SmartThings\Transformer\ActionTransformer;
 use ChristianBrown\SmartThings\Transformer\ActionTransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -90,6 +131,47 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ToggleAction::class)]
 #[CoversClass(WasCondition::class)]
 #[CoversClass(ActionTransformer::class)]
+#[CoversClass(NodeTransformerRegistry::class)]
+#[CoversClass(NodeTransformerRegistryFactory::class)]
+#[CoversClass(ActionNodeTransformer::class)]
+#[CoversClass(ActionSequenceNodeTransformer::class)]
+#[CoversClass(ArrayOperandNodeTransformer::class)]
+#[CoversClass(BetweenConditionNodeTransformer::class)]
+#[CoversClass(ChangesConditionNodeTransformer::class)]
+#[CoversClass(CommandActionNodeTransformer::class)]
+#[CoversClass(CommandSequenceNodeTransformer::class)]
+#[CoversClass(ConditionNodeTransformer::class)]
+#[CoversClass(DateOperandNodeTransformer::class)]
+#[CoversClass(DateTimeOperandNodeTransformer::class)]
+#[CoversClass(DeviceOperandNodeTransformer::class)]
+#[CoversClass(EqualsConditionNodeTransformer::class)]
+#[CoversClass(EveryActionNodeTransformer::class)]
+#[CoversClass(GreaterThanConditionNodeTransformer::class)]
+#[CoversClass(GreaterThanOrEqualsConditionNodeTransformer::class)]
+#[CoversClass(IfActionNodeTransformer::class)]
+#[CoversClass(IfActionSequenceNodeTransformer::class)]
+#[CoversClass(IntervalNodeTransformer::class)]
+#[CoversClass(LessThanConditionNodeTransformer::class)]
+#[CoversClass(LessThanOrEqualsConditionNodeTransformer::class)]
+#[CoversClass(LimitActionNodeTransformer::class)]
+#[CoversClass(LocationActionNodeTransformer::class)]
+#[CoversClass(LocationOperandNodeTransformer::class)]
+#[CoversClass(OperandNodeTransformer::class)]
+#[CoversClass(RemainsConditionNodeTransformer::class)]
+#[CoversClass(RuleDeviceCommandNodeTransformer::class)]
+#[CoversClass(SceneActionNodeTransformer::class)]
+#[CoversClass(SceneArgumentNodeTransformer::class)]
+#[CoversClass(SceneCapabilityNodeTransformer::class)]
+#[CoversClass(SceneCommandNodeTransformer::class)]
+#[CoversClass(SceneComponentNodeTransformer::class)]
+#[CoversClass(SceneDeviceGroupRequestNodeTransformer::class)]
+#[CoversClass(SceneDeviceRequestNodeTransformer::class)]
+#[CoversClass(SceneModeRequestNodeTransformer::class)]
+#[CoversClass(SceneSleepRequestNodeTransformer::class)]
+#[CoversClass(SleepActionNodeTransformer::class)]
+#[CoversClass(TimeOperandNodeTransformer::class)]
+#[CoversClass(ToggleActionNodeTransformer::class)]
+#[CoversClass(WasConditionNodeTransformer::class)]
 #[CoversClass(ActionSerializer::class)]
 final class ActionTransformerPart3Test extends TestCase
 {
@@ -102,7 +184,7 @@ final class ActionTransformerPart3Test extends TestCase
     #[DataProvider('provideTransformCases')]
     public function testTransform(array $data, array $expected): void
     {
-        $transformer = new ActionTransformer();
+        $transformer = new ActionTransformer((new NodeTransformerRegistryFactory())->create());
 
         $actual = $transformer->transform($data);
 

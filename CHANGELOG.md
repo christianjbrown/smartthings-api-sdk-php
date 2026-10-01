@@ -11,6 +11,13 @@ All notable changes to this package are recorded here. The format follows
 - `SmartThingsFactory` (behind `SmartThingsFactoryInterface`) builds the facade: `create($token)` for
   production, `createForHost($token, $apiHost)` for another host, and `createContainer($token, $apiHost)`
   for the container itself.
+- Each model type of the Rule action tree has its own transformer under `Transformer\Action\` (for example
+  `IfActionNodeTransformer`), looked up through `NodeTransformerRegistry` by the model interface it builds.
+  `NodeTransformerRegistryFactory` builds the registry with every type. A new action or operand type is a
+  new node transformer and one line in that factory.
+- `ActionTreeKeysInterface` holds the JSON keys of the action tree. `ActionTransformerInterface` extends it,
+  so `ActionTransformerInterface::KEY_*` still works.
+- `UnregisteredTypeException` is thrown when a registry is asked for a type nothing was registered for.
 
 ### Changed
 
@@ -20,6 +27,9 @@ All notable changes to this package are recorded here. The format follows
   See "Upgrading to 3.0" in the README.
 - **Breaking:** `ContainerFactory` takes the list of `ServiceRegistrarInterface` instances to run, in order,
   instead of a token and an API host. `SmartThingsFactory::createContainer()` builds the default container.
+- **Breaking:** `ActionTransformer` takes a `NodeTransformerRegistryInterface`. Replace
+  `new ActionTransformer()` with
+  `new ActionTransformer((new NodeTransformerRegistryFactory())->create())`. What it returns is unchanged.
 
 ### Removed
 

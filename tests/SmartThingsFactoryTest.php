@@ -256,10 +256,13 @@ use ChristianBrown\SmartThings\Serializer\VisibleConditionSerializer;
 use ChristianBrown\SmartThings\SmartThings;
 use ChristianBrown\SmartThings\SmartThingsFactory;
 use ChristianBrown\SmartThings\SmartThingsInterface;
+use ChristianBrown\SmartThings\Transformer\Action\NodeTransformerRegistry;
+use ChristianBrown\SmartThings\Transformer\Action\NodeTransformerRegistryFactory;
 use ChristianBrown\SmartThings\Transformer\ActionExecutionResultTransformer;
 use ChristianBrown\SmartThings\Transformer\ActionItemTransformer;
 use ChristianBrown\SmartThings\Transformer\ActionListItemTransformer;
 use ChristianBrown\SmartThings\Transformer\ActionsArrayItemTransformer;
+use ChristianBrown\SmartThings\Transformer\ActionTransformer;
 use ChristianBrown\SmartThings\Transformer\AlternativeItemTransformer;
 use ChristianBrown\SmartThings\Transformer\ApiErrorTransformer;
 use ChristianBrown\SmartThings\Transformer\AppDetailsTransformer;
@@ -641,6 +644,9 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SmartThingsFactory::class)]
+#[UsesClass(NodeTransformerRegistry::class)]
+#[UsesClass(NodeTransformerRegistryFactory::class)]
+#[UsesClass(ActionTransformer::class)]
 #[UsesClass(SmartThings::class)]
 #[UsesClass(ContainerFactory::class)]
 #[UsesClass(ApiClientRegistrar::class)]

@@ -10,6 +10,8 @@ interface SmartThingsInterface extends SmartThingsAppInterface, SmartThingsAutom
     public const string SERVICE_ACTION_ITEM_SERIALIZER = 'smartthings.serializer.action_item_serializer';
     public const string SERVICE_ACTION_ITEM_TRANSFORMER = 'smartthings.transformer.action_item_transformer';
     public const string SERVICE_ACTION_LIST_ITEM_TRANSFORMER = 'smartthings.transformer.action_list_item_transformer';
+    public const string SERVICE_ACTION_NODE_TRANSFORMER_REGISTRY = 'smartthings.transformer.action_node_transformer_registry';
+    public const string SERVICE_ACTION_NODE_TRANSFORMER_REGISTRY_FACTORY = 'smartthings.transformer.action_node_transformer_registry_factory';
     public const string SERVICE_ACTION_SERIALIZER = 'smartthings.serializer.action_serializer';
     public const string SERVICE_ACTION_TRANSFORMER = 'smartthings.transformer.action_transformer';
     public const string SERVICE_ACTIONS_ARRAY_ITEM_TRANSFORMER = 'smartthings.transformer.actions_array_item_transformer';

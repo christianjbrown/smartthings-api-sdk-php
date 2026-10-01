@@ -120,6 +120,14 @@ mirrored 1:1 under `tests/`, plus the top-level `SmartThings` facade. PSR-4:
   `capabilityKey => applier` map built in its constructor: `transform()` dispatches over the map with
   `array_map` (no `foreach`), so a new capability is added by registering one map entry — the dispatch
   logic itself stays closed for modification.
+- **Rule action tree** (`Transformer/Action/`) - the recursive action, condition and operand tree is read by
+  one `*NodeTransformer` per model type, each behind its own interface and returning that type's model.
+  Nested values are built by asking the `NodeTransformerRegistryInterface` (passed into `transform()`) for
+  the transformer of the nested model interface, so there is no if-chain on the type and no constructor
+  cycle. `NodeTransformerRegistryFactory` is the one list of types; `ActionTransformer` is the entry point
+  that delegates to it. The JSON keys live on `ActionTreeKeysInterface`, which the node interfaces extend,
+  so the node classes read them as `self::KEY_*` (a constant on an unrelated interface would be inlined or
+  not depending on load order, and the differing opcodes break merged path coverage under ParaTest).
 - **`Model/`** — plain, mutable typed DTOs with getters and fluent setters. Request-only models (e.g.
   `DeviceCommand`) live here too, alongside the response models.
 - **`Serializer/`** — turns typed request models into the array body an `Api` client posts/puts. One
